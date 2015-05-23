@@ -522,7 +522,7 @@ function! s:stuffs.get_region(textobj) abort "{{{
           let coord.inner_tail = inner_tail
 
           if self.is_valid_candidate(a:textobj)
-            let self.visualmode = self.a_or_i == 'a' ? motionwise_a : motionwise_i
+            let self.visualmode = self.a_or_i ==# 'a' ? motionwise_a : motionwise_i
             let a:textobj.candidates += [deepcopy(self)]
           endif
         else
