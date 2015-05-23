@@ -1,0 +1,867 @@
+*textobj-sandwich.jax*	日本語ヘルプ	Last change:23-May-2015.
+
+“挟まれた”テキストを検索し選択するためのテキストオブジェクトです。
+
+書いた人   : machakann <mckn@outlook.jp>
+ライセンス : NYSL license
+          日本語 <http://www.kmonos.net/nysl/>
+          English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>
+
+必須要件:	Vim 7.4 かそれ以降のバージョン
+		|+reltime| 機能 (任意)
+		|+float| 機能 (任意)
+
+==============================================================================
+CONTENTS				*textobj-sandwich-contents*
+
+TL;DR
+INTRODUCTION			|textobj-sandwich-introduction|
+KEYMAPPINGS			|textobj-sandwich-keymappings|
+CONFIGURATION			|textobj-sandwich-configuration|
+  REQUISITE
+    buns
+    external
+  FILTERS
+    filetype
+    kind
+    mode
+    operator
+  LOCAL OPTIONS
+    nesting
+    expand_range
+    regex
+    skip_regex
+    quoteescape
+    eval
+    synchro
+    noremap
+    syntax
+    match_syntax
+    skip_breaking
+  GLOBAL OPTIONS
+MISCELLANEOUS			|textobj-sandwich-miscellaneous|
+  dib で欲しいのははそれじゃない
+  頻繁に「 Timed out 」となる
+  誤操作でカーソルが飛んでいった！
+
+==============================================================================
+TL;DR
+	こちらをご覧ください。 |sandwich-quick-start|.
+
+
+
+==============================================================================
+INTRODUCTION				*textobj-sandwich-introduction*
+
+*textobj-sandwich* は (foo) や "bar" のような括弧などに挟まれたテキストを検索
+し選択するためのテキストオブジェクトです。これは次の四つの独立したテキストオブ
+ジェクトからなります。
+|<Plug>(textobj-sandwich-auto-i)|, |<Plug>(textobj-sandwich-auto-a)|,
+|<Plug>(textobj-sandwich-query-i)|, |<Plug>(textobj-sandwich-query-a)|
+
+|<Plug>(textobj-sandwich-auto-i)| および |<Plug>(textobj-sandwich-auto-a)| は
+対象テキストを自動的に検索します。対象テキストはレシピ recipe と呼ばれる括弧の
+セットが事前に用意されており、これに依って検索されます。これについては
+|textobj-sandwich-configuration| に詳しく書かれています。
+|<Plug>(textobj-sandwich-auto-i)| は囲みの内側のテキストを選択します。
+|<Plug>(textobj-sandwich-auto-a)| は囲みを含めてテキストを選択します。これらは
+デフォルトでは ib 及び ab にマップされています。
+
+|<Plug>(textobj-sandwich-query-i)| 及び |<Plug>(textobj-sandwich-query-a)| は
+対象テキストをユーザーの入力に応じて検索します。ユーザーの入力にマッチするレシ
+ピが見つかればそのレシピに応じて、あるいはマッチするレシピがなければ入力された
+一文字に挟まれた範囲を検索します。 |<Plug>(textobj-sandwich-query-i)| は囲みの
+内側のテキストを選択します。 |<Plug>(textobj-sandwich-query-a)| は囲みを含めた
+テキストを選択します。これらはデフォルトでは is 及び as にマップされています。
+
+------------------------------------------------------------------------------
+ビジュアルモードではこれらのテキストオブジェクトは選択領域を拡張するように動き
+ます。これは Vim 組み込みのテキストオブジェクト |iw| の |v|iw|iw|iw|... とした
+時の動作に似ています。例えば次のようなテキストの foo の上にカーソルがあると仮
+定しましょう。
+>
+	{baz[bar(foo)bar]baz}
+<
+vib と入力します
+>
+	         <->          : selected region
+	{baz[bar(foo)bar]baz}
+<
+さらに vib
+>
+	     <--------->      : selected region
+	{baz[bar(foo)bar]baz}
+<
+さらに vib
+>
+	 <----------------->  : selected region
+	{baz[bar(foo)bar]baz}
+<
+とこのように選択領域を拡張します。
+
+------------------------------------------------------------------------------
+矩形ビジュアルモードではカーソル行内で対象テキストを検索し、選択の逆端はこれに
+従います。例えば次の5行5桁のテキストがあるとします。
+>
+	(foo)
+	(bar)
+	(baz)
+<
+カーソルが第一行目にある時 <C-v>2jibd と押下すると
+>
+	()
+	()
+	()
+<
+こうなります。次にこのような場合を考えてみましょう。
+>
+	foooo
+	baaar
+	(baz)
+<
+カーソルが第一行目にある時 <C-v>2jibd と押下すると
+>
+	fo
+	br
+	()
+<
+このようにカーソルのあった第三行目に合わせて動作します。
+
+
+
+==============================================================================
+KEYMAPPINGS				*textobj-sandwich-keymappings*
+
+このプラグインは下記のキーマッピングを定義します。これらはオペレータ待機モード
+とビジュアルモードの両方で使用可能です。
+
+キーマッピング				デフォルト
+-----------------------------------------------------------
+<Plug>(textobj-sandwich-auto-i)		ib
+<Plug>(textobj-sandwich-auto-a)		ab
+
+<Plug>(textobj-sandwich-query-i)	is
+<Plug>(textobj-sandwich-query-a)	as
+-----------------------------------------------------------
+
+これらのデフォルト設定が必要なければ vimrc で
+g:textobj_sandwich_no_default_key_mappings を定義してください。
+>
+	let g:textobj_sandwich_no_default_key_mappings = 1
+<
+これでデフォルトキーマッピングは定義されません。あとはお好きなようにマップしな
+おしてください。
+>
+	omap ia <Plug>(textobj-sandwich-auto-i)
+	xmap ia <Plug>(textobj-sandwich-auto-i)
+	omap aa <Plug>(textobj-sandwich-auto-a)
+	xmap aa <Plug>(textobj-sandwich-auto-a)
+<
+
+------------------------------------------------------------------------------
+キーマッピング~
+
+<Plug>(textobj-sandwich-auto-i)		*<Plug>(textobj-sandwich-auto-i)*
+	括弧などに挟まれた文字列を自動的に検索するテキストオブジェクトです。こ
+	のキーマッピングは括弧などに囲まれた内側の文字列を選択します。
+
+<Plug>(textobj-sandwich-auto-a)		*<Plug>(textobj-sandwich-auto-a)*
+	括弧などに挟まれた文字列を自動的に検索するテキストオブジェクトです。こ
+	のキーマッピングは括弧などの囲みを含む文字列を選択します。
+
+<Plug>(textobj-sandwich-query-i)	*<Plug>(textobj-sandwich-query-i)*
+	括弧などに挟まれた文字列をユーザーの入力に応じて検索するテキストオブジ
+	ェクトです。このキーマッピングは括弧などに囲まれた内側の文字列を選択し
+	ます。
+
+<Plug>(textobj-sandwich-query-a)	*<Plug>(textobj-sandwich-query-a)*
+	括弧などに挟まれた文字列をユーザーの入力に応じて検索するテキストオブジ
+	ェクトです。このキーマッピングは括弧などの囲みを含む文字列を選択します
+	。
+
+
+
+==============================================================================
+CONFIGURATION				*textobj-sandwich-configuration*
+
+囲み文字のセットと付加情報をまとめたものをレシピ "recipe" と呼びます。一つ一つ
+のレシピは |Dictionary| であり、これを集めた |list| がテキストオブジェクトの動
+作を決めます。 |g:sandwich#default_recipes| はそのリストのうちの一つ
+で、|operator-sandwich| と |textobj-sandwich| の両方から参照されます。これは多
+くの場合、共有された方が便利であるためです。もしユーザーが
+|g:sandwich#recipes| を定義した場合はかわりにそちらが使用されます。デフォルト
+の|g:sandwich#default_recipes| は |:echo| コマンドで確認できます。
+>
+	:echo g:sandwich#default_recipes
+<
+この変数はロックされていますが、 |g:sandwich#recipes| をユーザーが宣言する際に
+必要ならコピーすることができます。
+>
+	:let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
+<
+デフォルトでは (), [], {}, <> のセットが登録されています。より詳しくは
+|g:sandwich#default_recipes| をご覧ください。
+
+|g:textobj#sandwich#default_recipes| はまた別のリストで、こちらは
+|textobj-sandwich| のみからしか参照されません。ユーザーが
+|g:textobj#sandwich#recipes| を定義した際にはそちらがかわりに使用されます。
+|g:textobj#sandwich#default_recipes| は |g:sandwich#default_recipes| と同様に
+ロックされています。
+
+
+
+g:textobj#sandwich#recipes		*g:textobj#sandwich#recipes*
+	テキストオブジェクトのみから参照されるレシピのリストです。このリストが
+	存在しない場合は |g:textobj#sandwich#default_recipes| が使用されます。
+
+
+
+g:textobj#sandwich#default_recipes	*g:textobj#sandwich#default_recipes*
+	デフォルトで用意されるレシピのリストの一つです。テキストオブジェクトの
+	みから参照されます。ユーザーが |g:textobj#sandwich#recipes| を定義した
+	場合にはそちらがかわりにつかわれます。その際必要ならコピーすることが
+	できます。
+>
+	:let g:textobj#sandwich#recipes
+	 \ = deepcopy(g:textobj#sandwich#default_recipes)
+<
+
+
+
+NOTE: もしレシピが競合する場合は |g:textobj#sandwich#default_recipes| か
+      |g:textobj#sandwich#recipes| が |g:sandwich#default_recipes| か
+      |g:sandwich#recipes| よりも優先されます。また同じリスト内であれば、リス
+      ト後方のレシピほど優先されます。
+
+------------------------------------------------------------------------------
+一つ一つのレシピは |Dictionary| 変数であり、 requisite, input, filter, local
+optionの三種の情報を持ちえます。 requisite はすべてのレシピに必須の情報で囲み
+文字を特定するためのものです。 input はレシピを指定するためのユーザー入力を決
+めます。 filter は使用する状況によってレシピを選別するためにあります。 local
+option はレシピによってテキストオブジェクトの働きを細かく制御するために使われ
+ます。さらにこれら以外にテキストオブジェクトの基本的な動作を制御するための
+global option もいくつか存在します。
+
+設定を変更する場合はまず必要なリストを宣言しましょう。
+>
+	let g:sandwich#recipes = []
+<
+あるいはデフォルト設定を引き継ぐためにコピーしてもよいでしょう。
+>
+	let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
+<
+
+Requisite~
+
+requisite には buns と external の二種類あり、すべてのレシピはどちらかを持たな
+ければなりません。
+
+buns
+	テキストを囲む文字列のセットを定義するためのキーです。値に文字列を二つ
+	要素に持つ |list| を持ちます。このセットに囲まれた文字列がテキストオブ
+	ジェクトに検索されます。 "regex" オプションが真のときは正規表現をとし
+	て扱われます。また、レシピが "input" キーを持たない場合、
+	|<Plug>(textobj-sandwich-query-i)| 及び
+	|<Plug>(textobj-sandwich-query-a)| でレシピを指定するためのキー入力に
+	も使われます。
+>
+	let g:sandwich#recipes += [
+	  \    {'buns': ['(', ')']}
+	  \  ]
+
+	" Press dis( or dis)
+	"       (foo)   --->   ()
+
+	let g:sandwich#recipes += [
+	  \    {'buns': ['ab', 'cd']}
+	  \  ]
+
+	" Press disab or discd
+	"       abfoocd   --->   abcd
+
+	let g:sandwich#recipes += [
+	  \    {'buns': ['ab', 'cd'], 'input': ['a']}
+	  \  ]
+
+	" Press disa
+	"       abfoocd   --->   abcd
+<
+
+
+
+external
+	こちらは補助的に使われる requisite です。文字列二要素の |list| でそれ
+	ぞれの要素は外部のテキストオブジェクトになります。これを使うと外部のテ
+	キストオブジェクトをレシピ化することができます。
+	|<Plug>(textobj-sandwich-auto-i)| 及び
+	|<Plug>(textobj-sandwich-query-i)| ではリストの前方の要素が選択する範
+	囲を、 |<Plug>(textobj-sandwich-auto-a)| 及び
+	|<Plug>(textobj-sandwich-query-a)| では後方の要素が選択する範囲を選択
+	します。"buns" とは異なり、多くの local option が無効になります。
+>
+	let g:sandwich#recipes += [
+	  \    {'external': ['it', 'at']}
+	  \  ]
+
+	" "it" selects the text inside tags, "at" selects including tags.
+	"              <---it--->
+	"       <title>title here</title>
+	"       <----------at----------->
+
+	" Press dib
+	"       <title>title here</title>   --->   <title></title>
+	" Press dab
+	"       <title>title here</title>   --->
+<
+	"noremap" オプションは適用されます。内部的にはビジュアル選択がテキスト
+	オブジェクトの指定する範囲を調べるのに使われるので "noremap" が適用さ
+	れるのはビジュアルモードへのマッピングになります。
+>
+	let g:sandwich#recipes += [
+	  \    {'external': ['i[', 'a['], 'noremap': 0}
+	  \  ]
+
+	" Press dib
+	"       [foo]   --->   []
+
+	xnoremap i[ i{
+	xnoremap a[ a{
+
+	" Press dib
+	"       {foo}   --->   {}
+<
+	"noremap" オプションを偽にすることでユーザー定義テキストオブジェクトを
+	同様にレシピ化することができます。
+>
+	" "noremap" option should be false.
+	let g:sandwich#recipes += [
+	  \    {
+	  \      'external': ["\<Plug>(textobj-sandwich-auto-i)",
+	  \                   "\<Plug>(textobj-sandwich-auto-a)"],
+	  \      'noremap': 0,
+	  \      'kind': ['query'],
+	  \      'input': ['b']
+	  \    }
+	  \ ]
+<
+	NOTE: 使用するテキストオブジェクトはビジュアルモードで正しく動作するこ
+	      とを期待されます。
+	NOTE: すべてのテキストオブジェクトが動作するとは限りません。
+
+
+
+Input~
+
+input
+	|<Plug>(textobj-sandwich-query-i)| 及び
+	|<Plug>(textobj-sandwich-query-a)| は囲みを決定するためにユーザーに入
+	力を促します。この時の入力に使われるのがこのキーの値になります。値はリ
+	ストで複数の文字列を含むことができます。このキーを持たないレシピでは
+	"buns" がかわりにつかわれます。以下の例では、 "input" キーを持たない
+	ので "buns" がそのまま使われます。
+>
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"""', '"""']}
+	  \  ]
+	" Press dis"""
+	" """foo"""   --->   """"""
+<
+	"input" キーがあればそちらがかわりにつかわれます。
+>
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"""', '"""'], 'input': ['"']}
+	  \  ]
+	" Press dis"
+	" """foo"""   --->   """"""
+<
+
+
+
+Filter~
+
+filetype
+	ファイルタイプによってレシピを選別するフィルターです。値はリストでファ
+	イルタイプ名の文字列が要素になります。レシピが "filetype" キーを持たな
+	いか、要素として "all" を持つ場合はすべてのファイルタイプで有効になり
+	ます。
+>
+	" The following recipes are valid on any filetype.
+	let g:sandwich#recipes += [
+	  \    {'buns': ['(', ')']}
+	  \    {'buns': ['[', ']'], 'filetype': ['all']}
+	  \  ]
+
+	" The textobj "it" and "at" is not versatile and might be heavy on
+	" large files, thus it would be better to activate only on specific
+	" filetypes.
+	let g:sandwich#recipes += [
+	  \    {'external': ['it', 'at'], 'filetype': ['html']}
+	  \  ]
+<
+
+
+
+kind
+	テキストオブジェクトの種類によってレシピを選別するフィルターです。値は
+	リストで要素にテキストオブジェクトの種類を文字列として持ちます。使用可
+	能な種類は "auto", "query", "textobj", "all" です。 "textobj" は
+	"auto", "query" の二つを指定した場合と同じです。 "textobj" と"all" の
+	違いは、 "all" は |operator-sandwich| の種類も含むことがある点にありま
+	す。あわせて |operator-sandwich-configuration| もご覧ください。レシピ
+	が "kind" キーを持たなければすべての種類で有効です。
+>
+	" The following recipe is valid only with
+	" <Plug>(textobj-sandwich-auto-i) and <Plug>(textobj-sandwich-auto-a)
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"""', '"""'], 'kind': ['auto']}
+	  \  ]
+<
+
+
+
+mode
+	使用されたモードによってレシピを選別するフィルターです。値はモードを表
+	す文字のリストです。使用可能な文字は "o" と "x" のみです。"o" はオペ
+	レータ待機モードを、 "x" はビジュアルモードを表します。レシピが "mode"
+	キーを持たなければすべてのモードで有効です。
+>
+	" These recipes are switch behaviors on modes with the same input.
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"', '"'], 'mode': ['o']}
+	  \    {'buns': ['"""', '"""'], 'mode': ['x'], 'input': ['"']}
+	  \  ]
+<
+
+
+
+operator
+	組み合わせて使われるオペレータの種類によってレシピを選別するフィルター
+	です。値はオペレータを表す文字列を含むリストです。組み込みオペレータで
+	あればオペレータキーマッピングの文字をリストに加えてください。ユーザー
+	定義オペレータでは文字列の代わりに二要素のリストを置きます。最初の要素
+	は文字列 |g@| でなければいけません。二つ目の要素は 'operatorfunc' の名
+	前の文字列です。
+
+	次のレシピは |d| オペレータで使ったときのみ有効です。
+>
+	let g:sandwich#recipes += [
+	  \    {'buns': ['if', 'endif'], 'operator': ['d'], 'input': ['if']}
+	  \  ]
+<
+	次の例はユーザー定義オペレータの例です。
+>
+	let g:sandwich#recipes += [
+	  \    {
+	  \      'buns': ['(', ')'],
+	  \      'operator': [['g@', 'operator#sandwich#delete']]
+	  \    }
+	  \  ]
+<
+	'operatorfunc' はそのオペレータを使用後に次のコマンドを叩くことで調べ
+	られます。
+>
+	:echo &operatorfunc
+<
+
+
+
+Local option~
+
+local option はレシピごとに細かく挙動を調整するために設定されます。もし指定の
+ない場合はデフォルトで設定されている値が使われます。この値はテキストオブジェク
+トの種類に依って違う値をもち、 |g:textobj#sandwich#options| に格納されていま
+す。
+
+|<Plug>(textobj-sandwich-query-i)| と |<Plug>(textobj-sandwich-query-a)| の
+"skip_break" オプションのデフォルト値を変更したい場合は次のようにします。
+>
+	let g:textobj#sandwich#options.query.skip_break = 1
+<
+あるいは関数インターフェースも用意されています。 |textobj#sandwich#set()|
+>
+	call textobj#sandwich#set('query', 'skip_break', 1)
+<
+
+
+
+g:textobj#sandwich#options		*g:textobj#sandwich#options*
+	local option のデフォルト値を格納した |Dictionary| 変数です。
+>
+	" let textobj#sandwich#options[kind][option] = {value}
+
+	" For example
+	let g:textobj#sandwich#options['query']['skip_break'] = 1
+	" or
+	let g:textobj#sandwich#options.query.skip_break = 1
+<
+	使用可能な引数を次に列挙します。
+	  * kind
+	    - query
+	    - auto
+	  * option
+	    - nesting
+	    - expand_range
+	    - regex
+	    - skip_regex
+	    - quoteescape
+	    - eval
+	    - synchro
+	    - noremap
+	    - syntax
+	    - match_syntax
+	    - skip_break
+
+
+
+					*textobj#sandwich#set()*
+textobj#sandwich#set(kind, option, value)
+	local option のデフォルト値を安全かつ簡単に変更するための関数です。引
+	数の組み合わせが不正な場合、関数はメッセージを表示します。使用可能な引
+	数は |g:textobj#sandwich#options| の項に列挙されています。また、これに
+	加えて、この関数では "all" を kind に指定することができます。
+
+
+
+textobj#sandwich#set_default()		*textobj#sandwich#set_default()*
+	local option のデフォルト値を初期化します。
+
+
+
+nesting
+	このオプションは対象範囲の検索アルゴリズムを切り替えます。もし、"buns"
+	がネスト構造を作る場合はこのオプションを真に設定してください。そうでな
+	ければ偽に設定してください。例を挙げれば、一般的に () はネスト構造を作
+	りますが、"" は作りません。次のようなテキストではネスト構造の有無に
+	よって期待する範囲が異なることがわかるでしょう。
+
+	キー入力 yib によって文字列をヤンクします。
+>
+	                 #              : cursor
+	case1:          (foo(bar)baz)   : foo(bar)baz is the expected result
+	case2:          "foo"bar"baz"   :     foo     is the expected result
+<
+	このオプションは特にレシピごとに設定されることが望ましいです。
+
+	デフォルト値
+	  * query: 0
+	  * auto : 0
+
+
+
+expand_range
+	このオプションが 0 なら検索はカーソル行内のみで行われます。正の整数を
+	与えた場合、その行数だけカーソル行から上下に検索範囲を拡大します。負の
+	整数を与えると、すべてのバッファを対象にして検索します。
+	NOTE: 内部的には広い検索範囲を一度に対象とはせず、段階的に広げながら検
+	      索します。この間経過時間を監視しながら
+	      |g:textobj#sandwich#stimeoutlen| に設定された時間が経過してなお
+	      [count] 個の候補が見つかっていない場合、検索をそこで諦めます。
+
+	おおよその場合 0 か負数がよい選択かと思われます。
+
+	デフォルト値
+	  * query: -1
+	  * auto : -1
+
+
+
+regex
+	もしこのオプションの値が真なら "buns" は正規表現だとみなされます。
+>
+	let g:sandwich#recipes += [
+	  \   {'buns': ['\d\+', '\d\+'], 'regex': 1}
+	  \ ]
+	" Press dib
+	" 123foo456   --->   123456
+<
+	デフォルト値
+	  * query: 0
+	  * auto : 0
+
+
+
+skip_regex
+	選択範囲候補を検索の際に、候補をスキップするための正規表現を収めた
+	|list| です。"buns" にマッチしたとしても同時にこのリストのどれかにも同
+	時にマッチした場合、この候補はスキップされます。正規表現は "buns" に
+	マッチした文字列の先頭にマッチしなければなりません。
+>
+	let g:sandwich#recipes += [
+	  \   {'buns': ['b', 'a'], 'skip_regex': ['a\zea']}
+	  \ ]
+	" Press dib
+	" baaaaaaaar   --->   bar
+<
+
+
+
+quoteescape
+	このオプションが真なら、'quoteescape' オプションに含まれる文字でエス
+	ケープされた候補をスキップします。実用的には、'', "", ``, 専用のオプ
+	ションです。
+>
+	let g:sandwich#recipes += [
+	  \   {'buns': ['"', '"'], 'quoteescape': 1}
+	  \ ]
+	" Press dib
+	" "foo\"bar"   --->   foo\"bar
+<
+
+
+
+eval
+	このオプションの値が 1 か 2 なら "buns" は式として評価されてから検索さ
+	れます。値が 1 の場合は一度だけ評価され、|.| コマンドでは同じものが使
+	用されます。値が 2 の場合は |.| コマンドで繰り返される毎に評価されます
+	。例えば以下のレシピはその時々の無名レジスタ |quotequote| の内容に挟ま
+	れた範囲を検索します。 (参考: |let-@|)
+>
+	let g:sandwich#recipes += [
+	  \   {'buns': ['@@', '@@'], 'eval': 1, 'input': ['@']}
+	  \ ]
+<
+	デフォルト値
+	  * query: 0
+	  * auto : 0
+
+
+
+synchro
+	このオプションが真の場合、|<Plug>(operator-sandwich-delete)| 及び
+	|<Plug>(operator-sandwich-replace)| と組み合わせて使われると、マッチし
+	たレシピがこれらのオペレータに渡され高い優先度で削除/置換されます。こ
+	のオプションは |g:textobj#sandwich#recipes| 内の "eval" オプションで評
+	価されたレシピをこれらのオペレータと連携させるのに役にたつでしょう。レ
+	シピが渡される際に "kind" フィルターに "replace" and "delete" が自動的
+	に追加されます。
+	こちらの項もご覧ください。 |operator-sandwich-configuration|
+
+	デフォルト値
+	  * query: 0
+	  * auto : 0
+
+
+
+noremap
+	このオプションは "external" を持つレシピにのみ適用されます。このオプ
+	ションが真なら "external" テキストオブジェクトのマッピングは展開されま
+	せん。このオプションが偽ならマッピングが展開されます。"external" の項
+	もご覧ください。
+	NOTE: 内部的にはテキストオブジェクトの選択範囲を調べるのに、ビジュアル
+	      モード選択を使いますので、このオプションが適用されるのはビジュア
+	      ルモードへのマッピングになります。
+
+	デフォルト値
+	  * query: 1
+	  * auto : 1
+
+
+
+syntax
+	テキストの囲みに適用されていることを期待するシンタックスグループ名のリ
+	ストです。このリストが空でなければ、テキストオブジェクトは選択範囲の候
+	補検索時にシンタックスを確認し、リスト要素にマッチするものがなければス
+	キップします。例えば '' や "" は一般的に String ハイライトグループが適
+	用されているでしょう。
+>
+	let g:sandwich#recipes += [
+	  \   {'buns': ['"', '"'], 'quoteescape': 1, 'syntax': ['String']}
+	  \ ]
+<
+	よく使われるハイライトグループは多くのカラースキーマで共有されていま
+	す。こちらをご覧ください。 |group-name|
+
+	NOTE: リストの要素がシンタックススタックの中に含まれていれば成功とみな
+	      されます。シンタックススタックは次のようなキーマッピングを対象文
+	      字列の上で使用することにより確認できます。
+>
+	nnoremap <Leader>s :echo map(synstack(line('.'), col('.')), 'synIDattr(synIDtrans(v:val), "name")')<CR>
+<
+	デフォルト値
+	  * query: []
+	  * auto : []
+
+
+
+match_syntax
+	もしこのオプションが 1 のとき、テキストオブジェクトは文字列両端の囲み
+	それぞれの先頭のシンタックスハイライトが一致していることを確認します。
+	一致しなければその候補はスキップされるでしょう。さらにこのオプションが
+	2 の時には、これに加えて囲まれたテキストの両端も同じくハイライトが一致
+	していることを確かめます。例えば "" は一般的にそれ自体を含み内部の文字
+	列も String シンタックスが適用されているでしょう。
+>
+	let g:sandwich#recipes += [
+	  \   {
+	  \     'buns': ['"', '"'],
+	  \     'quoteescape' : 1,
+	  \     'syntax'      : ['String']}
+	  \     'match_syntax': 2
+	  \ ]
+<
+	NOTE: 適用されたハイライトグループは次のようなキーマッピングを対象文字
+	      列の上で使用することで調べられます。
+>
+	nnoremap <Leader>S :echo synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')<CR>
+<
+	      先頭の囲みの先端のハイライトグループがほかの位置のシンタックスス
+	      タックに含まれていれば成功とみなされます。シンタックススタックは
+	      次のキーマッピングで確認できます。
+>
+	nnoremap <Leader>s :echo map(synstack(line('.'), col('.')), 'synIDattr(synIDtrans(v:val), "name")')<CR>
+<
+	デフォルト値
+	  * query: 0
+	  * auto : 0
+
+
+
+skip_break
+	次のようなテキストについて考えます。
+>
+	{
+	  foo
+	}
+<
+	{} に囲まれたテキストは "\n  foo\n" なので、キー入力 dib の結果は次の
+	ようになります。
+>
+	{}
+<
+	しかし、次のようになったほうが便利な場合もありますね。
+>
+	{
+	
+	}
+<
+	このオプションが真のときテキストオブジェクトは両端の改行文字をスキップ
+	して後者を与えます。
+
+	デフォルト値
+	  * query: 0
+	  * auto : 0
+
+
+
+Global option~
+
+いくつか基本的な動作を制御するためのオプションが存在します。
+
+g:textobj#sandwich#timeoutlen		*g:textobj#sandwich#timeoutlen*
+	"input" に前方一致で重複するレシピが存在する場合に次のキーシーケンスを
+	待つ時間をミリ秒単位で指定します。
+>
+	let g:sandwich#recipes = [
+	  \   {'buns': ['(', ')']}
+	  \   {'buns': ['((', '))']}
+	  \ ]
+<
+	vis( とキー入力するとテキストオブジェクトは次に ( が入力されるかこの時
+	間だけ待ちます。この間にもう一度 ( を押下すると '((' と '))' のレシピ
+	が使われるでしょう。キーの押下なしでこの時間が過ぎると '(' と ')' のレ
+	シピが使われるでしょう。デフォルトでは Vim のオプション 'timeoutlen'
+	と同じ値が使われます。
+
+
+
+g:textobj#sandwich#stimeoutlen		*g:textobj#sandwich#stimeoutlen*
+	テキストオブジェクトが選択領域の検索を諦めるまでの時間をミリ秒単位で指
+	定します。カウントに指定された数の候補を見つけられずにこの時間が経過す
+	ると検索を諦め、何も選択せずにユーザーに操作をかえします。デフォルト値
+	は 500 です。
+
+
+
+g:textobj#sandwich#latest_jump		*g:textobj#sandwich#latest_jump*
+	このオプションの値が真ならテキストオブジェクトは範囲選択の際にもとのカ
+	ーソル位置をマーク |``| に記録します。 これにより |``| コマンドでカー
+	ソルをその位置に戻すことができます。意図しない広い範囲を選択してしまっ
+	た際にカーソル位置を戻すのに便利です。デフォルト値は 1 です。
+
+
+
+------------------------------------------------------------------------------
+|g:textobj#sandwich#default_recipes| は一つのユニークなレシピを持っています。
+>
+	  {
+	\    'buns': [
+	\        'input("textobj-sandwich:head: ")',
+	\        'input("textobj-sandwich:tail: ")'
+	\    ],
+	\    'kind': ['query'],
+	\    'eval': 1,
+	\    'regex': 1,
+	\    'synchro': 1,
+	\    'input': ['f']
+	\ },
+<
+一つ一つの要素の意味は上で説明されています。重要なのはこのレシピが f という
+input によって発火することと、その機能によりインスタントなレシピが定義できるこ
+とです。このように使います。まず、このレシピを呼びましょう、例えばカーソルを
+foobarbaz という文字列に合わせ disf と入力します。
+>
+	foobarbaz
+<
+するとカーソルがコマンドラインへ移動し、前方の囲みにマッチする正規表現の入力を
+求められます。 foo とでも入れて <Enter> を押しましょう。
+>
+	operator-sandwich:head: foo
+<
+次に後方の囲みにマッチする正規表現の入力を求められます。 baz とでも入れて
+<Enter> を押しましょう。
+>
+	operator-sandwich:tail: baz
+<
+これで文字列 foobaz が得られます。
+>
+	foobaz
+<
+あるいは手順が冗長に感じる方もいるかと思いますが、この動作が |.| コマンドで繰
+り返せると考えると役に立つ場面もあるのではないでしょうか。
+
+
+
+==============================================================================
+MISCELLANEOUS				*textobj-sandwich-miscellaneous*
+
+dib で欲しいのははそれじゃない~
+	キー入力 dib は次のように働きます。これを
+>
+	(
+	    foo
+	)
+<
+	このようにします。
+>
+	()
+<
+	なぜならば、 () に囲まれたテキストは '    foo' ではなく '\n    foo\n'
+	だからです。しかし次のような結果
+>
+	(
+	
+	)
+<
+	を期待する場合は local option の "skip_break" が使えます。
+>
+	call textobj#sandwich#set('all', 'skip_break', 1)
+<
+
+
+
+頻繁に「 Timed out 」となる~
+	|g:textobj#sandwich#stimeoutlen| に大きめの値を設定しましょう。デフォ
+	ルト設定は 500 です。
+
+
+
+誤操作でカーソルが飛んでいった！~
+	慌てないでください。編集結果は |u| コマンドで戻せるでしょう。あるいは
+	単にビジュアルモード選択なら |``| コマンドでカーソルをもとの位置に戻す
+	ことができます。こちらも合わせてご覧ください。
+	|g:textobj#sandwich#latest_jump|
+
+
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:noet:

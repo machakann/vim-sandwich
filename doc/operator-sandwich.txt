@@ -1,0 +1,1151 @@
+*operator-sandwich.txt*			Last change:23-May-2015.
+
+The operator plugin to edit sandwiched textobjects.
+
+Author  : machakann <mckn@outlook.jp>
+License : NYSL license
+          Japanese <http://www.kmonos.net/nysl/>
+          English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>
+
+Requirement:	Vim 7.4 or higher
+		|+reltime| feature (optional)
+		|+float| feature (optional)
+
+==============================================================================
+CONTENTS				*operator-sandwich-contents*
+
+TL;DR
+INTRODUCTION			|operator-sandwich-introduction|
+KEYMAPPINGS			|operator-sandwich-keymappings|
+CONFIGURATION			|operator-sandwich-configuration|
+  REQUISITE
+    buns
+    external
+  FILTERS
+    filetype
+    kind
+    motionwise
+    mode
+  LOCAL OPTIONS
+    cursor
+    highlight
+    skip_space
+    noremap
+    linewise
+    command
+    query_once
+    eval
+    regex
+    skip_char
+    highlight_duration
+  GLOBAL OPTIONS
+HIGHLIGHT GROUP			|operator-sandwich-highlight-group|
+AUTOCOMMANDS			|operator-sandwich-autocommands|
+MISCELLANEOUS			|operator-sandwich-miscellaneous|
+  Highlighting in the delete operator is really irritating.
+  Highlighting is always irritating.
+  Highlighting by matchit.vim is confusing.
+  Why does not the add operator skip white spaces in character-wise motion?
+  Why the default mappings for the delete/replace operators were not defined?
+
+==============================================================================
+TL;DR
+	See |sandwich-quick-start|.
+
+
+
+==============================================================================
+INTRODUCTION				*operator-sandwich-introduction*
+
+*operator-sandwich* is an operator plugin to edit sandwiched textobjects, like
+(foo) or "bar". It consists of three independent operators,
+|<Plug>(operator-sandwich-add)|, |<Plug>(operator-sandwich-delete)|, and
+|<Plug>(operator-sandwich-replace)|.
+
+|<Plug>(operator-sandwich-add)| is an operator to add surroundings to a
+textobject. This keymapping is mapped to sa in default. For example, assume
+that the cursor is on the foo in a text:
+>
+	foo
+<
+press saiw", then you will get the following.
+>
+	"foo"
+<
+Or if you press saiw(, then you will get the following.
+>
+	(foo)
+<
+As for the case of '(' and ')', they are registered as a set of surroundings.
+That's why the word is appropriately surrounded, otherwise this operator puts
+same characters to the both ends like the case of '"'. The registered set of
+surroundings are called "recipe", it is described in detail at
+|operator-sandwich-configuration|.
+
+|<Plug>(operator-sandwich-delete)| is an operator to delete surroundings to a
+textobject. This keymapping is not mapped to any key in normal mode, if you
+want to try please assign it to your preferable key. This operator delete
+surroundings if the texts at the both ends of selected region are registered
+in recipes or are just same characters. For example, assume that it is mapped
+to sd and the cursor is on the (foo) in a text:
+>
+	(foo)
+<
+press sda( deletes the parenthesis since the default textobject |a(| assigns
+the region surrounded by "(" and ")" including them.
+>
+	foo
+<
+It works for "foo" as same with the keypress sd2i" (|iquote|). In practice,
+however, |<Plug>(operator-sandwich-delete)| is not assigned to sd in normal
+mode. Because this operator works well with |textobj-sandwich| which is
+implemented to search and select a regions surrounded. Therefore, sd is mapped
+to the key combination with the textobject in advance. See
+|sandwich-keymappings|.
+
+|<Plug>(operator-sandwich-replace)| is an operator to replace surroundings to
+a textobject. This keymapping is not mapped to any key in normal mode, if you
+want to try please assign it to your preferable key. This operator replace
+surroundings if the texts at the both ends of selected region are registered
+in recipes or are just same characters. For example, assume that it is mapped
+to sr and the cursor is on the (foo) in a text:
+>
+	(foo)
+<
+press sra(", then the operator replace "(" and ")" to '"'.
+>
+	"foo"
+<
+The order is that the deletion, "(" and ")", is the first and then the
+addition, '"', comes the next. The deleted and added text is chosen in the
+same manner with |<Plug>(operator-sandwich-delete)| and
+|<Plug>(operator-sandwich-add)|. In practice, sr is used by the default
+keymappings in combination with |textobj-sandwich| in the same reason with sd.
+See |sandwich-keymappings|.
+
+------------------------------------------------------------------------------
+These all operators accepts [count], but its handling is not as usual. As for
+the default operators and textobjects, the possible key input should be like
+this.
+
+		[count]{operator}[count]{textobject}
+
+For example, 3|d||iw| deletes two words and a intermediate space. There are
+two points to tell the count, but they are not distinguished. That is,
+3diw and d3iw is fundamentally the same. If both of two points are used, the
+count is their product, 3d2iw and 2d3iw is identical to 6diw or d6iw.
+
+In contrast, as for the case of |operator-sandwich|, these three operators
+distinguish the count depending on the point to be told. These operators takes
+only the first count for own use and the second count is passed to the
+following textobject. For example, 2sa3iw(( surrounds two words and a space by
+two set of parenthesis.
+>
+	foo bar   --->   ((foo bar))
+<
+When you use |.| for the single repeating, the last count is continue to be
+used. If the count is given to |.| command, only the count for the textobject
+would be updated.
+
+------------------------------------------------------------------------------
+These operators work also in |blockwise-visual| mode. For example, the
+following 3 by 3 region is selected:
+>
+	foo
+	bar
+	baz
+<
+press sa(
+>
+	(foo)
+	(bar)
+	(baz)
+<
+If short lines are included, for example, the following 4 by 4 region is
+selected:
+>
+	a
+	bb
+	ccc
+	dddd
+<
+press sa(
+>
+	a
+	bb
+	ccc
+	(dddd)
+<
+only the line reached at 4th column is processed. If you want to include all
+the lines to the targets, use |$| command in |blockwise-visual| mode. It
+extend the terminal end of selection until the each end of lines.
+>
+	a
+	bb
+	ccc
+	dddd
+<
+Start from a in the first line, press <C-v>3j$sa(, then you will get:
+>
+	(a)
+	(bb)
+	(ccc)
+	(dddd)
+<
+
+
+
+==============================================================================
+KEYMAPPINGS				*operator-sandwich-keymappings*
+
+This plugin prepares following keymappings. |<Plug>(operator-sandwich-add)|,
+|<Plug>(operator-sandwich-delete)| and |<Plug>(operator-sandwich-replace)| are
+valid in normal and visual mode in principle. |<Plug>(operator-sandwich-add)|
+is mapped to the keysequences sa in default, while
+|<Plug>(operator-sandwich-delete)| and |<Plug>(operator-sandwich-replace)| are
+mappded to the key sequences sd and sr respectively only in visual mode. sd
+and sr are used by the compound mappings with |textobj-sandwich| in normal
+mode. See |sandwich-keymappings|.
+
+function	keymappings				default keymappings
+--------------------------------------------------------------------------
+add		<Plug>(operator-sandwich-add)		sa
+
+delete		<Plug>(operator-sandwich-delete)	sd (in visual mode)
+
+replace		<Plug>(operator-sandwich-replace)	sr (in visual mode)
+--------------------------------------------------------------------------
+
+If you do not need default keymappings, define a variable named
+g:operator_sandwich_no_default_key_mappings in your vimrc.
+>
+	let g:operator_sandwich_no_default_key_mappings = 1
+<
+Then default mappings are never applied. And map them again as you like.
+>
+	nmap ys <Plug>(operator-sandwich-add)
+	xmap ys <Plug>(operator-sandwich-add)
+<
+
+NOTE: To prevent unintended operation, the following setting is strongly
+      recommended to add to your vimrc.
+>
+	nmap s <Nop>
+	xmap s <Nop>
+<
+      |s| could be easily replaced by |c|l| commands.
+
+------------------------------------------------------------------------------
+keymappings~
+<Plug>(operator-sandwich-add)		*<Plug>(operator-sandwich-add)*
+	The operator command to add surroundings to the both end of the
+	assigned region. If [count] is given, add surroundings [count] times.
+
+<Plug>(operator-sandwich-delete)	*<Plug>(operator-sandwich-delete)*
+	The operator command to delete surroundings at the both end of the
+	assigned region. If [count] is given, delete successive sets of
+	surroundings [count] times.
+
+<Plug>(operator-sandwich-replace)	*<Plug>(operator-sandwich-replace)*
+	The operator command to replace surroundings at the both end of the
+	assigned region. If [count] is given, replace successive sets of
+	surroundings [count] times.
+
+
+
+Supplementary keymappings~
+
+There are two supplementary keymappings related to the count treatment. They
+may be useful when you define your short-hand keymapping. About the unique
+count interpretation of the operators, See |operator-sandwich-introduction|.
+Practical examples are in |sandwich-keymappings|.
+
+				*<Plug>(operator-sandwich-synchro-count)*
+<Plug>(operator-sandwich-synchro-count)
+	The keymapping to pass a same count given to the operator for
+	following motions/textobjects.
+>
+ nnoremap sd(
+ \ <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-synchro-count)a(
+<
+A key sequence 2sd( is identical to 2<Plug>(operator-sandwich-delete)2a( in
+this case.
+
+
+
+				*<Plug>(operator-sandwich-release-count)*
+<Plug>(operator-sandwich-release-count)
+	The keymapping that a count pass through the operator for following
+	motions/textobjects.
+>
+ nnoremap sd(
+ \ <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)a(
+<
+A key sequence 2sd( is identical to <Plug>(operator-sandwich-delete)2a( in
+this case.
+
+
+
+==============================================================================
+CONFIGURATION				*operator-sandwich-configuration*
+
+A set of surroundings and options for it is called "recipe". Each recipe is a
+dictionary and the |list|s of recipes determines the operator's behavior.
+|g:sandwich#default_recipes| is one of the |list|s of recipes. This is shared
+to be used with |textobj-sandwich| since it is convenient in many cases. If
+|g:sandwich#recipes| is defined by user, it is employed alternatively. The
+default recipes |g:sandwich#default_recipes| can be checked by |:echo|
+command.
+>
+	:echo g:sandwich#default_recipes
+<
+This variable is locked usually, but it can be copied when you declare
+|g:sandwich#recipes| if you need.
+>
+	:let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
+<
+The set of (), [], {}, <> are registered in default. The detailed description
+is in |g:sandwich#default_recipes|.
+
+|g:operator#sandwich#default_recipes| is another list of recipes. This is used
+only by |operator-sandwich|. If |g:operator#sandwich#recipes| is defined, it
+is employed alternatively. |g:operator#sandwich#default_recipes| is locked as
+same as |g:sandwich#default_recipes|.
+
+
+
+g:operator#sandwich#recipes		*g:operator#sandwich#recipes*
+	This is one of the lists of recipes which is referred only from
+	|operator-sandwich|.  If this list does not exist,
+	|g:operator#sandwich#default_recipes| is used.
+
+
+
+g:operator#sandwich#default_recipes	*g:operator#sandwich#default_recipes*
+	This is one of the lists of recipes which is prepared in default. If
+	|g:operator#sandwich#recipes| exists, it will be used alternatively.
+	This variable is locked usually, but it can be copied when you declare
+	|g:operator#sandwich#recipes| if you need.
+>
+	:let g:operator#sandwich#recipes
+	 \ = deepcopy(g:operator#sandwich#default_recipes)
+<
+
+
+
+NOTE: If recipes are conflicted in some reason,
+      |g:operator#sandwich#default_recipes| and |g:operator#sandwich#recipes|
+      is prior to |g:sandwich#default_recipes| and |g:sandwich#recipes|. In a
+      same list, a latter item is prior to a former item.
+
+------------------------------------------------------------------------------
+A recipe is a |Dictionary| variable and it can have four kinds of information.
+Requisite, input, filters and local options. The requisite is essential for
+all recipe, it defines a set of surroundings. The input is a option to assign
+a recipe for an action. The filters is the option to filter recipes depending
+on the situation in use. The local option is utilized to tune the behavior for
+each recipe. In addition to them, several global options are employed to
+control fundamental behavior of the operators.
+
+As a first step, define your list of recipes.
+>
+	let g:sandwich#recipes = []
+<
+Or just copy the default one if you need.
+>
+	let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
+<
+
+Requisite~
+There are two kinds of requisite, buns and external. All recipes should have
+any one of the two.
+
+buns
+	This is the key to assign the surroundings. Its value is a list
+	including two strings. These are used for additions in add/replace
+	operators, and are searched as deletions in delete/replace operators.
+	If "regex" option is true, it is regarded as regular expression. If a
+	recipe do not have "input" option, this is used as the assignment
+	input.
+>
+	let g:sandwich#recipes += [
+	  \    {'buns': ['(', ')']}
+	  \  ]
+
+	" Press saiw( or saiw)
+	"       foo   --->   (foo)
+
+	let g:sandwich#recipes += [
+	  \    {'buns': ['ab', 'cd']}
+	  \  ]
+
+	" Press saiwab or saiwcd
+	"       foo   --->   abfoocd
+
+	let g:sandwich#recipes += [
+	  \    {'buns': ['ab', 'cd'], 'input': ['a']}
+	  \  ]
+
+	" Press saiwa
+	"       foo   --->   abfoocd
+<
+
+
+
+external
+	This is a supplementary requisite. This is a list including two
+	textobjects as strings. This is used only for determining deletions in
+	delete/replace operators. In other words, they can not be a candidate
+	of additions. The deletions are determined as the differences of the
+	textobjects. A narrower textobject is the first item and wider
+	textobject is the second item. Many local options are not valid.
+>
+	let g:sandwich#recipes += [
+	  \    {'external': ['it', 'at']}
+	  \  ]
+
+	" "it" selects the text inside tags, "at" selects including tags.
+	" Therefore, the deletions are the both tags.
+	"              <---it--->
+	"       <title>title here</title>
+	"       <----------at----------->
+
+	" Press <Plug>(operator-sandwich-delete)at
+	"       <title>title here</title>   --->   title here
+<
+	"noremap" option is applied for this. Since visual selection is
+	employed to check its region intrinsically, mappings in visual mode
+	are related to the action.
+>
+	let g:sandwich#recipes += [
+	  \    {'external': ['i[', 'a['], 'noremap': 0}
+	  \  ]
+
+	" Press <Plug>(operator-sandwich-delete)a[
+	"       [foo]   --->   foo
+
+	xnoremap i[ i{
+	xnoremap a[ a{
+
+	" Press <Plug>(operator-sandwich-delete)a{
+	"       {foo}   --->   foo
+<
+	Combined with "noremap" option, user defined textobjects can be used
+	in the same way.
+>
+	" "noremap" option should be false.
+	let g:sandwich#recipes += [
+	  \    {
+	  \      'external': ["\<Plug>(textobj-sandwich-auto-i)",
+	  \                   "\<Plug>(textobj-sandwich-auto-a)"],
+	  \      'noremap': 0,
+	  \    }
+	  \ ]
+<
+	NOTE: Registered textobjects should work correctly in visual mode.
+	NOTE: Not all the user defined textobjects are not guaranteed to work.
+
+
+
+Input~
+
+input
+	This is the key to assign a recipe for an action. The operators ask
+	user to determine addition in an action. At that moment, users are
+	asked an input to assign a recipe. This option makes the input. If a
+	recipe does not have the key, items in "buns" are used for the
+	assignment.
+>
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"""', '"""']}
+	  \  ]
+	" Press saiw"""
+	" foo   --->   """foo"""
+<
+	If the recipe has input key, it will be used alternatively.
+>
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"""', '"""'], 'input': ['"']}
+	  \  ]
+	" Press saiw"
+	" foo   --->   """foo"""
+<
+	This value should be a |list|, and multiple assignment is valid.
+
+
+
+Filter~
+
+filetype
+	This filter filters recipes by filetypes in use. It is a list of
+	filetypes as strings. If a recipe does not have filetype key or has a
+	value "all", the recipe is valid on any filetype.
+>
+	" The following recipes are valid on any filetype.
+	let g:sandwich#recipes += [
+	  \    {'buns': ['(', ')']}
+	  \    {'buns': ['[', ']'], 'filetype': ['all']}
+	  \  ]
+
+	" The textobj "it" and "at" is not versatile and might be heavy on
+	" large files, thus it would be better to activate only on specific
+	" filetypes.
+	let g:sandwich#recipes += [
+	  \    {'external': ['it', 'at'], 'filetype': ['html']}
+	  \  ]
+<
+
+
+
+kind
+	This filter filters recipes by kinds of operator actions. It is a list
+	of names of kinds. "add", "delete", "replace", "operator" and "all"
+	can be used. "operator" is same as that "add", "delete" and "replace"
+	is specified. The difference between "operator" and "all" is that
+	"all" might include textobject kind in |g:sandwich#recipes|. See
+	|textobj-sandwich-configuration|. If a recipe does not have kind key,
+	the recipe is valid on any kind.
+>
+	" The following recipe is valid only with the add operator.
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"""', '"""'], 'kind': ['add']}
+	  \  ]
+<
+
+
+
+motionwise
+	This filter filters recipes by motionwise (visualmode in visual mode).
+	It is a list of motionwises. "char", "line", "block" and "all" can be
+	used. See |characterwise|, |linewise|, |characterwise-visual|,
+	|linewise-visual|, |blockwise-visual|. If a recipe does not have
+	motionwise key, the recipe is valid on any motionwise.
+>
+	" The following recipe is valid only in linewise motion or linewise
+	" visual.
+	let g:sandwich#recipes += [
+	  \    {'buns': ['```', '```'], 'motionwise': ['line']}
+	  \  ]
+<
+
+
+
+mode
+	This filter filters recipes by modes. It is a list of characters
+	representing modes. "n" or "x" can be used. "n" represents a use in
+	normal mode, and "x" represents a use in visual mode. If a recipe does
+	not have mode key, the recipe is valid on any mode.
+>
+	" These recipes are switch behaviors on modes with the same input.
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"', '"'], 'mode': ['n']}
+	  \    {'buns': ['"""', '"""'], 'mode': ['x'], 'input': ['"']}
+	  \  ]
+<
+
+
+
+Local option~
+
+Local options are used to optimize the behavior for each recipe. If any
+option is set, the default value depending on kinds and motionwises is used.
+These default values are changed by |g:operator#sandwich#options|.
+
+If you want to change the default value of highlight option of add action in
+character-wise motion:
+>
+	let g:operator#sandwich#options.add.char.highlight = 0
+<
+Or use the function |operator#sandwich#set()|.
+>
+	call operator#sandwich#set('add', 'char', 'highlight', 0)
+<
+
+
+
+g:operator#sandwich#options		*g:operator#sandwich#options*
+	The dictionary includes default local option values.
+>
+	let operator#sandwich#options[kind][motionwise][option] = {value}
+
+	" For example
+	let g:operator#sandwich#options['add']['char']['highlight'] = 0
+	" or
+	let g:operator#sandwich#options.add.char.highlight = 0
+<
+	Available keys are listed below.
+	  * kind
+	    - add
+	    - delete
+	    - replace
+	  * motionwise
+	    - char
+	    - line
+	    - block
+	  * option
+	    - cursor			(for all kinds)
+	    - highlight			(for all kinds)
+	    - skip_space		(for all kinds)
+	    - noremap			(for all kinds)
+	    - linewise			(for all kinds)
+	    - command			(for all kinds)
+	    - query_once		(for add and replace)
+	    - eval			(for add and replace)
+	    - addition			(for add and replace)
+	    - deletion			(for delete and replace)
+	    - regex			(for delete and replace)
+	    - skip_char			(for delete and replace)
+	    - highlight_duration	(for delete)
+
+
+
+					*operator#sandwich#set()*
+operator#sandwich#set(kind, motionwise, option, value)
+	The function to change default values of local options easily and
+	safely. If the combination of arguments is not appropriate, this
+	function shows error messages. The available arguments are listed in
+	|g:operator#sandwich#options|. In addition to that, "all" is available
+	for kind and motionwise.
+
+
+
+operator#sandwich#set_default()		*operator#sandwich#set_default()*
+	The function initializes all default values of local options.
+
+
+
+cursor
+	This is a local option which determines the cursor position after
+	an action. "inner_head", "keep", "inner_tail", "front" and "end" can
+	be used.
+	  inner_head: the head of a surrounded text
+	  keep      : the same position at start
+	  inner_tail: the tail of a surrounded text
+	  front     : the head of the former surrounding
+	  tail      : the tail of the latter surrounding
+>
+         #                 : cursor
+	foo   --->   (foo)
+
+                      #    : inner_head
+	             (foo)
+                        #  : inner_tail
+
+                       #   : keep
+	             (foo)
+
+                     #     : front
+	             (foo)
+                         # : end
+<
+	NOTE: Unfortunately, "keep" option cannot be used in |.| command. In
+	      that case automatically falls back to "inner_head" option.
+
+	Default values
+	  * add
+	    - char : "inner_head"
+	    - line : "inner_head"
+	    - block: "inner_head"
+	  * delete
+	    - char : "inner_head"
+	    - line : "inner_head"
+	    - block: "inner_head"
+	  * replace
+	    - char : "inner_head"
+	    - line : "inner_head"
+	    - block: "inner_head"
+
+
+
+highlight
+	This option switch the highlight feature. If the value is true, the
+	both ends of a assigned region are highlighted in add operator. In
+	delete/replace operators, the both deleted regions are highlighted.
+	As for the delete operator, both deleted regions are highlighted in a
+	short time, see |g:operator#sandwich#highlight_duration|, after
+	determined the following motions/textobjects. If a user press any key
+	in the time, the operator immediately quit the highlighting.
+
+	The highlight color can be changed by the |highlight-groups| named
+	OperatorSandwichBuns (|hl-OperatorSandwichBuns|). It is linked to a
+	default |highlight-groups| IncSearch (|hl-IncSearch|).
+>
+	highlight link OperatorSandwichBuns Visual
+<
+
+	Default values
+	  * add
+	    - char : 1
+	    - line : 1
+	    - block: 1
+	  * delete
+	    - char : 1
+	    - line : 1
+	    - block: 1
+	  * replace
+	    - char : 1
+	    - line : 1
+	    - block: 1
+
+
+
+skip_space
+	This option enables to skip spaces at both ends of a assigned region.
+	If the value is true, adjust the both ends to skip white spaces.
+>
+	let g:sandwich#recipes += [
+	  \   {'buns': ['(', ')'], 'skip_space': 0}
+	  \ ]
+	" Press sa5l( when the cursor is on the first space.
+	"   ?foo?   --->   ( foo ) : ? is space
+
+	let g:sandwich#recipes = []
+	let g:sandwich#recipes += [
+	  \   {'buns': ['(', ')'], 'skip_space': 1}
+	  \ ]
+	"   ?foo?   --->  ?(foo)?  : ? is space
+<
+	However as for the case of delete/replace operators if both ends are
+	white spaces then it fills up the working condition for operators and
+	white spaces would be deleted/replaced. Thus this option just works
+	when either one end of the assigned region is white space.
+>
+	let g:sandwich#recipes += [
+	  \   {'buns': ['"', '"'], 'skip_space': 1}
+	  \ ]
+	" Press sda"
+	"   ?"foo"   --->  ?foo    : ? is space
+<
+
+	Default values
+	  * add
+	    - char : 0
+	    - line : 1
+	    - block: 1
+	  * delete
+	    - char : 1
+	    - line : 1
+	    - block: 1
+	  * replace
+	    - char : 1
+	    - line : 1
+	    - block: 1
+
+
+
+noremap
+	This option switches the behavior when adding buns (surroundings) to
+	the both ends whether the key presses are remapped to the nested
+	mappings. If the value is true then it would not be remapped.
+>
+	inoremap ( [
+	inoremap ) ]
+	let g:sandwich#recipes += [
+	  \   {'buns': ['(', ')'], 'noremap': 1}
+	  \ ]
+
+	" Press saiw(
+	" foo   --->   (foo)
+
+	let g:sandwich#recipes = []
+	let g:sandwich#recipes += [
+	  \   {'buns': ['(', ')'], 'noremap': 0}
+	  \ ]
+
+	" Press saiw(
+	" foo   --->   [foo]
+<
+	This option is also referred from external textobjects in searching
+	deletions. See the description of "external" in requisite.
+
+	Default values
+	  * add
+	    - char : 1
+	    - line : 1
+	    - block: 1
+	  * delete
+	    - char : 1
+	    - line : 1
+	    - block: 1
+	  * replace
+	    - char : 1
+	    - line : 1
+	    - block: 1
+
+
+
+linewise
+	This option change the way to add/delete surroundings. The usual
+	behavior is like character-wise.
+>
+	call operator#sandwich#set('add', 'char', 'linewise', 0)
+	" Press saiw(
+	" foo   --->   (foo)
+<
+	If this option is 1, add line-wise.
+>
+	call operator#sandwich#set('add', 'char', 'linewise', 1)
+	" Press saiw(
+	" foo   --->   (
+	               foo
+	               )
+<
+	For the case of deleting, if there are nothing other than white spaces
+	and breaking after deleting, delete the lines.
+>
+	call operator#sandwich#set('delete', 'char', 'linewise', 0)
+	" Press <Plug>(operator-sandwich-delete)a(
+	" (                  : this line was remained
+	" foo   --->   foo   : this line was remained
+	" )                  : this line was remained
+
+	call operator#sandwich#set('delete', 'char', 'linewise', 1)
+	" Press <Plug>(operator-sandwich-delete)a(
+	" (     --->   foo
+	" foo
+	" )
+<
+	In the case that something other than white spaces are left, keep the
+	lines.
+>
+	call operator#sandwich#set('delete', 'char', 'linewise', 1)
+	" Press <Plug>(operator-sandwich-delete)a(
+	" (foo          foo
+	" bar    --->   bar
+	" baz)          baz
+<
+	If this option is 2, delete lines forcibly.
+>
+	call operator#sandwich#set('delete', 'char', 'linewise', 2)
+	" Press <Plug>(operator-sandwich-delete)a(
+	" (foo   --->   bar
+	" bar
+	" baz)
+<
+	For the case of replace operator, it behaves in the combination of
+	additions and deletions.
+
+	Default values
+	  * add
+	    - char : 0
+	    - line : 1
+	    - block: 0
+	  * delete
+	    - char : 0
+	    - line : 1
+	    - block: 0
+	  * replace
+	    - char : 0
+	    - line : 1
+	    - block: 0
+
+
+
+command
+	This is a list of commands which is executed after an action. After an
+	action, the marks |'[| and |']| is set at the head and tail of a
+	surrounded text temporally.
+>
+	let g:sandwich#recipes += [
+	  \    {
+	  \      'buns'    : ['{', '}'],
+	  \      'linewise': 1,
+	  \      'command' : ["'[,']normal! >>"]
+	  \    },
+	  \ ]
+	" Press saiw{
+	" foo   --->   {
+	                   foo
+	               }
+<
+	Default values
+	  * add
+	    - char : []
+	    - line : []
+	    - block: []
+	  * delete
+	    - char : []
+	    - line : []
+	    - block: []
+	  * replace
+	    - char : []
+	    - line : []
+	    - block: []
+
+
+
+query_once
+	This option switches the behavior when a [count] is given. If this
+	option is false, add/replace operators ask additions [count] times.
+	Whereas if this option is true, add/replace operators ask only once
+	and add it [count] times.
+
+	Default values
+	  * add
+	    - char : 0
+	    - line : 0
+	    - block: 0
+	  * replace
+	    - char : 0
+	    - line : 0
+	    - block: 0
+
+
+
+eval
+	If this option is 1 or 2, requisite "buns" is evaluated as expression.
+	If this option is 1, "buns" are evaluated once and repeat it by |.|
+	command. If this option is 2, "buns" are evaluated every times in |.|
+	repeating. For example, the following recipe adds the text in the
+	unnamed register. (ref. |let-@|, |quotequote|)
+>
+	let g:sandwich#recipes += [
+	  \   {'buns': ['@@', '@@'], 'eval': 1, 'input': ['@']}
+	  \ ]
+<
+	Default values
+	  * add
+	    - char : 0
+	    - line : 0
+	    - block: 0
+	  * replace
+	    - char : 0
+	    - line : 0
+	    - block: 0
+
+
+
+regex
+	If this option is true, requisite "buns" is regarded as regular
+	expressions. If this option is true, the recipe is not used for
+	adding steps in add/replace operators, is only used for deleting steps
+	in delete/replace operators.
+>
+	let g:sandwich#recipes += [
+	  \   {'buns': ['\d\+', '\d\+'], 'regex': 1}
+	  \ ]
+	" Press <Plug>(operator-sandwich-delete)iw
+	" 123foo456   --->   foo
+<
+	Default values
+	  * delete
+	    - char : 0
+	    - line : 0
+	    - block: 0
+	  * replace
+	    - char : 0
+	    - line : 0
+	    - block: 0
+
+
+
+skip_char
+	If this option is true, both ends are shrunk to adjust until finding
+	registered surroundings.
+>
+	let g:sandwich#recipes += [
+	  \   {'buns': ['(', ')'], 'skip_char': 1}
+	  \ ]
+	" Press V<Plug>(operator-sandwich-delete)
+	" foo(bar)baz   --->   foobarbaz
+<
+	Default values
+	  * delete
+	    - char : 0
+	    - line : 0
+	    - block: 0
+	  * replace
+	    - char : 0
+	    - line : 0
+	    - block: 0
+
+
+
+Global option~
+
+There are several options to control fundamental behavior of the operators.
+
+g:operator#sandwich#timeoutlen		*g:operator#sandwich#timeoutlen*
+	The time in milli seconds that waits for a key code or mapped key
+	sequence to complete. If there are recipes overlapped, this option is
+	used. Assume that the following recipes are prepared:
+>
+	let g:sandwich#recipes = [
+	  \   {'buns': ['(', ')']}
+	  \   {'buns': ['((', '))']}
+	  \ ]
+<
+	after pressing saiw(, the operator waits in the time. If you press one
+	more ( in the time, then a recipe for '((' and '))' is decided to use.
+	No keypress has come through the time a recipe for '(' and ')' is
+	settled. The default value is same as 'timeoutlen' vim option.
+
+
+
+				*g:operator#sandwich#highlight_duration*
+g:operator#sandwich#highlight_duration
+	This option determines the time duration to show deletions in an
+	delete operator action. Give number in milli seconds.
+	The default value is 200.
+
+
+
+------------------------------------------------------------------------------
+|g:operator#sandwich#default_recipes| has a unique recipe:
+>
+	  {
+	\    'buns': [
+	\        'input("operator-sandwich:head: ")',
+	\        'input("operator-sandwich:tail: ")'
+	\    ],
+	\    'kind': ['add', 'replace'],
+	\    'eval': 1,
+	\    'input': ['f']
+	\ },
+<
+The meanings of these options are explained already. The important thing is
+that this recipe can be called by f key press and realizes the instant
+definition of recipe. This recipe is used like this. First call this recipe,
+for example, press saiwf on bar.
+>
+	bar
+<
+Then the cursor is moved to command line area and prompts to input a addition
+to the head. For example, assume that foo is input and pressed enter key.
+>
+	operator-sandwich:head: foo
+<
+Next you would be prompted to input a addition to the tail. For example,
+assume that baz is input and pressed enter key.
+>
+	operator-sandwich:tail: baz
+<
+Finally you will get foobarbaz.
+>
+	foobarbaz
+<
+You may think there are too many steps, but it can be repeated by |.| command.
+If you take into account the fact, it might be able to find the case it is
+useful.
+
+
+
+==============================================================================
+HIGHLIGHT GROUP				*operator-sandwich-highlight-group*
+
+All the three operators have highlighting feature. On and off is controlled by
+a local option, highlight, but the coloring is defined by its highlight group.
+
+OperatorSandwichBuns			*hl-OperatorSandwichBuns*
+	The highlight group to declare the highlight feature of the operators.
+	It is linked to a default highlight group IncSearch |hl-IncSearch| in
+	default.
+>
+	highlight link OperatorSandwichBuns IncSearch
+<
+	Users can define their preferable coloring.
+>
+	highlight OperatorSandwichBuns ctermfg=White ctermbg=Red
+	                             \ guifg=White   guibg=Red
+<
+
+
+
+==============================================================================
+AUTOCOMMAND				*operator-sandwich-autocommand*
+
+Users can fook some processes for the start and the end of the operator action
+by |:autocmd| command. Each operator defines its own |User| autocommand
+events, users just declare autocommands if needed.
+
+add operator~
+OperatorSandwichAddPre			*OperatorSandwichAddPre*
+	The autocommand event ignited right before the add operator action.
+
+OperatorSandwichAddPost			*OperatorSandwichAddPost*
+	The autocommand event ignited right after the add operator action.
+
+delete operator~
+OperatorSandwichDeletePre		*OperatorSandwichDeletePre*
+	The autocommand event ignited right before the delete operator action.
+
+OperatorSandwichDeletePost		*OperatorSandwichDeletePost*
+	The autocommand event ignited right after the delete operator action.
+
+replace operator~
+OperatorSandwichReplacePre		*OperatorSandwichReplacePre*
+	The autocommand event ignited right before the replace operator
+	action.
+
+OperatorSandwichReplacePost		*OperatorSandwichReplacePost*
+	The autocommand event ignited right after the replace operator action.
+
+Example~
+The following example disables matchit.vim (default plugin) highlighting in
+add/replace operators action.
+>
+ autocmd User OperatorSandwichAddPre,OperatorSandwichReplacePre NoMatchParen
+ autocmd User OperatorSandwichAddPost,OperatorSandwichReplacePost DoMatchParen
+<
+
+
+
+==============================================================================
+MISCELLANEOUS				*operator-sandwich-miscellaneous*
+
+Highlighting in the delete operator is really irritating.~
+	Yes, you are right. Add the line to your vimrc.
+>
+	call operator#sandwich#set('delete', 'all', 'highlight', 0)
+<
+
+
+
+Highlighting is always irritating.~
+	Ah, you might be right. Add the line to your vimrc.
+>
+	call operator#sandwich#set('all', 'all', 'highlight', 0)
+<
+
+
+
+Highlighting by matchit.vim is confusing.~
+	Use |:autocmd| to disable it temporary.
+	See |operator-sandwich-autocommands|.
+>
+ autocmd User OperatorSandwichAddPre,OperatorSandwichReplacePre NoMatchParen
+ autocmd User OperatorSandwichAddPost,OperatorSandwichReplacePost DoMatchParen
+<
+	Or just use a clearly different coloring depending on your favorite
+	colorscheme. See |operator-sandwich-highlight-group|.
+>
+	highlight OperatorSandwichBuns ctermfg=White ctermbg=Red
+	                             \ guifg=White   guibg=Red
+<
+
+
+
+Why does not the add operator skip white spaces in character-wise motion?~
+	Because it sometimes causes unwanted results when I use visual mode
+	selection. That is, I sometimes want to surround a text including
+	space. If you don't like it, add the line to your vimrc.
+>
+	call operator#sandwich#set('add', 'char', 'skip_space', 1)
+<
+
+
+
+Why the default mappings for the delete/replace operators were not defined?~
+	Because of their characteristics, it is better to use always with
+	|textobj-sandwich|. Thus, compound mappings are defined alternatively.
+	See |sandwich-keymappings|. In visual mode, you can use as same as
+	other operators.
+	However, of course, these operators |<Plug>(operator-sandwich-delete)|
+	and |<Plug>(operator-sandwich-replace)| can work with any
+	motions/textobjects as far as matching their working condition. If you
+	are interested, please map them somewhere you want and try!
+
+
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:noet:

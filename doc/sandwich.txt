@@ -1,0 +1,232 @@
+*sandwich.txt*				Last change:23-May-2015.
+
+The set of operator and textobject plugins to edit sandwiched textobjects.
+
+Author  : machakann <mckn@outlook.jp>
+License : NYSL license
+          Japanese <http://www.kmonos.net/nysl/>
+          English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>
+
+Requirement:	Vim 7.4 or higher
+		|+reltime| feature (optional)
+		|+float| feature (optional)
+
+==============================================================================
+CONTENTS				*sandwich-contents*
+
+QUICK START			|sandwich-quick-start|
+INTRODUCTION			|sandwich-introduction|
+KEYMAPPINGS			|sandwich-keymappings|
+CONFIGURATION			|sandwich-configuration|
+
+==============================================================================
+QUICK START				*sandwich-quick-start*
+
+*sandwich.vim* is the set of operator and textobject plugins to
+add/delete/replace surroundings of a sandwiched textobject, like (foo), "bar".
+
+add~
+Press sa{motion/textobject}{addition}.
+For example, saiw( makes foo to (foo).
+
+delete~
+Press sdb or sd{deletion}.
+For example, sdb or sd( makes (foo) to foo.
+sdb searchs a set of surrounding automatically.
+
+replace~
+Press srb{addition} or sr{deletion}{addition}.
+For example, srb" or sr(" makes (foo) to "foo".
+
+That's all. Now you already know enough about sandwich.vim. If you want more,
+read following descriptions and each help for operator/textobject,
+|operator-sandwich| and |textobj-sandwich|.
+
+
+
+==============================================================================
+INTRODUCTION				*sandwich-introduction*
+
+This plugin serves functions to add/delete/replace surroundings of sandwiched
+texts. These functions are implemented genuinely by utilizing
+operator/textobject framework. Their action can be repeated by |.| command
+without any dependency. It consists of two parts, |operator-sandwich| and
+|textobj-sandwich|. These two cooperate gracefully to realize the
+functionality. However, at the same time, each of them are independent, thus
+they could work with any other operators/textobjects.
+
+|operator-sandwich| gives three kinds of operators,
+|<Plug>(operator-sandwich-add)|, |<Plug>(operator-sandwich-delete)|,
+|<Plug>(operator-sandwich-replace)|. These operators edit sandwiched text.
+
+|textobj-sandwich| gives four kinds of textobjects,
+|<Plug>(textobj-sandwich-auto-i)|, |<Plug>(textobj-sandwich-auto-a)|,
+|<Plug>(textobj-sandwich-query-i)|, |<Plug>(textobj-sandwich-query-a)|.
+These textobjects search and select sandwiched text.
+
+
+
+==============================================================================
+KEYMAPPINGS				*sandwich-keymappings*
+
+This plugin defines the following keymappings.
+
+function	default keymappings
+--------------------------------------------------------------------------
+add		sa{motion/textobject}{addition}	(normal and visual mode)
+
+delete		sd				(visual mode)
+		sdb				(normal mode)
+		sd{deletion}			(normal mode)
+
+replace		sr{addition}			(visual mode)
+		srb{addition}			(normal mode)
+		sr{deletion}{addition}		(normal mode)
+
+textobjct	ib			(operator-pending and visual mode)
+		ab			(operator-pending and visual mode)
+		is			(operator-pending and visual mode)
+		as			(operator-pending and visual mode)
+--------------------------------------------------------------------------
+
+NOTE: To prevent unintended operation, the following setting is strongly
+      recommended to add to your vimrc.
+>
+	nmap s <Nop>
+	xmap s <Nop>
+<
+      |s| could be easily replaced by |c|l| commands.
+
+
+
+The detailed breakdown is described below.
+
+  * |operator-sandwich|
+|<Plug>(operator-sandwich-add)| which is a operator to add surroundings is
+mapped to the key sequences sa. This is valid in both normal and visual modes.
+
+|<Plug>(operator-sandwich-delete)| which is a operator to delete surroundings
+is mapped to the key sequences sd in visual mode. If the both ends of the
+selected region are the same characters or the set of registered surroundings,
+then it deletes them.
+
+|<Plug>(operator-sandwich-replace)| which is a operator to replace
+surroundings is mapped to the key sequences sr in visual mode. If the both
+ends of the selected region are the same characters or the set of registered
+surroundings, then it replaces them.
+
+
+
+  * |textobj-sandwich|
+|<Plug>(textobj-sandwich-auto-i)| and |<Plug>(textobj-sandwich-auto-a)| which
+are the textobjects to search and select a sandwiched text automatically are
+mapped to the key sequences ib and ab. They are valid in both operator-pending
+mode and visual mode. ib selects the text inside the surroundings. ab selects
+the text including surroundings.
+
+|<Plug>(textobj-sandwich-query-i)| and |<Plug>(textobj-sandwich-query-a)|
+which are the textobjects to search and select a sandwiched text depending on
+user input are mapped to the key sequences is and as. They are valid in both
+operator-pending mode and visual mode. is selects the text inside the
+surroundings. as selects the text including surroundings.
+
+
+
+In addition to the above, the key sequences sd, sdb, sr and srb in normal mode
+is used by compound mappings of |operator-sandwich| and |textobj-sandwich|.
+Each of them are the short-hand mappings as following keysequences.
+
+  sd
+>
+	<Plug>(operator-sandwich-delete)<Plug>(textobj-sandwich-query-a)
+<
+  sdb
+>
+	<Plug>(operator-sandwich-delete)<Plug>(textobj-sandwich-auto-a)
+<
+  sr
+>
+	<Plug>(operator-sandwich-replace)<Plug>(textobj-sandwich-query-a)
+<
+  srb
+>
+	<Plug>(operator-sandwich-replace)<Plug>(textobj-sandwich-auto-a)
+<
+This is just for convenience, since these textobjects perfectly fills up the
+working condition of these operators. Users only have to assign surroundings
+as listed above. If you don't like the short-hands, define
+g:sandwich_no_default_key_mappings in your vimrc.
+>
+	let g:sandwich_no_default_key_mappings = 1
+<
+NOTE: In fact, these compound keymappings have one more key sequence
+      |<Plug>(operator-sandwich-release-count)| in between the two key
+      sequences. It is a tiny trick for the [count] handling. For example the
+      key sequences 2sdb is identical to:
+>
+	<Plug>(operator-sandwich-delete)2<Plug>(textobj-sandwich-auto-a)
+<
+      It searches the second closest sandwiched text and deletes them.
+>
+	      #                            : cursor
+	[bar(foo)baz]   --->   bar(foo)baz
+<
+
+
+
+==============================================================================
+CONFIGURATION				*sandwich-configuration*
+
+A set of surroundings and options for it is called "recipe". Each recipe is a
+dictionary and the |list|s of recipes determines the operator's behavior and
+textobject's behavior.  |g:sandwich#default_recipes| is one of the |list|s of
+recipes. This is shared to be used by |operator-sandwich| and
+|textobj-sandwich| since it is convenient in many cases. If
+|g:sandwich#recipes| is defined by user, it is employed alternatively. The
+default recipes |g:sandwich#default_recipes| can be checked by |:echo|
+command.
+>
+	:echo g:sandwich#default_recipes
+<
+Besides them, |g:operator#sandwich#recipes| and |g:textobj#sandwich#recipes|
+can be used. They are used only by |operator-sandwich| and |textobj-sandwich|
+respectively.
+
+About the contents of a recipe, please see |operator-sandwich-configuration|
+and |textobj-sandwich-configuration|.
+
+
+
+g:sandwich#recipes			*g:sandwich#recipes*
+	This is one of the lists of recipes which is referred from both
+	|operator-sandwich| and |textobj-sandwich|. If this list does not
+	exist, |g:sandwich#default_recipes| is used.
+
+
+
+g:sandwich#default_recipes		*g:sandwich#default_recipes*
+	This is one of the lists of recipes which is prepared in default. If
+	|g:sandwich#recipes| exists, it will be used alternatively.
+>
+	let g:sandwich#default_recipes = [
+	\	{'buns': ['<', '>'], 'expand_range': 0, 'match_syntax': 1},
+	\	{'buns': ['"', '"'], 'quoteescape': 1, 'expand_range': 0,
+	\				'nesting': 0, 'match_syntax': 2},
+	\	{'buns': ["'", "'"], 'quoteescape': 1, 'expand_range': 0,
+	\				'nesting': 0, 'match_syntax': 2},
+	\	{'buns': ['{', '}'], 'nesting': 1, 'match_syntax': 1,
+	\				'skip_break': 1},
+	\	{'buns': ['[', ']'], 'nesting': 1, 'match_syntax': 1},
+	\	{'buns': ['(', ')'], 'nesting': 1, 'match_syntax': 1},
+	]
+<
+	This variable is locked usually, but it can be copied when you declare
+	|g:sandwich#recipes| if you need.
+>
+	:let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
+<
+
+
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:noet:

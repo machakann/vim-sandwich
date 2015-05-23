@@ -1,0 +1,1139 @@
+*operator-sandwich.jax*	日本語ヘルプ	Last change:23-May-2015.
+
+“挟まれた”テキストを編集するためのオペレータです。
+
+書いた人   : machakann <mckn@outlook.jp>
+ライセンス : NYSL license
+          日本語 <http://www.kmonos.net/nysl/>
+          English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>
+
+必須要件:	Vim 7.4 かそれ以降のバージョン
+		|+reltime| 機能 (任意)
+		|+float| 機能 (任意)
+
+==============================================================================
+CONTENTS				*operator-sandwich-contents*
+
+TL;DR
+INTRODUCTION			|operator-sandwich-introduction|
+KEYMAPPINGS			|operator-sandwich-keymappings|
+CONFIGURATION			|operator-sandwich-configuration|
+  REQUISITE
+    buns
+    external
+  FILTERS
+    filetype
+    kind
+    motionwise
+    mode
+  LOCAL OPTIONS
+    cursor
+    highlight
+    skip_space
+    noremap
+    linewise
+    command
+    query_once
+    eval
+    regex
+    skip_char
+  GLOBAL OPTIONS
+HIGHLIGHT GROUP			|operator-sandwich-highlight-group|
+AUTOCOMMANDS			|operator-sandwich-autocommands|
+MISCELLANEOUS			|operator-sandwich-miscellaneous|
+  囲みを外すオペレータのハイライトはいらない
+  ハイライトは全部いらない
+  matchit.vim のハイライトがかぶって邪魔
+  文字列を囲むオペレータの文字指向の場合だけ空白をスキップしないのはなぜ？
+  なぜ囲みを外す/置換するオペレータのキーマッピングはデフォルトで提供されない?
+
+==============================================================================
+TL;DR
+	こちらをご覧ください。 |sandwich-quick-start|.
+
+
+
+==============================================================================
+INTRODUCTION				*operator-sandwich-introduction*
+
+*operator-sandwich* は (foo) や "bar" などの「挟まれた」テキストを編集するため
+のオペレータプラグインです。
+|<Plug>(operator-sandwich-add)|, |<Plug>(operator-sandwich-delete)|,
+|<Plug>(operator-sandwich-replace)| の三つの独立したオペレータからなります。
+
+|<Plug>(operator-sandwich-add)| 文字列を括弧などで囲むオペレータです。デフォル
+トでは sa にマップされています。例えば、 foo という文字列上にカーソルがあると
+します。
+>
+	foo
+<
+saiw" とキーを押下すると次のようになります。
+>
+	"foo"
+<
+あるいは saiw( と押すと次のようになります。
+>
+	(foo)
+<
+( と ) のペアに関してはそれが一つのセットとして事前に登録されており、そのため
+に正しく囲むことができます。登録されていないものについては、 " と同じように同
+じ文字が前後に挿入されます。登録されたセットをレシピ "recipe" と呼びます。詳し
+くは |operator-sandwich-configuration| をご覧ください。
+
+|<Plug>(operator-sandwich-delete)| は囲みを外すオペレータです。デフォルトでは
+ノーマルモードに単独のマッピングが準備されませんので、試したい場合には適当なキ
+ーに割り当ててください。このオペレータは指定された領域の両端が同じ文字か、登録
+されたペアにマッチする場合にこれらを削除します。例えば、オペレータが sd にマッ
+プされているとして、 (foo) にカーソルがあっている場合を考えます。
+>
+	(foo)
+<
+sda( とキー入力をすると両端の括弧が外されます。なぜならテキストオブジェクト
+|a(| は括弧を両端に含む領域を指定するためです。
+>
+	foo
+<
+"foo" というテキストについてはキー入力 sd2i" (|iquote|) が同じように働くでしょ
+う。実際には先に述べたように |<Plug>(operator-sandwich-delete)| は sd にマップ
+されていません。なぜなら |textobj-sandwich| と組み合わせて使うのがほぼ常に便利
+であるからです。このため、 sd はあらかじめ |textobj-sandwich| との複合マッピン
+グとして用意されています。詳しくは |sandwich-keymappings| をご覧ください。
+
+|<Plug>(operator-sandwich-replace)| は囲みを置き換えるオペレータです。デフォル
+トではノーマルモードに単独のマッピングが準備されませんので、試したい場合には適
+当なキーに割り当ててください。このオペレータは指定された領域の両端が同じ文字
+か、登録されたペアにマッチする場合にこれらを置換します。例えばオペレータが sr
+にマップされているとして、 (foo) にカーソルがあっている場合を考えます。
+>
+	(foo)
+<
+sra(" とキー入力をすると両端の括弧がダブルクオーテーションに置換されます。
+>
+	"foo"
+<
+入力の順番は削除されるもの、ここでは ( が先で、そのあとに挿入されるもの、" を
+入力します。削除されるもの、挿入されるものはそれぞれ
+|<Plug>(operator-sandwich-delete)| 及び |<Plug>(operator-sandwich-add)| と同じ
+ように選ばれます。実際には sd と同じ理由で sr には複合マッピングがマップされて
+います。詳しくは |sandwich-keymappings| をご覧ください。
+
+------------------------------------------------------------------------------
+これらすべてのオペレータは [count] を受け付けますが、その解釈方法は少し変って
+います。通常のオペレータとテキストオブジェクトであれば、ありうるキー入力は次の
+ようなものでしょう。
+
+		[count]{operator}[count]{textobject}
+
+例えば 3|d|iw| というキー入力は二単語と間のスペースを削除します。カウントを入
+力するタイミングは二回ありますが、これらが区別されることはありません。つまり
+3diw と d3iw は原則的に同じです。もし両方のタイミングでカウントを与えれば、そ
+の積がカウントとなります。つまり、 3d2iw あるいは 2d3iw は 6diw および d6iw と
+全て同一のコマンドです。
+
+これに対して |operator-sandwich| の提供するオペレータはそのタイミングによって
+与えられるカウントを区別します。これらのオペレータは最初のタイミングで与えられ
+るカウントのみをオペレータで使用し、後のタイミングで与えられるカウントのみをテ
+キストオブジェクトに渡します。例えば、 2sa3iw(( というキー入力は二単語と間のス
+ペースを二回括弧で囲みます。
+>
+	foo bar   --->   ((foo bar))
+<
+|.| コマンドで動作を繰り返した場合は最後に使ったカウントが使用されます。もしカ
+ウントが |.| コマンドに渡された場合にはテキストオブジェクトに渡されたカウント
+のみが更新されます。
+
+------------------------------------------------------------------------------
+これらのオペレータは矩形ビジュアルモード |blockwise-visual| でも動作します。例
+えば次の三行三桁の領域を選択しているとします。
+>
+	foo
+	bar
+	baz
+<
+sa( と入力します
+>
+	(foo)
+	(bar)
+	(baz)
+<
+次の四行四桁の短い行が含まれている場合を考えます。
+>
+	a
+	bb
+	ccc
+	dddd
+<
+sa( と入力します。
+>
+	a
+	bb
+	ccc
+	(dddd)
+<
+この場合四桁目まで到達している行のみ処理の対象とします。もし、短い行も処理の対
+象としたい場合には矩形ビジュアルモードで |$| コマンドで全ての行末まで選択を拡
+張した状態にするとよいでしょう。
+>
+	a
+	bb
+	ccc
+	dddd
+<
+最初の行にカーソルを置き、 <C-v>3j$sa( とキー入力します。
+>
+	(a)
+	(bb)
+	(ccc)
+	(dddd)
+<
+
+
+
+==============================================================================
+KEYMAPPINGS				*operator-sandwich-keymappings*
+
+このプラグインは下記のキーマッピングを提供します。
+|<Plug>(operator-sandwich-add)|, |<Plug>(operator-sandwich-delete)| 及び
+|<Plug>(operator-sandwich-replace)| は基本的にノーマルモードとヴィジュアルモー
+ドで動作します。 |<Plug>(operator-sandwich-add)| はノーマルモードとビジュアル
+モードの両方で sa にマップされています。一方、
+|<Plug>(operator-sandwich-delete)| と |<Plug>(operator-sandwich-replace)| はビ
+ジュアルモードでのみ sd および sr に単独のマッピングとして定義されます。ノーマ
+ルモードでは便利のため |textobj-sandwich| との複合マッピングとして定義されます
+。詳しくは |sandwich-keymappings| をご覧ください。
+
+機能		キーマッピング				デフォルト
+--------------------------------------------------------------------------
+囲む		<Plug>(operator-sandwich-add)		sa
+
+囲みを外す	<Plug>(operator-sandwich-delete)	sd (ビジュアルモード)
+
+囲みを置換	<Plug>(operator-sandwich-replace)	sr (ビジュアルモード)
+--------------------------------------------------------------------------
+
+もし上記のデフォルト設定が必要なければ、あなたの vimrc で
+g:operator_sandwich_no_default_key_mappings を定義してください。
+>
+	let g:operator_sandwich_no_default_key_mappings = 1
+<
+これでデフォルト設定は適用されません。お好みのキーに設定しなおしてください。
+>
+	nmap ys <Plug>(operator-sandwich-add)
+	xmap ys <Plug>(operator-sandwich-add)
+<
+
+NOTE: 誤操作を防ぐため以下の設定を vimrc に追加することを強く推奨します。
+>
+	nmap s <Nop>
+	xmap s <Nop>
+<
+      |s| コマンドは |c|l| コマンドによって代替できます。
+
+------------------------------------------------------------------------------
+キーマッピング~
+<Plug>(operator-sandwich-add)		*<Plug>(operator-sandwich-add)*
+	テキストを括弧などで囲むためのオペレータコマンドです。[count] が与えら
+	れた場合、その数だけ囲みを追加します。
+
+<Plug>(operator-sandwich-delete)	*<Plug>(operator-sandwich-delete)*
+	テキストの囲みを外すためのオペレータコマンドです。 [count] が与えられ
+	た場合、その数だけ連続する囲みを外します。
+
+<Plug>(operator-sandwich-replace)	*<Plug>(operator-sandwich-replace)*
+	テキストの囲みを置き換えるためのオペレータコマンドです。 [count] が与
+	えられた場合、その数だけ連続する囲みを置換します。
+
+
+
+補助キーマッピング~
+
+カウントの取り扱いに関して、補助的な働きをするキーマッピングが二つ用意されてい
+ます。短縮キーマッピングなどを独自に定義する際に役に立つでしょう。オペレータの
+独特なカウントの扱いについては |operator-sandwich-introduction| をご覧ください
+。実用例は |sandwich-keymappings| をご覧ください。
+
+				*<Plug>(operator-sandwich-synchro-count)*
+<Plug>(operator-sandwich-synchro-count)
+	オペレータに与えられた [count] と同じカウントを続く
+	{motion}/{textobject} に与えるためのキーマッピングです。
+>
+ nnoremap sd(
+ \ <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-synchro-count)a(
+<
+このキーマッピングでは 2sd( は 2<Plug>(operator-sandwich-delete)2a( に等しくな
+ります。
+
+
+
+				*<Plug>(operator-sandwich-release-count)*
+<Plug>(operator-sandwich-release-count)
+	与えられたカウントをオペレータで使わずに続く {motion}/{textobject} に
+	与えるためのキーマッピングです。
+>
+ nnoremap sd(
+ \ <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)a(
+<
+このキーマッピングでは 2sd( は <Plug>(operator-sandwich-delete)2a( に等しくな
+ります。
+
+
+
+==============================================================================
+CONFIGURATION				*operator-sandwich-configuration*
+
+囲み文字のセットと付加情報をまとめたものをレシピ "recipe" と呼びます。一つ一つ
+のレシピは |Dictionary| であり、これを集めた |list| がオペレータの動作を決めま
+す。 |g:sandwich#default_recipes| はそのリストのうちの一つで、
+|operator-sandwich| と |textobj-sandwich| の両方から参照されます。これは多くの
+場合、共有された方が便利であるためです。もしユーザーが |g:sandwich#recipes| を
+定義した場合はかわりにそちらが使用されます。デフォルトの
+|g:sandwich#default_recipes| は |:echo| コマンドで確認できます。
+>
+	:echo g:sandwich#default_recipes
+<
+この変数はロックされていますが、 |g:sandwich#recipes| をユーザーが宣言する際に
+必要ならコピーすることができます。
+>
+	:let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
+<
+デフォルトでは (), [], {}, <> のセットが登録されています。より詳しくは
+|g:sandwich#default_recipes| をご覧ください。
+
+|g:operator#sandwich#default_recipes| はまた別のリストで、こちらは
+|operetor-sandwich| のみからしか参照されません。ユーザーが
+|g:operator#sandwich#recipes| を定義した際にはそちらがかわりに使用されます。
+|g:operator#sandwich#default_recipes| は |g:sandwich#default_recipes| と同様に
+ロックされています。
+
+
+
+g:operator#sandwich#recipes		*g:operator#sandwich#recipes*
+	オペレータのみから参照されるレシピのリストです。このリストが存在しない
+	場合は |g:operator#sandwich#default_recipes| が使用されます。
+
+
+
+g:operator#sandwich#default_recipes	*g:operator#sandwich#default_recipes*
+	デフォルトで用意されるレシピのリストの一つです。オペレータのみから参照
+	されます。ユーザーが |g:operator#sandwich#recipes| を定義した場合には
+	そちらがかわりにつかわれます。その際必要ならコピーすることができます。
+>
+	:let g:operator#sandwich#recipes
+	 \ = deepcopy(g:operator#sandwich#default_recipes)
+<
+
+
+
+NOTE: もしレシピが競合する場合は |g:operator#sandwich#default_recipes| か
+      |g:operator#sandwich#recipes| が |g:sandwich#default_recipes| か
+      |g:sandwich#recipes| よりも優先されます。また同じリスト内であれば、リス
+      ト後方のレシピほど優先されます。
+
+------------------------------------------------------------------------------
+一つ一つのレシピは |Dictionary| 変数であり、 requisite, input, filter, local
+optionの三種の情報を持ちえます。 requisite はすべてのレシピに必須の情報で囲み
+文字を特定するためのものです。input はレシピを指定するためのユーザー入力を決め
+ます。 filter は使用する状況によってレシピを選別するためにあります。 local
+option はレシピによってオペレータの働きを細かく制御するために使われます。さら
+にこれら以外にオペレータの基本的な動作を制御するための global option もいくつ
+か存在します。
+
+設定を変更する場合はまず必要なリストを宣言しましょう。
+>
+	let g:sandwich#recipes = []
+<
+あるいはデフォルト設定を引き継ぐためにコピーしてもよいでしょう。
+>
+	let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
+<
+
+Requisite~
+
+requisite には buns と external の二種類あり、すべてのレシピはどちらかを持たな
+ければなりません。
+
+buns
+	テキストを囲む文字列のセットを定義するためのキーです。値に文字列を二つ
+	要素に持つ |list| を持ちます。囲むまたは置換するオペレータにおける挿入
+	される文字列、囲みを外すまたは置換するオペレータにおける削除される文字
+	列の両方に使われます。もし "regex" オプションが真なら正規表現として扱
+	われます。またレシピが "input" キーを持たない場合、レシピを指定するた
+	めのキー入力にも使われます。
+>
+	let g:sandwich#recipes += [
+	  \    {'buns': ['(', ')']}
+	  \  ]
+
+	" Press saiw( or saiw)
+	"       foo   --->   (foo)
+
+	let g:sandwich#recipes += [
+	  \    {'buns': ['ab', 'cd']}
+	  \  ]
+
+	" Press saiwab or saiwcd
+	"       foo   --->   abfoocd
+
+	let g:sandwich#recipes += [
+	  \    {'buns': ['ab', 'cd'], 'input': ['a']}
+	  \  ]
+
+	" Press saiwa
+	"       foo   --->   abfoocd
+<
+
+
+
+external
+	こちらは補助的に使われる requisite です。文字列二要素の |list| でそれ
+	ぞれの要素は外部のテキストオブジェクトになります。囲みを外すまたは置換
+	するオペレータにおける削除される文字列を検索する場合にのみ使われ、挿入
+	文字列としては使われません。つまり、言い換えれば囲むオペレータでは使わ
+	れません。削除文字列は二つのテキストオブジェクトの選択する範囲の差によ
+	って決められ、リストの前方の要素が狭い範囲を選択するテキストオブジェク
+	ト、後方の要素が広い範囲を選択するテキストオブジェクトとみなされます。
+	"buns" とは違い、多くの local option が無効になります。
+>
+	let g:sandwich#recipes += [
+	  \    {'external': ['it', 'at']}
+	  \  ]
+
+	" "it" selects the text inside tags, "at" selects including tags.
+	" Therefore, the deletions are the both tags.
+	"              <---it--->
+	"       <title>title here</title>
+	"       <----------at----------->
+
+	" Press <Plug>(operator-sandwich-delete)at
+	"       <title>title here</title>   --->   title here
+<
+	"noremap" オプションは有効です。内部的にはビジュアルモード選択を利用し
+	て範囲を確かめているのでビジュアルモードへのマッピング (xmap,
+	xnoremap, vmap, vnoremap)が展開の対象になります。
+>
+	let g:sandwich#recipes += [
+	  \    {'external': ['i[', 'a['], 'noremap': 0}
+	  \  ]
+
+	" Press <Plug>(operator-sandwich-delete)a[
+	"       [foo]   --->   foo
+
+	xnoremap i[ i{
+	xnoremap a[ a{
+
+	" Press <Plug>(operator-sandwich-delete)a{
+	"       {foo}   --->   foo
+<
+	"noremap" オプションと組み合わせることでユーザー定義テキストオブジェク
+	トも同様にレシピ化できます。
+>
+	" "noremap" option should be false.
+	let g:sandwich#recipes += [
+	  \    {
+	  \      'external': ["\<Plug>(textobj-sandwich-auto-i)",
+	  \                   "\<Plug>(textobj-sandwich-auto-a)"],
+	  \      'noremap': 0,
+	  \    }
+	  \ ]
+<
+	NOTE: 使用するテキストオブジェクトはビジュアルモードで正しく動作するこ
+	      とを期待されます。
+	NOTE: すべてのテキストオブジェクトが動作するとは限りません。
+
+
+
+Input~
+
+input
+	文字列を囲むまたは置換する際、オペレータは囲みを決定するためにユーザー
+	に入力を促します。この時の入力に使われるのがこのキーの値になります。値
+	はリストで複数の文字列を含むことができます。このキーを持たないレシピで
+	は "buns" がかわりにつかわれます。以下の例では、 "input" キーを持たな
+	いので "buns" がそのまま使われます。
+>
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"""', '"""']}
+	  \  ]
+	" Press saiw"""
+	" foo   --->   """foo"""
+<
+	"input" キーがあればそちらがかわりにつかわれます。
+>
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"""', '"""'], 'input': ['"']}
+	  \  ]
+	" Press saiw"
+	" foo   --->   """foo"""
+<
+
+
+
+Filter~
+
+filetype
+	ファイルタイプによってレシピを選別するフィルターです。値はリストでファ
+	イルタイプ名の文字列が要素になります。レシピが "filetype" キーを持たな
+	いか、要素として "all" を持つ場合はすべてのファイルタイプで有効になり
+	ます。
+>
+	" The following recipes are valid on any filetype.
+	let g:sandwich#recipes += [
+	  \    {'buns': ['(', ')']}
+	  \    {'buns': ['[', ']'], 'filetype': ['all']}
+	  \  ]
+
+	" The textobj "it" and "at" is not versatile and might be heavy on
+	" large files, thus it would be better to activate only on specific
+	" filetypes.
+	let g:sandwich#recipes += [
+	  \    {'external': ['it', 'at'], 'filetype': ['html']}
+	  \  ]
+<
+
+
+
+kind
+	オペレータの種類によってレシピを選別するフィルターです。値はリストで要
+	素にオペレータの種類を文字列として持ちます。使用可能な種類は "add",
+	"delete", "replace", "operator", "all" です。 "operator" は "add",
+	"delete", "replace" のすべてを指定した場合と同じです。 "operator" と
+	"all" の違いは、 "all" は |textobj-sandwich| の種類も含むことがある点
+	にあります。あわせて |textobj-sandwich-configuration| もご覧ください。
+	レシピが "kind" キーを持たなければすべての種類で有効です。
+>
+	" The following recipe is valid only with the add operator.
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"""', '"""'], 'kind': ['add']}
+	  \  ]
+<
+
+
+
+motionwise
+	指定された範囲の性質によってレシピを選別するフィルターです。値はリスト
+	で使用可能な要素は "char", "line", "block", "all" です。範囲の種類につ
+	いては|characterwise|, |linewise|, |characterwise-visual|,
+	|linewise-visual|, |blockwise-visual| の項をご覧ください。レシピが
+	"motionwise" キーを持たなければすべての範囲指定に関して有効です。
+>
+	" The following recipe is valid only in linewise motion or linewise
+	" visual.
+	let g:sandwich#recipes += [
+	  \    {'buns': ['```', '```'], 'motionwise': ['line']}
+	  \  ]
+<
+
+
+
+mode
+	使用されたモードによってレシピを選別するフィルターです。値はモードを表
+	す文字のリストです。使用可能な文字は "n" と "x" のみです。"n" はノーマ
+	ルモードを、 "x" はビジュアルモードを表します。レシピが "mode" キーを
+	持たなければすべてのモードで有効です。
+>
+	" These recipes are switch behaviors on modes with the same input.
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"', '"'], 'mode': ['n']}
+	  \    {'buns': ['"""', '"""'], 'mode': ['x'], 'input': ['"']}
+	  \  ]
+<
+
+
+
+Local option~
+
+local option はレシピごとに細かく挙動を調整するために設定されます。もし指定の
+ない場合はデフォルトで設定されている値が使われます。この値はオペレータの種類と
+範囲指定の性質に依って違う値をもち、 |g:operator#sandwich#options| に格納され
+ています。
+
+例えば、文字列を囲むオペレータの文字単位範囲に対するハイライトをOn/Offするオプ
+ション "highlight" のデフォルト値を変更したい場合は次のようにします。
+>
+	let g:operator#sandwich#options.add.char.highlight = 0
+<
+あるいは関数インターフェースも用意されています。 |operator#sandwich#set()|
+>
+	call operator#sandwich#set('add', 'char', 'highlight', 0)
+<
+
+
+
+g:operator#sandwich#options		*g:operator#sandwich#options*
+	local option のデフォルト値を格納した |Dictionary| 変数です。
+>
+	let operator#sandwich#options[kind][motionwise][option] = {value}
+
+	" For example
+	let g:operator#sandwich#options['add']['char']['highlight'] = 0
+	" or
+	let g:operator#sandwich#options.add.char.highlight = 0
+<
+	使用可能なキー名を下に列挙します。
+	  * kind
+	    - add
+	    - delete
+	    - replace
+	  * motionwise
+	    - char
+	    - line
+	    - block
+	  * option
+	    - cursor			(for all kinds)
+	    - highlight			(for all kinds)
+	    - skip_space		(for all kinds)
+	    - noremap			(for all kinds)
+	    - linewise			(for all kinds)
+	    - command			(for all kinds)
+	    - query_once		(for add and replace)
+	    - eval			(for add and replace)
+	    - regex			(for delete and replace)
+	    - skip_char			(for delete and replace)
+	    - highlight_duration	(for delete)
+
+
+
+					*operator#sandwich#set()*
+operator#sandwich#set(kind, motionwise, option, value)
+	local option のデフォルト値を安全かつ簡単に変更するための関数です。引
+	数の組み合わせが不正な場合、関数はメッセージを表示します。使用可能な引
+	数は |g:operator#sandwich#options| の項に列挙されています。また、これ
+	に加えて、この関数では "all" を kind 及び motionwise に指定することが
+	できます。
+
+
+
+operator#sandwich#set_default()		*operator#sandwich#set_default()*
+	local option のデフォルト値を初期化します。
+
+
+
+cursor
+	オペレータが編集後のカーソル位置を指定するオプションです。
+	"innner_head", "keep", "inner_tail", "front", "end" が使用可能です。
+	  inner_head: 囲みの内側の文字列の先頭
+	  keep      : 処理開始時のカーソル位置をできる限り復元する
+	  inner_tail: 囲みの内側の文字列の末尾
+	  front     : 前方の囲みの先頭
+	  tail      : 後方の囲みの末尾
+>
+         #                 : cursor
+	foo   --->   (foo)
+
+                      #    : inner_head
+	             (foo)
+                        #  : inner_tail
+
+                       #   : keep
+	             (foo)
+
+                     #     : front
+	             (foo)
+                         # : end
+<
+	NOTE: 残念ながら "keep" オプションは |.| コマンドでの繰り返しの際に
+	      カーソル位置を復元できません。自動的に "inner_head" へフォール
+	      バックします。
+
+	デフォルト値
+	  * add
+	    - char : "inner_head"
+	    - line : "inner_head"
+	    - block: "inner_head"
+	  * delete
+	    - char : "inner_head"
+	    - line : "inner_head"
+	    - block: "inner_head"
+	  * replace
+	    - char : "inner_head"
+	    - line : "inner_head"
+	    - block: "inner_head"
+
+
+
+highlight
+	処理対象のハイライト機能のオン/オフを切り替えます。値が真なら、文字列
+	を囲むオペレータでは指定範囲の両端一文字が、囲みを外す/置換するオペレ
+	ータでは削除される/置換される文字列がハイライトされます。囲みを外すオ
+	ペレータでは削除される文字列が決定された後、短い時間だけハイライトされ
+	ますが、この間ユーザーの操作はブロックされませんので何らかの入力があっ
+	た場合ただちにハイライトは中止されます。合わせてグローバルオプションの
+	|g:operator#sandwich#highlight_duration| の項もご覧ください。
+
+	ハイライトに使われる色は OperatorSandwichBuns
+	|hl-OperatorSandwichBuns| という名前のハイライトグループ
+	|highlight-groups| を使って指定することができます。デフォルトでは
+	IncSearch |hl-IncSearch| にリンクされています。
+>
+	highlight link OperatorSandwichBuns Visual
+<
+
+	デフォルト値
+	  * add
+	    - char : 1
+	    - line : 1
+	    - block: 1
+	  * delete
+	    - char : 1
+	    - line : 1
+	    - block: 1
+	  * replace
+	    - char : 1
+	    - line : 1
+	    - block: 1
+
+
+
+skip_space
+	値が真なら、指定された文字列の両端がスペースであった場合にこれらをスキ
+	ップします。
+>
+	let g:sandwich#recipes += [
+	  \   {'buns': ['(', ')'], 'skip_space': 0}
+	  \ ]
+	" Press sa5l( when the cursor is on the first space.
+	"   ?foo?   --->   ( foo ) : ? is space
+
+	let g:sandwich#recipes = []
+	let g:sandwich#recipes += [
+	  \   {'buns': ['(', ')'], 'skip_space': 1}
+	  \ ]
+	"   ?foo?   --->  ?(foo)?  : ? is space
+<
+	ただし、囲みを外す/置換するオペレータについては両端が同じ文字である場
+	合は動作条件を満たすのでこれはただちに削除/置換されます。よってこのオ
+	プションは指定範囲の片側のみが空白であった場合に動作します。
+>
+	let g:sandwich#recipes += [
+	  \   {'buns': ['"', '"'], 'skip_space': 1}
+	  \ ]
+	" Press sda"
+	"   ?"foo"   --->  ?foo    : ? is space
+<
+
+	デフォルト値
+	  * add
+	    - char : 0
+	    - line : 1
+	    - block: 1
+	  * delete
+	    - char : 1
+	    - line : 1
+	    - block: 1
+	  * replace
+	    - char : 1
+	    - line : 1
+	    - block: 1
+
+
+
+noremap
+	このオプションは囲みを挿入する際にキーマッピングを展開するかどうかを切
+	り替えます。値が真なら展開しません。
+>
+	inoremap ( [
+	inoremap ) ]
+	let g:sandwich#recipes += [
+	  \   {'buns': ['(', ')'], 'noremap': 1}
+	  \ ]
+
+	" Press saiw(
+	" foo   --->   (foo)
+
+	let g:sandwich#recipes = []
+	let g:sandwich#recipes += [
+	  \   {'buns': ['(', ')'], 'noremap': 0}
+	  \ ]
+
+	" Press saiw(
+	" foo   --->   [foo]
+<
+	このオプションは requisite の "external" にも適用されます。
+
+	デフォルト値
+	  * add
+	    - char : 1
+	    - line : 1
+	    - block: 1
+	  * delete
+	    - char : 1
+	    - line : 1
+	    - block: 1
+	  * replace
+	    - char : 1
+	    - line : 1
+	    - block: 1
+
+
+
+linewise
+	このオプションは文字列の挿入/削除の方法を切り替えます。通常の動作は文
+	字単位指向です。
+>
+	call operator#sandwich#set('add', 'char', 'linewise', 0)
+	" Press saiw(
+	" foo   --->   (foo)
+<
+	このオプションが1であれば、行指向になります。
+>
+	call operator#sandwich#set('add', 'char', 'linewise', 1)
+	" Press saiw(
+	" foo   --->   (
+	               foo
+	               )
+<
+	文字列を削除する場合は、文字列削除後にその行に空白文字以外に残っていな
+	ければ行ごと削除します。
+>
+	call operator#sandwich#set('delete', 'char', 'linewise', 0)
+	" Press <Plug>(operator-sandwich-delete)a(
+	" (                  : this line was remained
+	" foo   --->   foo   : this line was remained
+	" )                  : this line was remained
+
+	call operator#sandwich#set('delete', 'char', 'linewise', 1)
+	" Press <Plug>(operator-sandwich-delete)a(
+	" (     --->   foo
+	" foo
+	" )
+<
+	空白文字以外が残るようであれば行を保存します。
+>
+	call operator#sandwich#set('delete', 'char', 'linewise', 1)
+	" Press <Plug>(operator-sandwich-delete)a(
+	" (foo          foo
+	" bar    --->   bar
+	" baz)          baz
+<
+	値が2の場合は空白以外が残っても気にせず行を削除します。
+>
+	call operator#sandwich#set('delete', 'char', 'linewise', 2)
+	" Press <Plug>(operator-sandwich-delete)a(
+	" (foo   --->   bar
+	" bar
+	" baz)
+<
+	囲みを置換するオペレータの場合はこれらの組み合わせの動作になります。
+
+	デフォルト値
+	  * add
+	    - char : 0
+	    - line : 1
+	    - block: 0
+	  * delete
+	    - char : 0
+	    - line : 1
+	    - block: 0
+	  * replace
+	    - char : 0
+	    - line : 1
+	    - block: 0
+
+
+
+command
+	オペレータ処理後に実行されるコマンドのリストです。コマンド実行の前に一
+	時的に |'[| と |']| の二つのマークが囲みの内側のテキストの先頭と末尾に
+	設定されます。
+>
+	let g:sandwich#recipes += [
+	  \    {
+	  \      'buns'    : ['{', '}'],
+	  \      'linewise': 1,
+	  \      'command' : ["'[,']normal! >>"]
+	  \    },
+	  \ ]
+	" Press saiw{
+	" foo   --->   {
+	                   foo
+	               }
+<
+	デフォルト値
+	  * add
+	    - char : []
+	    - line : []
+	    - block: []
+	  * delete
+	    - char : []
+	    - line : []
+	    - block: []
+	  * replace
+	    - char : []
+	    - line : []
+	    - block: []
+
+
+
+query_once
+	このオプションは [count] が与えられた場合の挙動を変更します。もしこの
+	値が偽なら、文字列を囲むオペレータと囲みを置換するオペレータは与えられ
+	たカウントの回数だけ挿入文字列をユーザーに尋ねます。一方、このオプショ
+	ンの値が真の場合、一回だけ尋ねて、以降は同じものを挿入します。
+
+	デフォルト値
+	  * add
+	    - char : 0
+	    - line : 0
+	    - block: 0
+	  * replace
+	    - char : 0
+	    - line : 0
+	    - block: 0
+
+
+
+eval
+	このオプションの値が 1 か 2 なら "buns" は式として評価されてから挿入さ
+	れます。値が 1 の場合は一度だけ評価され、|.| コマンドでは同じものが使
+	用されます。値が 2 の場合は |.| コマンドで繰り返される毎に評価されます
+	。例えば以下のレシピはその時々の無名レジスタ |quotequote| の内容を挿入
+	します。 (参考: |let-@|)
+>
+	let g:sandwich#recipes += [
+	  \   {'buns': ['@@', '@@'], 'eval': 1, 'input': ['@']}
+	  \ ]
+<
+	デフォルト値
+	  * add
+	    - char : 0
+	    - line : 0
+	    - block: 0
+	  * replace
+	    - char : 0
+	    - line : 0
+	    - block: 0
+
+
+
+regex
+	もしこのオプションの値が真なら "buns" は正規表現だとみなされます。また
+	このオプションが真の場合は文字列を囲む/囲みを置換するオペレータでの挿
+	入文字列には使用されなくなります。削除する文字列の検索にのみ使われます
+	。
+>
+	let g:sandwich#recipes += [
+	  \   {'buns': ['\d\+', '\d\+'], 'regex': 1}
+	  \ ]
+	" Press <Plug>(operator-sandwich-delete)iw
+	" 123foo456   --->   foo
+<
+	デフォルト値
+	  * delete
+	    - char : 0
+	    - line : 0
+	    - block: 0
+	  * replace
+	    - char : 0
+	    - line : 0
+	    - block: 0
+
+
+
+skip_char
+	もしこのオプションの値が真なら登録された囲みを見つけるまで指定範囲の両
+	端を縮小します。
+>
+	let g:sandwich#recipes += [
+	  \   {'buns': ['(', ')'], 'skip_char': 1}
+	  \ ]
+	" Press V<Plug>(operator-sandwich-delete)
+	" foo(bar)baz   --->   foobarbaz
+<
+	デフォルト値
+	  * delete
+	    - char : 0
+	    - line : 0
+	    - block: 0
+	  * replace
+	    - char : 0
+	    - line : 0
+	    - block: 0
+
+
+
+Global option~
+
+いくつか基本的な動作を制御するためのオプションが存在します。
+
+g:operator#sandwich#timeoutlen		*g:operator#sandwich#timeoutlen*
+	"input" に前方一致で重複するレシピが存在する場合に次のキーシーケンスを
+	待つ時間をミリ秒単位で指定します。
+>
+	let g:sandwich#recipes = [
+	  \   {'buns': ['(', ')']}
+	  \   {'buns': ['((', '))']}
+	  \ ]
+<
+	saiw( とキー入力するとオペレータは次に ( が入力されるかこの時間だけ待
+	ちます。この間にもう一度 ( を押下すると '((' と '))' のレシピが使われ
+	るでしょう。キーの押下なしでこの時間が過ぎると '(' と ')' のレシピが使
+	われるでしょう。デフォルトでは Vim のオプション 'timeoutlen' と同じ値
+	が使われます。
+
+
+
+				*g:operator#sandwich#highlight_duration*
+g:operator#sandwich#highlight_duration
+	囲みを外すオペレータにおけるハイライトが持続する時間をミリ秒単位で指定
+	します。デフォルト値は 200 です。
+
+
+
+------------------------------------------------------------------------------
+|g:operator#sandwich#default_recipes| は一つのユニークなレシピを持っています。
+>
+	  {
+	\    'buns': [
+	\        'input("operator-sandwich:head: ")',
+	\        'input("operator-sandwich:tail: ")'
+	\    ],
+	\    'kind': ['add', 'replace'],
+	\    'eval': 1,
+	\    'input': ['f']
+	\ },
+<
+一つ一つの要素の意味は上で説明されています。重要なのはこのレシピが f という
+input によって発火することと、その機能によりインスタントなレシピが定義できるこ
+とです。このように使います。まず、このレシピを呼びましょう、例えばカーソルを
+bar という文字列に合わせ saiwf と入力します。
+>
+	bar
+<
+するとカーソルがコマンドラインへ移動し、先頭へ挿入する文字列を入力するよう求め
+られます。 foo とでも入れて <Enter> を押しましょう。
+>
+	operator-sandwich:head: foo
+<
+次に末尾へ挿入する文字列を求められます。 baz とでも入れて <Enter> を押しましょ
+う。
+>
+	operator-sandwich:tail: baz
+<
+これで文字列 foobarbaz が得られます。
+>
+	foobarbaz
+<
+あるいは手順が冗長に感じる方もいると思いますが、この動作が |.| コマンドで繰り
+返せると考えると役に立つ場面もあるのではないでしょうか。
+
+
+
+==============================================================================
+HIGHLIGHT GROUP				*operator-sandwich-highlight-group*
+
+三つのオペレータすべてが何らかのハイライト機能を持っています。そのオンオフの切
+り替えは local option の highlight によって切り替えられますが、その色について
+は独自のハイライトグループによって管理されます。
+
+OperatorSandwichBuns			*hl-OperatorSandwichBuns*
+	このハイライトグループによってオペレータのハイライト色を宣言します。デ
+	フォルトでは IncSearch |hl-IncSearch| グループにリンクしています。
+>
+	highlight link OperatorSandwichBuns IncSearch
+<
+	ユーザーはこれを自由に変更できます。
+>
+	highlight OperatorSandwichBuns ctermfg=White ctermbg=Red
+	                             \ guifg=White   guibg=Red
+<
+
+
+
+==============================================================================
+AUTOCOMMAND				*operator-sandwich-autocommand*
+
+ユーザーは |:autocmd| によってオペレータの動作前と後に処理をフックできます。そ
+れぞれのオペレータは独自の |User| オートコマンドイベントを持っているのでこれを
+使いオートコマンドを設定するとよいでしょう。
+
+文字列を囲むオペレータ~
+OperatorSandwichAddPre			*OperatorSandwichAddPre*
+	文字列を囲むオペレータの処理前に実行されます。
+
+OperatorSandwichAddPost			*OperatorSandwichAddPost*
+	文字列を囲むオペレータの処理後に実行されます。
+
+囲みを外すオペレータ~
+OperatorSandwichDeletePre		*OperatorSandwichDeletePre*
+	囲みを外すオペレータの処理前に実行されます。
+
+OperatorSandwichDeletePost		*OperatorSandwichDeletePost*
+	囲みを外すオペレータの処理後に実行されます。
+
+囲みを置換するオペレータ~
+OperatorSandwichReplacePre		*OperatorSandwichReplacePre*
+	囲みを置換するオペレータの処理前に実行されます。
+
+OperatorSandwichReplacePost		*OperatorSandwichReplacePost*
+	囲みを置換するオペレータの処理後に実行されます。
+
+実用例~
+下記の例は Vim のデフォルトプラグイン matchit.vim のハイライトをオペレータ処理
+中のみ抑制します。
+>
+ autocmd User OperatorSandwichAddPre,OperatorSandwichReplacePre NoMatchParen
+ autocmd User OperatorSandwichAddPost,OperatorSandwichReplacePost DoMatchParen
+<
+
+
+
+==============================================================================
+MISCELLANEOUS				*operator-sandwich-miscellaneous*
+
+囲みを外すオペレータのハイライトはいらない~
+	そうですね。次の行を vimrc へ追記しましょう。
+>
+	call operator#sandwich#set('delete', 'all', 'highlight', 0)
+<
+
+
+
+ハイライトは全部いらない~
+	かもしれませんね。次の行を vimrc へ追記しましょう。
+>
+	call operator#sandwich#set('all', 'all', 'highlight', 0)
+<
+
+
+
+matchit.vim のハイライトがかぶって邪魔~
+	|:autocmd| を使って一時的に抑制しましょう。
+	|operator-sandwich-autocommands| をご参照ください。
+>
+ autocmd User OperatorSandwichAddPre,OperatorSandwichReplacePre NoMatchParen
+ autocmd User OperatorSandwichAddPost,OperatorSandwichReplacePost DoMatchParen
+<
+	あるいは単にはっきりと違う色を使うのもいいですね。
+	|operator-sandwich-highlight-group| の項をご覧ください。
+>
+	highlight OperatorSandwichBuns ctermfg=White ctermbg=Red
+	                             \ guifg=White   guibg=Red
+<
+
+
+
+文字列を囲むオペレータの文字指向の場合だけ空白をスキップしないのはなぜ？~
+	私がたまに不便に思ったからです。端的に言うとビジュアルモードなどでスペ
+	ース含みで囲みたい場合があったからです。お気に召さなければ次の行を
+	vimrc へ追加してください。
+>
+	call operator#sandwich#set('add', 'char', 'skip_space', 1)
+<
+
+
+
+なぜ囲みを外す/置換するオペレータのキーマッピングはデフォルトで提供されない？~
+	これらのオペレータの動作条件を鑑みるに、ほぼ常に |textobj-sandwich| と
+	組み合わせるのが便利だからです。このため単体ではなくテキストオブジェク
+	トとの複合マッピングがかわりに用意されます。詳しくは
+	|sandwich-keymappings| の項をご覧ください。また、ビジュアルモードでは
+	単体でマッピングされていますよ。もちろんノーマルモードでも動作条件を満
+	たす限り、あらゆるモーションあるいはテキストオブジェクトと組み合わせる
+	ことができますので興味があれば試してみてください。
+	|<Plug>(operator-sandwich-delete)|
+	|<Plug>(operator-sandwich-replace)|
+
+
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:noet:

@@ -1,0 +1,240 @@
+*sandwich.jax*	日本語ヘルプ		Last change:23-May-2015.
+
+“挟まれた”テキストを編集するためのオペレータとテキストオブジェクトの詰め合わせ
+です。
+
+書いた人   : machakann <mckn@outlook.jp>
+ライセンス : NYSL license
+          日本語 <http://www.kmonos.net/nysl/>
+          English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>
+
+必須要件:	Vim 7.4 かそれ以降のバージョン
+		|+reltime| 機能 (任意)
+		|+float| 機能 (任意)
+
+==============================================================================
+CONTENTS				*sandwich-contents*
+
+QUICK START			|sandwich-quick-start|
+INTRODUCTION			|sandwich-introduction|
+KEYMAPPINGS			|sandwich-keymappings|
+CONFIGURATION			|sandwich-configuration|
+
+==============================================================================
+QUICK START				*sandwich-quick-start*
+
+*sandwich.vim* は文字列を括弧などで囲む/囲みを外す/囲みを置き換えることを目的
+としたオペレータとテキストオブジェクトのセットです。例えば、(foo) や "bar" の
+ような文字列が処理の対象になります。
+
+囲む~
+sa{motion/textobject}{addition} と、キー入力します。
+例えば、 foo という単語にカーソルを合わせて saiw( と入力すると (foo) となりま
+す。
+
+囲みを外す~
+sdb あるいは sd{deletion} とキー入力します。
+例えば、 (foo) というテキストにカーソルを合わせて sdb あるいは sd( と入力する
+と foo となります。 sdb という入力は自動的に囲まれたテキストを検索します。
+
+囲みを置き換える~
+srb{addition} あるいは sr{deletion}{addition} キー入力します。
+例えば、 (foo) というテキストにカーソルを合わせて srb" あるいは sr(" と入力す
+ると "foo" となります。
+
+これだけ読めばこのプラグインを使うのに十分でしょう。もし、さらに興味がわいた方
+、挙動を細かく変更したい方は続く記述およびオペレータとテキストオブジェクトそれ
+ぞれのヘルプ |operator-sandwich| 、 |textobj-sandwich| をご覧ください。
+
+
+
+==============================================================================
+INTRODUCTION				*sandwich-introduction*
+
+このプラグインは文字列を括弧などで囲む/囲みを外す/囲みを置き換えるための機能を
+提供します。オペレータ部分 |operator-sandwich| とテキストオブジェクト部分
+|textobj-sandwich| の二つの部分からなり、これらが共働することにより機能を実現
+します。また、同時にそれぞれが独立したオペレータ/テキストオブジェクトであるの
+で、ほかのあらゆるオペレータ/テキストオブジェクトと組み合わせることもできます
+。これらの機能は純粋にオペレータ及びテキストオブジェクトの枠組みを使って実装さ
+れているので、いかなるライブラリにも依存することなく |.| コマンドによって繰り
+返すことができます。
+
+|operator-sandwich| は三種のオペレータ |<Plug>(operator-sandwich-add)|,
+|<Plug>(operator-sandwich-delete)|, |<Plug>(operator-sandwich-replace)| を定義
+します。これらが対象テキストの編集を行います。
+
+|textobj-sandwich| は四種のテキストオブジェクト
+|<Plug>(textobj-sandwich-auto-i)|, |<Plug>(textobj-sandwich-auto-a)|,
+|<Plug>(textobj-sandwich-query-i)|, |<Plug>(textobj-sandwich-query-a)| を定義
+します。これらのテキストオブジェクトは対象となるテキストを検索し選択します。
+
+
+
+==============================================================================
+KEYMAPPINGS				*sandwich-keymappings*
+
+このプラグインは以下のキーマッピングを提供します。
+
+機能		デフォルトキーマッピング
+--------------------------------------------------------------------------
+囲む		sa{motion/textobject}{addition}	(ノーマル、ビジュアルモード)
+
+囲みを外す
+		sd				(ビジュアルモード)
+		sdb				(ノーマルモード)
+		sd{deletion}			(ノーマルモード)
+
+囲みを置き換える
+		sr{addition}			(ビジュアルモード)
+		srb{addition}			(ノーマルモード)
+		sr{deletion}{addition}		(ノーマルモード)
+
+テキストオブジェクト
+		ib			(オペレータ待機、ビジュアルモード)
+		ab			(オペレータ待機、ビジュアルモード)
+		is			(オペレータ待機、ビジュアルモード)
+		as			(オペレータ待機、ビジュアルモード)
+--------------------------------------------------------------------------
+
+NOTE: 誤操作を防ぐため以下の設定を vimrc に追加することを強く推奨します。
+>
+	nmap s <Nop>
+	xmap s <Nop>
+<
+      |s| コマンドは |c|l| コマンドによって代替できます。
+
+
+
+細かな内訳は以下のようになります。
+
+  * |operator-sandwich|
+テキストを括弧などにより囲むオペレータ |<Plug>(operator-sandwich-add)| はノー
+マルモード、ビジュアルモード共に sa にマップされています。
+
+囲みを外すオペレータ |<Plug>(operator-sandwich-delete)| はビジュアルモードで
+sd にマップされています。これは選択された領域の両端が同じ文字であるか、登録さ
+れた囲みにマッチした場合にこれらを消去します。
+
+囲みを置き換えるオペレータ |<Plug>(operator-sandwich-replace)| はビジュアルモ
+ードで sr にマップされています。これは選択された領域の両端が同じ文字であるか、
+登録された囲みにマッチした場合にこれらを置換します。
+
+
+
+  * |textobj-sandwich|
+|<Plug>(textobj-sandwich-auto-i)| と |<Plug>(textobj-sandwich-auto-a)| は自動
+的に囲まれたテキストを検索し、選択するテキストオブジェクトです。これらはオペレ
+ータ待機モード、ビジュアルモードにおいて ib 及び ab にマップされています。前者
+は囲みの内側を、後者は囲みを含んだテキストを選択します。
+
+|<Plug>(textobj-sandwich-query-i)| と |<Plug>(textobj-sandwich-query-a)| はユ
+ーザーの入力に応じて囲まれたテキストを検索し、選択します。これらはオペレータ待
+機モード、ビジュアルモードにおいて is 及び as にマップされています。前者は囲み
+の内側を、後者は囲みを含んだテキストを選択します。
+
+
+
+これらに加え、ノーマルモードの sd, sdb, sr, srb にはオペレータとテキストオブジ
+ェクトの複合マッピングが用意されています。
+
+  sd
+>
+	<Plug>(operator-sandwich-delete)<Plug>(textobj-sandwich-query-a)
+<
+  sdb
+>
+	<Plug>(operator-sandwich-delete)<Plug>(textobj-sandwich-auto-a)
+<
+  sr
+>
+	<Plug>(operator-sandwich-replace)<Plug>(textobj-sandwich-query-a)
+<
+  srb
+>
+	<Plug>(operator-sandwich-replace)<Plug>(textobj-sandwich-auto-a)
+<
+これは、 |<Plug>(operator-sandwich-delete)| 及び
+|<Plug>(operator-sandwich-replace)| の作動条件を考えると、このようにするのが便
+利であるからです。これらのオペレータは指定される領域の両端が作動条件にマッチす
+る必要があり、組み合わされたテキストオブジェクトはまさにその条件を満たすためで
+す。これにより、ユーザーは削除する対象、置き換える文字列の入力のみを考えればよ
+くなります。もしこれらの複合マッピングがお気に召さなければ
+g:sandwich_no_default_key_mappings をあなたの vimrc で定義しておいてください。
+>
+	let g:sandwich_no_default_key_mappings = 1
+<
+NOTE: 実は上の複合マッピングの内訳は完全ではなく、オペレータとテキストオブジェ
+      クトの間に |<Plug>(operator-sandwich-release-count)| というキーシークエ
+      ンスが入ります。これはカウントを扱うためのちょっとした工夫で例えば、
+      2sdb という入力は次の入力に等しくなります。
+>
+	<Plug>(operator-sandwich-delete)2<Plug>(textobj-sandwich-auto-a)
+<
+      つまり二番目に近い囲まれたテキストの囲みを削除します。
+>
+	      #                            : cursor
+	[bar(foo)baz]   --->   bar(foo)baz
+<
+      これらのオペレータの [count] の特殊な扱い方に関しては
+      |operator-sandwich-introduction| をご覧ください。
+
+
+
+==============================================================================
+CONFIGURATION				*sandwich-configuration*
+
+括弧などのセットとその性質に依るオプションをまとめた情報をレシピ "recipe" と呼
+びます。一つ一つのレシピは |Dictionary| で、これらを集めた |list| がオペレータ
+やテキストオブジェクトの動作を決めます。 |g:sandwich#default_recipes| はその一
+つで、 |operator-sandwich| と |textobj-sandwich| の両方から参照されます。多く
+の場合、この情報は共有したほうが便利であるためです。 |g:sandwich#recipes| がユ
+ーザーによって定義された場合こちらがかわりに参照されます。デフォルト設定の
+|g:sandwich#default_recipes| は |:echo| コマンドによって確認できます。
+>
+	:echo g:sandwich#default_recipes
+<
+
+上記に加え、 |g:operator#sandwich#recipes| と |g:textobj#sandwich#recipes| も
+レシピを持つことができます。これらは |operator-sandwich| と |textobj-sandwich|
+のそれぞれからしか参照されません。固有のレシピをおきたい場合に使いましょう。
+
+レシピの細かい仕様については、オペレータ及びテキストオブジェクトのヘルプ、
+|operator-sandwich-configuration| 及び |textobj-sandwich-configuration| をご覧
+ください。
+
+
+
+g:sandwich#recipes			*g:sandwich#recipes*
+	|operator-sandwich| と |textobj-sandwich| の両方から参照されるレシピの
+	リストです。もし存在しなければ |g:sandwich#default_recipes| がかわりに
+	つかわれます。
+
+
+
+g:sandwich#default_recipes		*g:sandwich#default_recipes*
+	デフォルトで用意されたレシピのリストです。 |g:sandwich#recipes| が存在
+	すれば、そちらがかわりにつかわれます。
+>
+	let g:sandwich#default_recipes = [
+	\	{'buns': ['<', '>'], 'expand_range': 0, 'match_syntax': 1},
+	\	{'buns': ['"', '"'], 'quoteescape': 1, 'expand_range': 0,
+	\				'nesting': 0, 'match_syntax': 2},
+	\	{'buns': ["'", "'"], 'quoteescape': 1, 'expand_range': 0,
+	\				'nesting': 0, 'match_syntax': 2},
+	\	{'buns': ['{', '}'], 'nesting': 1, 'match_syntax': 1,
+	\				'skip_break': 1},
+	\	{'buns': ['[', ']'], 'nesting': 1, 'match_syntax': 1},
+	\	{'buns': ['(', ')'], 'nesting': 1, 'match_syntax': 1},
+	]
+<
+この変数は変更を禁止されていますが、 |g:sandwich#recipes| を宣言する際に必要な
+らコピーすることはできます。
+>
+	:let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
+<
+
+
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:noet:
