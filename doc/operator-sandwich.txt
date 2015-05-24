@@ -1,4 +1,4 @@
-*operator-sandwich.txt*			Last change:23-May-2015.
+*operator-sandwich.txt*			Last change:24-May-2015.
 
 The operator plugin to edit sandwiched textobjects.
 
@@ -540,6 +540,23 @@ mode
 	let g:sandwich#recipes += [
 	  \    {'buns': ['"', '"'], 'mode': ['n']}
 	  \    {'buns': ['"""', '"""'], 'mode': ['x'], 'input': ['"']}
+	  \  ]
+<
+
+
+
+action
+	This filter filters recipes by kinds of action. In principle, all the
+	operator's action could be split into two kinds, "add" and "delete".
+	The add operator has "add" action and the delete operator has "delete"
+	action. The replace operator has both "delete" action phase and "add"
+	action phase to replace strings. This filter limits the chance to be
+	used in each action. Available item is "add", "delete" and "all". If a
+	recipe does not have action key, the recipe is valid in both actions.
+>
+	" The recipe is valid only in add actions
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"""', '"""'], 'action': ['add'], 'input': ['"']}
 	  \  ]
 <
 

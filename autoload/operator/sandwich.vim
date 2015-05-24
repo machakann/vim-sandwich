@@ -648,7 +648,7 @@ endfunction
 "}}}
 function! s:search(recipes) dict abort "{{{
   let recipes = deepcopy(a:recipes)
-  let filter  = '(!has_key(v:val, "deletion") || v:val.deletion)'
+  let filter  = 's:has_action(candidate, "delete")'
   call filter(recipes, filter)
   let region  = self.region
   let opt     = self.opt
@@ -757,8 +757,7 @@ let s:act.search       = function('s:search')
 
 function! s:query(recipes) dict abort  "{{{
   let recipes = filter(deepcopy(a:recipes), 'has_key(v:val, "buns")')
-  let filter = '(!has_key(v:val, "addition") || v:val.addition)
-           \ && (!has_key(v:val, "regex") || !v:val.regex)'
+  let filter = 's:has_action(v:val, "add") && (!has_key(v:val, "regex") || !v:val.regex)'
   call filter(recipes, filter)
   let opt   = self.opt.integrated
   let clock = self.clock
@@ -1357,6 +1356,15 @@ function! s:has_mode(candidate, mode) abort "{{{
     return 1
   else
     return stridx(a:candidate['mode'], a:mode) > -1
+  endif
+endfunction
+"}}}
+function! s:has_action(candidate, action) abort "{{{
+  if !has_key(a:candidate, 'action')
+    return 1
+  else
+    let filter = 'v:val ==# a:action || v:val ==# "all"'
+    return filter(copy(a:candidate['action']), filter) != []
   endif
 endfunction
 "}}}

@@ -1,4 +1,4 @@
-*operator-sandwich.jax*	日本語ヘルプ	Last change:23-May-2015.
+*operator-sandwich.jax*	日本語ヘルプ	Last change:24-May-2015.
 
 “挟まれた”テキストを編集するためのオペレータです。
 
@@ -535,6 +535,23 @@ mode
 	let g:sandwich#recipes += [
 	  \    {'buns': ['"', '"'], 'mode': ['n']}
 	  \    {'buns': ['"""', '"""'], 'mode': ['x'], 'input': ['"']}
+	  \  ]
+<
+
+
+
+action
+	編集方法の種類によってレシピを選別するフィルターです。すべてのオペレー
+	タの動作は、追加 "add" と削除 "delete" の二つの編集方法に分けることが
+	できます。文字列を囲むオペレータは "add" のみ、囲みを外すオペレータは
+	"delete" のみ、置換するオペレータは "delete" のち "add" をすることによ
+	り置換しています。このフィルターはそれぞれの編集において使われる機会を
+	制限します。使用可能な名前は "add", "delete", "all" です。レシピが
+	"action" キーを持たなければすべての編集操作において有効になります。
+>
+	" The recipe is valid only in add actions
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"""', '"""'], 'action': ['add'], 'input': ['"']}
 	  \  ]
 <
 
