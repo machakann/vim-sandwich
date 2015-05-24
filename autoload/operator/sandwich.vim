@@ -1,4 +1,4 @@
-" operator-sandwich: wrap by buns!
+" (operator)-sandwich: wrap by buns!
 " TODO: add 'at' option
 " TODO: add a way to use user defined filter
 " TODO: add a filter for addition or deletion
@@ -648,7 +648,7 @@ endfunction
 "}}}
 function! s:search(recipes) dict abort "{{{
   let recipes = deepcopy(a:recipes)
-  let filter  = 's:has_action(candidate, "delete")'
+  let filter  = 's:has_action(v:val, "delete")'
   call filter(recipes, filter)
   let region  = self.region
   let opt     = self.opt
