@@ -1028,7 +1028,7 @@ function! s:textobj.synchronize(recipe) abort "{{{
         \ && &operatorfunc =~# '^operator#sandwich#\%(delete\|replace\)'
     let filter = 'v:key !=# "clear" && v:key !=# "update"'
     call filter(a:recipe, filter)
-    if has_key(a:recipe, 'kind')
+    if has_key(a:recipe, 'kind') && filter(copy(a:recipe.kind), 'v:val ==# "delete" || v:val ==# "replace"') == []
       let a:recipe.kind += ['delete', 'replace']
       let a:recipe.addition = 0
     endif

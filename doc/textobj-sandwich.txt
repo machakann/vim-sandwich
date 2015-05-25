@@ -1,4 +1,4 @@
-*textobj-sandwich.txt*			Last change:23-May-2015.
+*textobj-sandwich.txt*			Last change:25-May-2015.
 
 The textobject plugin to search and select sandwiched textobjects.
 
@@ -631,7 +631,8 @@ synchro
 	priority. This option is useful when a "eval"uated recipe in
 	|g:textobj#sandwich#recipes| collaborates with these operators. When
 	a recipe is passed to the operators, "replace" and "delete" is
-	automatically added to "kind" filter.
+	automatically added to "kind" filter if the recipe has "kind" key and
+	does not have both "delete" and "replace" in the list.
 	See |operator-sandwich-configuration|.
 
 	Default values

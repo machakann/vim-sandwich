@@ -1,4 +1,4 @@
-*textobj-sandwich.jax*	日本語ヘルプ	Last change:23-May-2015.
+*textobj-sandwich.jax*	日本語ヘルプ	Last change:25-May-2015.
 
 “挟まれた”テキストを検索し選択するためのテキストオブジェクトです。
 
@@ -632,8 +632,9 @@ synchro
 	たレシピがこれらのオペレータに渡され高い優先度で削除/置換されます。こ
 	のオプションは |g:textobj#sandwich#recipes| 内の "eval" オプションで評
 	価されたレシピをこれらのオペレータと連携させるのに役にたつでしょう。レ
-	シピが渡される際に "kind" フィルターに "replace" and "delete" が自動的
-	に追加されます。
+	シピが渡される際に "kind" キーをもち、 "delete" と "replace" の両方を
+	持たない場合、 "kind" フィルターに "replace" and "delete" が自動的に追
+	加されます。
 	こちらの項もご覧ください。 |operator-sandwich-configuration|
 
 	デフォルト値
