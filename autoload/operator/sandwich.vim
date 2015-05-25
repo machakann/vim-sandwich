@@ -756,9 +756,10 @@ let s:act.search       = function('s:search')
 "}}}
 
 function! s:query(recipes) dict abort  "{{{
-  let recipes = filter(deepcopy(a:recipes), 'has_key(v:val, "buns")')
-  let filter = 's:has_action(v:val, "add") && (!has_key(v:val, "regex") || !v:val.regex)'
-  call filter(recipes, filter)
+  let filter = 'has_key(v:val, "buns")
+          \ && (!has_key(v:val, "regex") || !v:val.regex)
+          \ && s:has_action(v:val, "add")'
+  let recipes = filter(deepcopy(a:recipes), filter)
   let opt   = self.opt.integrated
   let clock = self.clock
   let acts  = self.acts
