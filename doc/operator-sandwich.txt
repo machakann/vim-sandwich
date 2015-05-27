@@ -1,4 +1,4 @@
-*operator-sandwich.txt*			Last change:24-May-2015.
+*operator-sandwich.txt*			Last change:27-May-2015.
 
 The operator plugin to edit sandwiched textobjects.
 
@@ -250,6 +250,22 @@ keymappings~
 	The operator command to replace surroundings at the both end of the
 	assigned region. If [count] is given, replace successive sets of
 	surroundings [count] times.
+
+
+
+query-1st series~
+<Plug>(operator-sandwich-add-query1st)
+	The operator command to add surroundings to the both end of the
+	assigned region. If [count] is given, add surroundings [count] times.
+	Different from |<Plug>(operator-sandwich-add)|, this keymapping asks
+	the addition before {motion/textobject}.
+
+<Plug>(operator-sandwich-replace-query1st)
+	The operator command to replace surroundings at the both end of the
+	assigned region. If [count] is given, replace successive sets of
+	surroundings [count] times.  Different from
+	|<Plug>(operator-sandwich-replace)|, this keymapping asks the addition
+	before {motion/textobject}.
 
 
 

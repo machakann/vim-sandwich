@@ -1,4 +1,4 @@
-*operator-sandwich.jax*	日本語ヘルプ	Last change:24-May-2015.
+*operator-sandwich.jax*	日本語ヘルプ	Last change:27-May-2015.
 
 “挟まれた”テキストを編集するためのオペレータです。
 
@@ -242,6 +242,21 @@ NOTE: 誤操作を防ぐため以下の設定を vimrc に追加することを�
 <Plug>(operator-sandwich-replace)	*<Plug>(operator-sandwich-replace)*
 	テキストの囲みを置き換えるためのオペレータコマンドです。 [count] が与
 	えられた場合、その数だけ連続する囲みを置換します。
+
+
+
+query-1st 系列キーマッピング~
+<Plug>(operator-sandwich-add-query1st)
+	テキストを括弧などで囲むためのオペレータコマンドです。[count] が与えら
+	れた場合、その数だけ囲みを追加します。|<Plug>(operator-sandwich-add)|
+	とは違い、 {motion/textobject} の入力の前に挿入する文字の決定を行いま
+	す。
+
+<Plug>(operator-sandwich-replace-query1st)
+	テキストの囲みを置き換えるためのオペレータコマンドです。 [count] が与
+	えられた場合、その数だけ連続する囲みを置換します。
+	|<Plug>(operator-sandwich-replace)|とは違い、 {motion/textobject} の入
+	力の前に挿入する文字の決定を行います。
 
 
 
