@@ -1,7 +1,6 @@
-" (operator)-sandwich: wrap by buns!
+" operator-sandwich: wrap by buns!
 " TODO: add 'at' option
 " TODO: add a way to use user defined filter
-" TODO: add a filter for addition or deletion
 
 
 """ NOTE: Whole design (-: string or number, *: functions, []: list, {}: dictionary) "{{{
@@ -216,7 +215,7 @@ function! operator#sandwich#query1st(kind, mode, ...) abort "{{{
           \ join(keys(s:default_opt[a:kind]['char']), '\|'))
     let stuffs.opt.recipe     = deepcopy(s:opt)
     let stuffs.opt.integrated = deepcopy(s:opt)
-    let stuffs.opt.integrate  = function('s:integrate_opt')
+    let stuffs.opt.integrate  = function('s:opt_integrate')
     call stuffs.opt.integrate()
     for act in stuffs.acts
       let act.state   = stuffs.state
@@ -284,16 +283,16 @@ endfunction
 
 
 """ objects
-function! s:clear() dict abort "{{{
+function! s:opt_clear() dict abort "{{{
   call filter(self, 'v:key =~# ''\%(clear\|update\|integrate\)''')
 endfunction
 "}}}
-function! s:update(dict) dict abort "{{{
+function! s:opt_update(dict) dict abort "{{{
   call self.clear()
   call extend(self, a:dict, 'keep')
 endfunction
 "}}}
-function! s:integrate_opt() dict abort  "{{{
+function! s:opt_integrate() dict abort  "{{{
   call self.integrated.clear()
   let default = filter(copy(self.default), self.filter)
   let recipe  = filter(copy(self.recipe),  self.filter)
@@ -305,11 +304,11 @@ endfunction
 "}}}
 " opt object  {{{
 let s:opt = {'filter': ''}
-let s:opt.clear  = function('s:clear')
-let s:opt.update = function('s:update')
+let s:opt.clear  = function('s:opt_clear')
+let s:opt.update = function('s:opt_update')
 "}}}
 
-function! s:start() dict abort  "{{{
+function! s:clock_start() dict abort  "{{{
   if self.started
     if self.paused
       let self.losstime += str2float(reltimestr(reltime(self.stoptime)))
@@ -323,12 +322,12 @@ function! s:start() dict abort  "{{{
   endif
 endfunction
 "}}}
-function! s:pause() dict abort "{{{
+function! s:clock_pause() dict abort "{{{
   let self.stoptime = reltime()
   let self.paused   = 1
 endfunction
 "}}}
-function! s:erapsed() dict abort "{{{
+function! s:clock_erapsed() dict abort "{{{
   if self.started
     let total = str2float(reltimestr(reltime(self.zerotime)))
     return floor((total - self.losstime)*1000)
@@ -337,7 +336,7 @@ function! s:erapsed() dict abort "{{{
   endif
 endfunction
 "}}}
-function! s:stop() dict abort  "{{{
+function! s:clock_stop() dict abort  "{{{
   let self.started  = 0
   let self.paused   = 0
   let self.losstime = 0
@@ -351,10 +350,10 @@ let s:clock = {
       \   'stoptime': reltime(),
       \   'losstime': 0,
       \ }
-let s:clock.start   = function('s:start')
-let s:clock.pause   = function('s:pause')
-let s:clock.erapsed = function('s:erapsed')
-let s:clock.stop    = function('s:stop')
+let s:clock.start   = function('s:clock_start')
+let s:clock.pause   = function('s:clock_pause')
+let s:clock.erapsed = function('s:clock_erapsed')
+let s:clock.stop    = function('s:clock_stop')
 "}}}
 
 function! s:add_once(buns, undojoin, done, next_act) dict abort "{{{
@@ -985,7 +984,7 @@ function! s:initialize(kind, motionwise) dict abort "{{{
             \ join(keys(s:default_opt[a:kind][a:motionwise]), '\|'))
       let stuffs.opt.recipe     = deepcopy(s:opt)
       let stuffs.opt.integrated = deepcopy(s:opt)
-      let stuffs.opt.integrate  = function('s:integrate_opt')
+      let stuffs.opt.integrate  = function('s:opt_integrate')
       call stuffs.opt.integrate()
       for act in stuffs.acts
         let act.state   = stuffs.state
@@ -1265,7 +1264,7 @@ function! s:finalize() dict abort  "{{{
   let self.state = 0
 endfunction
 "}}}
-function! s:integrate_recipes(kind, motionwise, mode) dict abort  "{{{
+function! s:recipe_integrate(kind, motionwise, mode) dict abort  "{{{
   let self.integrated  = []
   if self.force != []
     let self.integrated += self.force
@@ -1317,7 +1316,7 @@ let s:operator.add        = function('s:add')
 let s:operator.delete     = function('s:delete')
 let s:operator.replace    = function('s:replace')
 let s:operator.finalize   = function('s:finalize')
-let s:operator.recipes.integrate = function('s:integrate_recipes')
+let s:operator.recipes.integrate = function('s:recipe_integrate')
 "}}}
 
 
