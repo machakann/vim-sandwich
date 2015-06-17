@@ -1,4 +1,4 @@
-*operator-sandwich.txt*			Last change:27-May-2015.
+*operator-sandwich.txt*			Last change:17-Jun-2015.
 
 The operator plugin to edit sandwiched textobjects.
 
@@ -628,7 +628,6 @@ g:operator#sandwich#options		*g:operator#sandwich#options*
 	    - deletion			(for delete and replace)
 	    - regex			(for delete and replace)
 	    - skip_char			(for delete and replace)
-	    - highlight_duration	(for delete)
 
 
 
