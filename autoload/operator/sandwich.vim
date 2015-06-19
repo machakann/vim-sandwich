@@ -1355,7 +1355,7 @@ function! s:has_mode(candidate, mode) abort "{{{
   if !has_key(a:candidate, 'mode')
     return 1
   else
-    return stridx(a:candidate['mode'], a:mode) > -1
+    return stridx(join(a:candidate['mode'], ''), a:mode) > -1
   endif
 endfunction
 "}}}
