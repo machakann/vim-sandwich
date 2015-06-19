@@ -1,4 +1,4 @@
-*textobj-sandwich.jax*	日本語ヘルプ	Last change:25-May-2015.
+*textobj-sandwich.jax*	日本語ヘルプ	Last change:19-Jun-2015.
 
 “挟まれた”テキストを検索し選択するためのテキストオブジェクトです。
 
@@ -40,7 +40,7 @@ CONFIGURATION			|textobj-sandwich-configuration|
     skip_breaking
   GLOBAL OPTIONS
 MISCELLANEOUS			|textobj-sandwich-miscellaneous|
-  dib で欲しいのははそれじゃない
+  dib で欲しいのはそれじゃない
   頻繁に「 Timed out 」となる
   誤操作でカーソルが飛んでいった！
 
@@ -825,7 +825,7 @@ foobarbaz という文字列に合わせ disf と入力します。
 ==============================================================================
 MISCELLANEOUS				*textobj-sandwich-miscellaneous*
 
-dib で欲しいのははそれじゃない~
+dib で欲しいのはそれじゃない~
 	キー入力 dib は次のように働きます。これを
 >
 	(
