@@ -1276,7 +1276,8 @@ function! s:recipe_integrate(kind, motionwise, mode) dict abort  "{{{
   let filter = 's:has_filetype(v:val)
            \ && s:has_kind(v:val, a:kind)
            \ && s:has_motionwise(v:val, a:motionwise)
-           \ && s:has_mode(v:val, a:mode)'
+           \ && s:has_mode(v:val, a:mode)
+           \ && s:user_filter(v:val)'
   call filter(self.integrated, filter)
   call reverse(self.integrated)
 endfunction
@@ -1365,6 +1366,19 @@ function! s:has_action(candidate, action) abort "{{{
   else
     let filter = 'v:val ==# a:action || v:val ==# "all"'
     return filter(copy(a:candidate['action']), filter) != []
+  endif
+endfunction
+"}}}
+function! s:user_filter(candidate) abort  "{{{
+  if !has_key(a:candidate, 'user_filter')
+    return 1
+  else
+    for filter in a:candidate['user_filter']
+      if !eval(filter)
+        return 0
+      endif
+    endfor
+    return 1
   endif
 endfunction
 "}}}

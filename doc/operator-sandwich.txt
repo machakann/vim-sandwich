@@ -1,4 +1,4 @@
-*operator-sandwich.txt*			Last change:17-Jun-2015.
+*operator-sandwich.txt*			Last change:19-Jun-2015.
 
 The operator plugin to edit sandwiched textobjects.
 
@@ -573,6 +573,33 @@ action
 	" The recipe is valid only in add actions
 	let g:sandwich#recipes += [
 	  \    {'buns': ['"""', '"""'], 'action': ['add'], 'input': ['"']}
+	  \  ]
+<
+
+
+
+user_filter
+	A user can define filters by oneself. The items of the list is
+	evaluated as |expressions|, and if the value is true (1) then the
+	recipe is valid, if the value is false (0) then the recipe is invalid.
+>
+	" A filter should be defined in somewhere, for example in your vimrc.
+	function! FilterValid()
+	    return 1
+	endfunction
+
+	function! FilterInvalid()
+	    return 0
+	endfunction
+
+	" This recipe is valid
+	let g:sandwich#recipes += [
+	  \    {'buns': ['(', ')'], 'user_filter': ['FilterValid()']}
+	  \  ]
+
+	" This recipe is invalid
+	let g:sandwich#recipes += [
+	  \    {'buns': ['(', ')'], 'user_filter': ['FilterInvalid()']}
 	  \  ]
 <
 

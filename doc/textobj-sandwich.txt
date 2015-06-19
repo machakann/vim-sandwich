@@ -428,6 +428,45 @@ mode
 
 
 
+user_filter
+	A user can define filters by oneself. The items of the list is
+	evaluated as |expressions|, and if the value is true (1) then the
+	recipe is valid, if the value is false (0) then the recipe is invalid.
+>
+	" A filter should be defined in somewhere, for example in your vimrc.
+	function! FilterValid()
+	    return 1
+	endfunction
+
+	function! FilterInvalid()
+	    return 0
+	endfunction
+
+	" This recipe is valid
+	let g:sandwich#recipes += [
+	  \    {'buns': ['(', ')'], 'user_filter': ['FilterValid()']}
+	  \  ]
+
+	" This recipe is invalid
+	let g:sandwich#recipes += [
+	  \    {'buns': ['(', ')'], 'user_filter': ['FilterInvalid()']}
+	  \  ]
+<
+	For example, the following filter makes recipes possible to be valid
+	only with a specific operator.
+>
+	function! FilterOperator(operator)
+	    return a:operator ==# v:operator ? 1 : 0
+	endfunction
+
+	" This recipe is valid only with d operator.
+	let g:sandwich#recipes += [
+	  \    {'buns': ['(', ')'], 'user_filter': ['FilterOperator("d")']}
+	  \  ]
+<
+
+
+
 Local option~
 
 Local options are used to optimize the behavior for each recipe. If any

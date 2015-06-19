@@ -434,6 +434,45 @@ mode
 
 
 
+user_filter
+	ユーザーがフィルターを自作して使うことができます。リストの要素は式
+	|expression| として評価され、評価値が真 (1) の場合にはそのレシピは有効
+	となり、評価値が偽 (0) の場合にはレシピは無効となります。
+>
+	" A filter should be defined in somewhere, for example in your vimrc.
+	function! FilterValid()
+	    return 1
+	endfunction
+
+	function! FilterInvalid()
+	    return 0
+	endfunction
+
+	" This recipe is valid
+	let g:sandwich#recipes += [
+	  \    {'buns': ['(', ')'], 'user_filter': ['FilterValid()']}
+	  \  ]
+
+	" This recipe is invalid
+	let g:sandwich#recipes += [
+	  \    {'buns': ['(', ')'], 'user_filter': ['FilterInvalid()']}
+	  \  ]
+<
+	例えば、次のようなフィルターを定義すると特定のオペレーターでのみ有効な
+	レシピを作ることができます。
+>
+	function! FilterOperator(operator)
+	    return a:operator ==# v:operator ? 1 : 0
+	endfunction
+
+	" This recipe is valid only with d operator.
+	let g:sandwich#recipes += [
+	  \    {'buns': ['(', ')'], 'user_filter': ['FilterOperator("d")']}
+	  \  ]
+<
+
+
+
 Local option~
 
 local option はレシピごとに細かく挙動を調整するために設定されます。もし指定の

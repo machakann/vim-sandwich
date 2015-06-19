@@ -1,4 +1,4 @@
-*operator-sandwich.jax*	日本語ヘルプ	Last change:17-Jun-2015.
+*operator-sandwich.jax*	日本語ヘルプ	Last change:19-Jun-2015.
 
 “挟まれた”テキストを編集するためのオペレータです。
 
@@ -567,6 +567,33 @@ action
 	" The recipe is valid only in add actions
 	let g:sandwich#recipes += [
 	  \    {'buns': ['"""', '"""'], 'action': ['add'], 'input': ['"']}
+	  \  ]
+<
+
+
+
+user_filter
+	ユーザーがフィルターを自作して使うことができます。リストの要素は式
+	|expression| として評価され、評価値が真 (1) の場合にはそのレシピは有効
+	となり、評価値が偽 (0) の場合にはレシピは無効となります。
+>
+	" A filter should be defined in somewhere, for example in your vimrc.
+	function! FilterValid()
+	    return 1
+	endfunction
+
+	function! FilterInvalid()
+	    return 0
+	endfunction
+
+	" This recipe is valid
+	let g:sandwich#recipes += [
+	  \    {'buns': ['(', ')'], 'user_filter': ['FilterValid()']}
+	  \  ]
+
+	" This recipe is invalid
+	let g:sandwich#recipes += [
+	  \    {'buns': ['(', ')'], 'user_filter': ['FilterInvalid()']}
 	  \  ]
 <
 
