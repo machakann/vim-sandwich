@@ -1,4 +1,4 @@
-*textobj-sandwich.txt*			Last change:25-May-2015.
+*textobj-sandwich.txt*			Last change:19-Jun-2015.
 
 The textobject plugin to search and select sandwiched textobjects.
 
@@ -424,36 +424,6 @@ mode
 	  \    {'buns': ['"', '"'], 'mode': ['o']}
 	  \    {'buns': ['"""', '"""'], 'mode': ['x'], 'input': ['"']}
 	  \  ]
-<
-
-
-
-operator
-	This filter filters recipes by the operator which is reserved. It is a
-	list of characters representing a operator. As for the case of
-	user-defined operator, put a list instead of a operator strings. The
-	list should have two items, the first item is a operator strings |g@|,
-	and the second item is the name of the operator function.
-
-	The following recipe is valid only with |d| operator.
->
-	let g:sandwich#recipes += [
-	  \    {'buns': ['if', 'endif'], 'operator': ['d'], 'input': ['if']}
-	  \  ]
-<
-	An example of user-defined operator.
->
-	let g:sandwich#recipes += [
-	  \    {
-	  \      'buns': ['(', ')'],
-	  \      'operator': [['g@', 'operator#sandwich#delete']]
-	  \    }
-	  \  ]
-<
-	The name of the operator function could be checked by the following
-	command after using the operator.
->
-	:echo &operatorfunc
 <
 
 

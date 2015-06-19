@@ -1049,8 +1049,7 @@ function! s:recipes_integrate(kind, mode) dict abort  "{{{
   endif
   let filter = 's:has_filetype(v:val)
            \ && s:has_kind(v:val, a:kind)
-           \ && s:has_mode(v:val, a:mode)
-           \ && s:has_operator(v:val)'
+           \ && s:has_mode(v:val, a:mode)'
   call filter(self.integrated, filter)
   call reverse(self.integrated)
 endfunction
@@ -1114,16 +1113,6 @@ function! s:has_mode(candidate, mode) abort "{{{
     return 1
   else
     return stridx(join(a:candidate['mode'], ''), a:mode) > -1
-  endif
-endfunction
-"}}}
-function! s:has_operator(candidate) abort "{{{
-  if !has_key(a:candidate, 'operator')
-    return 1
-  else
-    let filter = 'type(v:val) == s:type_str ? v:val ==# v:operator :
-                \ type(v:val) == s:type_list ? v:val[0] ==# v:operator && v:val[1] ==# v:operatorfunc : 0'
-    return filter(copy(a:candidate.operator), filter) != []
   endif
 endfunction
 "}}}
