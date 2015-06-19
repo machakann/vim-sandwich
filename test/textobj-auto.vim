@@ -2,6 +2,7 @@ let s:suite = themis#suite('textobj-sandwich: auto:')
 
 function! s:suite.before_each() abort "{{{
   %delete
+  set filetype=
   set virtualedit&
   set whichwrap&
   call textobj#sandwich#set_default()
@@ -16,511 +17,644 @@ function! s:suite.after() abort "{{{
 endfunction
 "}}}
 
-function! s:suite.i_o_default_recipes() abort "{{{
+" Filter
+function! s:suite.filter_filetype() abort "{{{
+  let g:sandwich#recipes = []
+  let g:textobj#sandwich#recipes = [
+        \   {'buns': ['(', ')']},
+        \   {'buns': ['[', ']'], 'filetype': ['vim']},
+        \   {'buns': ['{', '}'], 'filetype': ['all']},
+        \ ]
+
   " #1
+  call setline('.', '([foo])')
+  normal 03ldib
+  call g:assert.equals(getline('.'), '()', 'failed at #1')
+
+  " #2
+  call setline('.', '{foo}')
+  normal 02ldib
+  call g:assert.equals(getline('.'), '{}', 'failed at #2')
+
+  set filetype=vim
+
+  " #3
+  call setline('.', '([foo])')
+  normal 03ldib
+  call g:assert.equals(getline('.'), '([])', 'failed at #3')
+
+  " #4
+  call setline('.', '{foo}')
+  normal 02ldib
+  call g:assert.equals(getline('.'), '{}', 'failed at #4')
+endfunction
+"}}}
+function! s:suite.filter_kind() abort "{{{
+  let g:sandwich#recipes = []
+  let g:textobj#sandwich#recipes = [
+        \   {'buns': ['(', ')']},
+        \ ]
+
+  " #5
+  call setline('.', '([foo])')
+  normal 03ldib
+  call g:assert.equals(getline('.'), '()', 'failed at #5')
+
+  let g:textobj#sandwich#recipes = [
+        \   {'buns': ['(', ')']},
+        \   {'buns': ['[', ']'], 'kind': ['query']},
+        \ ]
+
+  " #6
+  call setline('.', '([foo])')
+  normal 03ldib
+  call g:assert.equals(getline('.'), '()', 'failed at #6')
+
+  let g:textobj#sandwich#recipes = [
+        \   {'buns': ['(', ')']},
+        \   {'buns': ['[', ']'], 'kind': ['auto']},
+        \ ]
+
+  " #7
+  call setline('.', '([foo])')
+  normal 03ldib
+  call g:assert.equals(getline('.'), '([])', 'failed at #7')
+
+  let g:textobj#sandwich#recipes = [
+        \   {'buns': ['(', ')']},
+        \   {'buns': ['[', ']'], 'kind': ['textobj']},
+        \ ]
+
+  " #8
+  call setline('.', '([foo])')
+  normal 03ldib
+  call g:assert.equals(getline('.'), '([])', 'failed at #8')
+
+  let g:textobj#sandwich#recipes = [
+        \   {'buns': ['(', ')']},
+        \   {'buns': ['[', ']'], 'kind': ['all']},
+        \ ]
+
+  " #9
+  call setline('.', '([foo])')
+  normal 03ldib
+  call g:assert.equals(getline('.'), '([])', 'failed at #9')
+endfunction
+"}}}
+function! s:suite.filter_mode() abort "{{{
+  let g:sandwich#recipes = []
+  let g:textobj#sandwich#recipes = [
+        \   {'buns': ['(', ')']},
+        \   {'buns': ['[', ']']},
+        \ ]
+
+  " #10
+  call setline('.', '([foo])')
+  normal 03ldib
+  call g:assert.equals(getline('.'), '([])', 'failed at #10')
+
+  " #11
+  call setline('.', '([foo])')
+  normal 03lvibd
+  call g:assert.equals(getline('.'), '([])', 'failed at #11')
+
+  let g:textobj#sandwich#recipes = [
+        \   {'buns': ['(', ')']},
+        \   {'buns': ['[', ']'], 'mode': ['o']},
+        \ ]
+
+  " #12
+  call setline('.', '([foo])')
+  normal 03ldib
+  call g:assert.equals(getline('.'), '([])', 'failed at #12')
+
+  " #13
+  call setline('.', '([foo])')
+  normal 03lvibd
+  call g:assert.equals(getline('.'), '()', 'failed at #13')
+
+  let g:textobj#sandwich#recipes = [
+        \   {'buns': ['(', ')']},
+        \   {'buns': ['[', ']'], 'mode': ['x']},
+        \ ]
+
+  " #14
+  call setline('.', '([foo])')
+  normal 03ldib
+  call g:assert.equals(getline('.'), '()', 'failed at #14')
+
+  " #15
+  call setline('.', '([foo])')
+  normal 03lvibd
+  call g:assert.equals(getline('.'), '([])', 'failed at #15')
+endfunction
+"}}}
+
+function! s:suite.i_o_default_recipes() abort "{{{
+  " #16
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 02lyib
-  call g:assert.equals(@@, 'foo', 'failed at #1')
+  call g:assert.equals(@@, 'foo', 'failed at #16')
 
-  " #2
+  " #17
   call setline('.', '[foo]')
   let @@ = 'fail'
   normal 02lyib
-  call g:assert.equals(@@, 'foo', 'failed at #2')
+  call g:assert.equals(@@, 'foo', 'failed at #17')
 
-  " #3
+  " #18
   call setline('.', '{foo}')
   let @@ = 'fail'
   normal 02lyib
-  call g:assert.equals(@@, 'foo', 'failed at #3')
+  call g:assert.equals(@@, 'foo', 'failed at #18')
 
-  " #4
+  " #19
   call setline('.', '<foo>')
   let @@ = 'fail'
   normal 02lyib
-  call g:assert.equals(@@, 'foo', 'failed at #4')
+  call g:assert.equals(@@, 'foo', 'failed at #19')
 
-  " #5
+  " #20
   call setline('.', '"foo"')
   let @@ = 'fail'
   normal 02lyib
-  call g:assert.equals(@@, 'foo', 'failed at #5')
+  call g:assert.equals(@@, 'foo', 'failed at #20')
 
-  " #6
+  " #21
   call setline('.', "'foo'")
   let @@ = 'fail'
   normal 02lyib
-  call g:assert.equals(@@, 'foo', 'failed at #6')
+  call g:assert.equals(@@, 'foo', 'failed at #21')
 endfunction
 "}}}
 function! s:suite.i_o_nest() abort  "{{{
-  " #7
+  " #22
   call setline('.', '()')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, '', 'failed at #7')
+  call g:assert.equals(@@, '', 'failed at #22')
 
-  " #8
+  " #23
   call setline('.', '(a)')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, 'a', 'failed at #8')
-
-  " #9
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 0yib
-  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #9')
-
-  " #10
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 0lyib
-  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #10')
-
-  " #11
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 02lyib
-  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #11')
-
-  " #12
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 03lyib
-  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #12')
-
-  " #13
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 04lyib
-  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #13')
-
-  " #14
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 05lyib
-  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #14')
-
-  " #15
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 06lyib
-  call g:assert.equals(@@, 'cc', 'failed at #15')
-
-  " #16
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 07lyib
-  call g:assert.equals(@@, 'cc', 'failed at #16')
-
-  " #17
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 08lyib
-  call g:assert.equals(@@, 'cc', 'failed at #17')
-
-  " #18
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 09lyib
-  call g:assert.equals(@@, 'cc', 'failed at #18')
-
-  " #19
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 010lyib
-  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #19')
-
-  " #20
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 011lyib
-  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #20')
-
-  " #21
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 012lyib
-  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #21')
-
-  " #22
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 013lyib
-  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #22')
-
-  " #23
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 014lyib
-  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #23')
+  call g:assert.equals(@@, 'a', 'failed at #23')
 
   " #24
   call setline('.', '(aa(bb(cc)bb)aa)')
   let @@ = 'fail'
-  normal 015lyib
+  normal 0yib
   call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #24')
+
+  " #25
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 0lyib
+  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #25')
+
+  " #26
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 02lyib
+  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #26')
+
+  " #27
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 03lyib
+  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #27')
+
+  " #28
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 04lyib
+  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #28')
+
+  " #29
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 05lyib
+  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #29')
+
+  " #30
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 06lyib
+  call g:assert.equals(@@, 'cc', 'failed at #30')
+
+  " #31
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 07lyib
+  call g:assert.equals(@@, 'cc', 'failed at #31')
+
+  " #32
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 08lyib
+  call g:assert.equals(@@, 'cc', 'failed at #32')
+
+  " #33
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 09lyib
+  call g:assert.equals(@@, 'cc', 'failed at #33')
+
+  " #34
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 010lyib
+  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #34')
+
+  " #35
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 011lyib
+  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #35')
+
+  " #36
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 012lyib
+  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #36')
+
+  " #37
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 013lyib
+  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #37')
+
+  " #38
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 014lyib
+  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #38')
+
+  " #39
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 015lyib
+  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #39')
 
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [{'buns': ['(((', ')))'], 'nesting': 1}]
 
-  " #25
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 0yib
-  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #25')
-
-  " #26
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 0lyib
-  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #26')
-
-  " #27
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 02lyib
-  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #27')
-
-  " #28
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 03lyib
-  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #28')
-
-  " #29
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 04lyib
-  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #29')
-
-  " #30
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 05lyib
-  call g:assert.equals(@@, 'bb', 'failed at #30')
-
-  " #31
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 06lyib
-  call g:assert.equals(@@, 'bb', 'failed at #31')
-
-  " #32
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 07lyib
-  call g:assert.equals(@@, 'bb', 'failed at #32')
-
-  " #33
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 08lyib
-  call g:assert.equals(@@, 'bb', 'failed at #33')
-
-  " #34
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 09lyib
-  call g:assert.equals(@@, 'bb', 'failed at #34')
-
-  " #35
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 010lyib
-  call g:assert.equals(@@, 'bb', 'failed at #35')
-
-  " #36
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 011lyib
-  call g:assert.equals(@@, 'bb', 'failed at #36')
-
-  " #37
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 012lyib
-  call g:assert.equals(@@, 'bb', 'failed at #37')
-
-  " #38
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 013lyib
-  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #38')
-
-  " #39
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 014lyib
-  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #39')
-
   " #40
   call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
-  normal 015lyib
+  normal 0yib
   call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #40')
 
   " #41
   call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
-  normal 016lyib
+  normal 0lyib
   call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #41')
 
   " #42
   call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
-  normal 017lyib
-  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #42')
-endfunction
-"}}}
-function! s:suite.i_o_no_nest() abort "{{{
-  " #43
-  call setline('.', '""')
-  let @@ = 'fail'
-  normal 0yib
-  call g:assert.equals(@@, '', 'failed at #43')
-
-  " #44
-  call setline('.', '"a"')
-  let @@ = 'fail'
-  normal 0yib
-  call g:assert.equals(@@, 'a', 'failed at #44')
-
-  " #45
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 0yib
-  call g:assert.equals(@@, 'aa', 'failed at #45')
-
-  " #46
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 0lyib
-  call g:assert.equals(@@, 'aa', 'failed at #46')
-
-  " #47
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
   normal 02lyib
-  call g:assert.equals(@@, 'aa', 'failed at #47')
+  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #42')
 
-  " #48
-  call setline('.', '"aa"bb"cc"bb"aa"')
+  " #43
+  call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
   normal 03lyib
-  call g:assert.equals(@@, 'aa', 'failed at #48')
+  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #43')
 
-  " #49
-  call setline('.', '"aa"bb"cc"bb"aa"')
+  " #44
+  call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
   normal 04lyib
+  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #44')
+
+  " #45
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 05lyib
+  call g:assert.equals(@@, 'bb', 'failed at #45')
+
+  " #46
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 06lyib
+  call g:assert.equals(@@, 'bb', 'failed at #46')
+
+  " #47
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 07lyib
+  call g:assert.equals(@@, 'bb', 'failed at #47')
+
+  " #48
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 08lyib
+  call g:assert.equals(@@, 'bb', 'failed at #48')
+
+  " #49
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 09lyib
   call g:assert.equals(@@, 'bb', 'failed at #49')
 
   " #50
-  call setline('.', '"aa"bb"cc"bb"aa"')
+  call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
-  normal 05lyib
+  normal 010lyib
   call g:assert.equals(@@, 'bb', 'failed at #50')
 
   " #51
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 06lyib
-  call g:assert.equals(@@, 'cc', 'failed at #51')
-
-  " #52
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 07lyib
-  call g:assert.equals(@@, 'cc', 'failed at #52')
-
-  " #53
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 08lyib
-  call g:assert.equals(@@, 'cc', 'failed at #53')
-
-  " #54
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 09lyib
-  call g:assert.equals(@@, 'cc', 'failed at #54')
-
-  " #55
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 010lyib
-  call g:assert.equals(@@, 'bb', 'failed at #55')
-
-  " #56
-  call setline('.', '"aa"bb"cc"bb"aa"')
+  call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
   normal 011lyib
-  call g:assert.equals(@@, 'bb', 'failed at #56')
+  call g:assert.equals(@@, 'bb', 'failed at #51')
 
-  " #57
-  call setline('.', '"aa"bb"cc"bb"aa"')
+  " #52
+  call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
   normal 012lyib
-  call g:assert.equals(@@, 'aa', 'failed at #57')
+  call g:assert.equals(@@, 'bb', 'failed at #52')
 
-  " #58
-  call setline('.', '"aa"bb"cc"bb"aa"')
+  " #53
+  call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
   normal 013lyib
-  call g:assert.equals(@@, 'aa', 'failed at #58')
+  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #53')
 
-  " #59
-  call setline('.', '"aa"bb"cc"bb"aa"')
+  " #54
+  call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
   normal 014lyib
-  call g:assert.equals(@@, 'aa', 'failed at #59')
+  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #54')
+
+  " #55
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 015lyib
+  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #55')
+
+  " #56
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 016lyib
+  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #56')
+
+  " #57
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 017lyib
+  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #57')
+endfunction
+"}}}
+function! s:suite.i_o_no_nest() abort "{{{
+  " #58
+  call setline('.', '""')
+  let @@ = 'fail'
+  normal 0yib
+  call g:assert.equals(@@, '', 'failed at #58')
+
+  " #59
+  call setline('.', '"a"')
+  let @@ = 'fail'
+  normal 0yib
+  call g:assert.equals(@@, 'a', 'failed at #59')
 
   " #60
   call setline('.', '"aa"bb"cc"bb"aa"')
   let @@ = 'fail'
-  normal 015lyib
+  normal 0yib
   call g:assert.equals(@@, 'aa', 'failed at #60')
+
+  " #61
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 0lyib
+  call g:assert.equals(@@, 'aa', 'failed at #61')
+
+  " #62
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 02lyib
+  call g:assert.equals(@@, 'aa', 'failed at #62')
+
+  " #63
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 03lyib
+  call g:assert.equals(@@, 'aa', 'failed at #63')
+
+  " #64
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 04lyib
+  call g:assert.equals(@@, 'bb', 'failed at #64')
+
+  " #65
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 05lyib
+  call g:assert.equals(@@, 'bb', 'failed at #65')
+
+  " #66
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 06lyib
+  call g:assert.equals(@@, 'cc', 'failed at #66')
+
+  " #67
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 07lyib
+  call g:assert.equals(@@, 'cc', 'failed at #67')
+
+  " #68
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 08lyib
+  call g:assert.equals(@@, 'cc', 'failed at #68')
+
+  " #69
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 09lyib
+  call g:assert.equals(@@, 'cc', 'failed at #69')
+
+  " #70
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 010lyib
+  call g:assert.equals(@@, 'bb', 'failed at #70')
+
+  " #71
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 011lyib
+  call g:assert.equals(@@, 'bb', 'failed at #71')
+
+  " #72
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 012lyib
+  call g:assert.equals(@@, 'aa', 'failed at #72')
+
+  " #73
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 013lyib
+  call g:assert.equals(@@, 'aa', 'failed at #73')
+
+  " #74
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 014lyib
+  call g:assert.equals(@@, 'aa', 'failed at #74')
+
+  " #75
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 015lyib
+  call g:assert.equals(@@, 'aa', 'failed at #75')
 
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [{'buns': ['"""', '"""'], 'nesting': 0}]
 
-  " #61
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 0yib
-  call g:assert.equals(@@, 'aa', 'failed at #61')
-
-  " #62
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 0lyib
-  call g:assert.equals(@@, 'aa', 'failed at #62')
-
-  " #63
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 02lyib
-  call g:assert.equals(@@, 'aa', 'failed at #63')
-
-  " #64
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 03lyib
-  call g:assert.equals(@@, 'aa', 'failed at #64')
-
-  " #65
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 04lyib
-  call g:assert.equals(@@, 'aa', 'failed at #65')
-
-  " #66
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 05lyib
-  call g:assert.equals(@@, 'aa', 'failed at #66')
-
-  " #67
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 06lyib
-  call g:assert.equals(@@, 'aa', 'failed at #67')
-
-  " #68
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 07lyib
-  call g:assert.equals(@@, 'aa', 'failed at #68')
-
-  " #69
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 08lyib
-  call g:assert.equals(@@, 'bb', 'failed at #69')
-
-  " #70
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 09lyib
-  call g:assert.equals(@@, 'bb', 'failed at #70')
-
-  " #71
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 010lyib
-  call g:assert.equals(@@, 'cc', 'failed at #71')
-
-  " #72
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 011lyib
-  call g:assert.equals(@@, 'cc', 'failed at #72')
-
-  " #73
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 012lyib
-  call g:assert.equals(@@, 'cc', 'failed at #73')
-
-  " #74
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 013lyib
-  call g:assert.equals(@@, 'cc', 'failed at #74')
-
-  " #75
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 014lyib
-  call g:assert.equals(@@, 'cc', 'failed at #75')
-
   " #76
   call setline('.', '"""aa"""bb"""cc"""')
   let @@ = 'fail'
-  normal 015lyib
-  call g:assert.equals(@@, 'cc', 'failed at #76')
+  normal 0yib
+  call g:assert.equals(@@, 'aa', 'failed at #76')
 
   " #77
   call setline('.', '"""aa"""bb"""cc"""')
   let @@ = 'fail'
-  normal 016lyib
-  call g:assert.equals(@@, 'cc', 'failed at #77')
+  normal 0lyib
+  call g:assert.equals(@@, 'aa', 'failed at #77')
 
   " #78
   call setline('.', '"""aa"""bb"""cc"""')
   let @@ = 'fail'
+  normal 02lyib
+  call g:assert.equals(@@, 'aa', 'failed at #78')
+
+  " #79
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 03lyib
+  call g:assert.equals(@@, 'aa', 'failed at #79')
+
+  " #80
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 04lyib
+  call g:assert.equals(@@, 'aa', 'failed at #80')
+
+  " #81
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 05lyib
+  call g:assert.equals(@@, 'aa', 'failed at #81')
+
+  " #82
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 06lyib
+  call g:assert.equals(@@, 'aa', 'failed at #82')
+
+  " #83
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 07lyib
+  call g:assert.equals(@@, 'aa', 'failed at #83')
+
+  " #84
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 08lyib
+  call g:assert.equals(@@, 'bb', 'failed at #84')
+
+  " #85
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 09lyib
+  call g:assert.equals(@@, 'bb', 'failed at #85')
+
+  " #86
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 010lyib
+  call g:assert.equals(@@, 'cc', 'failed at #86')
+
+  " #87
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 011lyib
+  call g:assert.equals(@@, 'cc', 'failed at #87')
+
+  " #88
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 012lyib
+  call g:assert.equals(@@, 'cc', 'failed at #88')
+
+  " #89
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 013lyib
+  call g:assert.equals(@@, 'cc', 'failed at #89')
+
+  " #90
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 014lyib
+  call g:assert.equals(@@, 'cc', 'failed at #90')
+
+  " #91
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 015lyib
+  call g:assert.equals(@@, 'cc', 'failed at #91')
+
+  " #92
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 016lyib
+  call g:assert.equals(@@, 'cc', 'failed at #92')
+
+  " #93
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
   normal 017lyib
-  call g:assert.equals(@@, 'cc', 'failed at #78')
+  call g:assert.equals(@@, 'cc', 'failed at #93')
 endfunction
 "}}}
 function! s:suite.i_o_external_textobj() abort  "{{{
   let g:textobj#sandwich#recipes = [{'external': ['it', 'at']}]
 
-  " #79
+  " #94
   call setline('.', 'aa<title>bb</title>aa')
   let @@ = 'fail'
   normal 0fbyib
-  call g:assert.equals(@@, 'bb', 'failed at #79')
+  call g:assert.equals(@@, 'bb', 'failed at #94')
 endfunction
 "}}}
 function! s:suite.i_o_priority() abort  "{{{
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
 
-  " #80
+  " #95
   call setline('.', '"aa(b"c)')
   let @@ = 'fail'
   normal 0fbyib
-  call g:assert.equals(@@, 'b"c', 'failed at #80')
+  call g:assert.equals(@@, 'b"c', 'failed at #95')
 
-  " #81
+  " #96
   call setline('.', '"aa(b"ccc)')
   let @@ = 'fail'
   normal 0fbyib
-  call g:assert.equals(@@, 'aa(b', 'failed at #81')
+  call g:assert.equals(@@, 'aa(b', 'failed at #96')
 endfunction
 "}}}
 function! s:suite.i_o_option_eval() abort "{{{
@@ -528,31 +662,31 @@ function! s:suite.i_o_option_eval() abort "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['1+1', '1+2']}]
 
   """ off
-  " #82
+  " #97
   call setline('.', '1+1aa1+2')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, 'aa', 'failed at #82')
+  call g:assert.equals(@@, 'aa', 'failed at #97')
 
-  " #83
+  " #98
   call setline('.', '2aa3')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, '', 'failed at #83')
+  call g:assert.equals(@@, '', 'failed at #98')
 
   """ on
   call textobj#sandwich#set('auto', 'eval', 1)
-  " #84
+  " #99
   call setline('.', '1+1aa1+2')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, '', 'failed at #84')
+  call g:assert.equals(@@, '', 'failed at #99')
 
-  " #85
+  " #100
   call setline('.', '2aa3')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, 'aa', 'failed at #85')
+  call g:assert.equals(@@, 'aa', 'failed at #100')
 endfunction
 "}}}
 function! s:suite.i_o_option_regex() abort "{{{
@@ -560,31 +694,31 @@ function! s:suite.i_o_option_regex() abort "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['\d\+', '\d\+']}]
 
   """ off
-  " #86
+  " #101
   call setline('.', '\d\+aa\d\+')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, 'aa', 'failed at #86')
+  call g:assert.equals(@@, 'aa', 'failed at #101')
 
-  " #87
+  " #102
   call setline('.', '888aa888')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, '', 'failed at #87')
+  call g:assert.equals(@@, '', 'failed at #102')
 
   """ on
   call textobj#sandwich#set('auto', 'regex', 1)
-  " #88
+  " #103
   call setline('.', '\d\+aa\d\+')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, '', 'failed at #88')
+  call g:assert.equals(@@, '', 'failed at #103')
 
-  " #89
+  " #104
   call setline('.', '888aa888')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, 'aa', 'failed at #89')
+  call g:assert.equals(@@, 'aa', 'failed at #104')
 endfunction
 "}}}
 function! s:suite.i_o_option_skip_regex() abort  "{{{
@@ -592,27 +726,27 @@ function! s:suite.i_o_option_skip_regex() abort  "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['a', 'a']}]
 
   """ off
-  " #90
+  " #105
   call setline('.', 'afooaa')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, 'foo', 'failed at #90')
+  call g:assert.equals(@@, 'foo', 'failed at #105')
 
   """ on
   call textobj#sandwich#set('auto', 'skip_regex', ['aa'])
-  " #91
+  " #106
   call setline('.', 'afooaa')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, 'fooa', 'failed at #91')
+  call g:assert.equals(@@, 'fooa', 'failed at #106')
 endfunction
 "}}}
 function! s:suite.i_o_option_quoteescape() abort  "{{{
-  " #92
+  " #107
   call setline('.', '"aa\"bb"')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, 'aa\"bb', 'failed at #92')
+  call g:assert.equals(@@, 'aa\"bb', 'failed at #107')
 endfunction
 "}}}
 function! s:suite.i_o_option_expand_range() abort  "{{{
@@ -620,79 +754,79 @@ function! s:suite.i_o_option_expand_range() abort  "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['"', '"']}]
 
   """ -1
-  " #93
+  " #108
   call setline('.', '"aa"')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, 'aa', 'failed at #93')
+  call g:assert.equals(@@, 'aa', 'failed at #108')
 
   %delete
 
-  " #94
+  " #109
   call append(0, ['"', 'aa', '"'])
   let @@ = 'fail'
   normal ggyib
-  call g:assert.equals(@@, "\naa\n", 'failed at #94')
+  call g:assert.equals(@@, "\naa\n", 'failed at #109')
 
   %delete
 
-  " #95
+  " #110
   call append(0, ['"', 'aa', 'bb', 'cc', '"'])
   let @@ = 'fail'
   normal ggyib
-  call g:assert.equals(@@, "\naa\nbb\ncc\n", 'failed at #95')
+  call g:assert.equals(@@, "\naa\nbb\ncc\n", 'failed at #110')
 
   %delete
 
   """ 0
   call textobj#sandwich#set('auto', 'expand_range', 0)
-  " #96
+  " #111
   call setline('.', '"aa"')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, 'aa', 'failed at #96')
+  call g:assert.equals(@@, 'aa', 'failed at #111')
 
   %delete
 
-  " #97
+  " #112
   call append(0, ['"', 'aa', '"'])
   let @@ = 'fail'
   normal ggyib
-  call g:assert.equals(@@, '', 'failed at #97')
+  call g:assert.equals(@@, '', 'failed at #112')
 
   %delete
 
-  " #98
+  " #113
   call append(0, ['"', 'aa', 'bb', 'cc', '"'])
   let @@ = 'fail'
   normal ggyib
-  call g:assert.equals(@@, '', 'failed at #98')
+  call g:assert.equals(@@, '', 'failed at #113')
 
   %delete
 
   """ 1
   call textobj#sandwich#set('auto', 'expand_range', 1)
-  " #99
+  " #114
   call setline('.', '"aa"')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, 'aa', 'failed at #99')
+  call g:assert.equals(@@, 'aa', 'failed at #114')
 
   %delete
 
-  " #100
+  " #115
   call append(0, ['"', 'aa', '"'])
   let @@ = 'fail'
   normal ggjyib
-  call g:assert.equals(@@, "\naa\n", 'failed at #100')
+  call g:assert.equals(@@, "\naa\n", 'failed at #115')
 
   %delete
 
-  " #101
+  " #116
   call append(0, ['"', 'aa', 'bb', 'cc', '"'])
   let @@ = 'fail'
   normal ggyib
-  call g:assert.equals(@@, '', 'failed at #101')
+  call g:assert.equals(@@, '', 'failed at #116')
 endfunction
 "}}}
 function! s:suite.i_o_option_noremap() abort  "{{{
@@ -702,31 +836,31 @@ function! s:suite.i_o_option_noremap() abort  "{{{
   xnoremap a{ a(
 
   """ on
-  " #102
+  " #117
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, '', 'failed at #102')
+  call g:assert.equals(@@, '', 'failed at #117')
 
-  " #103
+  " #118
   call setline('.', '{foo}')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, 'foo', 'failed at #103')
+  call g:assert.equals(@@, 'foo', 'failed at #118')
 
   """ off
   call textobj#sandwich#set('auto', 'noremap', 0)
-  " #104
+  " #119
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, 'foo', 'failed at #104')
+  call g:assert.equals(@@, 'foo', 'failed at #119')
 
-  " #105
+  " #120
   call setline('.', '{foo}')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, '', 'failed at #105')
+  call g:assert.equals(@@, '', 'failed at #120')
 endfunction
 "}}}
 function! s:suite.i_o_option_syntax() abort "{{{
@@ -734,29 +868,29 @@ function! s:suite.i_o_option_syntax() abort "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['(', ')']}]
   call textobj#sandwich#set('auto', 'syntax', [])
 
-  " #106
+  " #121
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, 'foo', 'failed at #106')
+  call g:assert.equals(@@, 'foo', 'failed at #121')
 
   call textobj#sandwich#set('auto', 'syntax', ['Special'])
   syn match TestParen '[()]'
   highlight link TestParen String
 
-  " #107
+  " #122
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, '', 'failed at #107')
+  call g:assert.equals(@@, '', 'failed at #122')
 
   highlight link TestParen Special
 
-  " #108
+  " #123
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, 'foo', 'failed at #108')
+  call g:assert.equals(@@, 'foo', 'failed at #123')
 endfunction
 "}}}
 function! s:suite.i_o_option_match_syntax() abort "{{{
@@ -769,11 +903,11 @@ function! s:suite.i_o_option_match_syntax() abort "{{{
   syntax match TestParen '[()]'
   highlight link TestParen Special
 
-  " #109
+  " #124
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, 'foo', 'failed at #109')
+  call g:assert.equals(@@, 'foo', 'failed at #124')
 
   syntax clear
   syntax match TestBra '('
@@ -781,11 +915,11 @@ function! s:suite.i_o_option_match_syntax() abort "{{{
   highlight link TestBra Special
   highlight link TestKet String
 
-  " #110
+  " #125
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, '', 'failed at #110')
+  call g:assert.equals(@@, '', 'failed at #125')
 
   syntax clear
   syntax match TestBra '(f'
@@ -793,11 +927,11 @@ function! s:suite.i_o_option_match_syntax() abort "{{{
   highlight link TestBra Special
   highlight link TestKet Special
 
-  " #111
+  " #126
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, 'foo', 'failed at #111')
+  call g:assert.equals(@@, 'foo', 'failed at #126')
 
   """ 2
   call textobj#sandwich#set('auto', 'match_syntax', 2)
@@ -805,11 +939,11 @@ function! s:suite.i_o_option_match_syntax() abort "{{{
   syntax match TestParen '[()]'
   highlight link TestParen Special
 
-  " #112
+  " #127
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, '', 'failed at #112')
+  call g:assert.equals(@@, '', 'failed at #127')
 
   syntax clear
   syntax match TestBra '('
@@ -817,11 +951,11 @@ function! s:suite.i_o_option_match_syntax() abort "{{{
   highlight link TestBra Special
   highlight link TestKet String
 
-  " #113
+  " #128
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, '', 'failed at #113')
+  call g:assert.equals(@@, '', 'failed at #128')
 
   syntax clear
   syntax match TestBra '(f'
@@ -829,11 +963,11 @@ function! s:suite.i_o_option_match_syntax() abort "{{{
   highlight link TestBra Special
   highlight link TestKet Special
 
-  " #114
+  " #129
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, 'foo', 'failed at #114')
+  call g:assert.equals(@@, 'foo', 'failed at #129')
 endfunction
 "}}}
 function! s:suite.i_o_option_skip_breaking() abort  "{{{
@@ -841,589 +975,589 @@ function! s:suite.i_o_option_skip_breaking() abort  "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['(', ')']}]
 
   """ 0
-  " #115
+  " #130
   call append(0, ['(', 'foo', ')'])
   let @@ = 'fail'
   normal ggyib
-  call g:assert.equals(@@, "\nfoo\n", 'failed at #115')
+  call g:assert.equals(@@, "\nfoo\n", 'failed at #130')
 
   %delete
 
   """ 1
   call textobj#sandwich#set('auto', 'skip_break', 1)
-  " #116
+  " #131
   call append(0, ['(', 'foo', ')'])
   let @@ = 'fail'
   normal ggyib
-  call g:assert.equals(@@, "foo", 'failed at #116')
+  call g:assert.equals(@@, "foo", 'failed at #131')
 endfunction
 "}}}
 
 function! s:suite.i_x_default_recipes() abort "{{{
-  " #117
+  " #132
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 02lviby
-  call g:assert.equals(@@, 'foo', 'failed at #117')
+  call g:assert.equals(@@, 'foo', 'failed at #132')
 
-  " #118
+  " #133
   call setline('.', '[foo]')
   let @@ = 'fail'
   normal 02lviby
-  call g:assert.equals(@@, 'foo', 'failed at #118')
+  call g:assert.equals(@@, 'foo', 'failed at #133')
 
-  " #119
+  " #134
   call setline('.', '{foo}')
   let @@ = 'fail'
   normal 02lviby
-  call g:assert.equals(@@, 'foo', 'failed at #119')
+  call g:assert.equals(@@, 'foo', 'failed at #134')
 
-  " #120
+  " #135
   call setline('.', '<foo>')
   let @@ = 'fail'
   normal 02lviby
-  call g:assert.equals(@@, 'foo', 'failed at #120')
+  call g:assert.equals(@@, 'foo', 'failed at #135')
 
-  " #121
+  " #136
   call setline('.', '"foo"')
   let @@ = 'fail'
   normal 02lviby
-  call g:assert.equals(@@, 'foo', 'failed at #121')
+  call g:assert.equals(@@, 'foo', 'failed at #136')
 
-  " #122
+  " #137
   call setline('.', "'foo'")
   let @@ = 'fail'
   normal 02lviby
-  call g:assert.equals(@@, 'foo', 'failed at #122')
+  call g:assert.equals(@@, 'foo', 'failed at #137')
 endfunction
 "}}}
 function! s:suite.i_x_nest() abort  "{{{
-  " #123
+  " #138
   call setline('.', '()')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, '(', 'failed at #123')
+  call g:assert.equals(@@, '(', 'failed at #138')
 
-  " #124
+  " #139
   call setline('.', '(a)')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'a', 'failed at #124')
-
-  " #125
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 0viby
-  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #125')
-
-  " #126
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 0lviby
-  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #126')
-
-  " #127
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 02lviby
-  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #127')
-
-  " #128
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 03lviby
-  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #128')
-
-  " #129
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 04lviby
-  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #129')
-
-  " #130
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 05lviby
-  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #130')
-
-  " #131
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 06lviby
-  call g:assert.equals(@@, 'cc', 'failed at #131')
-
-  " #132
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 07lviby
-  call g:assert.equals(@@, 'cc', 'failed at #132')
-
-  " #133
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 08lviby
-  call g:assert.equals(@@, 'cc', 'failed at #133')
-
-  " #134
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 09lviby
-  call g:assert.equals(@@, 'cc', 'failed at #134')
-
-  " #135
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 010lviby
-  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #135')
-
-  " #136
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 011lviby
-  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #136')
-
-  " #137
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 012lviby
-  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #137')
-
-  " #138
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 013lviby
-  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #138')
-
-  " #139
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 014lviby
-  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #139')
+  call g:assert.equals(@@, 'a', 'failed at #139')
 
   " #140
   call setline('.', '(aa(bb(cc)bb)aa)')
   let @@ = 'fail'
-  normal 015lviby
+  normal 0viby
   call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #140')
+
+  " #141
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 0lviby
+  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #141')
+
+  " #142
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 02lviby
+  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #142')
+
+  " #143
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 03lviby
+  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #143')
+
+  " #144
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 04lviby
+  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #144')
+
+  " #145
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 05lviby
+  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #145')
+
+  " #146
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 06lviby
+  call g:assert.equals(@@, 'cc', 'failed at #146')
+
+  " #147
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 07lviby
+  call g:assert.equals(@@, 'cc', 'failed at #147')
+
+  " #148
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 08lviby
+  call g:assert.equals(@@, 'cc', 'failed at #148')
+
+  " #149
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 09lviby
+  call g:assert.equals(@@, 'cc', 'failed at #149')
+
+  " #150
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 010lviby
+  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #150')
+
+  " #151
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 011lviby
+  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #151')
+
+  " #152
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 012lviby
+  call g:assert.equals(@@, 'bb(cc)bb', 'failed at #152')
+
+  " #153
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 013lviby
+  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #153')
+
+  " #154
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 014lviby
+  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #154')
+
+  " #155
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 015lviby
+  call g:assert.equals(@@, 'aa(bb(cc)bb)aa', 'failed at #155')
 
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [{'buns': ['(((', ')))'], 'nesting': 1}]
 
-  " #141
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 0viby
-  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #141')
-
-  " #142
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 0lviby
-  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #142')
-
-  " #143
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 02lviby
-  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #143')
-
-  " #144
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 03lviby
-  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #144')
-
-  " #145
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 04lviby
-  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #145')
-
-  " #146
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 05lviby
-  call g:assert.equals(@@, 'bb', 'failed at #146')
-
-  " #147
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 06lviby
-  call g:assert.equals(@@, 'bb', 'failed at #147')
-
-  " #148
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 07lviby
-  call g:assert.equals(@@, 'bb', 'failed at #148')
-
-  " #149
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 08lviby
-  call g:assert.equals(@@, 'bb', 'failed at #149')
-
-  " #150
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 09lviby
-  call g:assert.equals(@@, 'bb', 'failed at #150')
-
-  " #151
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 010lviby
-  call g:assert.equals(@@, 'bb', 'failed at #151')
-
-  " #152
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 011lviby
-  call g:assert.equals(@@, 'bb', 'failed at #152')
-
-  " #153
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 012lviby
-  call g:assert.equals(@@, 'bb', 'failed at #153')
-
-  " #154
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 013lviby
-  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #154')
-
-  " #155
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 014lviby
-  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #155')
-
   " #156
   call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
-  normal 015lviby
+  normal 0viby
   call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #156')
 
   " #157
   call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
-  normal 016lviby
+  normal 0lviby
   call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #157')
 
   " #158
   call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
-  normal 017lviby
-  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #158')
-endfunction
-"}}}
-function! s:suite.i_x_no_nest() abort "{{{
-  " #159
-  call setline('.', '""')
-  let @@ = 'fail'
-  normal 0viby
-  call g:assert.equals(@@, '"', 'failed at #159')
-
-  " #160
-  call setline('.', '"a"')
-  let @@ = 'fail'
-  normal 0viby
-  call g:assert.equals(@@, 'a', 'failed at #160')
-
-  " #161
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 0viby
-  call g:assert.equals(@@, 'aa', 'failed at #161')
-
-  " #162
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 0lviby
-  call g:assert.equals(@@, 'aa', 'failed at #162')
-
-  " #163
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
   normal 02lviby
-  call g:assert.equals(@@, 'aa', 'failed at #163')
+  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #158')
 
-  " #164
-  call setline('.', '"aa"bb"cc"bb"aa"')
+  " #159
+  call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
   normal 03lviby
-  call g:assert.equals(@@, 'aa', 'failed at #164')
+  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #159')
 
-  " #165
-  call setline('.', '"aa"bb"cc"bb"aa"')
+  " #160
+  call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
   normal 04lviby
+  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #160')
+
+  " #161
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 05lviby
+  call g:assert.equals(@@, 'bb', 'failed at #161')
+
+  " #162
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 06lviby
+  call g:assert.equals(@@, 'bb', 'failed at #162')
+
+  " #163
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 07lviby
+  call g:assert.equals(@@, 'bb', 'failed at #163')
+
+  " #164
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 08lviby
+  call g:assert.equals(@@, 'bb', 'failed at #164')
+
+  " #165
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 09lviby
   call g:assert.equals(@@, 'bb', 'failed at #165')
 
   " #166
-  call setline('.', '"aa"bb"cc"bb"aa"')
+  call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
-  normal 05lviby
+  normal 010lviby
   call g:assert.equals(@@, 'bb', 'failed at #166')
 
   " #167
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 06lviby
-  call g:assert.equals(@@, 'cc', 'failed at #167')
-
-  " #168
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 07lviby
-  call g:assert.equals(@@, 'cc', 'failed at #168')
-
-  " #169
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 08lviby
-  call g:assert.equals(@@, 'cc', 'failed at #169')
-
-  " #170
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 09lviby
-  call g:assert.equals(@@, 'cc', 'failed at #170')
-
-  " #171
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 010lviby
-  call g:assert.equals(@@, 'bb', 'failed at #171')
-
-  " #172
-  call setline('.', '"aa"bb"cc"bb"aa"')
+  call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
   normal 011lviby
-  call g:assert.equals(@@, 'bb', 'failed at #172')
+  call g:assert.equals(@@, 'bb', 'failed at #167')
 
-  " #173
-  call setline('.', '"aa"bb"cc"bb"aa"')
+  " #168
+  call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
   normal 012lviby
-  call g:assert.equals(@@, 'aa', 'failed at #173')
+  call g:assert.equals(@@, 'bb', 'failed at #168')
 
-  " #174
-  call setline('.', '"aa"bb"cc"bb"aa"')
+  " #169
+  call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
   normal 013lviby
-  call g:assert.equals(@@, 'aa', 'failed at #174')
+  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #169')
 
-  " #175
-  call setline('.', '"aa"bb"cc"bb"aa"')
+  " #170
+  call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
   normal 014lviby
-  call g:assert.equals(@@, 'aa', 'failed at #175')
+  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #170')
+
+  " #171
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 015lviby
+  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #171')
+
+  " #172
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 016lviby
+  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #172')
+
+  " #173
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 017lviby
+  call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #173')
+endfunction
+"}}}
+function! s:suite.i_x_no_nest() abort "{{{
+  " #174
+  call setline('.', '""')
+  let @@ = 'fail'
+  normal 0viby
+  call g:assert.equals(@@, '"', 'failed at #174')
+
+  " #175
+  call setline('.', '"a"')
+  let @@ = 'fail'
+  normal 0viby
+  call g:assert.equals(@@, 'a', 'failed at #175')
 
   " #176
   call setline('.', '"aa"bb"cc"bb"aa"')
   let @@ = 'fail'
-  normal 015lviby
+  normal 0viby
   call g:assert.equals(@@, 'aa', 'failed at #176')
+
+  " #177
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 0lviby
+  call g:assert.equals(@@, 'aa', 'failed at #177')
+
+  " #178
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 02lviby
+  call g:assert.equals(@@, 'aa', 'failed at #178')
+
+  " #179
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 03lviby
+  call g:assert.equals(@@, 'aa', 'failed at #179')
+
+  " #180
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 04lviby
+  call g:assert.equals(@@, 'bb', 'failed at #180')
+
+  " #181
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 05lviby
+  call g:assert.equals(@@, 'bb', 'failed at #181')
+
+  " #182
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 06lviby
+  call g:assert.equals(@@, 'cc', 'failed at #182')
+
+  " #183
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 07lviby
+  call g:assert.equals(@@, 'cc', 'failed at #183')
+
+  " #184
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 08lviby
+  call g:assert.equals(@@, 'cc', 'failed at #184')
+
+  " #185
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 09lviby
+  call g:assert.equals(@@, 'cc', 'failed at #185')
+
+  " #186
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 010lviby
+  call g:assert.equals(@@, 'bb', 'failed at #186')
+
+  " #187
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 011lviby
+  call g:assert.equals(@@, 'bb', 'failed at #187')
+
+  " #188
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 012lviby
+  call g:assert.equals(@@, 'aa', 'failed at #188')
+
+  " #189
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 013lviby
+  call g:assert.equals(@@, 'aa', 'failed at #189')
+
+  " #190
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 014lviby
+  call g:assert.equals(@@, 'aa', 'failed at #190')
+
+  " #191
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 015lviby
+  call g:assert.equals(@@, 'aa', 'failed at #191')
 
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [{'buns': ['"""', '"""'], 'nesting': 0}]
 
-  " #177
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 0viby
-  call g:assert.equals(@@, 'aa', 'failed at #177')
-
-  " #178
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 0lviby
-  call g:assert.equals(@@, 'aa', 'failed at #178')
-
-  " #179
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 02lviby
-  call g:assert.equals(@@, 'aa', 'failed at #179')
-
-  " #180
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 03lviby
-  call g:assert.equals(@@, 'aa', 'failed at #180')
-
-  " #181
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 04lviby
-  call g:assert.equals(@@, 'aa', 'failed at #181')
-
-  " #182
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 05lviby
-  call g:assert.equals(@@, 'aa', 'failed at #182')
-
-  " #183
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 06lviby
-  call g:assert.equals(@@, 'aa', 'failed at #183')
-
-  " #184
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 07lviby
-  call g:assert.equals(@@, 'aa', 'failed at #184')
-
-  " #185
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 08lviby
-  call g:assert.equals(@@, 'bb', 'failed at #185')
-
-  " #186
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 09lviby
-  call g:assert.equals(@@, 'bb', 'failed at #186')
-
-  " #187
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 010lviby
-  call g:assert.equals(@@, 'cc', 'failed at #187')
-
-  " #188
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 011lviby
-  call g:assert.equals(@@, 'cc', 'failed at #188')
-
-  " #189
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 012lviby
-  call g:assert.equals(@@, 'cc', 'failed at #189')
-
-  " #190
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 013lviby
-  call g:assert.equals(@@, 'cc', 'failed at #190')
-
-  " #191
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 014lviby
-  call g:assert.equals(@@, 'cc', 'failed at #191')
-
   " #192
   call setline('.', '"""aa"""bb"""cc"""')
   let @@ = 'fail'
-  normal 015lviby
-  call g:assert.equals(@@, 'cc', 'failed at #192')
+  normal 0viby
+  call g:assert.equals(@@, 'aa', 'failed at #192')
 
   " #193
   call setline('.', '"""aa"""bb"""cc"""')
   let @@ = 'fail'
-  normal 016lviby
-  call g:assert.equals(@@, 'cc', 'failed at #193')
+  normal 0lviby
+  call g:assert.equals(@@, 'aa', 'failed at #193')
 
   " #194
   call setline('.', '"""aa"""bb"""cc"""')
   let @@ = 'fail'
+  normal 02lviby
+  call g:assert.equals(@@, 'aa', 'failed at #194')
+
+  " #195
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 03lviby
+  call g:assert.equals(@@, 'aa', 'failed at #195')
+
+  " #196
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 04lviby
+  call g:assert.equals(@@, 'aa', 'failed at #196')
+
+  " #197
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 05lviby
+  call g:assert.equals(@@, 'aa', 'failed at #197')
+
+  " #198
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 06lviby
+  call g:assert.equals(@@, 'aa', 'failed at #198')
+
+  " #199
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 07lviby
+  call g:assert.equals(@@, 'aa', 'failed at #199')
+
+  " #200
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 08lviby
+  call g:assert.equals(@@, 'bb', 'failed at #200')
+
+  " #201
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 09lviby
+  call g:assert.equals(@@, 'bb', 'failed at #201')
+
+  " #202
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 010lviby
+  call g:assert.equals(@@, 'cc', 'failed at #202')
+
+  " #203
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 011lviby
+  call g:assert.equals(@@, 'cc', 'failed at #203')
+
+  " #204
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 012lviby
+  call g:assert.equals(@@, 'cc', 'failed at #204')
+
+  " #205
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 013lviby
+  call g:assert.equals(@@, 'cc', 'failed at #205')
+
+  " #206
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 014lviby
+  call g:assert.equals(@@, 'cc', 'failed at #206')
+
+  " #207
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 015lviby
+  call g:assert.equals(@@, 'cc', 'failed at #207')
+
+  " #208
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 016lviby
+  call g:assert.equals(@@, 'cc', 'failed at #208')
+
+  " #209
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
   normal 017lviby
-  call g:assert.equals(@@, 'cc', 'failed at #194')
+  call g:assert.equals(@@, 'cc', 'failed at #209')
 endfunction
 "}}}
 function! s:suite.i_x_external_textobj() abort  "{{{
   let g:textobj#sandwich#recipes = [{'external': ['it', 'at']}]
 
-  " #195
+  " #210
   call setline('.', 'aa<title>bb</title>aa')
   let @@ = 'fail'
   normal 0fbviby
-  call g:assert.equals(@@, 'bb', 'failed at #195')
+  call g:assert.equals(@@, 'bb', 'failed at #210')
 endfunction
 "}}}
 function! s:suite.i_x_priority() abort  "{{{
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
 
-  " #196
+  " #211
   call setline('.', '"aa(b"c)')
   let @@ = 'fail'
   normal 0fbviby
-  call g:assert.equals(@@, 'b"c', 'failed at #196')
+  call g:assert.equals(@@, 'b"c', 'failed at #211')
 
-  " #197
+  " #212
   call setline('.', '"aa(b"ccc)')
   let @@ = 'fail'
   normal 0fbviby
-  call g:assert.equals(@@, 'aa(b', 'failed at #197')
+  call g:assert.equals(@@, 'aa(b', 'failed at #212')
 endfunction
 "}}}
 function! s:suite.i_x_selected_area_extending() abort  "{{{
-  " #198
+  " #213
   call setline('.', '(aa[bb{cc}bb]aa)')
   let @@ = 'fail'
   normal 0fcviby
-  call g:assert.equals(@@, 'cc', 'failed at #198')
+  call g:assert.equals(@@, 'cc', 'failed at #213')
 
-  " #199
+  " #214
   call setline('.', '(aa[bb{cc}bb]aa)')
   let @@ = 'fail'
   normal 0fcvibiby
-  call g:assert.equals(@@, 'bb{cc}bb', 'failed at #199')
+  call g:assert.equals(@@, 'bb{cc}bb', 'failed at #214')
 
-  " #200
+  " #215
   call setline('.', '(aa[bb{cc}bb]aa)')
   let @@ = 'fail'
   normal 0fcvibibiby
-  call g:assert.equals(@@, 'aa[bb{cc}bb]aa', 'failed at #200')
+  call g:assert.equals(@@, 'aa[bb{cc}bb]aa', 'failed at #215')
 endfunction
 "}}}
 function! s:suite.i_x_blockwise_visual() abort  "{{{
-  " #201
+  " #216
   call append(0, ['( ', 'aa', '  )'])
   let @@ = 'fail'
   execute "normal gg\<C-v>iby"
-  call g:assert.equals(@@, " \na\n ", 'failed at #201')
+  call g:assert.equals(@@, " \na\n ", 'failed at #216')
 
   %delete
 
-  " #202
+  " #217
   call append(0, ['(aa)', '(bb)', '(cc)'])
   let @@ = 'fail'
   execute "normal gg\<C-v>2jiby"
-  call g:assert.equals(@@, "aa\nbb\ncc", 'failed at #202')
+  call g:assert.equals(@@, "aa\nbb\ncc", 'failed at #217')
 
   %delete
 
-  " #203
+  " #218
   call append(0, ['(aa)', '(bb)', '(cc)'])
   let @@ = 'fail'
   execute "normal gg\<C-v>2joiby"
-  call g:assert.equals(@@, "aa\nbb\ncc", 'failed at #203')
+  call g:assert.equals(@@, "aa\nbb\ncc", 'failed at #218')
 
   %delete
 
-  " #204
+  " #219
   call append(0, ['(aa)', '(bb)', '(ccc)'])
   let @@ = 'fail'
   execute "normal gg\<C-v>2jiby"
-  call g:assert.equals(@@, "aa)\nbb)\nccc", 'failed at #204')
+  call g:assert.equals(@@, "aa)\nbb)\nccc", 'failed at #219')
 
   %delete
 
-  " #205
+  " #220
   call append(0, ['(aaa)', '(bb)', '(cc)'])
   let @@ = 'fail'
   execute "normal gg\<C-v>2joiby"
-  call g:assert.equals(@@, "aaa\nbb)\ncc)", 'failed at #205')
+  call g:assert.equals(@@, "aaa\nbb)\ncc)", 'failed at #220')
 endfunction
 "}}}
 function! s:suite.i_x_option_eval() abort "{{{
@@ -1431,31 +1565,31 @@ function! s:suite.i_x_option_eval() abort "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['1+1', '1+2']}]
 
   """ off
-  " #206
+  " #221
   call setline('.', '1+1aa1+2')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'aa', 'failed at #206')
+  call g:assert.equals(@@, 'aa', 'failed at #221')
 
-  " #207
+  " #222
   call setline('.', '2aa3')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, '2', 'failed at #207')
+  call g:assert.equals(@@, '2', 'failed at #222')
 
   """ on
   call textobj#sandwich#set('auto', 'eval', 1)
-  " #208
+  " #223
   call setline('.', '1+1aa1+2')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, '1', 'failed at #208')
+  call g:assert.equals(@@, '1', 'failed at #223')
 
-  " #209
+  " #224
   call setline('.', '2aa3')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'aa', 'failed at #209')
+  call g:assert.equals(@@, 'aa', 'failed at #224')
 endfunction
 "}}}
 function! s:suite.i_x_option_regex() abort "{{{
@@ -1463,31 +1597,31 @@ function! s:suite.i_x_option_regex() abort "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['\d\+', '\d\+']}]
 
   """ off
-  " #210
+  " #225
   call setline('.', '\d\+aa\d\+')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'aa', 'failed at #210')
+  call g:assert.equals(@@, 'aa', 'failed at #225')
 
-  " #211
+  " #226
   call setline('.', '888aa888')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, '8', 'failed at #211')
+  call g:assert.equals(@@, '8', 'failed at #226')
 
   """ on
   call textobj#sandwich#set('auto', 'regex', 1)
-  " #212
+  " #227
   call setline('.', '\d\+aa\d\+')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, '\', 'failed at #212')
+  call g:assert.equals(@@, '\', 'failed at #227')
 
-  " #213
+  " #228
   call setline('.', '888aa888')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'aa', 'failed at #213')
+  call g:assert.equals(@@, 'aa', 'failed at #228')
 endfunction
 "}}}
 function! s:suite.i_x_option_skip_regex() abort  "{{{
@@ -1495,27 +1629,27 @@ function! s:suite.i_x_option_skip_regex() abort  "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['a', 'a']}]
 
   """ off
-  " #214
+  " #229
   call setline('.', 'afooaa')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'foo', 'failed at #214')
+  call g:assert.equals(@@, 'foo', 'failed at #229')
 
   """ on
   call textobj#sandwich#set('auto', 'skip_regex', ['aa'])
-  " #215
+  " #230
   call setline('.', 'afooaa')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'fooa', 'failed at #215')
+  call g:assert.equals(@@, 'fooa', 'failed at #230')
 endfunction
 "}}}
 function! s:suite.i_x_option_quoteescape() abort  "{{{
-  " #216
+  " #231
   call setline('.', '"aa\"bb"')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'aa\"bb', 'failed at #216')
+  call g:assert.equals(@@, 'aa\"bb', 'failed at #231')
 endfunction
 "}}}
 function! s:suite.i_x_option_expand_range() abort  "{{{
@@ -1523,79 +1657,79 @@ function! s:suite.i_x_option_expand_range() abort  "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['"', '"']}]
 
   """ -1
-  " #217
+  " #232
   call setline('.', '"aa"')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'aa', 'failed at #217')
+  call g:assert.equals(@@, 'aa', 'failed at #232')
 
   %delete
 
-  " #218
+  " #233
   call append(0, ['"', 'aa', '"'])
   let @@ = 'fail'
   normal ggviby
-  call g:assert.equals(@@, "\naa\n", 'failed at #218')
+  call g:assert.equals(@@, "\naa\n", 'failed at #233')
 
   %delete
 
-  " #219
+  " #234
   call append(0, ['"', 'aa', 'bb', 'cc', '"'])
   let @@ = 'fail'
   normal ggviby
-  call g:assert.equals(@@, "\naa\nbb\ncc\n", 'failed at #219')
+  call g:assert.equals(@@, "\naa\nbb\ncc\n", 'failed at #234')
 
   %delete
 
   """ 0
   call textobj#sandwich#set('auto', 'expand_range', 0)
-  " #220
+  " #235
   call setline('.', '"aa"')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'aa', 'failed at #220')
+  call g:assert.equals(@@, 'aa', 'failed at #235')
 
   %delete
 
-  " #221
+  " #236
   call append(0, ['"', 'aa', '"'])
   let @@ = 'fail'
   normal ggviby
-  call g:assert.equals(@@, '"', 'failed at #221')
+  call g:assert.equals(@@, '"', 'failed at #236')
 
   %delete
 
-  " #222
+  " #237
   call append(0, ['"', 'aa', 'bb', 'cc', '"'])
   let @@ = 'fail'
   normal ggviby
-  call g:assert.equals(@@, '"', 'failed at #222')
+  call g:assert.equals(@@, '"', 'failed at #237')
 
   %delete
 
   """ 1
   call textobj#sandwich#set('auto', 'expand_range', 1)
-  " #223
+  " #238
   call setline('.', '"aa"')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'aa', 'failed at #223')
+  call g:assert.equals(@@, 'aa', 'failed at #238')
 
   %delete
 
-  " #224
+  " #239
   call append(0, ['"', 'aa', '"'])
   let @@ = 'fail'
   normal ggjviby
-  call g:assert.equals(@@, "\naa\n", 'failed at #224')
+  call g:assert.equals(@@, "\naa\n", 'failed at #239')
 
   %delete
 
-  " #225
+  " #240
   call append(0, ['"', 'aa', 'bb', 'cc', '"'])
   let @@ = 'fail'
   normal ggviby
-  call g:assert.equals(@@, '"', 'failed at #225')
+  call g:assert.equals(@@, '"', 'failed at #240')
 endfunction
 "}}}
 function! s:suite.i_x_option_noremap() abort  "{{{
@@ -1605,31 +1739,31 @@ function! s:suite.i_x_option_noremap() abort  "{{{
   xnoremap a{ a(
 
   """ on
-  " #226
+  " #241
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, '(', 'failed at #226')
+  call g:assert.equals(@@, '(', 'failed at #241')
 
-  " #227
+  " #242
   call setline('.', '{foo}')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'foo', 'failed at #227')
+  call g:assert.equals(@@, 'foo', 'failed at #242')
 
   """ off
   call textobj#sandwich#set('auto', 'noremap', 0)
-  " #228
+  " #243
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'foo', 'failed at #228')
+  call g:assert.equals(@@, 'foo', 'failed at #243')
 
-  " #229
+  " #244
   call setline('.', '{foo}')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, '{', 'failed at #229')
+  call g:assert.equals(@@, '{', 'failed at #244')
 
 endfunction
 "}}}
@@ -1638,29 +1772,29 @@ function! s:suite.i_x_option_syntax() abort "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['(', ')']}]
   call textobj#sandwich#set('auto', 'syntax', [])
 
-  " #230
+  " #245
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'foo', 'failed at #230')
+  call g:assert.equals(@@, 'foo', 'failed at #245')
 
   call textobj#sandwich#set('auto', 'syntax', ['Special'])
   syn match TestParen '[()]'
   highlight link TestParen String
 
-  " #231
+  " #246
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, '(', 'failed at #231')
+  call g:assert.equals(@@, '(', 'failed at #246')
 
   highlight link TestParen Special
 
-  " #232
+  " #247
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'foo', 'failed at #232')
+  call g:assert.equals(@@, 'foo', 'failed at #247')
 endfunction
 "}}}
 function! s:suite.i_x_option_match_syntax() abort "{{{
@@ -1673,11 +1807,11 @@ function! s:suite.i_x_option_match_syntax() abort "{{{
   syntax match TestParen '[()]'
   highlight link TestParen Special
 
-  " #233
+  " #248
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'foo', 'failed at #233')
+  call g:assert.equals(@@, 'foo', 'failed at #248')
 
   syntax clear
   syntax match TestBra '('
@@ -1685,11 +1819,11 @@ function! s:suite.i_x_option_match_syntax() abort "{{{
   highlight link TestBra Special
   highlight link TestKet String
 
-  " #234
+  " #249
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, '(', 'failed at #234')
+  call g:assert.equals(@@, '(', 'failed at #249')
 
   syntax clear
   syntax match TestBra '(f'
@@ -1697,11 +1831,11 @@ function! s:suite.i_x_option_match_syntax() abort "{{{
   highlight link TestBra Special
   highlight link TestKet Special
 
-  " #235
+  " #250
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'foo', 'failed at #235')
+  call g:assert.equals(@@, 'foo', 'failed at #250')
 
   """ 2
   call textobj#sandwich#set('auto', 'match_syntax', 2)
@@ -1709,11 +1843,11 @@ function! s:suite.i_x_option_match_syntax() abort "{{{
   syntax match TestParen '[()]'
   highlight link TestParen Special
 
-  " #236
+  " #251
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, '(', 'failed at #236')
+  call g:assert.equals(@@, '(', 'failed at #251')
 
   syntax clear
   syntax match TestBra '('
@@ -1721,11 +1855,11 @@ function! s:suite.i_x_option_match_syntax() abort "{{{
   highlight link TestBra Special
   highlight link TestKet String
 
-  " #237
+  " #252
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, '(', 'failed at #237')
+  call g:assert.equals(@@, '(', 'failed at #252')
 
   syntax clear
   syntax match TestBra '(f'
@@ -1733,11 +1867,11 @@ function! s:suite.i_x_option_match_syntax() abort "{{{
   highlight link TestBra Special
   highlight link TestKet Special
 
-  " #238
+  " #253
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'foo', 'failed at #238')
+  call g:assert.equals(@@, 'foo', 'failed at #253')
 endfunction
 "}}}
 function! s:suite.i_o_option_skip_breaking() abort  "{{{
@@ -1745,542 +1879,542 @@ function! s:suite.i_o_option_skip_breaking() abort  "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['(', ')']}]
 
   """ 0
-  " #239
+  " #254
   call append(0, ['(', 'foo', ')'])
   let @@ = 'fail'
   normal ggviby
-  call g:assert.equals(@@, "\nfoo\n", 'failed at #239')
+  call g:assert.equals(@@, "\nfoo\n", 'failed at #254')
 
   %delete
 
   """ 1
   call textobj#sandwich#set('auto', 'skip_break', 1)
-  " #240
+  " #255
   call append(0, ['(', 'foo', ')'])
   let @@ = 'fail'
   normal ggviby
-  call g:assert.equals(@@, "foo", 'failed at #240')
+  call g:assert.equals(@@, "foo", 'failed at #255')
 endfunction
 "}}}
 
 function! s:suite.a_o_default_recipes() abort "{{{
-  " #241
+  " #256
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 02lyab
-  call g:assert.equals(@@, '(foo)', 'failed at #241')
+  call g:assert.equals(@@, '(foo)', 'failed at #256')
 
-  " #242
+  " #257
   call setline('.', '[foo]')
   let @@ = 'fail'
   normal 02lyab
-  call g:assert.equals(@@, '[foo]', 'failed at #242')
+  call g:assert.equals(@@, '[foo]', 'failed at #257')
 
-  " #243
+  " #258
   call setline('.', '{foo}')
   let @@ = 'fail'
   normal 02lyab
-  call g:assert.equals(@@, '{foo}', 'failed at #243')
+  call g:assert.equals(@@, '{foo}', 'failed at #258')
 
-  " #244
+  " #259
   call setline('.', '<foo>')
   let @@ = 'fail'
   normal 02lyab
-  call g:assert.equals(@@, '<foo>', 'failed at #244')
+  call g:assert.equals(@@, '<foo>', 'failed at #259')
 
-  " #245
+  " #260
   call setline('.', '"foo"')
   let @@ = 'fail'
   normal 02lyab
-  call g:assert.equals(@@, '"foo"', 'failed at #245')
+  call g:assert.equals(@@, '"foo"', 'failed at #260')
 
-  " #246
+  " #261
   call setline('.', "'foo'")
   let @@ = 'fail'
   normal 02lyab
-  call g:assert.equals(@@, "'foo'", 'failed at #246')
+  call g:assert.equals(@@, "'foo'", 'failed at #261')
 endfunction
 "}}}
 function! s:suite.a_o_nest() abort  "{{{
-  " #247
+  " #262
   call setline('.', '()')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '()', 'failed at #247')
+  call g:assert.equals(@@, '()', 'failed at #262')
 
-  " #248
+  " #263
   call setline('.', '(a)')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '(a)', 'failed at #248')
-
-  " #249
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 0yab
-  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #249')
-
-  " #250
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 0lyab
-  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #250')
-
-  " #251
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 02lyab
-  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #251')
-
-  " #252
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 03lyab
-  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #252')
-
-  " #253
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 04lyab
-  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #253')
-
-  " #254
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 05lyab
-  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #254')
-
-  " #255
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 06lyab
-  call g:assert.equals(@@, '(cc)', 'failed at #255')
-
-  " #256
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 07lyab
-  call g:assert.equals(@@, '(cc)', 'failed at #256')
-
-  " #257
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 08lyab
-  call g:assert.equals(@@, '(cc)', 'failed at #257')
-
-  " #258
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 09lyab
-  call g:assert.equals(@@, '(cc)', 'failed at #258')
-
-  " #259
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 010lyab
-  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #259')
-
-  " #260
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 011lyab
-  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #260')
-
-  " #261
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 012lyab
-  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #261')
-
-  " #262
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 013lyab
-  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #262')
-
-  " #263
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 014lyab
-  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #263')
+  call g:assert.equals(@@, '(a)', 'failed at #263')
 
   " #264
   call setline('.', '(aa(bb(cc)bb)aa)')
   let @@ = 'fail'
-  normal 015lyab
+  normal 0yab
   call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #264')
+
+  " #265
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 0lyab
+  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #265')
+
+  " #266
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 02lyab
+  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #266')
+
+  " #267
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 03lyab
+  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #267')
+
+  " #268
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 04lyab
+  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #268')
+
+  " #269
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 05lyab
+  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #269')
+
+  " #270
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 06lyab
+  call g:assert.equals(@@, '(cc)', 'failed at #270')
+
+  " #271
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 07lyab
+  call g:assert.equals(@@, '(cc)', 'failed at #271')
+
+  " #272
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 08lyab
+  call g:assert.equals(@@, '(cc)', 'failed at #272')
+
+  " #273
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 09lyab
+  call g:assert.equals(@@, '(cc)', 'failed at #273')
+
+  " #274
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 010lyab
+  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #274')
+
+  " #275
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 011lyab
+  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #275')
+
+  " #276
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 012lyab
+  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #276')
+
+  " #277
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 013lyab
+  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #277')
+
+  " #278
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 014lyab
+  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #278')
+
+  " #279
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 015lyab
+  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #279')
 
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [{'buns': ['(((', ')))'], 'nesting': 1}]
 
-  " #265
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 0yab
-  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #265')
-
-  " #266
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 0lyab
-  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #266')
-
-  " #267
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 02lyab
-  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #267')
-
-  " #268
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 03lyab
-  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #268')
-
-  " #269
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 04lyab
-  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #269')
-
-  " #270
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 05lyab
-  call g:assert.equals(@@, '(((bb)))', 'failed at #270')
-
-  " #271
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 06lyab
-  call g:assert.equals(@@, '(((bb)))', 'failed at #271')
-
-  " #272
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 07lyab
-  call g:assert.equals(@@, '(((bb)))', 'failed at #272')
-
-  " #273
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 08lyab
-  call g:assert.equals(@@, '(((bb)))', 'failed at #273')
-
-  " #274
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 09lyab
-  call g:assert.equals(@@, '(((bb)))', 'failed at #274')
-
-  " #275
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 010lyab
-  call g:assert.equals(@@, '(((bb)))', 'failed at #275')
-
-  " #276
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 011lyab
-  call g:assert.equals(@@, '(((bb)))', 'failed at #276')
-
-  " #277
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 012lyab
-  call g:assert.equals(@@, '(((bb)))', 'failed at #277')
-
-  " #278
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 013lyab
-  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #278')
-
-  " #279
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 014lyab
-  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #279')
-
   " #280
   call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
-  normal 015lyab
+  normal 0yab
   call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #280')
 
   " #281
   call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
-  normal 016lyab
+  normal 0lyab
   call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #281')
 
   " #282
   call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
-  normal 017lyab
+  normal 02lyab
   call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #282')
+
+  " #283
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 03lyab
+  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #283')
+
+  " #284
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 04lyab
+  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #284')
+
+  " #285
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 05lyab
+  call g:assert.equals(@@, '(((bb)))', 'failed at #285')
+
+  " #286
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 06lyab
+  call g:assert.equals(@@, '(((bb)))', 'failed at #286')
+
+  " #287
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 07lyab
+  call g:assert.equals(@@, '(((bb)))', 'failed at #287')
+
+  " #288
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 08lyab
+  call g:assert.equals(@@, '(((bb)))', 'failed at #288')
+
+  " #289
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 09lyab
+  call g:assert.equals(@@, '(((bb)))', 'failed at #289')
+
+  " #290
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 010lyab
+  call g:assert.equals(@@, '(((bb)))', 'failed at #290')
+
+  " #291
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 011lyab
+  call g:assert.equals(@@, '(((bb)))', 'failed at #291')
+
+  " #292
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 012lyab
+  call g:assert.equals(@@, '(((bb)))', 'failed at #292')
+
+  " #293
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 013lyab
+  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #293')
+
+  " #294
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 014lyab
+  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #294')
+
+  " #295
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 015lyab
+  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #295')
+
+  " #296
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 016lyab
+  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #296')
+
+  " #297
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 017lyab
+  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #297')
 endfunction
 "}}}
 function! s:suite.a_o_no_nest() abort "{{{
-  " #283
+  " #298
   call setline('.', '""')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '""', 'failed at #283')
+  call g:assert.equals(@@, '""', 'failed at #298')
 
-  " #284
+  " #299
   call setline('.', '"a"')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '"a"', 'failed at #284')
-
-  " #285
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 0yab
-  call g:assert.equals(@@, '"aa"', 'failed at #285')
-
-  " #286
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 0lyab
-  call g:assert.equals(@@, '"aa"', 'failed at #286')
-
-  " #287
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 02lyab
-  call g:assert.equals(@@, '"aa"', 'failed at #287')
-
-  " #288
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 03lyab
-  call g:assert.equals(@@, '"aa"', 'failed at #288')
-
-  " #289
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 04lyab
-  call g:assert.equals(@@, '"bb"', 'failed at #289')
-
-  " #290
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 05lyab
-  call g:assert.equals(@@, '"bb"', 'failed at #290')
-
-  " #291
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 06lyab
-  call g:assert.equals(@@, '"cc"', 'failed at #291')
-
-  " #292
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 07lyab
-  call g:assert.equals(@@, '"cc"', 'failed at #292')
-
-  " #293
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 08lyab
-  call g:assert.equals(@@, '"cc"', 'failed at #293')
-
-  " #294
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 09lyab
-  call g:assert.equals(@@, '"cc"', 'failed at #294')
-
-  " #295
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 010lyab
-  call g:assert.equals(@@, '"bb"', 'failed at #295')
-
-  " #296
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 011lyab
-  call g:assert.equals(@@, '"bb"', 'failed at #296')
-
-  " #297
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 012lyab
-  call g:assert.equals(@@, '"aa"', 'failed at #297')
-
-  " #298
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 013lyab
-  call g:assert.equals(@@, '"aa"', 'failed at #298')
-
-  " #299
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 014lyab
-  call g:assert.equals(@@, '"aa"', 'failed at #299')
+  call g:assert.equals(@@, '"a"', 'failed at #299')
 
   " #300
   call setline('.', '"aa"bb"cc"bb"aa"')
   let @@ = 'fail'
-  normal 015lyab
+  normal 0yab
   call g:assert.equals(@@, '"aa"', 'failed at #300')
+
+  " #301
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 0lyab
+  call g:assert.equals(@@, '"aa"', 'failed at #301')
+
+  " #302
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 02lyab
+  call g:assert.equals(@@, '"aa"', 'failed at #302')
+
+  " #303
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 03lyab
+  call g:assert.equals(@@, '"aa"', 'failed at #303')
+
+  " #304
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 04lyab
+  call g:assert.equals(@@, '"bb"', 'failed at #304')
+
+  " #305
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 05lyab
+  call g:assert.equals(@@, '"bb"', 'failed at #305')
+
+  " #306
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 06lyab
+  call g:assert.equals(@@, '"cc"', 'failed at #306')
+
+  " #307
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 07lyab
+  call g:assert.equals(@@, '"cc"', 'failed at #307')
+
+  " #308
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 08lyab
+  call g:assert.equals(@@, '"cc"', 'failed at #308')
+
+  " #309
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 09lyab
+  call g:assert.equals(@@, '"cc"', 'failed at #309')
+
+  " #310
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 010lyab
+  call g:assert.equals(@@, '"bb"', 'failed at #310')
+
+  " #311
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 011lyab
+  call g:assert.equals(@@, '"bb"', 'failed at #311')
+
+  " #312
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 012lyab
+  call g:assert.equals(@@, '"aa"', 'failed at #312')
+
+  " #313
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 013lyab
+  call g:assert.equals(@@, '"aa"', 'failed at #313')
+
+  " #314
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 014lyab
+  call g:assert.equals(@@, '"aa"', 'failed at #314')
+
+  " #315
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 015lyab
+  call g:assert.equals(@@, '"aa"', 'failed at #315')
 
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [{'buns': ['"""', '"""'], 'nesting': 0}]
 
-  " #301
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 0yab
-  call g:assert.equals(@@, '"""aa"""', 'failed at #301')
-
-  " #302
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 0lyab
-  call g:assert.equals(@@, '"""aa"""', 'failed at #302')
-
-  " #303
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 02lyab
-  call g:assert.equals(@@, '"""aa"""', 'failed at #303')
-
-  " #304
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 03lyab
-  call g:assert.equals(@@, '"""aa"""', 'failed at #304')
-
-  " #305
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 04lyab
-  call g:assert.equals(@@, '"""aa"""', 'failed at #305')
-
-  " #306
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 05lyab
-  call g:assert.equals(@@, '"""aa"""', 'failed at #306')
-
-  " #307
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 06lyab
-  call g:assert.equals(@@, '"""aa"""', 'failed at #307')
-
-  " #308
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 07lyab
-  call g:assert.equals(@@, '"""aa"""', 'failed at #308')
-
-  " #309
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 08lyab
-  call g:assert.equals(@@, '"""bb"""', 'failed at #309')
-
-  " #310
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 09lyab
-  call g:assert.equals(@@, '"""bb"""', 'failed at #310')
-
-  " #311
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 010lyab
-  call g:assert.equals(@@, '"""cc"""', 'failed at #311')
-
-  " #312
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 011lyab
-  call g:assert.equals(@@, '"""cc"""', 'failed at #312')
-
-  " #313
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 012lyab
-  call g:assert.equals(@@, '"""cc"""', 'failed at #313')
-
-  " #314
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 013lyab
-  call g:assert.equals(@@, '"""cc"""', 'failed at #314')
-
-  " #315
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 014lyab
-  call g:assert.equals(@@, '"""cc"""', 'failed at #315')
-
   " #316
   call setline('.', '"""aa"""bb"""cc"""')
   let @@ = 'fail'
-  normal 015lyab
-  call g:assert.equals(@@, '"""cc"""', 'failed at #316')
+  normal 0yab
+  call g:assert.equals(@@, '"""aa"""', 'failed at #316')
 
   " #317
   call setline('.', '"""aa"""bb"""cc"""')
   let @@ = 'fail'
-  normal 016lyab
-  call g:assert.equals(@@, '"""cc"""', 'failed at #317')
+  normal 0lyab
+  call g:assert.equals(@@, '"""aa"""', 'failed at #317')
 
   " #318
   call setline('.', '"""aa"""bb"""cc"""')
   let @@ = 'fail'
+  normal 02lyab
+  call g:assert.equals(@@, '"""aa"""', 'failed at #318')
+
+  " #319
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 03lyab
+  call g:assert.equals(@@, '"""aa"""', 'failed at #319')
+
+  " #320
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 04lyab
+  call g:assert.equals(@@, '"""aa"""', 'failed at #320')
+
+  " #321
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 05lyab
+  call g:assert.equals(@@, '"""aa"""', 'failed at #321')
+
+  " #322
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 06lyab
+  call g:assert.equals(@@, '"""aa"""', 'failed at #322')
+
+  " #323
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 07lyab
+  call g:assert.equals(@@, '"""aa"""', 'failed at #323')
+
+  " #324
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 08lyab
+  call g:assert.equals(@@, '"""bb"""', 'failed at #324')
+
+  " #325
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 09lyab
+  call g:assert.equals(@@, '"""bb"""', 'failed at #325')
+
+  " #326
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 010lyab
+  call g:assert.equals(@@, '"""cc"""', 'failed at #326')
+
+  " #327
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 011lyab
+  call g:assert.equals(@@, '"""cc"""', 'failed at #327')
+
+  " #328
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 012lyab
+  call g:assert.equals(@@, '"""cc"""', 'failed at #328')
+
+  " #329
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 013lyab
+  call g:assert.equals(@@, '"""cc"""', 'failed at #329')
+
+  " #330
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 014lyab
+  call g:assert.equals(@@, '"""cc"""', 'failed at #330')
+
+  " #331
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 015lyab
+  call g:assert.equals(@@, '"""cc"""', 'failed at #331')
+
+  " #332
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 016lyab
+  call g:assert.equals(@@, '"""cc"""', 'failed at #332')
+
+  " #333
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
   normal 017lyab
-  call g:assert.equals(@@, '"""cc"""', 'failed at #318')
+  call g:assert.equals(@@, '"""cc"""', 'failed at #333')
 endfunction
 "}}}
 function! s:suite.a_o_external_textobj() abort  "{{{
   let g:textobj#sandwich#recipes = [{'external': ['it', 'at']}]
 
-  " #319
+  " #334
   call setline('.', 'aa<title>bb</title>aa')
   let @@ = 'fail'
   normal 0fbyab
-  call g:assert.equals(@@, '<title>bb</title>', 'failed at #319')
+  call g:assert.equals(@@, '<title>bb</title>', 'failed at #334')
 endfunction
 "}}}
 function! s:suite.a_o_priority() abort  "{{{
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(((', ')))']}, {'buns': ['(', ')']}]
 
-  " #320
+  " #335
   call setline('.', '"aa(b"c)')
   let @@ = 'fail'
   normal 0fbyab
-  call g:assert.equals(@@, '(b"c)', 'failed at #320')
+  call g:assert.equals(@@, '(b"c)', 'failed at #335')
 
-  " #321
+  " #336
   call setline('.', '"aa(b"ccc)')
   let @@ = 'fail'
   normal 0fbyab
-  call g:assert.equals(@@, '"aa(b"', 'failed at #321')
+  call g:assert.equals(@@, '"aa(b"', 'failed at #336')
 
-  " #322
+  " #337
   call setline('.', '(((foo)))')
   let @@ = 'fail'
   normal 0ffyab
-  call g:assert.equals(@@, '(foo)', 'failed at #322')
+  call g:assert.equals(@@, '(foo)', 'failed at #337')
 
-  " #323
+  " #338
   let g:textobj#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}, {'buns': ['(((', ')))']}]
   call setline('.', '(((foo)))')
   let @@ = 'fail'
   normal 0ffyab
-  call g:assert.equals(@@, '(((foo)))', 'failed at #323')
+  call g:assert.equals(@@, '(((foo)))', 'failed at #338')
 endfunction
 "}}}
 function! s:suite.a_o_option_eval() abort "{{{
@@ -2288,31 +2422,31 @@ function! s:suite.a_o_option_eval() abort "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['1+1', '1+2']}]
 
   """ off
-  " #324
+  " #339
   call setline('.', '1+1aa1+2')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '1+1aa1+2', 'failed at #324')
+  call g:assert.equals(@@, '1+1aa1+2', 'failed at #339')
 
-  " #325
+  " #340
   call setline('.', '2aa3')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '', 'failed at #325')
+  call g:assert.equals(@@, '', 'failed at #340')
 
   """ on
   call textobj#sandwich#set('auto', 'eval', 1)
-  " #326
+  " #341
   call setline('.', '1+1aa1+2')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '', 'failed at #326')
+  call g:assert.equals(@@, '', 'failed at #341')
 
-  " #327
+  " #342
   call setline('.', '2aa3')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '2aa3', 'failed at #327')
+  call g:assert.equals(@@, '2aa3', 'failed at #342')
 endfunction
 "}}}
 function! s:suite.a_o_option_regex() abort "{{{
@@ -2320,31 +2454,31 @@ function! s:suite.a_o_option_regex() abort "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['\d\+', '\d\+']}]
 
   """ off
-  " #328
+  " #343
   call setline('.', '\d\+aa\d\+')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '\d\+aa\d\+', 'failed at #328')
+  call g:assert.equals(@@, '\d\+aa\d\+', 'failed at #343')
 
-  " #329
+  " #344
   call setline('.', '888aa888')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '', 'failed at #329')
+  call g:assert.equals(@@, '', 'failed at #344')
 
   """ on
   call textobj#sandwich#set('auto', 'regex', 1)
-  " #330
+  " #345
   call setline('.', '\d\+aa\d\+')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '', 'failed at #330')
+  call g:assert.equals(@@, '', 'failed at #345')
 
-  " #331
+  " #346
   call setline('.', '888aa888')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '888aa888', 'failed at #331')
+  call g:assert.equals(@@, '888aa888', 'failed at #346')
 endfunction
 "}}}
 function! s:suite.a_o_option_skip_regex() abort  "{{{
@@ -2352,27 +2486,27 @@ function! s:suite.a_o_option_skip_regex() abort  "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['a', 'a']}]
 
   """ off
-  " #332
+  " #347
   call setline('.', 'afooaa')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, 'afooa', 'failed at #332')
+  call g:assert.equals(@@, 'afooa', 'failed at #347')
 
   """ on
   call textobj#sandwich#set('auto', 'skip_regex', ['aa'])
-  " #333
+  " #348
   call setline('.', 'afooaa')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, 'afooaa', 'failed at #333')
+  call g:assert.equals(@@, 'afooaa', 'failed at #348')
 endfunction
 "}}}
 function! s:suite.a_o_option_quoteescape() abort  "{{{
-  " #334
+  " #349
   call setline('.', '"aa\"bb"')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '"aa\"bb"', 'failed at #334')
+  call g:assert.equals(@@, '"aa\"bb"', 'failed at #349')
 endfunction
 "}}}
 function! s:suite.a_o_option_expand_range() abort  "{{{
@@ -2380,79 +2514,79 @@ function! s:suite.a_o_option_expand_range() abort  "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['"', '"']}]
 
   """ -1
-  " #335
+  " #350
   call setline('.', '"aa"')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '"aa"', 'failed at #335')
+  call g:assert.equals(@@, '"aa"', 'failed at #350')
 
   %delete
 
-  " #336
+  " #351
   call append(0, ['"', 'aa', '"'])
   let @@ = 'fail'
   normal ggyab
-  call g:assert.equals(@@, "\"\naa\n\"", 'failed at #336')
+  call g:assert.equals(@@, "\"\naa\n\"", 'failed at #351')
 
   %delete
 
-  " #337
+  " #352
   call append(0, ['"', 'aa', 'bb', 'cc', '"'])
   let @@ = 'fail'
   normal ggyab
-  call g:assert.equals(@@, "\"\naa\nbb\ncc\n\"", 'failed at #337')
+  call g:assert.equals(@@, "\"\naa\nbb\ncc\n\"", 'failed at #352')
 
   %delete
 
   """ 0
   call textobj#sandwich#set('auto', 'expand_range', 0)
-  " #338
+  " #353
   call setline('.', '"aa"')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '"aa"', 'failed at #338')
+  call g:assert.equals(@@, '"aa"', 'failed at #353')
 
   %delete
 
-  " #339
+  " #354
   call append(0, ['"', 'aa', '"'])
   let @@ = 'fail'
   normal ggyab
-  call g:assert.equals(@@, '', 'failed at #339')
+  call g:assert.equals(@@, '', 'failed at #354')
 
   %delete
 
-  " #340
+  " #355
   call append(0, ['"', 'aa', 'bb', 'cc', '"'])
   let @@ = 'fail'
   normal ggyab
-  call g:assert.equals(@@, '', 'failed at #340')
+  call g:assert.equals(@@, '', 'failed at #355')
 
   %delete
 
   """ 1
   call textobj#sandwich#set('auto', 'expand_range', 1)
-  " #341
+  " #356
   call setline('.', '"aa"')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '"aa"', 'failed at #341')
+  call g:assert.equals(@@, '"aa"', 'failed at #356')
 
   %delete
 
-  " #342
+  " #357
   call append(0, ['"', 'aa', '"'])
   let @@ = 'fail'
   normal ggjyab
-  call g:assert.equals(@@, "\"\naa\n\"", 'failed at #342')
+  call g:assert.equals(@@, "\"\naa\n\"", 'failed at #357')
 
   %delete
 
-  " #343
+  " #358
   call append(0, ['"', 'aa', 'bb', 'cc', '"'])
   let @@ = 'fail'
   normal ggyab
-  call g:assert.equals(@@, '', 'failed at #343')
+  call g:assert.equals(@@, '', 'failed at #358')
 endfunction
 "}}}
 function! s:suite.a_o_option_noremap() abort  "{{{
@@ -2462,31 +2596,31 @@ function! s:suite.a_o_option_noremap() abort  "{{{
   xnoremap a{ a(
 
   """ on
-  " #344
+  " #359
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '', 'failed at #344')
+  call g:assert.equals(@@, '', 'failed at #359')
 
-  " #345
+  " #360
   call setline('.', '{foo}')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '{foo}', 'failed at #345')
+  call g:assert.equals(@@, '{foo}', 'failed at #360')
 
   """ off
   call textobj#sandwich#set('auto', 'noremap', 0)
-  " #346
+  " #361
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '(foo)', 'failed at #346')
+  call g:assert.equals(@@, '(foo)', 'failed at #361')
 
-  " #347
+  " #362
   call setline('.', '{foo}')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '', 'failed at #347')
+  call g:assert.equals(@@, '', 'failed at #362')
 endfunction
 "}}}
 function! s:suite.a_o_option_syntax() abort "{{{
@@ -2494,29 +2628,29 @@ function! s:suite.a_o_option_syntax() abort "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['(', ')']}]
   call textobj#sandwich#set('auto', 'syntax', [])
 
-  " #348
+  " #363
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '(foo)', 'failed at #348')
+  call g:assert.equals(@@, '(foo)', 'failed at #363')
 
   call textobj#sandwich#set('auto', 'syntax', ['Special'])
   syn match TestParen '[()]'
   highlight link TestParen String
 
-  " #349
+  " #364
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '', 'failed at #349')
+  call g:assert.equals(@@, '', 'failed at #364')
 
   highlight link TestParen Special
 
-  " #350
+  " #365
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '(foo)', 'failed at #350')
+  call g:assert.equals(@@, '(foo)', 'failed at #365')
 endfunction
 "}}}
 function! s:suite.a_o_option_match_syntax() abort "{{{
@@ -2529,11 +2663,11 @@ function! s:suite.a_o_option_match_syntax() abort "{{{
   syntax match TestParen '[()]'
   highlight link TestParen Special
 
-  " #351
+  " #366
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '(foo)', 'failed at #351')
+  call g:assert.equals(@@, '(foo)', 'failed at #366')
 
   syntax clear
   syntax match TestBra '('
@@ -2541,11 +2675,11 @@ function! s:suite.a_o_option_match_syntax() abort "{{{
   highlight link TestBra Special
   highlight link TestKet String
 
-  " #352
+  " #367
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '', 'failed at #352')
+  call g:assert.equals(@@, '', 'failed at #367')
 
   syntax clear
   syntax match TestBra '(f'
@@ -2553,11 +2687,11 @@ function! s:suite.a_o_option_match_syntax() abort "{{{
   highlight link TestBra Special
   highlight link TestKet Special
 
-  " #353
+  " #368
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '(foo)', 'failed at #353')
+  call g:assert.equals(@@, '(foo)', 'failed at #368')
 
   """ 2
   call textobj#sandwich#set('auto', 'match_syntax', 2)
@@ -2565,11 +2699,11 @@ function! s:suite.a_o_option_match_syntax() abort "{{{
   syntax match TestParen '[()]'
   highlight link TestParen Special
 
-  " #354
+  " #369
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '', 'failed at #354')
+  call g:assert.equals(@@, '', 'failed at #369')
 
   syntax clear
   syntax match TestBra '('
@@ -2577,11 +2711,11 @@ function! s:suite.a_o_option_match_syntax() abort "{{{
   highlight link TestBra Special
   highlight link TestKet String
 
-  " #355
+  " #370
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '', 'failed at #355')
+  call g:assert.equals(@@, '', 'failed at #370')
 
   syntax clear
   syntax match TestBra '(f'
@@ -2589,11 +2723,11 @@ function! s:suite.a_o_option_match_syntax() abort "{{{
   highlight link TestBra Special
   highlight link TestKet Special
 
-  " #356
+  " #371
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '(foo)', 'failed at #356')
+  call g:assert.equals(@@, '(foo)', 'failed at #371')
 endfunction
 "}}}
 function! s:suite.a_o_option_synchro() abort  "{{{
@@ -2603,591 +2737,591 @@ function! s:suite.a_o_option_synchro() abort  "{{{
   call textobj#sandwich#set('auto', 'synchro', 1)
   nmap sd <Plug>(operator-sandwich-delete)
 
-  " #357
+  " #372
   call setline('.', 'afooa')
   normal 0sdab
-  call g:assert.equals(getline('.'), 'foo', 'failed at #357')
+  call g:assert.equals(getline('.'), 'foo', 'failed at #372')
 endfunction
 "}}}
 
 function! s:suite.a_x_default_recipes() abort "{{{
-  " #358
+  " #373
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 02lvaby
-  call g:assert.equals(@@, '(foo)', 'failed at #358')
+  call g:assert.equals(@@, '(foo)', 'failed at #373')
 
-  " #359
+  " #374
   call setline('.', '[foo]')
   let @@ = 'fail'
   normal 02lvaby
-  call g:assert.equals(@@, '[foo]', 'failed at #359')
+  call g:assert.equals(@@, '[foo]', 'failed at #374')
 
-  " #360
+  " #375
   call setline('.', '{foo}')
   let @@ = 'fail'
   normal 02lvaby
-  call g:assert.equals(@@, '{foo}', 'failed at #360')
+  call g:assert.equals(@@, '{foo}', 'failed at #375')
 
-  " #361
+  " #376
   call setline('.', '<foo>')
   let @@ = 'fail'
   normal 02lvaby
-  call g:assert.equals(@@, '<foo>', 'failed at #361')
+  call g:assert.equals(@@, '<foo>', 'failed at #376')
 
-  " #362
+  " #377
   call setline('.', '"foo"')
   let @@ = 'fail'
   normal 02lvaby
-  call g:assert.equals(@@, '"foo"', 'failed at #362')
+  call g:assert.equals(@@, '"foo"', 'failed at #377')
 
-  " #363
+  " #378
   call setline('.', "'foo'")
   let @@ = 'fail'
   normal 02lvaby
-  call g:assert.equals(@@, "'foo'", 'failed at #363')
+  call g:assert.equals(@@, "'foo'", 'failed at #378')
 endfunction
 "}}}
 function! s:suite.a_x_nest() abort  "{{{
-  " #364
+  " #379
   call setline('.', '()')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '()', 'failed at #364')
+  call g:assert.equals(@@, '()', 'failed at #379')
 
-  " #365
+  " #380
   call setline('.', '(a)')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '(a)', 'failed at #365')
-
-  " #366
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 0vaby
-  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #366')
-
-  " #367
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 0lvaby
-  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #367')
-
-  " #368
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 02lvaby
-  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #368')
-
-  " #369
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 03lvaby
-  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #369')
-
-  " #370
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 04lvaby
-  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #370')
-
-  " #371
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 05lvaby
-  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #371')
-
-  " #372
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 06lvaby
-  call g:assert.equals(@@, '(cc)', 'failed at #372')
-
-  " #373
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 07lvaby
-  call g:assert.equals(@@, '(cc)', 'failed at #373')
-
-  " #374
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 08lvaby
-  call g:assert.equals(@@, '(cc)', 'failed at #374')
-
-  " #375
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 09lvaby
-  call g:assert.equals(@@, '(cc)', 'failed at #375')
-
-  " #376
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 010lvaby
-  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #376')
-
-  " #377
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 011lvaby
-  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #377')
-
-  " #378
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 012lvaby
-  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #378')
-
-  " #379
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 013lvaby
-  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #379')
-
-  " #380
-  call setline('.', '(aa(bb(cc)bb)aa)')
-  let @@ = 'fail'
-  normal 014lvaby
-  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #380')
+  call g:assert.equals(@@, '(a)', 'failed at #380')
 
   " #381
   call setline('.', '(aa(bb(cc)bb)aa)')
   let @@ = 'fail'
-  normal 015lvaby
+  normal 0vaby
   call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #381')
+
+  " #382
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 0lvaby
+  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #382')
+
+  " #383
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 02lvaby
+  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #383')
+
+  " #384
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 03lvaby
+  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #384')
+
+  " #385
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 04lvaby
+  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #385')
+
+  " #386
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 05lvaby
+  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #386')
+
+  " #387
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 06lvaby
+  call g:assert.equals(@@, '(cc)', 'failed at #387')
+
+  " #388
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 07lvaby
+  call g:assert.equals(@@, '(cc)', 'failed at #388')
+
+  " #389
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 08lvaby
+  call g:assert.equals(@@, '(cc)', 'failed at #389')
+
+  " #390
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 09lvaby
+  call g:assert.equals(@@, '(cc)', 'failed at #390')
+
+  " #391
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 010lvaby
+  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #391')
+
+  " #392
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 011lvaby
+  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #392')
+
+  " #393
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 012lvaby
+  call g:assert.equals(@@, '(bb(cc)bb)', 'failed at #393')
+
+  " #394
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 013lvaby
+  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #394')
+
+  " #395
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 014lvaby
+  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #395')
+
+  " #396
+  call setline('.', '(aa(bb(cc)bb)aa)')
+  let @@ = 'fail'
+  normal 015lvaby
+  call g:assert.equals(@@, '(aa(bb(cc)bb)aa)', 'failed at #396')
 
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [{'buns': ['(((', ')))'], 'nesting': 1}]
 
-  " #382
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 0vaby
-  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #382')
-
-  " #383
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 0lvaby
-  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #383')
-
-  " #384
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 02lvaby
-  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #384')
-
-  " #385
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 03lvaby
-  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #385')
-
-  " #386
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 04lvaby
-  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #386')
-
-  " #387
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 05lvaby
-  call g:assert.equals(@@, '(((bb)))', 'failed at #387')
-
-  " #388
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 06lvaby
-  call g:assert.equals(@@, '(((bb)))', 'failed at #388')
-
-  " #389
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 07lvaby
-  call g:assert.equals(@@, '(((bb)))', 'failed at #389')
-
-  " #390
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 08lvaby
-  call g:assert.equals(@@, '(((bb)))', 'failed at #390')
-
-  " #391
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 09lvaby
-  call g:assert.equals(@@, '(((bb)))', 'failed at #391')
-
-  " #392
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 010lvaby
-  call g:assert.equals(@@, '(((bb)))', 'failed at #392')
-
-  " #393
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 011lvaby
-  call g:assert.equals(@@, '(((bb)))', 'failed at #393')
-
-  " #394
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 012lvaby
-  call g:assert.equals(@@, '(((bb)))', 'failed at #394')
-
-  " #395
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 013lvaby
-  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #395')
-
-  " #396
-  call setline('.', '(((aa(((bb)))aa)))')
-  let @@ = 'fail'
-  normal 014lvaby
-  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #396')
-
   " #397
   call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
-  normal 015lvaby
+  normal 0vaby
   call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #397')
 
   " #398
   call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
-  normal 016lvaby
+  normal 0lvaby
   call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #398')
 
   " #399
   call setline('.', '(((aa(((bb)))aa)))')
   let @@ = 'fail'
-  normal 017lvaby
+  normal 02lvaby
   call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #399')
+
+  " #400
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 03lvaby
+  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #400')
+
+  " #401
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 04lvaby
+  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #401')
+
+  " #402
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 05lvaby
+  call g:assert.equals(@@, '(((bb)))', 'failed at #402')
+
+  " #403
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 06lvaby
+  call g:assert.equals(@@, '(((bb)))', 'failed at #403')
+
+  " #404
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 07lvaby
+  call g:assert.equals(@@, '(((bb)))', 'failed at #404')
+
+  " #405
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 08lvaby
+  call g:assert.equals(@@, '(((bb)))', 'failed at #405')
+
+  " #406
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 09lvaby
+  call g:assert.equals(@@, '(((bb)))', 'failed at #406')
+
+  " #407
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 010lvaby
+  call g:assert.equals(@@, '(((bb)))', 'failed at #407')
+
+  " #408
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 011lvaby
+  call g:assert.equals(@@, '(((bb)))', 'failed at #408')
+
+  " #409
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 012lvaby
+  call g:assert.equals(@@, '(((bb)))', 'failed at #409')
+
+  " #410
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 013lvaby
+  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #410')
+
+  " #411
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 014lvaby
+  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #411')
+
+  " #412
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 015lvaby
+  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #412')
+
+  " #413
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 016lvaby
+  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #413')
+
+  " #414
+  call setline('.', '(((aa(((bb)))aa)))')
+  let @@ = 'fail'
+  normal 017lvaby
+  call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #414')
 endfunction
 "}}}
 function! s:suite.a_x_no_nest() abort "{{{
-  " #400
+  " #415
   call setline('.', '""')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '""', 'failed at #400')
+  call g:assert.equals(@@, '""', 'failed at #415')
 
-  " #401
+  " #416
   call setline('.', '"a"')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '"a"', 'failed at #401')
-
-  " #402
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 0vaby
-  call g:assert.equals(@@, '"aa"', 'failed at #402')
-
-  " #403
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 0lvaby
-  call g:assert.equals(@@, '"aa"', 'failed at #403')
-
-  " #404
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 02lvaby
-  call g:assert.equals(@@, '"aa"', 'failed at #404')
-
-  " #405
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 03lvaby
-  call g:assert.equals(@@, '"aa"', 'failed at #405')
-
-  " #406
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 04lvaby
-  call g:assert.equals(@@, '"bb"', 'failed at #406')
-
-  " #407
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 05lvaby
-  call g:assert.equals(@@, '"bb"', 'failed at #407')
-
-  " #408
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 06lvaby
-  call g:assert.equals(@@, '"cc"', 'failed at #408')
-
-  " #409
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 07lvaby
-  call g:assert.equals(@@, '"cc"', 'failed at #409')
-
-  " #410
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 08lvaby
-  call g:assert.equals(@@, '"cc"', 'failed at #410')
-
-  " #411
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 09lvaby
-  call g:assert.equals(@@, '"cc"', 'failed at #411')
-
-  " #412
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 010lvaby
-  call g:assert.equals(@@, '"bb"', 'failed at #412')
-
-  " #413
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 011lvaby
-  call g:assert.equals(@@, '"bb"', 'failed at #413')
-
-  " #414
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 012lvaby
-  call g:assert.equals(@@, '"aa"', 'failed at #414')
-
-  " #415
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 013lvaby
-  call g:assert.equals(@@, '"aa"', 'failed at #415')
-
-  " #416
-  call setline('.', '"aa"bb"cc"bb"aa"')
-  let @@ = 'fail'
-  normal 014lvaby
-  call g:assert.equals(@@, '"aa"', 'failed at #416')
+  call g:assert.equals(@@, '"a"', 'failed at #416')
 
   " #417
   call setline('.', '"aa"bb"cc"bb"aa"')
   let @@ = 'fail'
-  normal 015lvaby
+  normal 0vaby
   call g:assert.equals(@@, '"aa"', 'failed at #417')
+
+  " #418
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 0lvaby
+  call g:assert.equals(@@, '"aa"', 'failed at #418')
+
+  " #419
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 02lvaby
+  call g:assert.equals(@@, '"aa"', 'failed at #419')
+
+  " #420
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 03lvaby
+  call g:assert.equals(@@, '"aa"', 'failed at #420')
+
+  " #421
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 04lvaby
+  call g:assert.equals(@@, '"bb"', 'failed at #421')
+
+  " #422
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 05lvaby
+  call g:assert.equals(@@, '"bb"', 'failed at #422')
+
+  " #423
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 06lvaby
+  call g:assert.equals(@@, '"cc"', 'failed at #423')
+
+  " #424
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 07lvaby
+  call g:assert.equals(@@, '"cc"', 'failed at #424')
+
+  " #425
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 08lvaby
+  call g:assert.equals(@@, '"cc"', 'failed at #425')
+
+  " #426
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 09lvaby
+  call g:assert.equals(@@, '"cc"', 'failed at #426')
+
+  " #427
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 010lvaby
+  call g:assert.equals(@@, '"bb"', 'failed at #427')
+
+  " #428
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 011lvaby
+  call g:assert.equals(@@, '"bb"', 'failed at #428')
+
+  " #429
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 012lvaby
+  call g:assert.equals(@@, '"aa"', 'failed at #429')
+
+  " #430
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 013lvaby
+  call g:assert.equals(@@, '"aa"', 'failed at #430')
+
+  " #431
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 014lvaby
+  call g:assert.equals(@@, '"aa"', 'failed at #431')
+
+  " #432
+  call setline('.', '"aa"bb"cc"bb"aa"')
+  let @@ = 'fail'
+  normal 015lvaby
+  call g:assert.equals(@@, '"aa"', 'failed at #432')
 
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [{'buns': ['"""', '"""'], 'nesting': 0}]
 
-  " #418
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 0vaby
-  call g:assert.equals(@@, '"""aa"""', 'failed at #418')
-
-  " #419
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 0lvaby
-  call g:assert.equals(@@, '"""aa"""', 'failed at #419')
-
-  " #420
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 02lvaby
-  call g:assert.equals(@@, '"""aa"""', 'failed at #420')
-
-  " #421
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 03lvaby
-  call g:assert.equals(@@, '"""aa"""', 'failed at #421')
-
-  " #422
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 04lvaby
-  call g:assert.equals(@@, '"""aa"""', 'failed at #422')
-
-  " #423
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 05lvaby
-  call g:assert.equals(@@, '"""aa"""', 'failed at #423')
-
-  " #424
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 06lvaby
-  call g:assert.equals(@@, '"""aa"""', 'failed at #424')
-
-  " #425
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 07lvaby
-  call g:assert.equals(@@, '"""aa"""', 'failed at #425')
-
-  " #426
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 08lvaby
-  call g:assert.equals(@@, '"""bb"""', 'failed at #426')
-
-  " #427
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 09lvaby
-  call g:assert.equals(@@, '"""bb"""', 'failed at #427')
-
-  " #428
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 010lvaby
-  call g:assert.equals(@@, '"""cc"""', 'failed at #428')
-
-  " #429
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 011lvaby
-  call g:assert.equals(@@, '"""cc"""', 'failed at #429')
-
-  " #430
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 012lvaby
-  call g:assert.equals(@@, '"""cc"""', 'failed at #430')
-
-  " #431
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 013lvaby
-  call g:assert.equals(@@, '"""cc"""', 'failed at #431')
-
-  " #432
-  call setline('.', '"""aa"""bb"""cc"""')
-  let @@ = 'fail'
-  normal 014lvaby
-  call g:assert.equals(@@, '"""cc"""', 'failed at #432')
-
   " #433
   call setline('.', '"""aa"""bb"""cc"""')
   let @@ = 'fail'
-  normal 015lvaby
-  call g:assert.equals(@@, '"""cc"""', 'failed at #433')
+  normal 0vaby
+  call g:assert.equals(@@, '"""aa"""', 'failed at #433')
 
   " #434
   call setline('.', '"""aa"""bb"""cc"""')
   let @@ = 'fail'
-  normal 016lvaby
-  call g:assert.equals(@@, '"""cc"""', 'failed at #434')
+  normal 0lvaby
+  call g:assert.equals(@@, '"""aa"""', 'failed at #434')
 
   " #435
   call setline('.', '"""aa"""bb"""cc"""')
   let @@ = 'fail'
+  normal 02lvaby
+  call g:assert.equals(@@, '"""aa"""', 'failed at #435')
+
+  " #436
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 03lvaby
+  call g:assert.equals(@@, '"""aa"""', 'failed at #436')
+
+  " #437
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 04lvaby
+  call g:assert.equals(@@, '"""aa"""', 'failed at #437')
+
+  " #438
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 05lvaby
+  call g:assert.equals(@@, '"""aa"""', 'failed at #438')
+
+  " #439
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 06lvaby
+  call g:assert.equals(@@, '"""aa"""', 'failed at #439')
+
+  " #440
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 07lvaby
+  call g:assert.equals(@@, '"""aa"""', 'failed at #440')
+
+  " #441
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 08lvaby
+  call g:assert.equals(@@, '"""bb"""', 'failed at #441')
+
+  " #442
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 09lvaby
+  call g:assert.equals(@@, '"""bb"""', 'failed at #442')
+
+  " #443
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 010lvaby
+  call g:assert.equals(@@, '"""cc"""', 'failed at #443')
+
+  " #444
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 011lvaby
+  call g:assert.equals(@@, '"""cc"""', 'failed at #444')
+
+  " #445
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 012lvaby
+  call g:assert.equals(@@, '"""cc"""', 'failed at #445')
+
+  " #446
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 013lvaby
+  call g:assert.equals(@@, '"""cc"""', 'failed at #446')
+
+  " #447
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 014lvaby
+  call g:assert.equals(@@, '"""cc"""', 'failed at #447')
+
+  " #448
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 015lvaby
+  call g:assert.equals(@@, '"""cc"""', 'failed at #448')
+
+  " #449
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
+  normal 016lvaby
+  call g:assert.equals(@@, '"""cc"""', 'failed at #449')
+
+  " #450
+  call setline('.', '"""aa"""bb"""cc"""')
+  let @@ = 'fail'
   normal 017lvaby
-  call g:assert.equals(@@, '"""cc"""', 'failed at #435')
+  call g:assert.equals(@@, '"""cc"""', 'failed at #450')
 endfunction
 "}}}
 function! s:suite.a_x_external_textobj() abort  "{{{
   let g:textobj#sandwich#recipes = []
 
-  " #436
+  " #451
   call setline('.', 'aa<title>bb</title>aa')
   let @@ = 'fail'
   normal 0fbvaby
-  call g:assert.equals(@@, '<title>bb</title>', 'failed at #436')
+  call g:assert.equals(@@, '<title>bb</title>', 'failed at #451')
 endfunction
 "}}}
 function! s:suite.a_x_priority() abort  "{{{
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(((', ')))']}, {'buns': ['(', ')']}]
 
-  " #437
+  " #452
   call setline('.', '"aa(b"c)')
   let @@ = 'fail'
   normal 0fbvaby
-  call g:assert.equals(@@, '(b"c)', 'failed at #437')
+  call g:assert.equals(@@, '(b"c)', 'failed at #452')
 
-  " #438
+  " #453
   call setline('.', '"aa(b"ccc)')
   let @@ = 'fail'
   normal 0fbvaby
-  call g:assert.equals(@@, '"aa(b"', 'failed at #438')
+  call g:assert.equals(@@, '"aa(b"', 'failed at #453')
 
-  " #439
+  " #454
   call setline('.', '(((foo)))')
   let @@ = 'fail'
   normal 0ffvaby
-  call g:assert.equals(@@, '(foo)', 'failed at #439')
+  call g:assert.equals(@@, '(foo)', 'failed at #454')
 
-  " #440
+  " #455
   let g:textobj#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}, {'buns': ['(((', ')))']}]
   call setline('.', '(((foo)))')
   let @@ = 'fail'
   normal 0ffvaby
-  call g:assert.equals(@@, '(((foo)))', 'failed at #440')
+  call g:assert.equals(@@, '(((foo)))', 'failed at #455')
 endfunction
 "}}}
 function! s:suite.a_x_selected_area_extending() abort  "{{{
-  " #441
+  " #456
   call setline('.', '(aa[bb{cc}bb]aa)')
   let @@ = 'fail'
   normal 0fcvaby
-  call g:assert.equals(@@, '{cc}', 'failed at #441')
+  call g:assert.equals(@@, '{cc}', 'failed at #456')
 
-  " #442
+  " #457
   call setline('.', '(aa[bb{cc}bb]aa)')
   let @@ = 'fail'
   normal 0fcvababy
-  call g:assert.equals(@@, '[bb{cc}bb]', 'failed at #442')
+  call g:assert.equals(@@, '[bb{cc}bb]', 'failed at #457')
 
-  " #443
+  " #458
   call setline('.', '(aa[bb{cc}bb]aa)')
   let @@ = 'fail'
   normal 0fcvabababy
-  call g:assert.equals(@@, '(aa[bb{cc}bb]aa)', 'failed at #443')
+  call g:assert.equals(@@, '(aa[bb{cc}bb]aa)', 'failed at #458')
 endfunction
 "}}}
 function! s:suite.a_x_blockwise_visual() abort  "{{{
-  " #444
+  " #459
   call append(0, ['( ', 'aa', '  )'])
   let @@ = 'fail'
   execute "normal gg\<C-v>aby"
-  call g:assert.equals(@@, "( \naa\n  )", 'failed at #444')
+  call g:assert.equals(@@, "( \naa\n  )", 'failed at #459')
 
   %delete
 
-  " #445
+  " #460
   call append(0, ['(aa)', '(bb)', '(cc)'])
   let @@ = 'fail'
   execute "normal gg\<C-v>2jaby"
-  call g:assert.equals(@@, "(aa)\n(bb)\n(cc)", 'failed at #445')
+  call g:assert.equals(@@, "(aa)\n(bb)\n(cc)", 'failed at #460')
 
   %delete
 
-  " #446
+  " #461
   call append(0, ['(aa)', '(bb)', '(cc)'])
   let @@ = 'fail'
   execute "normal gg\<C-v>2joaby"
-  call g:assert.equals(@@, "(aa)\n(bb)\n(cc)", 'failed at #446')
+  call g:assert.equals(@@, "(aa)\n(bb)\n(cc)", 'failed at #461')
 
   %delete
 
-  " #447
+  " #462
   call append(0, ['(aa)', '(bb)', '(ccc)'])
   let @@ = 'fail'
   execute "normal gg\<C-v>2jaby"
-  call g:assert.equals(@@, "(aa)\n(bb)\n(ccc)", 'failed at #447')
+  call g:assert.equals(@@, "(aa)\n(bb)\n(ccc)", 'failed at #462')
 
   %delete
 
-  " #448
+  " #463
   call append(0, ['(aaa)', '(bb)', '(cc)'])
   let @@ = 'fail'
   execute "normal gg\<C-v>2joaby"
-  call g:assert.equals(@@, "(aaa)\n(bb)\n(cc)", 'failed at #448')
+  call g:assert.equals(@@, "(aaa)\n(bb)\n(cc)", 'failed at #463')
 endfunction
 "}}}
 function! s:suite.a_x_option_eval() abort "{{{
@@ -3195,31 +3329,31 @@ function! s:suite.a_x_option_eval() abort "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['1+1', '1+2']}]
 
   """ off
-  " #449
+  " #464
   call setline('.', '1+1aa1+2')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '1+1aa1+2', 'failed at #449')
+  call g:assert.equals(@@, '1+1aa1+2', 'failed at #464')
 
-  " #450
+  " #465
   call setline('.', '2aa3')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '2', 'failed at #450')
+  call g:assert.equals(@@, '2', 'failed at #465')
 
   """ on
   call textobj#sandwich#set('auto', 'eval', 1)
-  " #451
+  " #466
   call setline('.', '1+1aa1+2')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '1', 'failed at #451')
+  call g:assert.equals(@@, '1', 'failed at #466')
 
-  " #452
+  " #467
   call setline('.', '2aa3')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '2aa3', 'failed at #452')
+  call g:assert.equals(@@, '2aa3', 'failed at #467')
 endfunction
 "}}}
 function! s:suite.a_x_option_regex() abort "{{{
@@ -3227,31 +3361,31 @@ function! s:suite.a_x_option_regex() abort "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['\d\+', '\d\+']}]
 
   """ off
-  " #453
+  " #468
   call setline('.', '\d\+aa\d\+')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '\d\+aa\d\+', 'failed at #453')
+  call g:assert.equals(@@, '\d\+aa\d\+', 'failed at #468')
 
-  " #454
+  " #469
   call setline('.', '888aa888')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '8', 'failed at #454')
+  call g:assert.equals(@@, '8', 'failed at #469')
 
   """ on
   call textobj#sandwich#set('auto', 'regex', 1)
-  " #455
+  " #470
   call setline('.', '\d\+aa\d\+')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '\', 'failed at #455')
+  call g:assert.equals(@@, '\', 'failed at #470')
 
-  " #456
+  " #471
   call setline('.', '888aa888')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '888aa888', 'failed at #456')
+  call g:assert.equals(@@, '888aa888', 'failed at #471')
 endfunction
 "}}}
 function! s:suite.a_x_option_skip_regex() abort  "{{{
@@ -3259,27 +3393,27 @@ function! s:suite.a_x_option_skip_regex() abort  "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['a', 'a']}]
 
   """ off
-  " #457
+  " #472
   call setline('.', 'afooaa')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, 'afooa', 'failed at #457')
+  call g:assert.equals(@@, 'afooa', 'failed at #472')
 
   """ on
   call textobj#sandwich#set('auto', 'skip_regex', ['aa'])
-  " #458
+  " #473
   call setline('.', 'afooaa')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, 'afooaa', 'failed at #458')
+  call g:assert.equals(@@, 'afooaa', 'failed at #473')
 endfunction
 "}}}
 function! s:suite.a_x_option_quoteescape() abort  "{{{
-  " #459
+  " #474
   call setline('.', '"aa\"bb"')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '"aa\"bb"', 'failed at #459')
+  call g:assert.equals(@@, '"aa\"bb"', 'failed at #474')
 endfunction
 "}}}
 function! s:suite.a_x_option_expand_range() abort  "{{{
@@ -3287,79 +3421,79 @@ function! s:suite.a_x_option_expand_range() abort  "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['"', '"']}]
 
   """ -1
-  " #460
+  " #475
   call setline('.', '"aa"')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '"aa"', 'failed at #460')
+  call g:assert.equals(@@, '"aa"', 'failed at #475')
 
   %delete
 
-  " #461
+  " #476
   call append(0, ['"', 'aa', '"'])
   let @@ = 'fail'
   normal ggvaby
-  call g:assert.equals(@@, "\"\naa\n\"", 'failed at #461')
+  call g:assert.equals(@@, "\"\naa\n\"", 'failed at #476')
 
   %delete
 
-  " #462
+  " #477
   call append(0, ['"', 'aa', 'bb', 'cc', '"'])
   let @@ = 'fail'
   normal ggvaby
-  call g:assert.equals(@@, "\"\naa\nbb\ncc\n\"", 'failed at #462')
+  call g:assert.equals(@@, "\"\naa\nbb\ncc\n\"", 'failed at #477')
 
   %delete
 
   """ 0
   call textobj#sandwich#set('auto', 'expand_range', 0)
-  " #463
+  " #478
   call setline('.', '"aa"')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '"aa"', 'failed at #463')
+  call g:assert.equals(@@, '"aa"', 'failed at #478')
 
   %delete
 
-  " #464
+  " #479
   call append(0, ['"', 'aa', '"'])
   let @@ = 'fail'
   normal ggvaby
-  call g:assert.equals(@@, '"', 'failed at #464')
+  call g:assert.equals(@@, '"', 'failed at #479')
 
   %delete
 
-  " #465
+  " #480
   call append(0, ['"', 'aa', 'bb', 'cc', '"'])
   let @@ = 'fail'
   normal ggvaby
-  call g:assert.equals(@@, '"', 'failed at #465')
+  call g:assert.equals(@@, '"', 'failed at #480')
 
   %delete
 
   """ 1
   call textobj#sandwich#set('auto', 'expand_range', 1)
-  " #466
+  " #481
   call setline('.', '"aa"')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '"aa"', 'failed at #466')
+  call g:assert.equals(@@, '"aa"', 'failed at #481')
 
   %delete
 
-  " #467
+  " #482
   call append(0, ['"', 'aa', '"'])
   let @@ = 'fail'
   normal ggjvaby
-  call g:assert.equals(@@, "\"\naa\n\"", 'failed at #467')
+  call g:assert.equals(@@, "\"\naa\n\"", 'failed at #482')
 
   %delete
 
-  " #468
+  " #483
   call append(0, ['"', 'aa', 'bb', 'cc', '"'])
   let @@ = 'fail'
   normal ggvaby
-  call g:assert.equals(@@, '"', 'failed at #468')
+  call g:assert.equals(@@, '"', 'failed at #483')
 endfunction
 "}}}
 function! s:suite.a_x_option_noremap() abort  "{{{
@@ -3369,31 +3503,31 @@ function! s:suite.a_x_option_noremap() abort  "{{{
   xnoremap a{ a(
 
   """ on
-  " #469
+  " #484
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '(', 'failed at #469')
+  call g:assert.equals(@@, '(', 'failed at #484')
 
-  " #470
+  " #485
   call setline('.', '{foo}')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '{foo}', 'failed at #470')
+  call g:assert.equals(@@, '{foo}', 'failed at #485')
 
   """ off
   call textobj#sandwich#set('auto', 'noremap', 0)
-  " #471
+  " #486
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '(foo)', 'failed at #471')
+  call g:assert.equals(@@, '(foo)', 'failed at #486')
 
-  " #472
+  " #487
   call setline('.', '{foo}')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '{', 'failed at #472')
+  call g:assert.equals(@@, '{', 'failed at #487')
 endfunction
 "}}}
 function! s:suite.a_x_option_syntax() abort "{{{
@@ -3401,29 +3535,29 @@ function! s:suite.a_x_option_syntax() abort "{{{
   let g:textobj#sandwich#recipes = [{'buns': ['(', ')']}]
   call textobj#sandwich#set('auto', 'syntax', [])
 
-  " #473
+  " #488
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '(foo)', 'failed at #473')
+  call g:assert.equals(@@, '(foo)', 'failed at #488')
 
   call textobj#sandwich#set('auto', 'syntax', ['Special'])
   syn match TestParen '[()]'
   highlight link TestParen String
 
-  " #474
+  " #489
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '(', 'failed at #474')
+  call g:assert.equals(@@, '(', 'failed at #489')
 
   highlight link TestParen Special
 
-  " #475
+  " #490
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '(foo)', 'failed at #475')
+  call g:assert.equals(@@, '(foo)', 'failed at #490')
 endfunction
 "}}}
 function! s:suite.a_x_option_match_syntax() abort "{{{
@@ -3436,11 +3570,11 @@ function! s:suite.a_x_option_match_syntax() abort "{{{
   syntax match TestParen '[()]'
   highlight link TestParen Special
 
-  " #476
+  " #491
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '(foo)', 'failed at #476')
+  call g:assert.equals(@@, '(foo)', 'failed at #491')
 
   syntax clear
   syntax match TestBra '('
@@ -3448,11 +3582,11 @@ function! s:suite.a_x_option_match_syntax() abort "{{{
   highlight link TestBra Special
   highlight link TestKet String
 
-  " #477
+  " #492
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '(', 'failed at #477')
+  call g:assert.equals(@@, '(', 'failed at #492')
 
   syntax clear
   syntax match TestBra '(f'
@@ -3460,11 +3594,11 @@ function! s:suite.a_x_option_match_syntax() abort "{{{
   highlight link TestBra Special
   highlight link TestKet Special
 
-  " #478
+  " #493
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '(foo)', 'failed at #478')
+  call g:assert.equals(@@, '(foo)', 'failed at #493')
 
   """ 2
   call textobj#sandwich#set('auto', 'match_syntax', 2)
@@ -3472,11 +3606,11 @@ function! s:suite.a_x_option_match_syntax() abort "{{{
   syntax match TestParen '[()]'
   highlight link TestParen Special
 
-  " #479
+  " #494
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '(', 'failed at #479')
+  call g:assert.equals(@@, '(', 'failed at #494')
 
   syntax clear
   syntax match TestBra '('
@@ -3484,11 +3618,11 @@ function! s:suite.a_x_option_match_syntax() abort "{{{
   highlight link TestBra Special
   highlight link TestKet String
 
-  " #480
+  " #495
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '(', 'failed at #480')
+  call g:assert.equals(@@, '(', 'failed at #495')
 
   syntax clear
   syntax match TestBra '(f'
@@ -3496,11 +3630,11 @@ function! s:suite.a_x_option_match_syntax() abort "{{{
   highlight link TestBra Special
   highlight link TestKet Special
 
-  " #481
+  " #496
   call setline('.', '(foo)')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '(foo)', 'failed at #481')
+  call g:assert.equals(@@, '(foo)', 'failed at #496')
 endfunction
 "}}}
 function! s:suite.a_x_option_synchro() abort  "{{{
@@ -3510,10 +3644,10 @@ function! s:suite.a_x_option_synchro() abort  "{{{
   call textobj#sandwich#set('auto', 'synchro', 1)
   xmap sd <Plug>(operator-sandwich-delete)
 
-  " #482
+  " #497
   call setline('.', 'afooa')
   normal 0vabsd
-  call g:assert.equals(getline('.'), 'foo', 'failed at #482')
+  call g:assert.equals(getline('.'), 'foo', 'failed at #497')
 endfunction
 "}}}
 
