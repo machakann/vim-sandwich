@@ -1,4 +1,4 @@
-*operator-sandwich.jax*	日本語ヘルプ	Last change:19-Jun-2015.
+*operator-sandwich.jax*	日本語ヘルプ	Last change:23-Jun-2015.
 
 “挟まれた”テキストを編集するためのオペレータです。
 
@@ -272,7 +272,7 @@ query-1st 系列キーマッピング~
 	オペレータに与えられた [count] と同じカウントを続く
 	{motion}/{textobject} に与えるためのキーマッピングです。
 >
- nnoremap sd(
+ nmap sd(
  \ <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-synchro-count)a(
 <
 このキーマッピングでは 2sd( は 2<Plug>(operator-sandwich-delete)2a( に等しくな
@@ -285,7 +285,7 @@ query-1st 系列キーマッピング~
 	与えられたカウントをオペレータで使わずに続く {motion}/{textobject} に
 	与えるためのキーマッピングです。
 >
- nnoremap sd(
+ nmap sd(
  \ <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)a(
 <
 このキーマッピングでは 2sd( は <Plug>(operator-sandwich-delete)2a( に等しくな
