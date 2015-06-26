@@ -1053,6 +1053,21 @@ function! s:recipes_integrate(kind, mode) dict abort  "{{{
            \ && s:user_filter(v:val)'
   call filter(self.integrated, filter)
   call reverse(self.integrated)
+
+  " uniq by buns
+  if a:kind ==# 'auto'
+    let recipes = copy(self.integrated)
+    let self.integrated = []
+    while recipes != []
+      let recipe = remove(recipes, 0)
+      let self.integrated += [recipe]
+      if has_key(recipe, 'buns')
+        call filter(recipes, '!s:is_duplicated_buns(recipe, v:val, a:opt)')
+      elseif has_key(recipe, 'external')
+        call filter(recipes, '!s:is_duplicated_external(recipe, v:val, a:opt)')
+      endif
+    endwhile
+  endif
 endfunction
 "}}}
 " textobj object  "{{{
