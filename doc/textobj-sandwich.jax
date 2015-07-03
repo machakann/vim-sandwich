@@ -497,7 +497,7 @@ mode
 
 
 
-user_filter
+expr_filter
 	ユーザーがフィルターを自作して使うことができます。リストの要素は式
 	|expression| として評価され、評価値が真 (1) の場合にはそのレシピは有効
 	となり、評価値が偽 (0) の場合にはレシピは無効となります。
@@ -513,12 +513,12 @@ user_filter
 
 	" This recipe is valid
 	let g:sandwich#recipes += [
-	  \    {'buns': ['(', ')'], 'user_filter': ['FilterValid()']}
+	  \    {'buns': ['(', ')'], 'expr_filter': ['FilterValid()']}
 	  \  ]
 
 	" This recipe is invalid
 	let g:sandwich#recipes += [
-	  \    {'buns': ['(', ')'], 'user_filter': ['FilterInvalid()']}
+	  \    {'buns': ['(', ')'], 'expr_filter': ['FilterInvalid()']}
 	  \  ]
 <
 	例えば、次のようなフィルターを定義すると特定のオペレーターでのみ有効な
@@ -530,7 +530,7 @@ user_filter
 
 	" This recipe is valid only with d operator.
 	let g:sandwich#recipes += [
-	  \    {'buns': ['(', ')'], 'user_filter': ['FilterOperator("d")']}
+	  \    {'buns': ['(', ')'], 'expr_filter': ['FilterOperator("d")']}
 	  \  ]
 <
 

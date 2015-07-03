@@ -358,12 +358,12 @@ function! s:suite.filter_action() abort "{{{
   call g:assert.equals(getline('.'), '(foo)', 'failed at #43')
 endfunction
 "}}}
-function! s:suite.filter_user() abort "{{{
+function! s:suite.filter_expr() abort "{{{
   let g:sandwich#recipes = []
   let g:operator#sandwich#recipes = [
         \   {'buns': ['(', ')']},
-        \   {'buns': ['[', ']'], 'user_filter': ['FilterValid()']},
-        \   {'buns': ['{', '}'], 'user_filter': ['FilterInvalid()']},
+        \   {'buns': ['[', ']'], 'expr_filter': ['FilterValid()']},
+        \   {'buns': ['{', '}'], 'expr_filter': ['FilterInvalid()']},
         \ ]
 
   function! FilterValid() abort

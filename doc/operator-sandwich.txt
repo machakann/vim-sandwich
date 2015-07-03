@@ -27,7 +27,7 @@ CONFIGURATION			|operator-sandwich-configuration|
     motionwise
     mode
     action
-    user_filter
+    expr_filter
   LOCAL OPTIONS
     cursor
     highlight
@@ -653,7 +653,7 @@ action
 
 
 
-user_filter
+expr_filter
 	A user can define filters by oneself. The items of the list is
 	evaluated as |expressions|, and if the value is true (1) then the
 	recipe is valid, if the value is false (0) then the recipe is invalid.
@@ -669,12 +669,12 @@ user_filter
 
 	" This recipe is valid
 	let g:sandwich#recipes += [
-	  \    {'buns': ['(', ')'], 'user_filter': ['FilterValid()']}
+	  \    {'buns': ['(', ')'], 'expr_filter': ['FilterValid()']}
 	  \  ]
 
 	" This recipe is invalid
 	let g:sandwich#recipes += [
-	  \    {'buns': ['(', ')'], 'user_filter': ['FilterInvalid()']}
+	  \    {'buns': ['(', ')'], 'expr_filter': ['FilterInvalid()']}
 	  \  ]
 <
 

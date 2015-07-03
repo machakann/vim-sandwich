@@ -488,7 +488,7 @@ mode
 
 
 
-user_filter
+expr_filter
 	A user can define filters by oneself. The items of the list is
 	evaluated as |expressions|, and if the value is true (1) then the
 	recipe is valid, if the value is false (0) then the recipe is invalid.
@@ -504,12 +504,12 @@ user_filter
 
 	" This recipe is valid
 	let g:sandwich#recipes += [
-	  \    {'buns': ['(', ')'], 'user_filter': ['FilterValid()']}
+	  \    {'buns': ['(', ')'], 'expr_filter': ['FilterValid()']}
 	  \  ]
 
 	" This recipe is invalid
 	let g:sandwich#recipes += [
-	  \    {'buns': ['(', ')'], 'user_filter': ['FilterInvalid()']}
+	  \    {'buns': ['(', ')'], 'expr_filter': ['FilterInvalid()']}
 	  \  ]
 <
 	For example, the following filter makes recipes possible to be valid
@@ -521,7 +521,7 @@ user_filter
 
 	" This recipe is valid only with d operator.
 	let g:sandwich#recipes += [
-	  \    {'buns': ['(', ')'], 'user_filter': ['FilterOperator("d")']}
+	  \    {'buns': ['(', ')'], 'expr_filter': ['FilterOperator("d")']}
 	  \  ]
 <
 
