@@ -1,4 +1,4 @@
-*operator-sandwich.txt*			Last change:02-Jul-2015.
+*operator-sandwich.txt*			Last change:03-Jul-2015.
 
 The operator plugin to edit sandwiched textobjects.
 
@@ -26,6 +26,8 @@ CONFIGURATION			|operator-sandwich-configuration|
     kind
     motionwise
     mode
+    action
+    user_filter
   LOCAL OPTIONS
     cursor
     highlight
@@ -37,8 +39,9 @@ CONFIGURATION			|operator-sandwich-configuration|
     eval
     regex
     skip_char
-    highlight_duration
   GLOBAL OPTIONS
+    timeoutlen			|g:operator#sandwich#timeoutlen|
+    highlight_duration		|g:operator#sandwich#highlight_duration|
 HIGHLIGHT GROUP			|operator-sandwich-highlight-group|
 AUTOCOMMANDS			|operator-sandwich-autocommands|
 MISCELLANEOUS			|operator-sandwich-miscellaneous|
@@ -254,12 +257,14 @@ keymappings~
 
 
 query-1st series~
+				*<Plug>(operator-sandwich-add-query1st)*
 <Plug>(operator-sandwich-add-query1st)
 	The operator command to add surroundings to the both end of the
 	assigned region. If [count] is given, add surroundings [count] times.
 	Different from |<Plug>(operator-sandwich-add)|, this keymapping asks
 	the addition before {motion/textobject}.
 
+				*<Plug>(operator-sandwich-replace-query1st)*
 <Plug>(operator-sandwich-replace-query1st)
 	The operator command to replace surroundings at the both end of the
 	assigned region. If [count] is given, replace successive sets of
@@ -721,8 +726,6 @@ g:operator#sandwich#options		*g:operator#sandwich#options*
 	    - command			(for all kinds)
 	    - query_once		(for add and replace)
 	    - eval			(for add and replace)
-	    - addition			(for add and replace)
-	    - deletion			(for delete and replace)
 	    - regex			(for delete and replace)
 	    - skip_char			(for delete and replace)
 
@@ -1163,7 +1166,8 @@ useful.
 HIGHLIGHT GROUP				*operator-sandwich-highlight-group*
 
 All the three operators have highlighting feature. On and off is controlled by
-a local option, highlight, but the coloring is defined by its highlight group.
+the local option "highlight", but the coloring is defined by its highlight
+group.
 
 OperatorSandwichBuns			*hl-OperatorSandwichBuns*
 	The highlight group to declare the highlight feature of the operators.
@@ -1183,7 +1187,7 @@ OperatorSandwichBuns			*hl-OperatorSandwichBuns*
 ==============================================================================
 AUTOCOMMAND				*operator-sandwich-autocommand*
 
-Users can fook some processes for the start and the end of the operator action
+Users can hook some processes for the start and the end of the operator action
 by |:autocmd| command. Each operator defines its own |User| autocommand
 events, users just declare autocommands if needed.
 

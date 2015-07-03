@@ -1,4 +1,4 @@
-*textobj-sandwich.jax*	日本語ヘルプ	Last change:02-Jul-2015.
+*textobj-sandwich.jax*	日本語ヘルプ	Last change:03-Jul-2015.
 
 “挟まれた”テキストを検索し選択するためのテキストオブジェクトです。
 
@@ -39,6 +39,9 @@ CONFIGURATION			|textobj-sandwich-configuration|
     match_syntax
     skip_breaking
   GLOBAL OPTIONS
+    timeoutlen			|g:textobj#sandwich#timeoutlen|
+    stimeoutlen			|g:textobj#sandwich#stimeoutlen|
+    latest_jump			|g:textobj#sandwich#latest_jump|
 MISCELLANEOUS			|textobj-sandwich-miscellaneous|
   dib で欲しいのはそれじゃない
   頻繁に「 Timed out 」となる
