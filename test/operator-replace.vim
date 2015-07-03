@@ -2003,8 +2003,8 @@ function! s:suite.charwise_n_option_query_once() abort  "{{{
   call operator#sandwich#set('replace', 'char', 'query_once', 0)
 endfunction
 "}}}
-function! s:suite.charwise_n_option_eval() abort "{{{
-  """"" eval
+function! s:suite.charwise_n_option_expr() abort "{{{
+  """"" expr
   let g:operator#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'input':['a']}]
 
   """ 0
@@ -2015,7 +2015,7 @@ function! s:suite.charwise_n_option_eval() abort "{{{
 
   """ 1
   " #201
-  call operator#sandwich#set('replace', 'char', 'eval', 1)
+  call operator#sandwich#set('replace', 'char', 'expr', 1)
   call setline('.', '"foo"')
   normal 0sra"a
   call g:assert.equals(getline('.'), '2foo3',  'failed at #201')
@@ -2025,7 +2025,7 @@ function! s:suite.charwise_n_option_eval() abort "{{{
   " dot-repeat.
 
   unlet! g:operator#sandwich#recipes
-  call operator#sandwich#set('replace', 'char', 'eval', 0)
+  call operator#sandwich#set('replace', 'char', 'expr', 0)
 endfunction
 "}}}
 
@@ -3368,8 +3368,8 @@ function! s:suite.linewise_n_option_query_once() abort  "{{{
   call operator#sandwich#set('replace', 'line', 'query_once', 0)
 endfunction
 "}}}
-function! s:suite.linewise_n_option_eval() abort "{{{
-  """"" eval
+function! s:suite.linewise_n_option_expr() abort "{{{
+  """"" expr
   let g:operator#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'input':['a']}]
 
   """ 0
@@ -3380,7 +3380,7 @@ function! s:suite.linewise_n_option_eval() abort "{{{
 
   """ 1
   " #343
-  call operator#sandwich#set('replace', 'line', 'eval', 1)
+  call operator#sandwich#set('replace', 'line', 'expr', 1)
   call setline('.', '"foo"')
   normal 0srVla
   call g:assert.equals(getline('.'), '2foo3',  'failed at #343')
@@ -3390,7 +3390,7 @@ function! s:suite.linewise_n_option_eval() abort "{{{
   " dot-repeat.
 
   unlet! g:operator#sandwich#recipes
-  call operator#sandwich#set('replace', 'line', 'eval', 0)
+  call operator#sandwich#set('replace', 'line', 'expr', 0)
 endfunction
 "}}}
 
@@ -4074,8 +4074,8 @@ function! s:suite.linewise_x_option_query_once() abort  "{{{
   call operator#sandwich#set('replace', 'line', 'query_once', 0)
 endfunction
 "}}}
-function! s:suite.linewise_x_option_eval() abort "{{{
-  """"" eval
+function! s:suite.linewise_x_option_expr() abort "{{{
+  """"" expr
   let g:operator#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'input':['a']}]
 
   """ 0
@@ -4086,7 +4086,7 @@ function! s:suite.linewise_x_option_eval() abort "{{{
 
   """ 1
   " #413
-  call operator#sandwich#set('replace', 'line', 'eval', 1)
+  call operator#sandwich#set('replace', 'line', 'expr', 1)
   call setline('.', '"foo"')
   normal Vsra
   call g:assert.equals(getline('.'), '2foo3',  'failed at #413')
@@ -4096,7 +4096,7 @@ function! s:suite.linewise_x_option_eval() abort "{{{
   " dot-repeat.
 
   unlet! g:operator#sandwich#recipes
-  call operator#sandwich#set('replace', 'line', 'eval', 0)
+  call operator#sandwich#set('replace', 'line', 'expr', 0)
 endfunction
 "}}}
 
@@ -4765,8 +4765,8 @@ function! s:suite.blockwise_n_option_query_once() abort  "{{{
   call operator#sandwich#set('replace', 'block', 'query_once', 0)
 endfunction
 "}}}
-function! s:suite.blockwise_n_option_eval() abort "{{{
-  """"" eval
+function! s:suite.blockwise_n_option_expr() abort "{{{
+  """"" expr
   set whichwrap=h,l
   let g:operator#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'input':['a']}]
 
@@ -4780,7 +4780,7 @@ function! s:suite.blockwise_n_option_eval() abort "{{{
 
   """ 1
   " #340
-  call operator#sandwich#set('replace', 'block', 'eval', 1)
+  call operator#sandwich#set('replace', 'block', 'expr', 1)
   call append(0, ['"foo"', '"bar"', '"baz"'])
   execute "normal ggsr\<C-v>17la"
   call g:assert.equals(getline('.'), '2foo3',  'failed at #340')
@@ -4791,7 +4791,7 @@ function! s:suite.blockwise_n_option_eval() abort "{{{
 
   set whichwrap&
   unlet! g:operator#sandwich#recipes
-  call operator#sandwich#set('replace', 'block', 'eval', 0)
+  call operator#sandwich#set('replace', 'block', 'expr', 0)
 endfunction
 "}}}
 
@@ -5450,8 +5450,8 @@ function! s:suite.blockwise_x_option_query_once() abort  "{{{
   call operator#sandwich#set('replace', 'block', 'query_once', 0)
 endfunction
 "}}}
-function! s:suite.blockwise_x_option_eval() abort "{{{
-  """"" eval
+function! s:suite.blockwise_x_option_expr() abort "{{{
+  """"" expr
   let g:operator#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'input':['a']}]
 
   """ 0
@@ -5464,7 +5464,7 @@ function! s:suite.blockwise_x_option_eval() abort "{{{
 
   """ 1
   " #399
-  call operator#sandwich#set('replace', 'block', 'eval', 1)
+  call operator#sandwich#set('replace', 'block', 'expr', 1)
   call append(0, ['"foo"', '"bar"', '"baz"'])
   execute "normal gg\<C-v>2j4lsra"
   call g:assert.equals(getline('.'), '2foo3',  'failed at #399')
@@ -5474,7 +5474,7 @@ function! s:suite.blockwise_x_option_eval() abort "{{{
   " dot-repeat.
 
   unlet! g:operator#sandwich#recipes
-  call operator#sandwich#set('replace', 'block', 'eval', 0)
+  call operator#sandwich#set('replace', 'block', 'expr', 0)
 endfunction
 "}}}
 

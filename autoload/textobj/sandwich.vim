@@ -46,7 +46,7 @@
 "       - mode              : 'o' or 'x'. Which mode the keymapping is called.
 "       - visualmode        : If the textobject is called in blockwise visual mode, then '<C-v>'. Otherwise 'v'.
 "       - syntax            : The place to put the name of displayed syntax for skipping in search.
-"       - evaluated         : If the buns are evaluated by opt.integrated.eval feature, then 1.
+"       - evaluated         : If the buns are evaluated by opt.integrated.expr feature, then 1.
 "       []cursor            : Linked to textobj.cursor.
 "       {}clock             : Linked to textobj.clock.
 "       {}coord
@@ -340,7 +340,7 @@ function! s:search_with_nest(textobj) dict abort  "{{{
     " add to candidates
     if self.is_valid_candidate(a:textobj)
       let candidate = deepcopy(self)
-      " this is required for the case of 'eval' option is 2.
+      " this is required for the case of 'expr' option is 2.
       let candidate.buns[0:1] = buns
       let a:textobj.candidates += [candidate]
     endif
@@ -439,7 +439,7 @@ function! s:search_without_nest(textobj) dict abort  "{{{
 
   if self.is_valid_candidate(a:textobj)
     let candidate = deepcopy(self)
-    " this is required for the case of 'eval' option is 2.
+    " this is required for the case of 'expr' option is 2.
     let candidate.buns[0:1] = buns
     let a:textobj.candidates += [candidate]
   endif
@@ -644,10 +644,10 @@ function! s:get_buns() dict abort  "{{{
   let buns  = self.buns
   let clock = self.clock
 
-  if (opt.eval && !self.evaluated) || opt.eval == 2
+  if (opt.expr && !self.evaluated) || opt.expr == 2
     call clock.pause()
     echo ''
-    let buns = opt.eval == 2 ? deepcopy(buns) : buns
+    let buns = opt.expr == 2 ? deepcopy(buns) : buns
     let buns[0] = eval(buns[0])
     if buns[0] !=# ''
       let buns[1] = eval(buns[1])
@@ -1151,13 +1151,13 @@ function! s:is_duplicated_buns(recipe, item, opt) abort  "{{{
         \ && a:recipe['buns'][1] ==# a:item['buns'][1]
     let regex_r   = get(a:recipe, 'regex',   a:opt.regex)
     let regex_i   = get(a:item,   'regex',   a:opt.regex)
-    let eval_r    = get(a:recipe, 'eval',    a:opt.eval)
-    let eval_i    = get(a:item,   'eval',    a:opt.eval)
+    let expr_r    = get(a:recipe, 'expr',    a:opt.expr)
+    let expr_i    = get(a:item,   'expr',    a:opt.expr)
 
-    let eval_r = eval_r ? 1 : 0
-    let eval_i = eval_i ? 1 : 0
+    let expr_r = expr_r ? 1 : 0
+    let expr_i = expr_i ? 1 : 0
 
-    if regex_r == regex_i && eval_r == eval_i
+    if regex_r == regex_i && expr_r == expr_i
       return 1
     endif
   endif
@@ -1292,7 +1292,7 @@ if exists('g:textobj#sandwich#default_recipes')
   unlockvar! g:textobj#sandwich#default_recipes
 endif
 let g:textobj#sandwich#default_recipes = [
-      \   {'buns': ['input("textobj-sandwich:head: ")', 'input("textobj-sandwich:tail: ")'], 'kind': ['query'], 'eval': 1, 'regex': 1, 'synchro': 1, 'input': ['f']},
+      \   {'buns': ['input("textobj-sandwich:head: ")', 'input("textobj-sandwich:tail: ")'], 'kind': ['query'], 'expr': 1, 'regex': 1, 'synchro': 1, 'input': ['f']},
       \ ]
 lockvar! g:textobj#sandwich#default_recipes
 "}}}
@@ -1300,7 +1300,7 @@ lockvar! g:textobj#sandwich#default_recipes
 " options "{{{
 let s:default_opt = {}
 let s:default_opt.auto = {
-      \   'eval'         : 0,
+      \   'expr'         : 0,
       \   'regex'        : 0,
       \   'skip_regex'   : [],
       \   'quoteescape'  : 0,
@@ -1313,7 +1313,7 @@ let s:default_opt.auto = {
       \   'skip_break'   : 0,
       \ }
 let s:default_opt.query = {
-      \   'eval'         : 0,
+      \   'expr'         : 0,
       \   'regex'        : 0,
       \   'skip_regex'   : [],
       \   'quoteescape'  : 0,

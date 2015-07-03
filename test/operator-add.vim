@@ -915,8 +915,8 @@ function! s:suite.charwise_n_option_query_once() abort  "{{{
   call operator#sandwich#set('add', 'char', 'query_once', 0)
 endfunction
 "}}}
-function! s:suite.charwise_n_option_eval() abort "{{{
-  """"" eval
+function! s:suite.charwise_n_option_expr() abort "{{{
+  """"" expr
   let g:operator#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'input':['a']}]
 
   """ 0
@@ -927,7 +927,7 @@ function! s:suite.charwise_n_option_eval() abort "{{{
 
   """ 1
   " #102
-  call operator#sandwich#set('add', 'char', 'eval', 1)
+  call operator#sandwich#set('add', 'char', 'expr', 1)
   call setline('.', 'foo')
   normal 0saiwa
   call g:assert.equals(getline('.'), '2foo3',  'failed at #102')
@@ -937,7 +937,7 @@ function! s:suite.charwise_n_option_eval() abort "{{{
   " dot-repeat.
 
   unlet! g:operator#sandwich#recipes
-  call operator#sandwich#set('add', 'char', 'eval', 0)
+  call operator#sandwich#set('add', 'char', 'expr', 0)
 endfunction
 "}}}
 function! s:suite.charwise_n_option_noremap() abort  "{{{
@@ -1292,8 +1292,8 @@ function! s:suite.charwise_x_option_query_once() abort  "{{{
   call operator#sandwich#set('add', 'char', 'query_once', 0)
 endfunction
 "}}}
-function! s:suite.charwise_x_option_eval() abort  "{{{
-  """"" eval
+function! s:suite.charwise_x_option_expr() abort  "{{{
+  """"" expr
   let g:operator#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'input':['a']}]
 
   """ 0
@@ -1304,7 +1304,7 @@ function! s:suite.charwise_x_option_eval() abort  "{{{
 
   """ 1
   " #142
-  call operator#sandwich#set('add', 'char', 'eval', 1)
+  call operator#sandwich#set('add', 'char', 'expr', 1)
   call setline('.', 'foo')
   normal 0viwsaa
   call g:assert.equals(getline('.'), '2foo3',  'failed at #142')
@@ -1314,7 +1314,7 @@ function! s:suite.charwise_x_option_eval() abort  "{{{
   " dot-repeat.
 
   unlet! g:operator#sandwich#recipes
-  call operator#sandwich#set('add', 'char', 'eval', 0)
+  call operator#sandwich#set('add', 'char', 'expr', 0)
 endfunction
 "}}}
 function! s:suite.charwise_x_option_noremap() abort "{{{
@@ -1839,8 +1839,8 @@ function! s:suite.linewise_n_option_query_once() abort  "{{{
   call operator#sandwich#set('add', 'line', 'query_once', 0)
 endfunction
 "}}}
-function! s:suite.linewise_n_option_eval() abort  "{{{
-  """"" eval
+function! s:suite.linewise_n_option_expr() abort  "{{{
+  """"" expr
   let g:operator#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'input':['a']}]
 
   """ 0
@@ -1855,7 +1855,7 @@ function! s:suite.linewise_n_option_eval() abort  "{{{
 
   """ 1
   " #184
-  call operator#sandwich#set('add', 'line', 'eval', 1)
+  call operator#sandwich#set('add', 'line', 'expr', 1)
   call setline('.', 'foo')
   normal 0saViwa
   call g:assert.equals(getline(1), '2',   'failed at #184')
@@ -1869,7 +1869,7 @@ function! s:suite.linewise_n_option_eval() abort  "{{{
   " dot-repeat.
 
   unlet! g:operator#sandwich#recipes
-  call operator#sandwich#set('add', 'line', 'eval', 0)
+  call operator#sandwich#set('add', 'line', 'expr', 0)
 endfunction
 "}}}
 function! s:suite.linewise_n_option_noremap() abort "{{{
@@ -2339,8 +2339,8 @@ function! s:suite.linewise_x_option_query_once() abort  "{{{
   call operator#sandwich#set('add', 'line', 'query_once', 0)
 endfunction
 "}}}
-function! s:suite.linewise_x_option_eval() abort  "{{{
-  """"" eval
+function! s:suite.linewise_x_option_expr() abort  "{{{
+  """"" expr
   let g:operator#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'input':['a']}]
 
   """ 0
@@ -2355,7 +2355,7 @@ function! s:suite.linewise_x_option_eval() abort  "{{{
 
   """ 1
   " #221
-  call operator#sandwich#set('add', 'line', 'eval', 1)
+  call operator#sandwich#set('add', 'line', 'expr', 1)
   call setline('.', 'foo')
   normal Vsaa
   call g:assert.equals(getline(1), '2',   'failed at #221')
@@ -2369,7 +2369,7 @@ function! s:suite.linewise_x_option_eval() abort  "{{{
   " dot-repeat.
 
   unlet! g:operator#sandwich#recipes
-  call operator#sandwich#set('add', 'line', 'eval', 0)
+  call operator#sandwich#set('add', 'line', 'expr', 0)
 endfunction
 "}}}
 function! s:suite.linewise_x_option_noremap() abort "{{{
@@ -2920,8 +2920,8 @@ function! s:suite.blockwise_n_option_query_once() abort  "{{{
   call operator#sandwich#set('add', 'block', 'query_once', 0)
 endfunction
 "}}}
-function! s:suite.blockwise_n_option_eval() abort "{{{
-  """"" eval
+function! s:suite.blockwise_n_option_expr() abort "{{{
+  """"" expr
   let g:operator#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'input':['a']}]
 
   """ 0
@@ -2932,7 +2932,7 @@ function! s:suite.blockwise_n_option_eval() abort "{{{
 
   """ 1
   " #269
-  call operator#sandwich#set('add', 'block', 'eval', 1)
+  call operator#sandwich#set('add', 'block', 'expr', 1)
   call setline('.', 'foo')
   execute "normal 0sa\<C-v>iwa"
   call g:assert.equals(getline('.'), '2foo3', 'failed at #269')
@@ -2942,7 +2942,7 @@ function! s:suite.blockwise_n_option_eval() abort "{{{
   " dot-repeat.
 
   unlet! g:operator#sandwich#recipes
-  call operator#sandwich#set('add', 'block', 'eval', 0)
+  call operator#sandwich#set('add', 'block', 'expr', 0)
 endfunction
 "}}}
 function! s:suite.blockwise_n_option_noremap() abort  "{{{
@@ -3479,8 +3479,8 @@ function! s:suite.blockwise_x_option_query_once() abort  "{{{
   call operator#sandwich#set('add', 'block', 'query_once', 0)
 endfunction
 "}}}
-function! s:suite.blockwise_x_option_eval() abort "{{{
-  """"" eval
+function! s:suite.blockwise_x_option_expr() abort "{{{
+  """"" expr
   let g:operator#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'input':['a']}]
 
   """ 0
@@ -3491,7 +3491,7 @@ function! s:suite.blockwise_x_option_eval() abort "{{{
 
   """ 1
   " #317
-  call operator#sandwich#set('add', 'block', 'eval', 1)
+  call operator#sandwich#set('add', 'block', 'expr', 1)
   call setline('.', 'foo')
   execute "normal 0\<C-v>iwsaa"
   call g:assert.equals(getline('.'), '2foo3', 'failed at #317')
@@ -3501,7 +3501,7 @@ function! s:suite.blockwise_x_option_eval() abort "{{{
   " dot-repeat.
 
   unlet! g:operator#sandwich#recipes
-  call operator#sandwich#set('add', 'block', 'eval', 0)
+  call operator#sandwich#set('add', 'block', 'expr', 0)
 endfunction
 "}}}
 function! s:suite.blockwise_x_option_noremap() abort  "{{{

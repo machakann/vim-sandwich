@@ -908,9 +908,9 @@ function! s:get_buns() dict abort  "{{{
   let opt = self.opt.integrated
   let buns = self.buns
 
-  if (opt.eval && !self.evaluated) || opt.eval == 2
+  if (opt.expr && !self.evaluated) || opt.expr == 2
     echo ''
-    let buns = opt.eval == 2 ? deepcopy(buns) : buns
+    let buns = opt.expr == 2 ? deepcopy(buns) : buns
     call map(buns, 'eval(v:val)')
     let self.evaluated = 1
     redraw
@@ -2058,7 +2058,7 @@ if exists('g:operator#sandwich#default_recipes')
   unlockvar! g:operator#sandwich#default_recipes
 endif
 let g:operator#sandwich#default_recipes = [
-      \   {'buns': ['input("operator-sandwich:head: ")', 'input("operator-sandwich:tail: ")'], 'kind': ['add', 'replace'], 'eval': 1, 'input': ['f']},
+      \   {'buns': ['input("operator-sandwich:head: ")', 'input("operator-sandwich:tail: ")'], 'kind': ['add', 'replace'], 'expr': 1, 'input': ['f']},
       \ ]
 lockvar! g:operator#sandwich#default_recipes
 "}}}
@@ -2069,7 +2069,7 @@ let s:default_opt.add = {}
 let s:default_opt.add.char = {
       \   'cursor'    : 'inner_head',
       \   'query_once': 0,
-      \   'eval'      : 0,
+      \   'expr'      : 0,
       \   'noremap'   : 1,
       \   'skip_space': 0,
       \   'highlight' : 1,
@@ -2080,7 +2080,7 @@ let s:default_opt.add.char = {
 let s:default_opt.add.line = {
       \   'cursor'    : 'inner_head',
       \   'query_once': 0,
-      \   'eval'      : 0,
+      \   'expr'      : 0,
       \   'noremap'   : 1,
       \   'skip_space': 1,
       \   'highlight' : 1,
@@ -2091,7 +2091,7 @@ let s:default_opt.add.line = {
 let s:default_opt.add.block = {
       \   'cursor'    : 'inner_head',
       \   'query_once': 0,
-      \   'eval'      : 0,
+      \   'expr'      : 0,
       \   'noremap'   : 1,
       \   'skip_space': 1,
       \   'highlight' : 1,
@@ -2138,7 +2138,7 @@ let s:default_opt.replace.char = {
       \   'cursor'    : 'inner_head',
       \   'query_once': 0,
       \   'regex'     : 0,
-      \   'eval'      : 0,
+      \   'expr'      : 0,
       \   'noremap'   : 1,
       \   'skip_space': 1,
       \   'skip_char' : 0,
@@ -2152,7 +2152,7 @@ let s:default_opt.replace.line = {
       \   'cursor'    : 'inner_head',
       \   'query_once': 0,
       \   'regex'     : 0,
-      \   'eval'      : 0,
+      \   'expr'      : 0,
       \   'noremap'   : 1,
       \   'skip_space': 1,
       \   'skip_char' : 0,
@@ -2166,7 +2166,7 @@ let s:default_opt.replace.block = {
       \   'cursor'    : 'inner_head',
       \   'query_once': 0,
       \   'regex'     : 0,
-      \   'eval'      : 0,
+      \   'expr'      : 0,
       \   'noremap'   : 1,
       \   'skip_space': 1,
       \   'skip_char' : 0,

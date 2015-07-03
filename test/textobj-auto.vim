@@ -674,7 +674,7 @@ function! s:suite.i_o_external_textobj() abort  "{{{
   call g:assert.equals(@@, 'bb', 'failed at #97')
 endfunction
 "}}}
-function! s:suite.i_o_option_eval() abort "{{{
+function! s:suite.i_o_option_expr() abort "{{{
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [{'buns': ['1+1', '1+2']}]
 
@@ -692,7 +692,7 @@ function! s:suite.i_o_option_eval() abort "{{{
   call g:assert.equals(@@, '', 'failed at #99')
 
   """ on
-  call textobj#sandwich#set('auto', 'eval', 1)
+  call textobj#sandwich#set('auto', 'expr', 1)
   " #100
   call setline('.', '1+1aa1+2')
   let @@ = 'fail'
@@ -1063,7 +1063,7 @@ function! s:suite.i_o_priority() abort  "{{{
 
   let g:textobj#sandwich#recipes = [
         \   {'buns': ['1+1', '1+1']},
-        \   {'buns': ['1+1', '1+1'], 'eval': 1}
+        \   {'buns': ['1+1', '1+1'], 'expr': 1}
         \ ]
 
   " #139
@@ -1649,7 +1649,7 @@ function! s:suite.i_x_blockwise_visual() abort  "{{{
   call g:assert.equals(@@, "aaa\nbb)\ncc)", 'failed at #229')
 endfunction
 "}}}
-function! s:suite.i_x_option_eval() abort "{{{
+function! s:suite.i_x_option_expr() abort "{{{
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [{'buns': ['1+1', '1+2']}]
 
@@ -1667,7 +1667,7 @@ function! s:suite.i_x_option_eval() abort "{{{
   call g:assert.equals(@@, '2', 'failed at #231')
 
   """ on
-  call textobj#sandwich#set('auto', 'eval', 1)
+  call textobj#sandwich#set('auto', 'expr', 1)
   " #232
   call setline('.', '1+1aa1+2')
   let @@ = 'fail'
@@ -2039,7 +2039,7 @@ function! s:suite.i_x_priority() abort  "{{{
 
   let g:textobj#sandwich#recipes = [
         \   {'buns': ['1+1', '1+1']},
-        \   {'buns': ['1+1', '1+1'], 'eval': 1}
+        \   {'buns': ['1+1', '1+1'], 'expr': 1}
         \ ]
 
   " #271
@@ -2565,7 +2565,7 @@ function! s:suite.a_o_external_textobj() abort  "{{{
   call g:assert.equals(@@, '<title>bb</title>', 'failed at #353')
 endfunction
 "}}}
-function! s:suite.a_o_option_eval() abort "{{{
+function! s:suite.a_o_option_expr() abort "{{{
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [{'buns': ['1+1', '1+2']}]
 
@@ -2583,7 +2583,7 @@ function! s:suite.a_o_option_eval() abort "{{{
   call g:assert.equals(@@, '', 'failed at #355')
 
   """ on
-  call textobj#sandwich#set('auto', 'eval', 1)
+  call textobj#sandwich#set('auto', 'expr', 1)
   " #356
   call setline('.', '1+1aa1+2')
   let @@ = 'fail'
@@ -2958,7 +2958,7 @@ function! s:suite.a_o_priority() abort  "{{{
 
   let g:textobj#sandwich#recipes = [
         \   {'buns': ['1+1', '1+1']},
-        \   {'buns': ['1+1', '1+1'], 'eval': 1}
+        \   {'buns': ['1+1', '1+1'], 'expr': 1}
         \ ]
 
   " #396
@@ -3574,7 +3574,7 @@ function! s:suite.a_x_blockwise_visual() abort  "{{{
   call g:assert.equals(@@, "(aaa)\n(bb)\n(cc)", 'failed at #490')
 endfunction
 "}}}
-function! s:suite.a_x_option_eval() abort "{{{
+function! s:suite.a_x_option_expr() abort "{{{
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [{'buns': ['1+1', '1+2']}]
 
@@ -3592,7 +3592,7 @@ function! s:suite.a_x_option_eval() abort "{{{
   call g:assert.equals(@@, '2', 'failed at #492')
 
   """ on
-  call textobj#sandwich#set('auto', 'eval', 1)
+  call textobj#sandwich#set('auto', 'expr', 1)
   " #493
   call setline('.', '1+1aa1+2')
   let @@ = 'fail'
@@ -3967,7 +3967,7 @@ function! s:suite.a_o_priority() abort  "{{{
 
   let g:textobj#sandwich#recipes = [
         \   {'buns': ['1+1', '1+1']},
-        \   {'buns': ['1+1', '1+1'], 'eval': 1}
+        \   {'buns': ['1+1', '1+1'], 'expr': 1}
         \ ]
 
   " #533
