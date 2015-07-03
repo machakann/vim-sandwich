@@ -1145,6 +1145,41 @@ function! s:user_filter(candidate) abort  "{{{
   endif
 endfunction
 "}}}
+function! s:is_duplicated_buns(recipe, item, opt) abort  "{{{
+  if has_key(a:item, 'buns')
+        \ && a:recipe['buns'][0] ==# a:item['buns'][0]
+        \ && a:recipe['buns'][1] ==# a:item['buns'][1]
+    let regex_r   = get(a:recipe, 'regex',   a:opt.regex)
+    let regex_i   = get(a:item,   'regex',   a:opt.regex)
+    let eval_r    = get(a:recipe, 'eval',    a:opt.eval)
+    let eval_i    = get(a:item,   'eval',    a:opt.eval)
+
+    let eval_r = eval_r ? 1 : 0
+    let eval_i = eval_i ? 1 : 0
+
+    if regex_r == regex_i && eval_r == eval_i
+      return 1
+    endif
+  endif
+
+  return 0
+endfunction
+"}}}
+function! s:is_duplicated_external(recipe, item, opt) abort "{{{
+  if has_key(a:item, 'external')
+        \ && a:recipe['external'][0] ==# a:item['external'][0]
+        \ && a:recipe['external'][1] ==# a:item['external'][1]
+    let noremap_r = get(a:recipe, 'noremap', a:opt.noremap)
+    let noremap_i = get(a:item,   'noremap', a:opt.noremap)
+
+    if noremap_r == noremap_i
+      return 1
+    endif
+  endif
+
+  return 0
+endfunction
+"}}}
 function! s:get(name, default) abort  "{{{
   return get(g:, 'textobj#sandwich#' . a:name, a:default)
 endfunction
