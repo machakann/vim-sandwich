@@ -1,4 +1,4 @@
-*operator-sandwich.jax*	日本語ヘルプ	Last change:23-Jun-2015.
+*operator-sandwich.jax*	日本語ヘルプ	Last change:02-Jul-2015.
 
 “挟まれた”テキストを編集するためのオペレータです。
 
@@ -290,6 +290,76 @@ query-1st 系列キーマッピング~
 <
 このキーマッピングでは 2sd( は <Plug>(operator-sandwich-delete)2a( に等しくな
 ります。
+
+
+
+キーマッピング関数~
+
+ユーザーは新しいキーマッピングを定義するのに以下の関数を使うこともできます。
+
+					*operator#sandwich#keymap()*
+operator#sandwich#keymap(kind, mode[, options[, recipes]])
+	この関数はオペレータのキーマッピングを定義するのにつかわれます。
+>
+	nnoremap <silent> sa <Esc>:call operator#sandwich#keymap('add', 'n')<CR>
+	xnoremap <silent> sa <Esc>:call operator#sandwich#keymap('add', 'x')<CR>
+<
+	もし空でない辞書変数が省略可能な第三引数に与えられた場合、辞書に含まれ
+	る local option はそのキーマッピングで使われるオプションのデフォルト値
+	を上書きします。ただし、 motionwise に依って設定することはここではでき
+	ません。
+>
+	" example 1
+	nnoremap <silent> sa
+	\ <Esc>:call operator#sandwich#keymap(
+	\ 'add',
+	\ 'n',
+	\ {'highlight': 0}
+	\ )<CR>
+
+	" example 2
+	let g:sandwich_alt_options = {'highlight': 0}
+	nnoremap <silent> sa
+	\ <Esc>:call operator#sandwich#keymap(
+	\ 'add',
+	\ 'n',
+	\ g:sandwich_alt_options
+	\ )<CR>
+<
+
+	空でないレシピのリストが省略可能な第四引数に与えられた場合、そのキーマ
+	ッピングは |sandwich#recipes| (|sandwich#default_recipes|) や
+	|operator#sandwich#recipes| (|operator#sandwich#default_recipes|) のか
+	わりに引数に与えられたリストを参照します。
+>
+	" example 1
+	nnoremap <silent> sa
+	\ <Esc>:call operator#sandwich#keymap(
+	\ 'add',
+	\ 'n',
+	\ {},
+	\ [{'buns': ['(', ')']}]
+	\ )<CR>
+
+	" example 2
+	let g:sandwich_alt_recipes = [{'buns': ['(', ')']}]
+	nnoremap <silent> sa
+	\ <Esc>:call operator#sandwich#keymap(
+	\ 'add',
+	\ 'n',
+	\ {},
+	\ g:sandwich_alt_recipes
+	\ )<CR>
+<
+
+
+
+					*operator#sandwich#query1st()*
+operator#sandwich#query1st(kind, mode[, options[, recipes]])
+	この関数は |operator#sandwich#keymap()| と同様の関数ですが、
+	|<Plug>(operator-sandwich-add-query1st)| や
+	|<Plug>(operator-sandwich-replace-query1st)| などの query1st 系列の
+	キーマッピングを定義するのに使われます。
 
 
 

@@ -1,4 +1,4 @@
-*textobj-sandwich.jax*	日本語ヘルプ	Last change:19-Jun-2015.
+*textobj-sandwich.jax*	日本語ヘルプ	Last change:02-Jul-2015.
 
 “挟まれた”テキストを検索し選択するためのテキストオブジェクトです。
 
@@ -178,6 +178,66 @@ g:textobj_sandwich_no_default_key_mappings を定義してください。
 	括弧などに挟まれた文字列をユーザーの入力に応じて検索するテキストオブジ
 	ェクトです。このキーマッピングは括弧などの囲みを含む文字列を選択します
 	。
+
+
+
+キーマッピング関数~
+
+ユーザーは新しいキーマッピングを定義するのに以下の関数を使うこともできます。
+
+					*textobj#sandwich#auto()*
+textobj#sandwich#auto(mode, a_or_i[, options[, recipes]])
+	この関数はテキストオブジェクトのキーマッピングを定義するのにつかわれま
+	す。
+>
+	onoremap <silent><expr> ib textobj#sandwich#auto('o', 'i')
+	xnoremap <silent><expr> ib textobj#sandwich#auto('x', 'i')
+	onoremap <silent><expr> ab textobj#sandwich#auto('o', 'a')
+	xnoremap <silent><expr> ab textobj#sandwich#auto('x', 'a')
+<
+	もし空でない辞書変数が省略可能な第三引数に与えられた場合、辞書に含まれ
+	る local option はそのキーマッピングで使われるオプションのデフォルト値
+	を上書きします。
+>
+	" example 1
+	onoremap <silent><expr> ib
+	\ textobj#sandwich#auto('o', 'i', {'expand_range': 0})
+
+	" example 2
+	let g:sandwich_alt_options = {'expand_range': 0}
+	onoremap <silent><expr> ib
+	\ textobj#sandwich#auto('o', 'i', g:sandwich_alt_options)
+<
+
+	空でないレシピのリストが省略可能な第四引数に与えられた場合、そのキーマ
+	ッピングは |sandwich#recipes| (|sandwich#default_recipes|) や
+	|textobj#sandwich#recipes| (|textobj#sandwich#default_recipes|) の
+	かわりに引数に与えられたリストを参照します。
+>
+	" example 1
+	onoremap <silent><expr> ib
+	\ textobj#sandwich#auto('o', 'i', {}, [{'buns': ['(', ')']}])
+
+	" example 2
+	let g:sandwich_alt_recipes = [{'buns': ['(', ')']}]
+	onoremap <silent><expr> ib
+	\ textobj#sandwich#auto('o', 'i', {}, g:sandwich_alt_recipes)
+<
+
+
+
+					*textobj#sandwich#query()*
+textobj#sandwich#query(mode, a_or_i[, options[, recipes]])
+	この関数は |textobj#sandwich#auto()| と同様の関数ですが、
+	|<Plug>(textobj-sandwich-query-i)| や
+	|<Plug>(textobj-sandwich-query-a)| などの query 系列の
+	テキストオブジェクトを定義するのに使われます。
+>
+	onoremap <silent><expr> is textobj#sandwich#query('o', 'i')
+	xnoremap <silent><expr> is textobj#sandwich#query('x', 'i')
+	onoremap <silent><expr> as textobj#sandwich#query('o', 'a')
+	xnoremap <silent><expr> as textobj#sandwich#query('x', 'a')
+<
 
 
 

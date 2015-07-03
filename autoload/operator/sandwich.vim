@@ -13,7 +13,7 @@
 "   - extended               : 0 or 1. If it is called in blockwise visual mode with extending the terminal edges to line ends, then 1. Otherwise 0
 "   {}view                   : The dictionary to restore the view when the operarion starts.
 "   {}recipes
-"     []force                : The recipes which are forced to be used.
+"     []arg                  : The recipes which are forced to be used given through the 4th argument of operator#sandwich#prerequisite().
 "     []synchro              : The recipes which are used for the cooperation with textobj-sandwich. It works only on delete and replace action.
 "     []integrated           : The recipes which are the integrated result of all recipes. This is the one used practically.
 "     * integrate            : The function to set operator.recipes.integrated.
@@ -23,7 +23,7 @@
 "     []inner_tail           : The right bottom edge of the assigned region.
 "   {}modmark                : [Linked from stuffs.modmark] The positions of both edges of the modified region.
 "   {}opt
-"     {}prime                : [Linked from stuffs.opt.prime] The options given through a 3rd argument of operator#sandwich#prerequisite(). This has the highest priority to use.
+"     {}arg                  : [Linked from stuffs.opt.arg] The options given through the 3rd argument of operator#sandwich#prerequisite(). This has higher priority than default.
 "       * clear              : The function to clear the containts.
 "       * update             : The function to update the containts.
 "     {}default              : [Linked from stuffs.opt.default] The default options
@@ -49,14 +49,14 @@
 "       {}opt                : [Linked from act.opt]
 "         - filter           : A strings for integrate() function to filter out redundant options.
 "         {}default          : Linked to operator.opt.default.
-"         {}prime            : Linked to operator.opt.prime.
+"         {}arg              : Linked to operator.opt.arg.
 "         {}recipe           : The copy of a snippet of recipe. But 'buns' is removed.
 "           * clear          : The function to clear the containts.
 "           * update         : The function to update the containts.
 "         {}integrated       : The integrated options which is used in practical use.
 "           * clear          : The function to clear the containts.
 "           * update         : The function to update the containts.
-"         * integrate        : The function that integrates three options (prime, recipe, default) to get 'integrated'.
+"         * integrate        : The function that integrates three options (arg, recipe, default) to get 'integrated'.
 "       []acts
 "         {}act              : The information and functions to execute an action.
 "           {}region         : The both edges of processed region.
@@ -126,8 +126,8 @@ function! operator#sandwich#prerequisite(kind, mode, ...) abort "{{{
   let operator.view  = winsaveview()
   let operator.cursor.keep[0:3] = getpos('.')[0:3]
 
-  call operator.opt.prime.update(get(a:000, 0, {}))
-  let operator.recipes.force = get(a:000, 1, [])
+  call operator.opt.arg.update(get(a:000, 0, {}))
+  let operator.recipes.arg = get(a:000, 1, [])
 
   if a:mode ==# 'x' && visualmode() ==# "\<C-v>"
     " The case for blockwise selections in visual mode
@@ -150,6 +150,20 @@ function! operator#sandwich#prerequisite(kind, mode, ...) abort "{{{
   let operator.basket = []
 
   let &l:operatorfunc = 'operator#sandwich#' . a:kind
+  return
+endfunction
+"}}}
+function! operator#sandwich#keymap(kind, mode, ...) abort "{{{
+  if a:0 == 0
+    call operator#sandwich#prerequisite(a:kind, a:mode)
+  elseif a:0 == 1
+    call operator#sandwich#prerequisite(a:kind, a:mode, a:1)
+  else
+    call operator#sandwich#prerequisite(a:kind, a:mode, a:1, a:2)
+  endif
+
+  let cmd = a:mode ==# 'x' ? 'gvg@' : 'g@'
+  call feedkeys(cmd, 'n')
   return
 endfunction
 "}}}
@@ -188,9 +202,9 @@ function! operator#sandwich#query1st(kind, mode, ...) abort "{{{
 
   " prerequisite
   " NOTE: force to set highlight=0
-  let prime_opt = get(a:000, 0, {})
-  let prime_opt.highlight = 0
-  call operator#sandwich#prerequisite(a:kind, a:mode, prime_opt)
+  let arg_opt = get(a:000, 0, {})
+  let arg_recipes = get(a:000, 1, [])
+  call operator#sandwich#prerequisite(a:kind, a:mode, arg_opt, arg_recipes)
   let operator     = g:operator#sandwich#object
   let operator.num = 1
   let operator.opt.timeoutlen = s:get('timeoutlen', &timeoutlen)
@@ -295,11 +309,11 @@ endfunction
 function! s:opt_integrate() dict abort  "{{{
   call self.integrated.clear()
   let default = filter(copy(self.default), self.filter)
+  let arg     = filter(copy(self.arg),     self.filter)
   let recipe  = filter(copy(self.recipe),  self.filter)
-  let prime   = filter(copy(self.prime),   self.filter)
   call extend(self.integrated, default, 'force')
+  call extend(self.integrated, arg,     'force')
   call extend(self.integrated, recipe,  'force')
-  call extend(self.integrated, prime,   'force')
 endfunction
 "}}}
 " opt object  {{{
@@ -834,7 +848,7 @@ function! s:query(recipes) dict abort  "{{{
   endtry
 endfunction
 "}}}
-function! s:show() dict abort"{{{
+function! s:show() dict abort "{{{
   let clock = self.clock
   let acts  = self.acts
   let hi_exited = 0
@@ -1265,9 +1279,9 @@ function! s:finalize() dict abort  "{{{
 endfunction
 "}}}
 function! s:recipe_integrate(kind, motionwise, mode) dict abort  "{{{
-  let self.integrated  = []
-  if self.force != []
-    let self.integrated += self.force
+  let self.integrated = []
+  if self.arg != []
+    let self.integrated += self.arg
   else
     let self.integrated += sandwich#get_recipes()
     let self.integrated += operator#sandwich#get_recipes()
@@ -1292,7 +1306,7 @@ let s:operator = {
       \   'blockwidth': 0,
       \   'extended'  : 0,
       \   'recipes'   : {
-      \     'force'     : [],
+      \     'arg'       : [],
       \     'synchro'   : [],
       \     'integrated': [],
       \   },
@@ -1305,7 +1319,7 @@ let s:operator = {
       \   },
       \   'modmark': copy(s:null_2pos),
       \   'opt': {
-      \     'prime'  : copy(s:opt),
+      \     'arg'    : copy(s:opt),
       \     'default': copy(s:opt),
       \   },
       \   'basket'    : [],

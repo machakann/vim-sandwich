@@ -10,6 +10,8 @@ function! s:suite.before_each() abort "{{{
   unlet! g:textobj#sandwich#recipes
   silent! xunmap i{
   silent! xunmap a{
+  silent! ounmap iis
+  silent! ounmap aas
 endfunction
 "}}}
 function! s:suite.after() abort "{{{
@@ -3746,6 +3748,88 @@ function! s:suite.a_x_option_synchro() abort  "{{{
   call setline('.', 'afooa')
   normal 0vasasd
   call g:assert.equals(getline('.'), 'foo', 'failed at #512')
+endfunction
+"}}}
+
+" Function interface
+function! s:suite.i_function_interface() abort  "{{{
+  omap <expr> iis textobj#sandwich#query('o', 'i', {'quoteescape': 0}, [{'buns': ['"', '"']}, {'buns': ['(', ')']}])
+  let g:sandwich#recipes = []
+  let g:textobj#sandwich#recipes = [
+        \   {'buns': ['"', '"']},
+        \   {'buns': ['[', ']']},
+        \ ]
+  call textobj#sandwich#set('query', 'quoteescape', 1)
+
+  " #513
+  call setline('.', '"foo\""')
+  normal 0dis"
+  call g:assert.equals(getline('.'), '""', 'failed at #513')
+
+  " #514
+  call setline('.', '(foo)')
+  normal 0dis(
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #514')
+
+  " #515
+  call setline('.', '[foo]')
+  normal 0dis[
+  call g:assert.equals(getline('.'), '[]', 'failed at #515')
+
+  " #516
+  call setline('.', '"foo\""')
+  normal 0diis"
+  call g:assert.equals(getline('.'), '"""', 'failed at #516')
+
+  " #517
+  call setline('.', '(foo)')
+  normal 0diis(
+  call g:assert.equals(getline('.'), '()', 'failed at #517')
+
+  " #518
+  call setline('.', '[foo]')
+  normal 0diis[
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #518')
+endfunction
+"}}}
+function! s:suite.a_function_interface() abort  "{{{
+  omap <expr> aas textobj#sandwich#query('o', 'a', {'quoteescape': 0}, [{'buns': ['"', '"']}, {'buns': ['(', ')']}])
+  let g:sandwich#recipes = []
+  let g:textobj#sandwich#recipes = [
+        \   {'buns': ['"', '"']},
+        \   {'buns': ['[', ']']},
+        \ ]
+  call textobj#sandwich#set('query', 'quoteescape', 1)
+
+  " #519
+  call setline('.', '"foo\""')
+  normal 0das"
+  call g:assert.equals(getline('.'), '', 'failed at #519')
+
+  " #520
+  call setline('.', '(foo)')
+  normal 0das(
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #520')
+
+  " #521
+  call setline('.', '[foo]')
+  normal 0das[
+  call g:assert.equals(getline('.'), '', 'failed at #521')
+
+  " #522
+  call setline('.', '"foo\""')
+  normal 0daas"
+  call g:assert.equals(getline('.'), '"', 'failed at #522')
+
+  " #523
+  call setline('.', '(foo)')
+  normal 0daas(
+  call g:assert.equals(getline('.'), '', 'failed at #523')
+
+  " #524
+  call setline('.', '[foo]')
+  normal 0daas[
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #524')
 endfunction
 "}}}
 

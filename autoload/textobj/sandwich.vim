@@ -18,11 +18,11 @@
 "   - done                  : If the textobject could find the target and select, then 1. Otherwise 0.
 "   - visualmode            : If the textobject is called in blockwise visual mode, then '<C-v>'. Otherwise 'v'.
 "   []recipes
-"     []force               : The recipes which is used mandatory if it is not empty. It could be given through the 4th argument.
+"     []arg                 : The recipes which is used mandatory if it is not empty. It could be given through the 4th argument.
 "     []integrated          : The recipes which are the integrated result of all recipes. This is the one used practically.
 "     * integrate           : The function to set operator.recipes.integrated.
 "   {}opt
-"     {}prime               : [Linked from stuffs.opt.prime] The options given through the 3rd argument of textobj#sandwich#auto(). This has the highest priority to use.
+"     {}arg                 : [Linked from stuffs.opt.arg] The options given through the 3rd argument of textobj#sandwich#auto(). This has the highest priority to use.
 "       * clear             : The function to clear the containts.
 "       * update            : The function to update the containts.
 "     {}default             : [Linked from stuffs.opt.default] The default options
@@ -68,14 +68,14 @@
 "       {}opt               : [Linked from act.opt]
 "         - filter          : A strings for integrate() function to filter out redundant options.
 "         {}default         : Linked to textobj.opt.default.
-"         {}prime           : Linked to textobj.opt.prime.
+"         {}arg             : Linked to textobj.opt.arg.
 "         {}recipe          : The copy of a snippet of recipe. But 'buns' is removed.
 "           * clear         : The function to clear the containts.
 "           * update        : The function to update the containts.
 "         {}integrated      : The integrated options which is used in practical use.
 "           * clear         : The function to clear the containts.
 "           * update        : The function to update the containts.
-"         * integrate       : The function that integrates three options (prime, recipe, default) to get 'integrated'.
+"         * integrate       : The function that integrates three options (arg, recipe, default) to get 'integrated'.
 "     * search_with_nest    : The function to search the candidate in the range with nesting structure.
 "     * search_without_nest : The function to search the candidate in the range without nesting structure.
 "     * searchpos           : The wrap function of searchpos() for search_without_nest.
@@ -131,8 +131,8 @@ function! textobj#sandwich#auto(mode, a_or_i, ...) abort  "{{{
   let textobj.count  = v:count1
   let textobj.cursor = getpos('.')[1:2]
   let textobj.view   = winsaveview()
-  let textobj.recipes.force = get(a:000, 1, [])
-  call textobj.opt.prime.update(get(a:000, 0, {}))
+  let textobj.recipes.arg = get(a:000, 1, [])
+  call textobj.opt.arg.update(get(a:000, 0, {}))
 
   return ":\<C-u>call textobj#sandwich#select()\<CR>"
 endfunction
@@ -153,10 +153,10 @@ function! textobj#sandwich#query(mode, a_or_i, ...) abort  "{{{
   let textobj.count  = v:count1
   let textobj.cursor = getpos('.')[1:2]
   let textobj.view   = winsaveview()
-  let textobj.recipes.force = get(a:000, 1, [])
+  let textobj.recipes.arg = get(a:000, 1, [])
   let textobj.opt.timeoutlen = s:get('timeoutlen', &timeoutlen)
   let textobj.opt.timeoutlen = textobj.opt.timeoutlen < 0 ? 0 : textobj.opt.timeoutlen
-  call textobj.opt.prime.update(get(a:000, 0, {}))
+  call textobj.opt.arg.update(get(a:000, 0, {}))
 
   " query
   call textobj.query()
@@ -185,10 +185,10 @@ function! s:opt_integrate() dict abort  "{{{
   call self.integrated.clear()
   let default = filter(copy(self.default), self.filter)
   let recipe  = filter(copy(self.recipe),  self.filter)
-  let prime   = filter(copy(self.prime),   self.filter)
+  let arg     = filter(copy(self.arg),     self.filter)
   call extend(self.integrated, self.default, 'force')
   call extend(self.integrated, self.recipe,  'force')
-  call extend(self.integrated, self.prime,   'force')
+  call extend(self.integrated, self.arg,     'force')
 endfunction
 "}}}
 function! s:opt_clear() dict abort "{{{
@@ -720,7 +720,7 @@ let s:stuffs = {
 "}}}
 
 function! s:query() dict abort  "{{{
-  call self.recipes.integrate(self.kind, self.mode)
+  call self.recipes.integrate(self.kind, self.mode, self.opt.default)
   let recipes = deepcopy(self.recipes.integrated)
   let clock   = self.clock
   let timeoutlen = self.opt.timeoutlen
@@ -812,16 +812,16 @@ function! s:initialize() dict abort  "{{{
   endif
 
   if self.state
-    if self.recipes.integrated == []
-      call self.recipes.integrate(self.kind, self.mode)
-    endif
-    let recipes = self.recipes.integrated
-
     let self.opt.stimeoutlen = s:get('stimeoutlen', 500)
     let self.opt.stimeoutlen = self.opt.stimeoutlen < 0 ? 0 : self.opt.stimeoutlen
     let self.opt.latestjump  = s:get('latest_jump', 1)
     let self.visualmode = self.mode ==# 'x' && visualmode() ==# "\<C-v>" ? "\<C-v>" : 'v'
     call self.opt.default.update(deepcopy(g:textobj#sandwich#options[self.kind]))
+
+    if self.recipes.integrated == []
+      call self.recipes.integrate(self.kind, self.mode, self.opt.default)
+    endif
+    let recipes = self.recipes.integrated
 
     " prepare basket
     for recipe in recipes
@@ -1039,10 +1039,10 @@ function! s:finalize() dict abort "{{{
   endif
 endfunction
 "}}}
-function! s:recipes_integrate(kind, mode) dict abort  "{{{
+function! s:recipes_integrate(kind, mode, opt) dict abort  "{{{
   let self.integrated  = []
-  if self.force != []
-    let self.integrated += self.force
+  if self.arg != []
+    let self.integrated += self.arg
   else
     let self.integrated += sandwich#get_recipes()
     let self.integrated += textobj#sandwich#get_recipes()
@@ -1080,7 +1080,7 @@ let s:textobj = {
       \   'cursor'    : copy(s:null_coord),
       \   'view'      : {},
       \   'recipes'   : {
-      \     'force'     : [],
+      \     'arg'       : [],
       \     'integrated': [],
       \     'integrate' : function('s:recipes_integrate'),
       \   },
@@ -1090,7 +1090,7 @@ let s:textobj = {
       \   'visualmark': copy(s:null_2coord),
       \   'opt'       : {
       \     'stimeoutlen': 0,
-      \     'prime'  : copy(s:opt),
+      \     'arg'    : copy(s:opt),
       \     'default': copy(s:opt),
       \   },
       \   'done'      : 0,

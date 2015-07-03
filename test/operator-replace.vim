@@ -12,6 +12,7 @@ function! s:suite.before_each() abort "{{{
   set autoindent&
   silent! mapc!
   silent! ounmap ii
+  silent! ounmap ssr
   silent! xunmap i{
   silent! xunmap a{
   call operator#sandwich#set_default()
@@ -5474,6 +5475,40 @@ function! s:suite.blockwise_x_option_eval() abort "{{{
 
   unlet! g:operator#sandwich#recipes
   call operator#sandwich#set('replace', 'block', 'eval', 0)
+endfunction
+"}}}
+
+" Function interface
+function! s:suite.function_interface() abort  "{{{
+  nmap ssr <Esc>:call operator#sandwich#prerequisite('replace', 'n', {'cursor': 'inner_tail'}, [{'buns': ['(', ')']}])<CR>g@
+  let g:sandwich#recipes = []
+  let g:operator#sandwich#recipes = [
+        \   {'buns': ['[', ']']},
+        \ ]
+
+  " #400
+  call setline('.', '(foo)')
+  normal 0sra([
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #400')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #400')
+
+  " #401
+  call setline('.', '[foo]')
+  normal 0sra[(
+  call g:assert.equals(getline('.'), '(foo(',      'failed at #401')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #401')
+
+  " #402
+  call setline('.', '(foo)')
+  normal 0ssra([
+  call g:assert.equals(getline('.'), '[foo[',      'failed at #402')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #402')
+
+  " #403
+  call setline('.', '[foo]')
+  normal 0ssra[(
+  call g:assert.equals(getline('.'), '[foo]',      'failed at #403')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #403')
 endfunction
 "}}}
 

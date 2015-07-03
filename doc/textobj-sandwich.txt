@@ -1,4 +1,4 @@
-*textobj-sandwich.txt*			Last change:19-Jun-2015.
+*textobj-sandwich.txt*			Last change:02-Jul-2015.
 
 The textobject plugin to search and select sandwiched textobjects.
 
@@ -178,6 +178,63 @@ keymappings~
 	The textobject mapping to search and select a sandwiched text
 	depending on a user input. This keymapping selects sandwiched text
 	including surroundings.
+
+
+
+KEY MAPPING FUNCTIONS~
+
+User can make new mappings by using function interfaces natively.
+
+					*textobj#sandwich#auto()*
+textobj#sandwich#auto(mode, a_or_i[, options[, recipes]])
+	This function is used to make a operator key-mapping as following.
+>
+	onoremap <silent><expr> ib textobj#sandwich#auto('o', 'i')
+	xnoremap <silent><expr> ib textobj#sandwich#auto('x', 'i')
+	onoremap <silent><expr> ab textobj#sandwich#auto('o', 'a')
+	xnoremap <silent><expr> ab textobj#sandwich#auto('x', 'a')
+<
+	If a not-empty dictionary is given to the optional third argument of
+	this function, the local options inside the dictionary override
+	default option values.
+>
+	" example 1
+	onoremap <silent><expr> ib
+	\ textobj#sandwich#auto('o', 'i', {'expand_range': 0})
+
+	" example 2
+	let g:sandwich_alt_options = {'expand_range': 0}
+	onoremap <silent><expr> ib
+	\ textobj#sandwich#auto('o', 'i', g:sandwich_alt_options)
+<
+
+	If a not-empty list of recipes is given to the optional fourth
+	argument of this function, the key mapping use the list instead of
+	|sandwich#recipes| (or |sandwich#default_recipes|) and
+	|textobj#sandwich#recipes| (or |textobj#sandwich#default_recipes|).
+>
+	" example 1
+	onoremap <silent><expr> ib
+	\ textobj#sandwich#auto('o', 'i', {}, [{'buns': ['(', ')']}])
+
+	" example 2
+	let g:sandwich_alt_recipes = [{'buns': ['(', ')']}]
+	onoremap <silent><expr> ib
+	\ textobj#sandwich#auto('o', 'i', {}, g:sandwich_alt_recipes)
+<
+
+
+
+					*textobj#sandwich#query()*
+textobj#sandwich#query(mode, a_or_i[, options[, recipes]])
+	This function is similar as |textobj#sandwich#auto()|, but it is
+	used for declaring new query series textobjects.
+>
+	onoremap <silent><expr> is textobj#sandwich#query('o', 'i')
+	xnoremap <silent><expr> is textobj#sandwich#query('x', 'i')
+	onoremap <silent><expr> as textobj#sandwich#query('o', 'a')
+	xnoremap <silent><expr> as textobj#sandwich#query('x', 'a')
+<
 
 
 

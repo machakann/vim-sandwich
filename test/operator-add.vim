@@ -7,6 +7,7 @@ function! s:suite.before_each() abort "{{{
   set autoindent&
   silent! mapc!
   silent! ounmap ii
+  silent! ounmap ssa
   call operator#sandwich#set_default()
   unlet! g:sandwich#recipes
   unlet! g:operator#sandwich#recipes
@@ -3583,6 +3584,40 @@ function! s:suite.blockwise_x_option_linewise() abort "{{{
 
   set autoindent&
   call operator#sandwich#set('add', 'block', 'linewise', 0)
+endfunction
+"}}}
+
+" Function interface
+function! s:suite.function_interface() abort  "{{{
+  nmap ssa <Esc>:call operator#sandwich#prerequisite('add', 'n', {'cursor': 'inner_tail'}, [{'buns': ['(', ')']}])<CR>g@
+  let g:sandwich#recipes = []
+  let g:operator#sandwich#recipes = [
+        \   {'buns': ['[', ']']},
+        \ ]
+
+  " #325
+  call setline('.', 'foo')
+  normal 0saiw(
+  call g:assert.equals(getline('.'), '(foo(',      'failed at #325')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #325')
+
+  " #326
+  call setline('.', 'foo')
+  normal 0saiw[
+  call g:assert.equals(getline('.'), '[foo]',      'failed at #326')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #326')
+
+  " #327
+  call setline('.', 'foo')
+  normal 0ssaiw(
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #327')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #327')
+
+  " #328
+  call setline('.', 'foo')
+  normal 0ssaiw[
+  call g:assert.equals(getline('.'), '[foo[',      'failed at #328')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #328')
 endfunction
 "}}}
 

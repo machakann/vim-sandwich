@@ -10,6 +10,8 @@ function! s:suite.before_each() abort "{{{
   unlet! g:textobj#sandwich#recipes
   silent! xunmap i{
   silent! xunmap a{
+  silent! ounmap iib
+  silent! ounmap aab
 endfunction
 "}}}
 function! s:suite.after() abort "{{{
@@ -4040,6 +4042,46 @@ function! s:suite.i_function_interface() abort  "{{{
   call setline('.', '[foo]')
   normal 0diib
   call g:assert.equals(getline('.'), '[foo]', 'failed at #542')
+endfunction
+"}}}
+function! s:suite.a_function_interface() abort  "{{{
+  omap <expr> aab textobj#sandwich#auto('o', 'a', {'quoteescape': 0}, [{'buns': ['"', '"']}, {'buns': ['(', ')']}])
+  let g:sandwich#recipes = []
+  let g:textobj#sandwich#recipes = [
+        \   {'buns': ['"', '"']},
+        \   {'buns': ['[', ']']},
+        \ ]
+  call textobj#sandwich#set('auto', 'quoteescape', 1)
+
+  " #543
+  call setline('.', '"foo\""')
+  normal 0dab
+  call g:assert.equals(getline('.'), '', 'failed at #543')
+
+  " #544
+  call setline('.', '(foo)')
+  normal 0dab
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #544')
+
+  " #545
+  call setline('.', '[foo]')
+  normal 0dab
+  call g:assert.equals(getline('.'), '', 'failed at #545')
+
+  " #546
+  call setline('.', '"foo\""')
+  normal 0daab
+  call g:assert.equals(getline('.'), '"', 'failed at #546')
+
+  " #547
+  call setline('.', '(foo)')
+  normal 0daab
+  call g:assert.equals(getline('.'), '', 'failed at #547')
+
+  " #548
+  call setline('.', '[foo]')
+  normal 0daab
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #548')
 endfunction
 "}}}
 
