@@ -557,7 +557,7 @@ function! s:skip(is_head, ...) dict abort  "{{{
     if opt.syntax != []
       let list = map(synstack(coord[0], coord[1]),
             \ 'synIDattr(synIDtrans(v:val), "name")')
-      if filter(copy(opt.syntax), 'match(list, v:val) > -1') == []
+      if !s:is_included_syntax(list, opt.syntax)
         return 1
       endif
     endif
@@ -628,8 +628,12 @@ function! s:is_valid_candidate(textobj) dict abort "{{{
   if opt.match_syntax != 2
     let opt_match_syntax_affair = 1
   else
-    let opt_match_syntax_affair = s:is_matched_syntax(coord.inner_head, self.syntax)
-                             \ || s:is_matched_syntax(coord.inner_tail, self.syntax)
+    let synstack_inner_head = map(synstack(coord.inner_head[0], coord.inner_head[1]),
+          \ 'synIDattr(synIDtrans(v:val), "name")')
+    let synstack_inner_tail = map(synstack(coord.inner_tail[0], coord.inner_tail[1]),
+          \ 'synIDattr(synIDtrans(v:val), "name")')
+    let opt_match_syntax_affair = s:is_included_syntax(synstack_inner_head, self.syntax)
+                             \ || s:is_included_syntax(synstack_inner_tail, self.syntax)
   endif
 
   return s:is_equal_or_ahead(tail, head)
@@ -1218,6 +1222,20 @@ function! s:is_matched_syntax(coord, syntaxID) abort  "{{{
   else
     return [synIDattr(synIDtrans(synID(a:coord[0], a:coord[1], 1)), 'name')]
           \ == a:syntaxID
+  endif
+endfunction
+"}}}
+function! s:is_included_syntax(synstack, syntaxID) abort  "{{{
+  if a:syntaxID == []
+    return 1
+  elseif a:synstack == []
+    if a:syntaxID == ['']
+      return 1
+    else
+      return 0
+    endif
+  else
+    return filter(copy(a:syntaxID), 'match(a:synstack, v:val) > -1') != []
   endif
 endfunction
 "}}}

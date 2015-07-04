@@ -1,4 +1,4 @@
-*textobj-sandwich.txt*			Last change:03-Jul-2015.
+*textobj-sandwich.txt*			Last change:04-Jul-2015.
 
 The textobject plugin to search and select sandwiched textobjects.
 
@@ -741,7 +741,8 @@ syntax
 	      candidate, it is regarded as the matched. The syntax stack can
 	      be checked by using following keymapping on a text.
 >
-	nnoremap <Leader>s :echo map(synstack(line('.'), col('.')), 'synIDattr(synIDtrans(v:val), "name")')<CR>
+	nnoremap <Leader>s :echo map(synstack(line('.'), col('.')),
+	                        \ 'synIDattr(synIDtrans(v:val), "name")')<CR>
 <
 	Default values
 	  * query: []
@@ -750,13 +751,15 @@ syntax
 
 
 match_syntax
-	If this option is 1, the textobjects check the heads of both
-	surroundings whether their syntaxes are matched or not. If not, the
-	candidate is skipped. In addition to that, if this option is 2, the
-	textobjects also check the both edge of the surrounded text. In many
-	cases, both sides of surroundings have same syntax. For example, " is
-	frequently used for the string literal, " itself would be applied
-	String syntax and the inside text also applied the same.
+	If this option is 1, the textobjects check the both surroundings
+	whether their syntaxes are matched or not. If not, the candidate is
+	skipped. In addition to that, if this option is 2, the textobjects
+	also check the both edge of the surrounded text. In many cases, both
+	sides of surroundings have same syntaxes. For example, "" is
+	frequently used for the string literal, "" itself would be applied
+	String syntax and the inside text also applied the same. If the
+	surrounding is not a character, then only the first character would
+	be checked.
 >
 	let g:sandwich#recipes += [
 	  \   {
@@ -766,17 +769,24 @@ match_syntax
 	  \     'match_syntax': 2
 	  \ ]
 <
-	NOTE: The applied syntax can be checked by using the following
-	      keymapping on a text.
+	NOTE: The applied (displayed) syntax can be checked by using the
+	      following keymapping on a text.
 >
-	nnoremap <Leader>S :echo synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')<CR>
+	nnoremap <Leader>S
+	\ :echo synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')<CR>
 <
-	      If the syntax at the head of a former surrounding is included in
-	      syntax stacks of the other positions, then it is regarded as the
-	      matched. A syntax stack can be checked by using the following
-	      keymapping on a text.
+	      The displayed syntaxes of both surroundings should be matched to
+	      be valid. However, as for the case of insides the surroundings
+	      the matched condition is somehow relaxed, only have to be
+	      included in syntax stacks. Because, for instance, output
+	      conversion specifiers in string literal like "%s" is highlighted
+	      with different color. Even though the fact, "String" is expect
+	      to included in its syntax stack, if it is true it works same as
+	      other string literals. A syntax stack can be checked by using
+	      the following key mapping on a text.
 >
-	nnoremap <Leader>s :echo map(synstack(line('.'), col('.')), 'synIDattr(synIDtrans(v:val), "name")')<CR>
+	nnoremap <Leader>s :echo map(synstack(line('.'), col('.')),
+	                        \ 'synIDattr(synIDtrans(v:val), "name")')<CR>
 <
 	Default values
 	  * query: 0
