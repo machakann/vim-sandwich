@@ -1077,7 +1077,12 @@ function! s:split(region) dict abort  "{{{
         let head = getpos('.')
         call s:set_displaycoord([lnum, col_tail])
         let tail = getpos('.')
-        if !(col([lnum, '$']) == tail[2]) && tail[3] == 0 && s:is_equal_or_ahead(tail, head)
+        let endcol = col([lnum, '$'])
+        if head[2] != endcol && s:is_equal_or_ahead(tail, head)
+          if tail[2] == endcol
+            let tail[2] = endcol - 1
+            let tail[3] = 0
+          endif
           let region_list += [{'head': head, 'tail': tail}]
         else
           let region_list += [deepcopy(s:null_2pos)]

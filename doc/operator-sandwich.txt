@@ -1,4 +1,4 @@
-*operator-sandwich.txt*			Last change:03-Jul-2015.
+*operator-sandwich.txt*			Last change:04-Jul-2015.
 
 The operator plugin to edit sandwiched textobjects.
 
@@ -174,26 +174,26 @@ selected:
 <
 press sa(
 >
-	a
-	bb
-	ccc
-	(dddd)
-<
-only the line reached at 4th column is processed. If you want to include all
-the lines to the targets, use |$| command in |blockwise-visual| mode. It
-extend the terminal end of selection until the each end of lines.
->
-	a
-	bb
-	ccc
-	dddd
-<
-Start from a in the first line, press <C-v>3j$sa(, then you will get:
->
 	(a)
 	(bb)
 	(ccc)
 	(dddd)
+<
+All the lines are processed until the ends of these lines. If a last line is
+not the longest line, use |$| command in |blockwise-visual| mode. It extends
+the selection until the each end of lines.
+>
+	aaaa
+	bbb
+	cc
+	d
+<
+Start from a in the first line, press <C-v>3j$sa(, then you will get:
+>
+	(aaaa)
+	(bbb)
+	(cc)
+	(d)
 <
 
 
