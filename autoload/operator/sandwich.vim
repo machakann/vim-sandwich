@@ -1502,7 +1502,16 @@ function! s:check_edges(head, tail, candidate, opt) abort  "{{{
   if head1 != a:head[1:2] | return s:null_4pos | endif
 
   call setpos('.', a:tail)
-  let tail2 = searchpos(patterns[1], 'bce', a:head[1])
+  " workaround for unicode string (because of a bug of vim)
+  " If the cursor is on a unicode character(uc), searchpos(uc, 'bce', stopline) always returns [0, 0],
+  " though searchpos(uc, 'bce') returns a correct value.
+  if a:tail[1] == line('$') && a:tail[2] == col([line('$'), '$'])
+    normal! h
+    let tail2 = searchpos(patterns[1], 'e', a:head[1])
+  else
+    normal! l
+    let tail2 = searchpos(patterns[1], 'be', a:head[1])
+  endif
 
   if tail2 != a:tail[1:2] | return s:null_4pos | endif
 
