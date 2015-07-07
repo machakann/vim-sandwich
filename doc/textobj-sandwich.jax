@@ -1,4 +1,4 @@
-*textobj-sandwich.jax*	日本語ヘルプ	Last change:04-Jul-2015.
+*textobj-sandwich.jax*	日本語ヘルプ	Last change:07-Jul-2015.
 
 “挟まれた”テキストを検索し選択するためのテキストオブジェクトです。
 
@@ -32,7 +32,7 @@ CONFIGURATION			|textobj-sandwich-configuration|
     regex
     skip_regex
     quoteescape
-    eval
+    expr
     synchro
     noremap
     syntax
@@ -575,7 +575,7 @@ g:textobj#sandwich#options		*g:textobj#sandwich#options*
 	    - regex
 	    - skip_regex
 	    - quoteescape
-	    - eval
+	    - expr
 	    - synchro
 	    - noremap
 	    - syntax
@@ -680,7 +680,7 @@ quoteescape
 
 
 
-eval
+expr
 	このオプションの値が 1 か 2 なら "buns" は式として評価されてから検索さ
 	れます。値が 1 の場合は一度だけ評価され、|.| コマンドでは同じものが使
 	用されます。値が 2 の場合は |.| コマンドで繰り返される毎に評価されます
@@ -688,7 +688,7 @@ eval
 	れた範囲を検索します。 (参考: |let-@|)
 >
 	let g:sandwich#recipes += [
-	  \   {'buns': ['@@', '@@'], 'eval': 1, 'input': ['@']}
+	  \   {'buns': ['@@', '@@'], 'expr': 1, 'input': ['@']}
 	  \ ]
 <
 	デフォルト値
@@ -701,7 +701,7 @@ synchro
 	このオプションが真の場合、|<Plug>(operator-sandwich-delete)| 及び
 	|<Plug>(operator-sandwich-replace)| と組み合わせて使われると、マッチし
 	たレシピがこれらのオペレータに渡され高い優先度で削除/置換されます。こ
-	のオプションは |g:textobj#sandwich#recipes| 内の "eval" オプションで評
+	のオプションは |g:textobj#sandwich#recipes| 内の "expr" オプションで評
 	価されたレシピをこれらのオペレータと連携させるのに役にたつでしょう。レ
 	シピが渡される際に "kind" キーをもち、 "delete" と "replace" の両方を
 	持たない場合、 "kind" フィルターに "replace" and "delete" が自動的に追
@@ -873,7 +873,7 @@ g:textobj#sandwich#latest_jump		*g:textobj#sandwich#latest_jump*
 	\        'input("textobj-sandwich:tail: ")'
 	\    ],
 	\    'kind': ['query'],
-	\    'eval': 1,
+	\    'expr': 1,
 	\    'regex': 1,
 	\    'synchro': 1,
 	\    'input': ['f']
