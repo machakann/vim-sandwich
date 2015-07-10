@@ -790,11 +790,12 @@ function! s:query(recipes) dict abort  "{{{
     " query phase
     let input   = ''
     let cmdline = []
+    let last_compl_match = ['', []]
     while 1
       let c = getchar(0)
       if c == 0
         if clock.started && timeoutlen > 0 && clock.erapsed() > timeoutlen
-          let recipe = {'buns': []}
+          let [input, recipes] = last_compl_match
           break
         else
           sleep 20m
@@ -806,7 +807,7 @@ function! s:query(recipes) dict abort  "{{{
       let input .= c
 
       " check forward match
-      call filter(recipes, 's:is_input_matched(v:val, input, 0)')
+      let n_fwd = len(filter(recipes, 's:is_input_matched(v:val, input, 0)'))
 
       " check complete match
       let n_comp = len(filter(copy(recipes), 's:is_input_matched(v:val, input, 1)'))
@@ -816,20 +817,28 @@ function! s:query(recipes) dict abort  "{{{
         else
           call clock.stop()
           call clock.start()
+          let last_compl_match = [input, copy(recipes)]
+        endif
+      else
+        if clock.started && !n_fwd
+          let [input, recipes] = last_compl_match
+          break
         endif
       endif
 
       if recipes == [] | break | endif
     endwhile
+    call clock.stop()
 
     " pick up and register a recipe
     if filter(recipes, 's:is_input_matched(v:val, input, 1)') != []
       let recipe = recipes[0]
     else
-      if strlen(input) > 1 || input ==# "\<Esc>" || input ==# "\<C-c>"
+      if input ==# "\<Esc>" || input ==# "\<C-c>" || input ==# ''
         let recipe = {}
       else
-        let recipe = {'buns': [input, input]}
+        let c = split(input, '\zs')[0]
+        let recipe = {'buns': [c, c]}
       endif
     endif
 

@@ -732,11 +732,12 @@ function! s:query() dict abort  "{{{
   " query phase
   let input   = ''
   let cmdline = []
+  let last_compl_match = ['', []]
   while recipes != []
     let c = getchar(0)
     if c == 0
       if clock.started && timeoutlen > 0 && clock.erapsed() > timeoutlen
-        let recipe = {'buns': []}
+        let [input, recipes] = last_compl_match
         break
       else
         sleep 20m
@@ -747,7 +748,6 @@ function! s:query() dict abort  "{{{
     endif
 
     let c = type(c) == s:type_num ? nr2char(c) : c
-    let _input = input
     let input .= c
 
     " check forward match
@@ -761,12 +761,11 @@ function! s:query() dict abort  "{{{
       else
         call clock.stop()
         call clock.start()
-        let _recipes = copy(recipes)
+        let last_compl_match = [input, copy(recipes)]
       endif
     else
       if clock.started && !n_fwd
-        let input = _input
-        let recipes = _recipes
+        let [input, recipes] = last_compl_match
         " FIXME: Additional keypress, 'c', is ignored now, but it should be pressed.
         "        The problem is feedkeys() cannot be used for here...
         break
@@ -779,10 +778,11 @@ function! s:query() dict abort  "{{{
   if filter(recipes, 's:is_input_matched(v:val, input, 1)') != []
     let recipe = recipes[0]
   else
-    if strlen(input) > 1 || input ==# "\<Esc>" || input ==# "\<C-c>"
+    if input ==# "\<Esc>" || input ==# "\<C-c>" || input ==# ''
       let recipe = {}
     else
-      let recipe = {'buns': [input, input]}
+      let c = split(input, '\zs')[0]
+      let recipe = {'buns': [c, c]}
     endif
   endif
 

@@ -59,6 +59,99 @@ function! s:suite.input() abort "{{{
   call setline('.', '[foo]')
   normal 0sra[(
   call g:assert.equals(getline('.'), '(foo(', 'failed at #4')
+
+  let g:sandwich#recipes = []
+  let g:operator#sandwich#recipes = [
+        \   {'buns': ['`', '`']},
+        \   {'buns': ['``', '``']},
+        \   {'buns': ['```', '```']},
+        \ ]
+
+  " #5
+  call setline('.', "'foo'")
+  normal 0sr2i'`
+  call g:assert.equals(getline('.'), '`foo`', 'failed at #5')
+
+  " #6
+  call setline('.', "'foo'")
+  normal 0sr2i'`h
+  call g:assert.equals(getline('.'), '`foo`', 'failed at #6')
+
+  " #7
+  call setline('.', "'foo'")
+  normal 0sr2i'``
+  call g:assert.equals(getline('.'), '``foo``', 'failed at #7')
+
+  " #8
+  call setline('.', "'foo'")
+  normal 0sr2i'``h
+  call g:assert.equals(getline('.'), '``foo``', 'failed at #8')
+
+  " #9
+  call setline('.', "'foo'")
+  normal 0sr2i'```
+  call g:assert.equals(getline('.'), '```foo```', 'failed at #9')
+
+  let g:sandwich#recipes = []
+  let g:operator#sandwich#recipes = [
+        \   {'buns': ['```', '```']},
+        \ ]
+
+  " #10
+  call setline('.', "'foo'")
+  normal 0sr2i'`
+  call g:assert.equals(getline('.'), '`foo`', 'failed at #10')
+
+  " #11
+  call setline('.', "'foo'")
+  normal 0sr2i'`h
+  call g:assert.equals(getline('.'), '`foo`', 'failed at #11')
+
+  " #12
+  call setline('.', "'foo'")
+  normal 0sr2i'``
+  call g:assert.equals(getline('.'), '`foo`', 'failed at #12')
+
+  " #13
+  call setline('.', "'foo'")
+  normal 0sr2i'``h
+  call g:assert.equals(getline('.'), '`foo`', 'failed at #13')
+
+  " #14
+  call setline('.', "'foo'")
+  normal 0sr2i'```
+  call g:assert.equals(getline('.'), '```foo```', 'failed at #14')
+
+  let g:sandwich#recipes = []
+  let g:operator#sandwich#recipes = [
+        \   {'buns': ['"', '"'], 'input': ['`']},
+        \   {'buns': ['```', '```']},
+        \ ]
+
+  " #15
+  call setline('.', "'foo'")
+  normal 0sr2i'`
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #15')
+
+  " #16
+  call setline('.', "'foo'")
+  normal 0sr2i'`h
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #16')
+
+  " #17
+  call setline('.', "'foo'")
+  normal 0sr2i'``
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #17')
+
+  " #18
+  call setline('.', "'foo'")
+  normal 0sr2i'``h
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #18')
+
+  " #19
+  call setline('.', "'foo'")
+  normal 0sr2i'```
+  call g:assert.equals(getline('.'), '```foo```', 'failed at #19')
 endfunction
 "}}}
 
@@ -71,27 +164,27 @@ function! s:suite.filter_filetype() abort "{{{
         \   {'buns': ['{', '}'], 'filetype': ['all']},
         \ ]
 
-  " #5
+  " #20
   call setline('.', '{foo}')
   normal 0sra{(
-  call g:assert.equals(getline('.'), '(foo)', 'failed at #5')
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #20')
 
-  " #6
+  " #21
   call setline('.', '(foo)')
   normal 0sra({
-  call g:assert.equals(getline('.'), '{foo}', 'failed at #6')
+  call g:assert.equals(getline('.'), '{foo}', 'failed at #21')
 
   set filetype=vim
 
-  " #7
+  " #22
   call setline('.', '{foo}')
   normal 0sra{(
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #7')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #22')
 
-  " #8
+  " #23
   call setline('.', '(foo)')
   normal 0sra({
-  call g:assert.equals(getline('.'), '{foo}', 'failed at #8')
+  call g:assert.equals(getline('.'), '{foo}', 'failed at #23')
 endfunction
 "}}}
 function! s:suite.filter_kind() abort "{{{
@@ -101,10 +194,10 @@ function! s:suite.filter_kind() abort "{{{
         \   {'buns': ['(', ')']},
         \ ]
 
-  " #9
+  " #24
   call setline('.', '[foo]')
   normal 0sra[(
-  call g:assert.equals(getline('.'), '(foo)', 'failed at #9')
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #24')
 
   let g:operator#sandwich#recipes = [
         \   {'buns': ['(', ')']},
@@ -112,10 +205,10 @@ function! s:suite.filter_kind() abort "{{{
         \   {'buns': ['[', ']'], 'kind': ['add']},
         \ ]
 
-  " #10
+  " #25
   call setline('.', '(foo)')
   normal 0sra([
-  call g:assert.equals(getline('.'), '{foo}', 'failed at #10')
+  call g:assert.equals(getline('.'), '{foo}', 'failed at #25')
 
   let g:operator#sandwich#recipes = [
         \   {'buns': ['(', ')']},
@@ -123,10 +216,10 @@ function! s:suite.filter_kind() abort "{{{
         \   {'buns': ['[', ']'], 'kind': ['delete']},
         \ ]
 
-  " #11
+  " #26
   call setline('.', '(foo)')
   normal 0sra([
-  call g:assert.equals(getline('.'), '{foo}', 'failed at #11')
+  call g:assert.equals(getline('.'), '{foo}', 'failed at #26')
 
   let g:operator#sandwich#recipes = [
         \   {'buns': ['(', ')']},
@@ -134,10 +227,10 @@ function! s:suite.filter_kind() abort "{{{
         \   {'buns': ['[', ']'], 'kind': ['replace']},
         \ ]
 
-  " #12
+  " #27
   call setline('.', '(foo)')
   normal 0sra([
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #12')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #27')
 
   let g:operator#sandwich#recipes = [
         \   {'buns': ['(', ')']},
@@ -145,10 +238,10 @@ function! s:suite.filter_kind() abort "{{{
         \   {'buns': ['[', ']'], 'kind': ['operator']},
         \ ]
 
-  " #13
+  " #28
   call setline('.', '(foo)')
   normal 0sra([
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #13')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #28')
 
   let g:operator#sandwich#recipes = [
         \   {'buns': ['(', ')']},
@@ -156,10 +249,10 @@ function! s:suite.filter_kind() abort "{{{
         \   {'buns': ['[', ']'], 'kind': ['all']},
         \ ]
 
-  " #14
+  " #29
   call setline('.', '(foo)')
   normal 0sra([
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #14')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #29')
 endfunction
 "}}}
 function! s:suite.filter_motionwise() abort "{{{
@@ -171,20 +264,20 @@ function! s:suite.filter_motionwise() abort "{{{
         \ ]
   call operator#sandwich#set('add', 'line', 'linewise', 0)
 
-  " #15
+  " #30
   call setline('.', '(foo)')
   normal 0sra({
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #15')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #30')
 
-  " #16
+  " #31
   call setline('.', '(foo)')
   normal 0srVl{
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #16')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #31')
 
-  " #17
+  " #32
   call setline('.', '(foo)')
   execute "normal 0sr\<C-v>a({"
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #17')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #32')
 
   let g:operator#sandwich#recipes = [
         \   {'buns': ['(', ')']},
@@ -192,20 +285,20 @@ function! s:suite.filter_motionwise() abort "{{{
         \   {'buns': ['[', ']'], 'motionwise': ['all'], 'input': ['{']},
         \ ]
 
-  " #18
+  " #33
   call setline('.', '(foo)')
   normal 0sra({
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #18')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #33')
 
-  " #19
+  " #34
   call setline('.', '(foo)')
   normal 0srVl{
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #19')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #34')
 
-  " #20
+  " #35
   call setline('.', '(foo)')
   execute "normal 0sr\<C-v>a({"
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #20')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #35')
 
   let g:operator#sandwich#recipes = [
         \   {'buns': ['(', ')']},
@@ -213,20 +306,20 @@ function! s:suite.filter_motionwise() abort "{{{
         \   {'buns': ['[', ']'], 'motionwise': ['char'], 'input': ['{']},
         \ ]
 
-  " #21
+  " #36
   call setline('.', '(foo)')
   normal 0sra({
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #21')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #36')
 
-  " #22
+  " #37
   call setline('.', '(foo)')
   normal 0srVl{
-  call g:assert.equals(getline('.'), '{foo}', 'failed at #22')
+  call g:assert.equals(getline('.'), '{foo}', 'failed at #37')
 
-  " #23
+  " #38
   call setline('.', '(foo)')
   execute "normal 0sr\<C-v>a({"
-  call g:assert.equals(getline('.'), '{foo}', 'failed at #23')
+  call g:assert.equals(getline('.'), '{foo}', 'failed at #38')
 
   let g:operator#sandwich#recipes = [
         \   {'buns': ['(', ')']},
@@ -234,20 +327,20 @@ function! s:suite.filter_motionwise() abort "{{{
         \   {'buns': ['[', ']'], 'motionwise': ['line'], 'input': ['{']},
         \ ]
 
-  " #24
+  " #39
   call setline('.', '(foo)')
   normal 0sra({
-  call g:assert.equals(getline('.'), '{foo}', 'failed at #24')
+  call g:assert.equals(getline('.'), '{foo}', 'failed at #39')
 
-  " #25
+  " #40
   call setline('.', '(foo)')
   normal 0srVl{
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #25')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #40')
 
-  " #26
+  " #41
   call setline('.', '(foo)')
   execute "normal 0sr\<C-v>a({"
-  call g:assert.equals(getline('.'), '{foo}', 'failed at #26')
+  call g:assert.equals(getline('.'), '{foo}', 'failed at #41')
 
   let g:operator#sandwich#recipes = [
         \   {'buns': ['(', ')']},
@@ -255,20 +348,20 @@ function! s:suite.filter_motionwise() abort "{{{
         \   {'buns': ['[', ']'], 'motionwise': ['block'], 'input': ['{']},
         \ ]
 
-  " #27
+  " #42
   call setline('.', '(foo)')
   normal 0sra({
-  call g:assert.equals(getline('.'), '{foo}', 'failed at #27')
+  call g:assert.equals(getline('.'), '{foo}', 'failed at #42')
 
-  " #28
+  " #43
   call setline('.', '(foo)')
   normal 0srVl{
-  call g:assert.equals(getline('.'), '{foo}', 'failed at #28')
+  call g:assert.equals(getline('.'), '{foo}', 'failed at #43')
 
-  " #29
+  " #44
   call setline('.', '(foo)')
   execute "normal 0sr\<C-v>a({"
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #29')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #44')
 endfunction
 "}}}
 function! s:suite.filter_mode() abort "{{{
@@ -279,15 +372,15 @@ function! s:suite.filter_mode() abort "{{{
         \   {'buns': ['[', ']'], 'input': ['{']},
         \ ]
 
-  " #30
+  " #45
   call setline('.', '(foo)')
   normal 0sra({
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #30')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #45')
 
-  " #31
+  " #46
   call setline('.', '(foo)')
   normal 0va(sr{
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #31')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #46')
 
   let g:operator#sandwich#recipes = [
         \   {'buns': ['(', ')']},
@@ -295,15 +388,15 @@ function! s:suite.filter_mode() abort "{{{
         \   {'buns': ['[', ']'], 'mode': ['n'], 'input': ['{']},
         \ ]
 
-  " #32
+  " #47
   call setline('.', '(foo)')
   normal 0sra({
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #32')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #47')
 
-  " #33
+  " #48
   call setline('.', '(foo)')
   normal 0va(sr{
-  call g:assert.equals(getline('.'), '{foo}', 'failed at #33')
+  call g:assert.equals(getline('.'), '{foo}', 'failed at #48')
 
   let g:operator#sandwich#recipes = [
         \   {'buns': ['(', ')']},
@@ -311,15 +404,15 @@ function! s:suite.filter_mode() abort "{{{
         \   {'buns': ['[', ']'], 'mode': ['x'], 'input': ['{']},
         \ ]
 
-  " #34
+  " #49
   call setline('.', '(foo)')
   normal 0sra({
-  call g:assert.equals(getline('.'), '{foo}', 'failed at #34')
+  call g:assert.equals(getline('.'), '{foo}', 'failed at #49')
 
-  " #35
+  " #50
   call setline('.', '(foo)')
   normal 0va(sr{
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #35')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #50')
 endfunction
 "}}}
 function! s:suite.filter_action() abort "{{{
@@ -330,15 +423,15 @@ function! s:suite.filter_action() abort "{{{
         \   {'buns': ['[', ']'], 'input': ['{']},
         \ ]
 
-  " #36
+  " #51
   call setline('.', '(foo)')
   normal 0sra({
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #36')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #51')
 
-  " #37
+  " #52
   call setline('.', '[foo]')
   normal 0sra[(
-  call g:assert.equals(getline('.'), '(foo)', 'failed at #37')
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #52')
 
   let g:operator#sandwich#recipes = [
         \   {'buns': ['(', ')']},
@@ -346,15 +439,15 @@ function! s:suite.filter_action() abort "{{{
         \   {'buns': ['[', ']'], 'action': ['all'], 'input': ['{']},
         \ ]
 
-  " #38
+  " #53
   call setline('.', '(foo)')
   normal 0sra({
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #38')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #53')
 
-  " #39
+  " #54
   call setline('.', '[foo]')
   normal 0sra[(
-  call g:assert.equals(getline('.'), '(foo)', 'failed at #39')
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #54')
 
   let g:operator#sandwich#recipes = [
         \   {'buns': ['(', ')']},
@@ -362,15 +455,15 @@ function! s:suite.filter_action() abort "{{{
         \   {'buns': ['[', ']'], 'action': ['add'], 'input': ['{']},
         \ ]
 
-  " #40
+  " #55
   call setline('.', '(foo)')
   normal 0sra({
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #40')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #55')
 
-  " #41
+  " #56
   call setline('.', '[foo]')
   normal 0sra[(
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #41')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #56')
 
   let g:operator#sandwich#recipes = [
         \   {'buns': ['(', ')']},
@@ -378,15 +471,15 @@ function! s:suite.filter_action() abort "{{{
         \   {'buns': ['[', ']'], 'action': ['delete'], 'input': ['{']},
         \ ]
 
-  " #42
+  " #57
   call setline('.', '(foo)')
   normal 0sra({
-  call g:assert.equals(getline('.'), '{foo}', 'failed at #42')
+  call g:assert.equals(getline('.'), '{foo}', 'failed at #57')
 
-  " #43
+  " #58
   call setline('.', '[foo]')
   normal 0sra[(
-  call g:assert.equals(getline('.'), '(foo)', 'failed at #43')
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #58')
 endfunction
 "}}}
 function! s:suite.filter_expr() abort "{{{
@@ -405,147 +498,147 @@ function! s:suite.filter_expr() abort "{{{
     return 0
   endfunction
 
-  " #44
+  " #59
   call setline('.', '"foo"')
   normal 0sr2i"(
-  call g:assert.equals(getline('.'), '(foo)', 'failed at #44')
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #59')
 
-  " #45
+  " #60
   call setline('.', '"foo"')
   normal 0sr2i"[
-  call g:assert.equals(getline('.'), '[foo]', 'failed at #45')
+  call g:assert.equals(getline('.'), '[foo]', 'failed at #60')
 
-  " #46
+  " #61
   call setline('.', '"foo"')
   normal 0sr2i"{
-  call g:assert.equals(getline('.'), '{foo{', 'failed at #46')
+  call g:assert.equals(getline('.'), '{foo{', 'failed at #61')
 
-  " #47
+  " #62
   call setline('.', '(foo)')
   normal 0sr5l"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #47')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #62')
 
-  " #48
+  " #63
   call setline('.', '[foo]')
   normal 0sr5l"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #48')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #63')
 
-  " #49
+  " #64
   call setline('.', '{foo}')
   normal 0sr5l"
-  call g:assert.equals(getline('.'), '{foo}', 'failed at #49')
+  call g:assert.equals(getline('.'), '{foo}', 'failed at #64')
 endfunction
 "}}}
 
 " character-wise
 function! s:suite.charwise_n_default_recipes() abort "{{{
-  " #50
+  " #65
   call setline('.', '(foo)')
   normal 0sra([
-  call g:assert.equals(getline('.'), '[foo]',      'failed at #50')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #50')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #50')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #50')
+  call g:assert.equals(getline('.'), '[foo]',      'failed at #65')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #65')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #65')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #65')
 
-  " #51
+  " #66
   call setline('.', '[foo]')
   normal 0sra[{
-  call g:assert.equals(getline('.'), '{foo}',      'failed at #51')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #51')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #51')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #51')
+  call g:assert.equals(getline('.'), '{foo}',      'failed at #66')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #66')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #66')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #66')
 
-  " #52
+  " #67
   call setline('.', '{foo}')
   normal 0sra{<
-  call g:assert.equals(getline('.'), '<foo>',      'failed at #52')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #52')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #52')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #52')
+  call g:assert.equals(getline('.'), '<foo>',      'failed at #67')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #67')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #67')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #67')
 
-  " #53
+  " #68
 call setline('.', '<foo>')
   normal 0sra<(
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #53')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #53')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #53')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #53')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #68')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #68')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #68')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #68')
 
-  " #54
+  " #69
   call setline('.', '(foo)')
   normal 0sra(]
-  call g:assert.equals(getline('.'), '[foo]',      'failed at #54')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #54')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #54')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #54')
+  call g:assert.equals(getline('.'), '[foo]',      'failed at #69')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #69')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #69')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #69')
 
-  " #55
+  " #70
   call setline('.', '[foo]')
   normal 0sra[}
-  call g:assert.equals(getline('.'), '{foo}',      'failed at #55')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #55')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #55')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #55')
+  call g:assert.equals(getline('.'), '{foo}',      'failed at #70')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #70')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #70')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #70')
 
-  " #56
+  " #71
   call setline('.', '{foo}')
   normal 0sra{>
-  call g:assert.equals(getline('.'), '<foo>',      'failed at #56')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #56')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #56')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #56')
+  call g:assert.equals(getline('.'), '<foo>',      'failed at #71')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #71')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #71')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #71')
 
-  " #57
+  " #72
   call setline('.', '<foo>')
   normal 0sra<)
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #57')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #57')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #57')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #57')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #72')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #72')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #72')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #72')
 endfunction
 "}}}
 function! s:suite.charwise_n_not_registered() abort "{{{
-  " #58
+  " #73
   call setline('.', 'afooa')
   normal 0sriwb
-  call g:assert.equals(getline('.'), 'bfoob',      'failed at #58')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #58')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #58')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #58')
+  call g:assert.equals(getline('.'), 'bfoob',      'failed at #73')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #73')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #73')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #73')
 
-  " #59
+  " #74
   call setline('.', '+foo+')
   normal 0sr$*
-  call g:assert.equals(getline('.'), '*foo*',      'failed at #59')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #59')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #59')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #59')
+  call g:assert.equals(getline('.'), '*foo*',      'failed at #74')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #74')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #74')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #74')
 endfunction
 "}}}
 function! s:suite.charwise_n_positioning() abort "{{{
-  " #60
+  " #75
   call setline('.', '(foo)bar')
   normal 0sra([
-  call g:assert.equals(getline('.'), '[foo]bar',   'failed at #60')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #60')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #60')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #60')
+  call g:assert.equals(getline('.'), '[foo]bar',   'failed at #75')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #75')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #75')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #75')
 
-  " #61
+  " #76
   call setline('.', 'foo(bar)')
   normal 0fbsra([
-  call g:assert.equals(getline('.'), 'foo[bar]',   'failed at #61')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #61')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #61')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0], 'failed at #61')
+  call g:assert.equals(getline('.'), 'foo[bar]',   'failed at #76')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #76')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #76')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0], 'failed at #76')
 
-  " #62
+  " #77
   call setline('.', 'foo(bar)baz')
   normal 0fbsra([
-  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #62')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0],  'failed at #62')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #62')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #62')
+  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #77')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0],  'failed at #77')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #77')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #77')
 
   %delete
 
@@ -553,248 +646,248 @@ function! s:suite.charwise_n_positioning() abort "{{{
   call operator#sandwich#set('replace', 'char', 'cursor', 'keep')
   let g:operator#sandwich#recipes = [{'buns': ['((', '))'], 'input': ['(']}, {'buns': ['[', ']']}]
 
-  " #63
+  " #78
   call setline('.', 'foo((bar))baz')
   normal 0srii[
-  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #63')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0],  'failed at #63')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #63')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #63')
+  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #78')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0],  'failed at #78')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #78')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #78')
 
-  " #64
+  " #79
   call setline('.', 'foo((bar))baz')
   normal 02lsrii[
-  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #64')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0],  'failed at #64')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #64')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #64')
+  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #79')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0],  'failed at #79')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #79')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #79')
 
-  " #65
+  " #80
   call setline('.', 'foo((bar))baz')
   normal 03lsrii[
-  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #65')
-  call g:assert.equals(getpos('.'),  [0, 1, 4, 0],  'failed at #65')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #65')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #65')
+  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #80')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0],  'failed at #80')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #80')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #80')
 
-  " #66
+  " #81
   call setline('.', 'foo((bar))baz')
   normal 04lsrii[
-  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #66')
-  call g:assert.equals(getpos('.'),  [0, 1, 4, 0],  'failed at #66')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #66')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #66')
+  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #81')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0],  'failed at #81')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #81')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #81')
 
-  " #67
+  " #82
   call setline('.', 'foo((bar))baz')
   normal 05lsrii[
-  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #67')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0],  'failed at #67')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #67')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #67')
+  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #82')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0],  'failed at #82')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #82')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #82')
 
-  " #68
+  " #83
   call setline('.', 'foo((bar))baz')
   normal 07lsrii[
-  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #68')
-  call g:assert.equals(getpos('.'),  [0, 1, 7, 0],  'failed at #68')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #68')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #68')
+  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #83')
+  call g:assert.equals(getpos('.'),  [0, 1, 7, 0],  'failed at #83')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #83')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #83')
 
-  " #69
+  " #84
   call setline('.', 'foo((bar))baz')
   normal 08lsrii[
-  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #69')
-  call g:assert.equals(getpos('.'),  [0, 1, 8, 0],  'failed at #69')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #69')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #69')
+  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #84')
+  call g:assert.equals(getpos('.'),  [0, 1, 8, 0],  'failed at #84')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #84')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #84')
 
-  " #70
+  " #85
   call setline('.', 'foo((bar))baz')
   normal 09lsrii[
-  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #70')
-  call g:assert.equals(getpos('.'),  [0, 1, 8, 0],  'failed at #70')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #70')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #70')
+  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #85')
+  call g:assert.equals(getpos('.'),  [0, 1, 8, 0],  'failed at #85')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #85')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #85')
 
-  " #71
+  " #86
   call setline('.', 'foo((bar))baz')
   normal 010lsrii[
-  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #71')
-  call g:assert.equals(getpos('.'),  [0, 1, 9, 0],  'failed at #71')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #71')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #71')
+  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #86')
+  call g:assert.equals(getpos('.'),  [0, 1, 9, 0],  'failed at #86')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #86')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #86')
 
-  " #72
+  " #87
   call setline('.', 'foo((bar))baz')
   normal 012lsrii[
-  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #72')
-  call g:assert.equals(getpos('.'),  [0, 1, 11, 0], 'failed at #72')
-  call g:assert.equals(getpos("'["), [0, 1,  4, 0], 'failed at #72')
-  call g:assert.equals(getpos("']"), [0, 1,  9, 0], 'failed at #72')
+  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #87')
+  call g:assert.equals(getpos('.'),  [0, 1, 11, 0], 'failed at #87')
+  call g:assert.equals(getpos("'["), [0, 1,  4, 0], 'failed at #87')
+  call g:assert.equals(getpos("']"), [0, 1,  9, 0], 'failed at #87')
 
-  " #73
+  " #88
   call setline('.', 'foo[[bar]]baz')
   normal 03lsrii(
-  call g:assert.equals(getline('.'), 'foo(([bar]))baz', 'failed at #73')
-  call g:assert.equals(getpos('.'),  [0, 1,  4, 0],     'failed at #73')
-  call g:assert.equals(getpos("'["), [0, 1,  4, 0],     'failed at #73')
-  call g:assert.equals(getpos("']"), [0, 1, 13, 0],     'failed at #73')
+  call g:assert.equals(getline('.'), 'foo(([bar]))baz', 'failed at #88')
+  call g:assert.equals(getpos('.'),  [0, 1,  4, 0],     'failed at #88')
+  call g:assert.equals(getpos("'["), [0, 1,  4, 0],     'failed at #88')
+  call g:assert.equals(getpos("']"), [0, 1, 13, 0],     'failed at #88')
 
-  " #74
+  " #89
   call setline('.', 'foo[[bar]]baz')
   normal 09lsrii(
-  call g:assert.equals(getline('.'), 'foo(([bar]))baz', 'failed at #74')
-  call g:assert.equals(getpos('.'),  [0, 1, 11, 0],     'failed at #74')
-  call g:assert.equals(getpos("'["), [0, 1,  4, 0],     'failed at #74')
-  call g:assert.equals(getpos("']"), [0, 1, 13, 0],     'failed at #74')
+  call g:assert.equals(getline('.'), 'foo(([bar]))baz', 'failed at #89')
+  call g:assert.equals(getpos('.'),  [0, 1, 11, 0],     'failed at #89')
+  call g:assert.equals(getpos("'["), [0, 1,  4, 0],     'failed at #89')
+  call g:assert.equals(getpos("']"), [0, 1, 13, 0],     'failed at #89')
 
   ounmap ii
   call operator#sandwich#set('replace', 'char', 'cursor', 'inner_head')
   unlet g:operator#sandwich#recipes
 
-  " #75
+  " #90
   set whichwrap=h,l
   call append(0, ['(foo', 'bar', 'baz)'])
   normal ggsr13l[
-  call g:assert.equals(getline(1),   '[foo',       'failed at #75')
-  call g:assert.equals(getline(2),   'bar',        'failed at #75')
-  call g:assert.equals(getline(3),   'baz]',       'failed at #75')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #75')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #75')
-  call g:assert.equals(getpos("']"), [0, 3, 5, 0], 'failed at #75')
+  call g:assert.equals(getline(1),   '[foo',       'failed at #90')
+  call g:assert.equals(getline(2),   'bar',        'failed at #90')
+  call g:assert.equals(getline(3),   'baz]',       'failed at #90')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #90')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #90')
+  call g:assert.equals(getpos("']"), [0, 3, 5, 0], 'failed at #90')
   set whichwrap&
 endfunction
 "}}}
 function! s:suite.charwise_n_a_character() abort "{{{
-  " #76
+  " #91
   call setline('.', '(a)')
   normal 0sra([
-  call g:assert.equals(getline('.'), '[a]',        'failed at #76')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #76')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #76')
-  call g:assert.equals(getpos("']"), [0, 1, 4, 0], 'failed at #76')
+  call g:assert.equals(getline('.'), '[a]',        'failed at #91')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #91')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #91')
+  call g:assert.equals(getpos("']"), [0, 1, 4, 0], 'failed at #91')
 
   %delete
 
-  " #77
+  " #92
   call append(0, ['(', 'a', ')'])
   normal ggsra([
-  call g:assert.equals(getline(1),   '[',          'failed at #77')
-  call g:assert.equals(getline(2),   'a',          'failed at #77')
-  call g:assert.equals(getline(3),   ']',          'failed at #77')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #77')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #77')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #77')
+  call g:assert.equals(getline(1),   '[',          'failed at #92')
+  call g:assert.equals(getline(2),   'a',          'failed at #92')
+  call g:assert.equals(getline(3),   ']',          'failed at #92')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #92')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #92')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #92')
 
   %delete
 
-  " #78
+  " #93
   call append(0, ['(a', ')'])
   normal ggsra([
-  call g:assert.equals(getline(1),   '[a',         'failed at #78')
-  call g:assert.equals(getline(2),   ']',          'failed at #78')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #78')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #78')
-  call g:assert.equals(getpos("']"), [0, 2, 2, 0], 'failed at #78')
+  call g:assert.equals(getline(1),   '[a',         'failed at #93')
+  call g:assert.equals(getline(2),   ']',          'failed at #93')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #93')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #93')
+  call g:assert.equals(getpos("']"), [0, 2, 2, 0], 'failed at #93')
 
   %delete
 
-  " #79
+  " #94
   call append(0, ['(', 'a)'])
   normal ggsra([
-  call g:assert.equals(getline(1),   '[',          'failed at #79')
-  call g:assert.equals(getline(2),   'a]',         'failed at #79')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #79')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #79')
-  call g:assert.equals(getpos("']"), [0, 2, 3, 0], 'failed at #79')
+  call g:assert.equals(getline(1),   '[',          'failed at #94')
+  call g:assert.equals(getline(2),   'a]',         'failed at #94')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #94')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #94')
+  call g:assert.equals(getpos("']"), [0, 2, 3, 0], 'failed at #94')
 endfunction
 "}}}
 function! s:suite.charwise_n_nothing_inside() abort "{{{
-  " #80
+  " #95
   call setline('.', '()')
   normal 0sra([
-  call g:assert.equals(getline('.'), '[]',         'failed at #80')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #80')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #80')
-  call g:assert.equals(getpos("']"), [0, 1, 3, 0], 'failed at #80')
+  call g:assert.equals(getline('.'), '[]',         'failed at #95')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #95')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #95')
+  call g:assert.equals(getpos("']"), [0, 1, 3, 0], 'failed at #95')
 
-  " #81
+  " #96
   call setline('.', 'foo()bar')
   normal 03lsra([
-  call g:assert.equals(getline('.'), 'foo[]bar',   'failed at #81')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #81')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #81')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #81')
+  call g:assert.equals(getline('.'), 'foo[]bar',   'failed at #96')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #96')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #96')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #96')
 
   %delete
 
-  " #82
+  " #97
   call append(0, ['(', ')'])
   normal ggsra([
-  call g:assert.equals(getline(1),   '[',          'failed at #82')
-  call g:assert.equals(getline(2),   ']',          'failed at #82')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #82')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #82')
-  call g:assert.equals(getpos("']"), [0, 2, 2, 0], 'failed at #82')
+  call g:assert.equals(getline(1),   '[',          'failed at #97')
+  call g:assert.equals(getline(2),   ']',          'failed at #97')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #97')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #97')
+  call g:assert.equals(getpos("']"), [0, 2, 2, 0], 'failed at #97')
 endfunction
 "}}}
 function! s:suite.charwise_n_count() abort "{{{
-  " #83
+  " #98
   call setline('.', '([foo])')
   normal 02sr%[(
-  call g:assert.equals(getline('.'), '[(foo)]',    'failed at #83')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #83')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #83')
-  call g:assert.equals(getpos("']"), [0, 1, 8, 0], 'failed at #83')
+  call g:assert.equals(getline('.'), '[(foo)]',    'failed at #98')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #98')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #98')
+  call g:assert.equals(getpos("']"), [0, 1, 8, 0], 'failed at #98')
 
-  " #84
+  " #99
   call setline('.', '[({foo})]')
   normal 03sr%{[(
-  call g:assert.equals(getline('.'), '{[(foo)]}',   'failed at #84')
-  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #84')
-  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #84')
-  call g:assert.equals(getpos("']"), [0, 1, 10, 0], 'failed at #84')
+  call g:assert.equals(getline('.'), '{[(foo)]}',   'failed at #99')
+  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #99')
+  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #99')
+  call g:assert.equals(getpos("']"), [0, 1, 10, 0], 'failed at #99')
 
-  " #85
+  " #100
   call setline('.', '[foo ]bar')
   normal 0sr6l(
-  call g:assert.equals(getline('.'), '(foo )bar',  'failed at #85')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #85')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #85')
-  call g:assert.equals(getpos("']"), [0, 1, 7, 0], 'failed at #85')
+  call g:assert.equals(getline('.'), '(foo )bar',  'failed at #100')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #100')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #100')
+  call g:assert.equals(getpos("']"), [0, 1, 7, 0], 'failed at #100')
 
-  " #86
+  " #101
   call setline('.', '[foo bar]')
   normal 0sr9l(
-  call g:assert.equals(getline('.'), '(foo bar)',   'failed at #86')
-  call g:assert.equals(getpos('.'),  [0, 1,  2, 0], 'failed at #86')
-  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #86')
-  call g:assert.equals(getpos("']"), [0, 1, 10, 0], 'failed at #86')
+  call g:assert.equals(getline('.'), '(foo bar)',   'failed at #101')
+  call g:assert.equals(getpos('.'),  [0, 1,  2, 0], 'failed at #101')
+  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #101')
+  call g:assert.equals(getpos("']"), [0, 1, 10, 0], 'failed at #101')
 
-  " #87
+  " #102
   call setline('.', '{[foo bar]}')
   normal 02sr11l[(
-  call g:assert.equals(getline('.'), '[(foo bar)]', 'failed at #87')
-  call g:assert.equals(getpos('.'),  [0, 1,  3, 0], 'failed at #87')
-  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #87')
-  call g:assert.equals(getpos("']"), [0, 1, 12, 0], 'failed at #87')
+  call g:assert.equals(getline('.'), '[(foo bar)]', 'failed at #102')
+  call g:assert.equals(getpos('.'),  [0, 1,  3, 0], 'failed at #102')
+  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #102')
+  call g:assert.equals(getpos("']"), [0, 1, 12, 0], 'failed at #102')
 
-  " #88
+  " #103
   call setline('.', 'foo{[bar]}baz')
   normal 03l2sr7l[(
-  call g:assert.equals(getline('.'), 'foo[(bar)]baz', 'failed at #88')
-  call g:assert.equals(getpos('.'),  [0, 1,  6, 0],   'failed at #88')
-  call g:assert.equals(getpos("'["), [0, 1,  4, 0],   'failed at #88')
-  call g:assert.equals(getpos("']"), [0, 1, 11, 0],   'failed at #88')
+  call g:assert.equals(getline('.'), 'foo[(bar)]baz', 'failed at #103')
+  call g:assert.equals(getpos('.'),  [0, 1,  6, 0],   'failed at #103')
+  call g:assert.equals(getpos("'["), [0, 1,  4, 0],   'failed at #103')
+  call g:assert.equals(getpos("']"), [0, 1, 11, 0],   'failed at #103')
 
-  " #89
+  " #104
   call setline('.', 'foo({[bar]})baz')
   normal 03l3sr9l{[(
-  call g:assert.equals(getline('.'), 'foo{[(bar)]}baz', 'failed at #89')
-  call g:assert.equals(getpos('.'),  [0, 1,  7, 0],     'failed at #89')
-  call g:assert.equals(getpos("'["), [0, 1,  4, 0],     'failed at #89')
-  call g:assert.equals(getpos("']"), [0, 1, 13, 0],     'failed at #89')
+  call g:assert.equals(getline('.'), 'foo{[(bar)]}baz', 'failed at #104')
+  call g:assert.equals(getpos('.'),  [0, 1,  7, 0],     'failed at #104')
+  call g:assert.equals(getpos("'["), [0, 1,  4, 0],     'failed at #104')
+  call g:assert.equals(getpos("']"), [0, 1, 13, 0],     'failed at #104')
 endfunction
 "}}}
 function! s:suite.charwise_n_breaking() abort "{{{
@@ -805,761 +898,581 @@ function! s:suite.charwise_n_breaking() abort "{{{
         \   {'buns': ["bb\nbbb\nbb", "bb\nbbb\nbb"], 'input':['b']},
         \ ]
 
-  " #90
+  " #105
   call append(0, ['aa', 'aaafooaaa', 'aa'])
   normal ggsr15l(
-  call g:assert.equals(getline(1),   '(foo)',      'failed at #90')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #90')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #90')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #90')
+  call g:assert.equals(getline(1),   '(foo)',      'failed at #105')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #105')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #105')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #105')
 
   %delete
 
-  " #91
+  " #106
   call append(0, ['bb', 'bbb', 'bbfoobb', 'bbb', 'bb'])
   normal ggsr21l(
-  call g:assert.equals(getline(1),   '(foo)',      'failed at #91')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #91')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #91')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #91')
+  call g:assert.equals(getline(1),   '(foo)',      'failed at #106')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #106')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #106')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #106')
 
   %delete
 
-  " #92
+  " #107
   call setline('.', '(foo)')
   normal 0sr5la
-  call g:assert.equals(getline(1),   'aa',         'failed at #92')
-  call g:assert.equals(getline(2),   'aaafooaaa',  'failed at #92')
-  call g:assert.equals(getline(3),   'aa',         'failed at #92')
-  call g:assert.equals(getpos('.'),  [0, 2, 4, 0], 'failed at #92')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #92')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #92')
+  call g:assert.equals(getline(1),   'aa',         'failed at #107')
+  call g:assert.equals(getline(2),   'aaafooaaa',  'failed at #107')
+  call g:assert.equals(getline(3),   'aa',         'failed at #107')
+  call g:assert.equals(getpos('.'),  [0, 2, 4, 0], 'failed at #107')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #107')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #107')
 
   %delete
 
-  " #93
+  " #108
   call setline('.', '(foo)')
   normal 0sr5lb
-  call g:assert.equals(getline(1),   'bb',         'failed at #93')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #93')
-  call g:assert.equals(getline(3),   'bbfoobb',    'failed at #93')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #93')
-  call g:assert.equals(getline(5),   'bb',         'failed at #93')
-  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #93')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #93')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #93')
+  call g:assert.equals(getline(1),   'bb',         'failed at #108')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #108')
+  call g:assert.equals(getline(3),   'bbfoobb',    'failed at #108')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #108')
+  call g:assert.equals(getline(5),   'bb',         'failed at #108')
+  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #108')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #108')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #108')
 
   %delete
 
-  " #94
+  " #109
   call append(0, ['aa', 'aaafooaaa', 'aa'])
   normal ggsr15lb
-  call g:assert.equals(getline(1),   'bb',         'failed at #94')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #94')
-  call g:assert.equals(getline(3),   'bbfoobb',    'failed at #94')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #94')
-  call g:assert.equals(getline(5),   'bb',         'failed at #94')
-  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #94')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #94')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #94')
+  call g:assert.equals(getline(1),   'bb',         'failed at #109')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #109')
+  call g:assert.equals(getline(3),   'bbfoobb',    'failed at #109')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #109')
+  call g:assert.equals(getline(5),   'bb',         'failed at #109')
+  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #109')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #109')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #109')
 
   %delete
 
-  " #95
+  " #110
   call append(0, ['bb', 'bbb', 'bbfoobb', 'bbb', 'bb'])
   normal ggsr21la
-  call g:assert.equals(getline(1),   'aa',         'failed at #95')
-  call g:assert.equals(getline(2),   'aaafooaaa',  'failed at #95')
-  call g:assert.equals(getline(3),   'aa',         'failed at #95')
-  call g:assert.equals(getpos('.'),  [0, 2, 4, 0], 'failed at #95')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #95')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #95')
+  call g:assert.equals(getline(1),   'aa',         'failed at #110')
+  call g:assert.equals(getline(2),   'aaafooaaa',  'failed at #110')
+  call g:assert.equals(getline(3),   'aa',         'failed at #110')
+  call g:assert.equals(getpos('.'),  [0, 2, 4, 0], 'failed at #110')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #110')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #110')
 
   %delete
 
-  " #96
+  " #111
   call append(0, ['aa', 'aaaaa', 'aaafooaaa', 'aaaaa', 'aa'])
   normal gg2sr27lbb
-  call g:assert.equals(getline(1),   'bb',         'failed at #96')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #96')
-  call g:assert.equals(getline(3),   'bbbb',       'failed at #96')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #96')
-  call g:assert.equals(getline(5),   'bbfoobb',    'failed at #96')
-  call g:assert.equals(getline(6),   'bbb',        'failed at #96')
-  call g:assert.equals(getline(7),   'bbbb',       'failed at #96')
-  call g:assert.equals(getline(8),   'bbb',        'failed at #96')
-  call g:assert.equals(getline(9),   'bb',         'failed at #96')
-  call g:assert.equals(getpos('.'),  [0, 5, 3, 0], 'failed at #96')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #96')
-  call g:assert.equals(getpos("']"), [0, 9, 3, 0], 'failed at #96')
+  call g:assert.equals(getline(1),   'bb',         'failed at #111')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #111')
+  call g:assert.equals(getline(3),   'bbbb',       'failed at #111')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #111')
+  call g:assert.equals(getline(5),   'bbfoobb',    'failed at #111')
+  call g:assert.equals(getline(6),   'bbb',        'failed at #111')
+  call g:assert.equals(getline(7),   'bbbb',       'failed at #111')
+  call g:assert.equals(getline(8),   'bbb',        'failed at #111')
+  call g:assert.equals(getline(9),   'bb',         'failed at #111')
+  call g:assert.equals(getpos('.'),  [0, 5, 3, 0], 'failed at #111')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #111')
+  call g:assert.equals(getpos("']"), [0, 9, 3, 0], 'failed at #111')
 
   %delete
 
-  " #97
+  " #112
   call append(0, ['bb', 'bbb', 'bbbb', 'bbb', 'bbfoobb', 'bbb', 'bbbb', 'bbb', 'bb'])
   normal gg2sr39laa
-  call g:assert.equals(getline(1),   'aa',         'failed at #97')
-  call g:assert.equals(getline(2),   'aaaaa',      'failed at #97')
-  call g:assert.equals(getline(3),   'aaafooaaa',  'failed at #97')
-  call g:assert.equals(getline(4),   'aaaaa',      'failed at #97')
-  call g:assert.equals(getline(5),   'aa',         'failed at #97')
-  call g:assert.equals(getpos('.'),  [0, 3, 4, 0], 'failed at #97')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #97')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #97')
+  call g:assert.equals(getline(1),   'aa',         'failed at #112')
+  call g:assert.equals(getline(2),   'aaaaa',      'failed at #112')
+  call g:assert.equals(getline(3),   'aaafooaaa',  'failed at #112')
+  call g:assert.equals(getline(4),   'aaaaa',      'failed at #112')
+  call g:assert.equals(getline(5),   'aa',         'failed at #112')
+  call g:assert.equals(getpos('.'),  [0, 3, 4, 0], 'failed at #112')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #112')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #112')
 
   %delete
   call operator#sandwich#set('replace', 'char', 'cursor', 'keep')
   onoremap ii :<C-u>call TextobjCoord(1, 4, 1, 8)<CR>
 
-  " #98
+  " #113
   call setline('.', ['foo(bar)baz'])
   normal 0sriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #98')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #98')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #98')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #98')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #98')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #98')
-
-  %delete
-
-  " #99
-  call setline('.', ['foo(bar)baz'])
-  normal 02lsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #99')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #99')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #99')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #99')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #99')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #99')
-
-  %delete
-
-  " #100
-  call setline('.', ['foo(bar)baz'])
-  normal 03lsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #100')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #100')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #100')
-  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #100')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #100')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #100')
-
-  %delete
-
-  " #101
-  call setline('.', ['foo(bar)baz'])
-  normal 04lsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #101')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #101')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #101')
-  call g:assert.equals(getpos('.'),  [0, 2, 4, 0], 'failed at #101')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #101')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #101')
-
-  %delete
-
-  " #102
-  call setline('.', ['foo(bar)baz'])
-  normal 06lsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #102')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #102')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #102')
-  call g:assert.equals(getpos('.'),  [0, 2, 6, 0], 'failed at #102')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #102')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #102')
-
-  %delete
-
-  " #103
-  call setline('.', ['foo(bar)baz'])
-  normal 07lsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #103')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #103')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #103')
-  call g:assert.equals(getpos('.'),  [0, 2, 7, 0], 'failed at #103')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #103')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #103')
-
-  %delete
-
-  " #104
-  call setline('.', ['foo(bar)baz'])
-  normal 08lsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #104')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #104')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #104')
-  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #104')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #104')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #104')
-
-  %delete
-
-  " #105
-  call setline('.', ['foo(bar)baz'])
-  normal 010lsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #105')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #105')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #105')
-  call g:assert.equals(getpos('.'),  [0, 3, 5, 0], 'failed at #105')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #105')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #105')
-
-  %delete
-  onoremap ii :<C-u>call TextobjCoord(1, 4, 3, 2)<CR>
-
-  " #106
-  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal ggsrii(
-  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #106')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0],  'failed at #106')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #106')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #106')
-
-  %delete
-
-  " #107
-  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal gg2lsrii(
-  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #107')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0],  'failed at #107')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #107')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #107')
-
-  %delete
-
-  " #108
-  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal gg3lsrii(
-  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #108')
-  call g:assert.equals(getpos('.'),  [0, 1, 4, 0],  'failed at #108')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #108')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #108')
-
-  %delete
-
-  " #109
-  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal gg4lsrii(
-  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #109')
-  call g:assert.equals(getpos('.'),  [0, 1, 4, 0],  'failed at #109')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #109')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #109')
-
-  %delete
-
-  " #110
-  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal ggjsrii(
-  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #110')
-  call g:assert.equals(getpos('.'),  [0, 1, 4, 0],  'failed at #110')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #110')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #110')
-
-  %delete
-
-  " #111
-  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal ggj2lsrii(
-  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #111')
-  call g:assert.equals(getpos('.'),  [0, 1, 4, 0],  'failed at #111')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #111')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #111')
-
-  %delete
-
-  " #112
-  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal ggj3lsrii(
-  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #112')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0],  'failed at #112')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #112')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #112')
-
-  %delete
-
-  " #113
-  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal ggj5lsrii(
-  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #113')
-  call g:assert.equals(getpos('.'),  [0, 1, 7, 0],  'failed at #113')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #113')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #113')
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #113')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #113')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #113')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #113')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #113')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #113')
 
   %delete
 
   " #114
-  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal ggj6lsrii(
-  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #114')
-  call g:assert.equals(getpos('.'),  [0, 1, 8, 0],  'failed at #114')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #114')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #114')
+  call setline('.', ['foo(bar)baz'])
+  normal 02lsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #114')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #114')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #114')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #114')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #114')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #114')
 
   %delete
 
   " #115
-  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal ggj8lsrii(
-  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #115')
-  call g:assert.equals(getpos('.'),  [0, 1, 8, 0],  'failed at #115')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #115')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #115')
+  call setline('.', ['foo(bar)baz'])
+  normal 03lsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #115')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #115')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #115')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #115')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #115')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #115')
 
   %delete
 
   " #116
-  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal gg2jsrii(
-  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #116')
-  call g:assert.equals(getpos('.'),  [0, 1, 8, 0],  'failed at #116')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #116')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #116')
+  call setline('.', ['foo(bar)baz'])
+  normal 04lsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #116')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #116')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #116')
+  call g:assert.equals(getpos('.'),  [0, 2, 4, 0], 'failed at #116')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #116')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #116')
 
   %delete
 
   " #117
-  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal gg2jlsrii(
-  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #117')
-  call g:assert.equals(getpos('.'),  [0, 1, 8, 0],  'failed at #117')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #117')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #117')
+  call setline('.', ['foo(bar)baz'])
+  normal 06lsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #117')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #117')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #117')
+  call g:assert.equals(getpos('.'),  [0, 2, 6, 0], 'failed at #117')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #117')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #117')
 
   %delete
 
   " #118
-  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal gg2j2lsrii(
-  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #118')
-  call g:assert.equals(getpos('.'),  [0, 1, 9, 0],  'failed at #118')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #118')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #118')
+  call setline('.', ['foo(bar)baz'])
+  normal 07lsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #118')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #118')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #118')
+  call g:assert.equals(getpos('.'),  [0, 2, 7, 0], 'failed at #118')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #118')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #118')
 
   %delete
 
   " #119
-  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal gg2j4lsrii(
-  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #119')
-  call g:assert.equals(getpos('.'),  [0, 1, 11, 0], 'failed at #119')
-  call g:assert.equals(getpos("'["), [0, 1,  4, 0], 'failed at #119')
-  call g:assert.equals(getpos("']"), [0, 1,  9, 0], 'failed at #119')
+  call setline('.', ['foo(bar)baz'])
+  normal 08lsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #119')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #119')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #119')
+  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #119')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #119')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #119')
 
   %delete
 
   " #120
-  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal ggsriib
-  call g:assert.equals(getline(1),   'foobb',      'failed at #120')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #120')
-  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #120')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #120')
-  call g:assert.equals(getline(5),   'bbbaz',      'failed at #120')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #120')
+  call setline('.', ['foo(bar)baz'])
+  normal 010lsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #120')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #120')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #120')
+  call g:assert.equals(getpos('.'),  [0, 3, 5, 0], 'failed at #120')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #120')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #120')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #120')
 
   %delete
+  onoremap ii :<C-u>call TextobjCoord(1, 4, 3, 2)<CR>
 
   " #121
   call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal gg2lsriib
-  call g:assert.equals(getline(1),   'foobb',      'failed at #121')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #121')
-  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #121')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #121')
-  call g:assert.equals(getline(5),   'bbbaz',      'failed at #121')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #121')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #121')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #121')
+  normal ggsrii(
+  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #121')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0],  'failed at #121')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #121')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #121')
 
   %delete
 
   " #122
   call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal gg3lsriib
-  call g:assert.equals(getline(1),   'foobb',      'failed at #122')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #122')
-  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #122')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #122')
-  call g:assert.equals(getline(5),   'bbbaz',      'failed at #122')
-  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #122')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #122')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #122')
+  normal gg2lsrii(
+  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #122')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0],  'failed at #122')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #122')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #122')
 
   %delete
 
   " #123
   call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal gg4lsriib
-  call g:assert.equals(getline(1),   'foobb',      'failed at #123')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #123')
-  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #123')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #123')
-  call g:assert.equals(getline(5),   'bbbaz',      'failed at #123')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #123')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #123')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #123')
+  normal gg3lsrii(
+  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #123')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0],  'failed at #123')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #123')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #123')
 
   %delete
 
   " #124
   call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal ggjsriib
-  call g:assert.equals(getline(1),   'foobb',      'failed at #124')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #124')
-  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #124')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #124')
-  call g:assert.equals(getline(5),   'bbbaz',      'failed at #124')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #124')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #124')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #124')
+  normal gg4lsrii(
+  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #124')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0],  'failed at #124')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #124')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #124')
 
   %delete
 
   " #125
   call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal ggjlsriib
-  call g:assert.equals(getline(1),   'foobb',      'failed at #125')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #125')
-  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #125')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #125')
-  call g:assert.equals(getline(5),   'bbbaz',      'failed at #125')
-  call g:assert.equals(getpos('.'),  [0, 2, 2, 0], 'failed at #125')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #125')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #125')
+  normal ggjsrii(
+  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #125')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0],  'failed at #125')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #125')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #125')
 
   %delete
 
   " #126
   call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal ggj2lsriib
-  call g:assert.equals(getline(1),   'foobb',      'failed at #126')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #126')
-  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #126')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #126')
-  call g:assert.equals(getline(5),   'bbbaz',      'failed at #126')
-  call g:assert.equals(getpos('.'),  [0, 2, 3, 0], 'failed at #126')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #126')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #126')
+  normal ggj2lsrii(
+  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #126')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0],  'failed at #126')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #126')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #126')
 
   %delete
 
   " #127
   call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal ggj3lsriib
-  call g:assert.equals(getline(1),   'foobb',      'failed at #127')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #127')
-  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #127')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #127')
-  call g:assert.equals(getline(5),   'bbbaz',      'failed at #127')
-  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #127')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #127')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #127')
+  normal ggj3lsrii(
+  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #127')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0],  'failed at #127')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #127')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #127')
 
   %delete
 
   " #128
   call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal ggj5lsriib
-  call g:assert.equals(getline(1),   'foobb',      'failed at #128')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #128')
-  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #128')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #128')
-  call g:assert.equals(getline(5),   'bbbaz',      'failed at #128')
-  call g:assert.equals(getpos('.'),  [0, 3, 5, 0], 'failed at #128')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #128')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #128')
+  normal ggj5lsrii(
+  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #128')
+  call g:assert.equals(getpos('.'),  [0, 1, 7, 0],  'failed at #128')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #128')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #128')
 
   %delete
 
   " #129
   call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal ggj6lsriib
-  call g:assert.equals(getline(1),   'foobb',      'failed at #129')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #129')
-  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #129')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #129')
-  call g:assert.equals(getline(5),   'bbbaz',      'failed at #129')
-  call g:assert.equals(getpos('.'),  [0, 3, 6, 0], 'failed at #129')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #129')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #129')
+  normal ggj6lsrii(
+  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #129')
+  call g:assert.equals(getpos('.'),  [0, 1, 8, 0],  'failed at #129')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #129')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #129')
 
   %delete
 
   " #130
   call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal ggj7lsriib
-  call g:assert.equals(getline(1),   'foobb',      'failed at #130')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #130')
-  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #130')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #130')
-  call g:assert.equals(getline(5),   'bbbaz',      'failed at #130')
-  call g:assert.equals(getpos('.'),  [0, 3, 7, 0], 'failed at #130')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #130')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #130')
+  normal ggj8lsrii(
+  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #130')
+  call g:assert.equals(getpos('.'),  [0, 1, 8, 0],  'failed at #130')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #130')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #130')
 
   %delete
 
   " #131
   call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal ggj8lsriib
-  call g:assert.equals(getline(1),   'foobb',      'failed at #131')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #131')
-  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #131')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #131')
-  call g:assert.equals(getline(5),   'bbbaz',      'failed at #131')
-  call g:assert.equals(getpos('.'),  [0, 3, 7, 0], 'failed at #131')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #131')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #131')
+  normal gg2jsrii(
+  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #131')
+  call g:assert.equals(getpos('.'),  [0, 1, 8, 0],  'failed at #131')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #131')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #131')
 
   %delete
 
   " #132
   call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal gg2jsriib
-  call g:assert.equals(getline(1),   'foobb',      'failed at #132')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #132')
-  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #132')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #132')
-  call g:assert.equals(getline(5),   'bbbaz',      'failed at #132')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #132')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #132')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #132')
+  normal gg2jlsrii(
+  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #132')
+  call g:assert.equals(getpos('.'),  [0, 1, 8, 0],  'failed at #132')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #132')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #132')
 
   %delete
 
   " #133
   call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal gg2jlsriib
-  call g:assert.equals(getline(1),   'foobb',      'failed at #133')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #133')
-  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #133')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #133')
-  call g:assert.equals(getline(5),   'bbbaz',      'failed at #133')
-  call g:assert.equals(getpos('.'),  [0, 4, 2, 0], 'failed at #133')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #133')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #133')
+  normal gg2j2lsrii(
+  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #133')
+  call g:assert.equals(getpos('.'),  [0, 1, 9, 0],  'failed at #133')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #133')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #133')
 
   %delete
 
   " #134
   call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal gg2j2lsriib
-  call g:assert.equals(getline(1),   'foobb',      'failed at #134')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #134')
-  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #134')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #134')
-  call g:assert.equals(getline(5),   'bbbaz',      'failed at #134')
-  call g:assert.equals(getpos('.'),  [0, 5, 3, 0], 'failed at #134')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #134')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #134')
+  normal gg2j4lsrii(
+  call g:assert.equals(getline(1),   'foo(bar)baz', 'failed at #134')
+  call g:assert.equals(getpos('.'),  [0, 1, 11, 0], 'failed at #134')
+  call g:assert.equals(getpos("'["), [0, 1,  4, 0], 'failed at #134')
+  call g:assert.equals(getpos("']"), [0, 1,  9, 0], 'failed at #134')
 
   %delete
 
   " #135
   call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
-  normal gg2j4lsriib
+  normal ggsriib
   call g:assert.equals(getline(1),   'foobb',      'failed at #135')
   call g:assert.equals(getline(2),   'bbb',        'failed at #135')
   call g:assert.equals(getline(3),   'bbbarbb',    'failed at #135')
   call g:assert.equals(getline(4),   'bbb',        'failed at #135')
   call g:assert.equals(getline(5),   'bbbaz',      'failed at #135')
-  call g:assert.equals(getpos('.'),  [0, 5, 5, 0], 'failed at #135')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #135')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #135')
   call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #135')
 
   %delete
-  onoremap ii :<C-u>call TextobjCoord(1, 4, 5, 2)<CR>
 
   " #136
-  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal ggsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #136')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #136')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #136')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #136')
+  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
+  normal gg2lsriib
+  call g:assert.equals(getline(1),   'foobb',      'failed at #136')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #136')
+  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #136')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #136')
+  call g:assert.equals(getline(5),   'bbbaz',      'failed at #136')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #136')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #136')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #136')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #136')
 
   %delete
 
   " #137
-  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal gg2lsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #137')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #137')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #137')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #137')
+  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
+  normal gg3lsriib
+  call g:assert.equals(getline(1),   'foobb',      'failed at #137')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #137')
+  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #137')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #137')
+  call g:assert.equals(getline(5),   'bbbaz',      'failed at #137')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #137')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #137')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #137')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #137')
 
   %delete
 
   " #138
-  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal gg3lsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #138')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #138')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #138')
-  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #138')
+  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
+  normal gg4lsriib
+  call g:assert.equals(getline(1),   'foobb',      'failed at #138')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #138')
+  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #138')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #138')
+  call g:assert.equals(getline(5),   'bbbaz',      'failed at #138')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #138')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #138')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #138')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #138')
 
   %delete
 
   " #139
-  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal gg4lsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #139')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #139')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #139')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #139')
+  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
+  normal ggjsriib
+  call g:assert.equals(getline(1),   'foobb',      'failed at #139')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #139')
+  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #139')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #139')
+  call g:assert.equals(getline(5),   'bbbaz',      'failed at #139')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #139')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #139')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #139')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #139')
 
   %delete
 
   " #140
-  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal ggjsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #140')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #140')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #140')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #140')
+  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
+  normal ggjlsriib
+  call g:assert.equals(getline(1),   'foobb',      'failed at #140')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #140')
+  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #140')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #140')
+  call g:assert.equals(getline(5),   'bbbaz',      'failed at #140')
+  call g:assert.equals(getpos('.'),  [0, 2, 2, 0], 'failed at #140')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #140')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #140')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #140')
 
   %delete
 
   " #141
-  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal ggjlsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #141')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #141')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #141')
-  call g:assert.equals(getpos('.'),  [0, 2, 2, 0], 'failed at #141')
+  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
+  normal ggj2lsriib
+  call g:assert.equals(getline(1),   'foobb',      'failed at #141')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #141')
+  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #141')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #141')
+  call g:assert.equals(getline(5),   'bbbaz',      'failed at #141')
+  call g:assert.equals(getpos('.'),  [0, 2, 3, 0], 'failed at #141')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #141')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #141')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #141')
 
   %delete
 
   " #142
-  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal ggj2lsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #142')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #142')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #142')
-  call g:assert.equals(getpos('.'),  [0, 2, 3, 0], 'failed at #142')
+  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
+  normal ggj3lsriib
+  call g:assert.equals(getline(1),   'foobb',      'failed at #142')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #142')
+  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #142')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #142')
+  call g:assert.equals(getline(5),   'bbbaz',      'failed at #142')
+  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #142')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #142')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #142')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #142')
 
   %delete
 
   " #143
-  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal gg2jsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #143')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #143')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #143')
-  call g:assert.equals(getpos('.'),  [0, 2, 3, 0], 'failed at #143')
+  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
+  normal ggj5lsriib
+  call g:assert.equals(getline(1),   'foobb',      'failed at #143')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #143')
+  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #143')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #143')
+  call g:assert.equals(getline(5),   'bbbaz',      'failed at #143')
+  call g:assert.equals(getpos('.'),  [0, 3, 5, 0], 'failed at #143')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #143')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #143')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #143')
 
   %delete
 
   " #144
-  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal gg2jlsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #144')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #144')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #144')
-  call g:assert.equals(getpos('.'),  [0, 2, 3, 0], 'failed at #144')
+  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
+  normal ggj6lsriib
+  call g:assert.equals(getline(1),   'foobb',      'failed at #144')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #144')
+  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #144')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #144')
+  call g:assert.equals(getline(5),   'bbbaz',      'failed at #144')
+  call g:assert.equals(getpos('.'),  [0, 3, 6, 0], 'failed at #144')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #144')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #144')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #144')
 
   %delete
 
   " #145
-  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal gg2j2lsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #145')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #145')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #145')
-  call g:assert.equals(getpos('.'),  [0, 2, 4, 0], 'failed at #145')
+  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
+  normal ggj7lsriib
+  call g:assert.equals(getline(1),   'foobb',      'failed at #145')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #145')
+  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #145')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #145')
+  call g:assert.equals(getline(5),   'bbbaz',      'failed at #145')
+  call g:assert.equals(getpos('.'),  [0, 3, 7, 0], 'failed at #145')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #145')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #145')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #145')
 
   %delete
 
   " #146
-  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal gg2j4lsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #146')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #146')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #146')
-  call g:assert.equals(getpos('.'),  [0, 2, 6, 0], 'failed at #146')
+  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
+  normal ggj8lsriib
+  call g:assert.equals(getline(1),   'foobb',      'failed at #146')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #146')
+  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #146')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #146')
+  call g:assert.equals(getline(5),   'bbbaz',      'failed at #146')
+  call g:assert.equals(getpos('.'),  [0, 3, 7, 0], 'failed at #146')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #146')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #146')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #146')
 
   %delete
 
   " #147
-  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal gg2j5lsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #147')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #147')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #147')
-  call g:assert.equals(getpos('.'),  [0, 2, 7, 0], 'failed at #147')
+  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
+  normal gg2jsriib
+  call g:assert.equals(getline(1),   'foobb',      'failed at #147')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #147')
+  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #147')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #147')
+  call g:assert.equals(getline(5),   'bbbaz',      'failed at #147')
+  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #147')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #147')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #147')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #147')
 
   %delete
 
   " #148
-  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal gg2j6lsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #148')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #148')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #148')
-  call g:assert.equals(getpos('.'),  [0, 2, 8, 0], 'failed at #148')
+  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
+  normal gg2jlsriib
+  call g:assert.equals(getline(1),   'foobb',      'failed at #148')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #148')
+  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #148')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #148')
+  call g:assert.equals(getline(5),   'bbbaz',      'failed at #148')
+  call g:assert.equals(getpos('.'),  [0, 4, 2, 0], 'failed at #148')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #148')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #148')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #148')
 
   %delete
 
   " #149
-  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal gg3jsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #149')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #149')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #149')
-  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #149')
+  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
+  normal gg2j2lsriib
+  call g:assert.equals(getline(1),   'foobb',      'failed at #149')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #149')
+  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #149')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #149')
+  call g:assert.equals(getline(5),   'bbbaz',      'failed at #149')
+  call g:assert.equals(getpos('.'),  [0, 5, 3, 0], 'failed at #149')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #149')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #149')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #149')
 
   %delete
 
   " #150
-  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal gg3jlsriia
-  call g:assert.equals(getline(1),   'fooaa',      'failed at #150')
-  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #150')
-  call g:assert.equals(getline(3),   'aabaz',      'failed at #150')
-  call g:assert.equals(getpos('.'),  [0, 3, 2, 0], 'failed at #150')
+  call append(0, ['fooaa', 'aaabaraaa', 'aabaz'])
+  normal gg2j4lsriib
+  call g:assert.equals(getline(1),   'foobb',      'failed at #150')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #150')
+  call g:assert.equals(getline(3),   'bbbarbb',    'failed at #150')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #150')
+  call g:assert.equals(getline(5),   'bbbaz',      'failed at #150')
+  call g:assert.equals(getpos('.'),  [0, 5, 5, 0], 'failed at #150')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #150')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #150')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #150')
 
   %delete
+  onoremap ii :<C-u>call TextobjCoord(1, 4, 5, 2)<CR>
 
   " #151
   call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal gg3j2lsriia
+  normal ggsriia
   call g:assert.equals(getline(1),   'fooaa',      'failed at #151')
   call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #151')
   call g:assert.equals(getline(3),   'aabaz',      'failed at #151')
-  call g:assert.equals(getpos('.'),  [0, 3, 2, 0], 'failed at #151')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #151')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #151')
   call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #151')
 
@@ -1567,11 +1480,11 @@ function! s:suite.charwise_n_breaking() abort "{{{
 
   " #152
   call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal gg4jsriia
+  normal gg2lsriia
   call g:assert.equals(getline(1),   'fooaa',      'failed at #152')
   call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #152')
   call g:assert.equals(getline(3),   'aabaz',      'failed at #152')
-  call g:assert.equals(getpos('.'),  [0, 3, 2, 0], 'failed at #152')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #152')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #152')
   call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #152')
 
@@ -1579,11 +1492,11 @@ function! s:suite.charwise_n_breaking() abort "{{{
 
   " #153
   call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal gg4jlsriia
+  normal gg3lsriia
   call g:assert.equals(getline(1),   'fooaa',      'failed at #153')
   call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #153')
   call g:assert.equals(getline(3),   'aabaz',      'failed at #153')
-  call g:assert.equals(getpos('.'),  [0, 3, 2, 0], 'failed at #153')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #153')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #153')
   call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #153')
 
@@ -1591,11 +1504,11 @@ function! s:suite.charwise_n_breaking() abort "{{{
 
   " #154
   call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal gg4j2lsriia
+  normal gg4lsriia
   call g:assert.equals(getline(1),   'fooaa',      'failed at #154')
   call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #154')
   call g:assert.equals(getline(3),   'aabaz',      'failed at #154')
-  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #154')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #154')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #154')
   call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #154')
 
@@ -1603,13 +1516,193 @@ function! s:suite.charwise_n_breaking() abort "{{{
 
   " #155
   call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
-  normal gg4j4lsriia
+  normal ggjsriia
   call g:assert.equals(getline(1),   'fooaa',      'failed at #155')
   call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #155')
   call g:assert.equals(getline(3),   'aabaz',      'failed at #155')
-  call g:assert.equals(getpos('.'),  [0, 3, 5, 0], 'failed at #155')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #155')
   call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #155')
   call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #155')
+
+  %delete
+
+  " #156
+  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
+  normal ggjlsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #156')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #156')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #156')
+  call g:assert.equals(getpos('.'),  [0, 2, 2, 0], 'failed at #156')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #156')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #156')
+
+  %delete
+
+  " #157
+  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
+  normal ggj2lsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #157')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #157')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #157')
+  call g:assert.equals(getpos('.'),  [0, 2, 3, 0], 'failed at #157')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #157')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #157')
+
+  %delete
+
+  " #158
+  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
+  normal gg2jsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #158')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #158')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #158')
+  call g:assert.equals(getpos('.'),  [0, 2, 3, 0], 'failed at #158')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #158')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #158')
+
+  %delete
+
+  " #159
+  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
+  normal gg2jlsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #159')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #159')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #159')
+  call g:assert.equals(getpos('.'),  [0, 2, 3, 0], 'failed at #159')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #159')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #159')
+
+  %delete
+
+  " #160
+  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
+  normal gg2j2lsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #160')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #160')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #160')
+  call g:assert.equals(getpos('.'),  [0, 2, 4, 0], 'failed at #160')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #160')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #160')
+
+  %delete
+
+  " #161
+  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
+  normal gg2j4lsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #161')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #161')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #161')
+  call g:assert.equals(getpos('.'),  [0, 2, 6, 0], 'failed at #161')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #161')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #161')
+
+  %delete
+
+  " #162
+  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
+  normal gg2j5lsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #162')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #162')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #162')
+  call g:assert.equals(getpos('.'),  [0, 2, 7, 0], 'failed at #162')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #162')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #162')
+
+  %delete
+
+  " #163
+  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
+  normal gg2j6lsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #163')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #163')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #163')
+  call g:assert.equals(getpos('.'),  [0, 2, 8, 0], 'failed at #163')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #163')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #163')
+
+  %delete
+
+  " #164
+  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
+  normal gg3jsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #164')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #164')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #164')
+  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #164')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #164')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #164')
+
+  %delete
+
+  " #165
+  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
+  normal gg3jlsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #165')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #165')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #165')
+  call g:assert.equals(getpos('.'),  [0, 3, 2, 0], 'failed at #165')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #165')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #165')
+
+  %delete
+
+  " #166
+  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
+  normal gg3j2lsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #166')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #166')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #166')
+  call g:assert.equals(getpos('.'),  [0, 3, 2, 0], 'failed at #166')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #166')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #166')
+
+  %delete
+
+  " #167
+  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
+  normal gg4jsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #167')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #167')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #167')
+  call g:assert.equals(getpos('.'),  [0, 3, 2, 0], 'failed at #167')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #167')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #167')
+
+  %delete
+
+  " #168
+  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
+  normal gg4jlsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #168')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #168')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #168')
+  call g:assert.equals(getpos('.'),  [0, 3, 2, 0], 'failed at #168')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #168')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #168')
+
+  %delete
+
+  " #169
+  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
+  normal gg4j2lsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #169')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #169')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #169')
+  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #169')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #169')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #169')
+
+  %delete
+
+  " #170
+  call append(0, ['foobb', 'bbb', 'bbbarbb', 'bbb', 'bbbaz'])
+  normal gg4j4lsriia
+  call g:assert.equals(getline(1),   'fooaa',      'failed at #170')
+  call g:assert.equals(getline(2),   'aaabaraaa',  'failed at #170')
+  call g:assert.equals(getline(3),   'aabaz',      'failed at #170')
+  call g:assert.equals(getpos('.'),  [0, 3, 5, 0], 'failed at #170')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #170')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #170')
 
   ounmap ii
   call operator#sandwich#set('replace', 'char', 'cursor', 'inner_head')
@@ -1617,7 +1710,7 @@ function! s:suite.charwise_n_breaking() abort "{{{
   set whichwrap&
 endfunction
 "}}}
-function! s:suite.charwise_n_external_textobj() abort"{{{
+function! s:suite.charwise_n_external_textobj() abort "{{{
   let g:sandwich#recipes = []
   let g:operator#sandwich#recipes = [
         \   {'external': ['i{', 'a{']},
@@ -1626,25 +1719,25 @@ function! s:suite.charwise_n_external_textobj() abort"{{{
         \   {'external': ['it', 'at']},
         \ ]
 
-  " #156
+  " #171
   call setline('.', '{[(foo)]}')
   normal 02lsr5l"
-  call g:assert.equals(getline('.'), '{["foo"]}', 'failed at #156')
+  call g:assert.equals(getline('.'), '{["foo"]}', 'failed at #171')
 
-  " #157
+  " #172
   call setline('.', '{[(foo)]}')
   normal 0lsr7l"
-  call g:assert.equals(getline('.'), '{"(foo)"}', 'failed at #157')
+  call g:assert.equals(getline('.'), '{"(foo)"}', 'failed at #172')
 
-  " #158
+  " #173
   call setline('.', '{[(foo)]}')
   normal 0sr9l"
-  call g:assert.equals(getline('.'), '"[(foo)]"', 'failed at #158')
+  call g:assert.equals(getline('.'), '"[(foo)]"', 'failed at #173')
 
-  " #159
+  " #174
   call setline('.', '<title>foo</title>')
   normal 0sr$"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #159')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #174')
 
   unlet g:sandwich#recipes
   unlet g:operator#sandwich#recipes
@@ -1653,68 +1746,68 @@ endfunction
 function! s:suite.charwise_n_option_cursor() abort  "{{{
   """"" cursor
   """ inner_head
-  " #160
+  " #175
   call setline('.', '(((foo)))')
   normal 0l2sr%[[
-  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #160')
-  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #160')
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #175')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #175')
 
-  " #161
+  " #176
   normal 0sra([
-  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #161')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #161')
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #176')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #176')
 
   """ keep
-  " #162
+  " #177
   call operator#sandwich#set('replace', 'char', 'cursor', 'keep')
   call setline('.', '(((foo)))')
   normal 04l2sr2a([[
-  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #162')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #162')
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #177')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #177')
 
-  " #163
+  " #178
   normal lsra([
-  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #163')
-  call g:assert.equals(getpos('.'),  [0, 1, 6, 0], 'failed at #163')
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #178')
+  call g:assert.equals(getpos('.'),  [0, 1, 6, 0], 'failed at #178')
 
   """ inner_tail
-  " #164
+  " #179
   call operator#sandwich#set('replace', 'char', 'cursor', 'inner_tail')
   call setline('.', '(((foo)))')
   normal 04l2sr2a([[
-  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #164')
-  call g:assert.equals(getpos('.'),  [0, 1, 6, 0], 'failed at #164')
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #179')
+  call g:assert.equals(getpos('.'),  [0, 1, 6, 0], 'failed at #179')
 
-  " #165
+  " #180
   normal hsra([
-  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #165')
-  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #165')
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #180')
+  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #180')
 
   """ front
-  " #166
+  " #181
   call operator#sandwich#set('replace', 'char', 'cursor', 'front')
   call setline('.', '(((foo)))')
   normal 04l2sr2a([[
-  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #166')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #166')
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #181')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #181')
 
-  " #167
+  " #182
   normal 3lsra([
-  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #167')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #167')
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #182')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #182')
 
   """ end
-  " #168
+  " #183
   call operator#sandwich#set('replace', 'char', 'cursor', 'end')
   call setline('.', '(((foo)))')
   normal 04l2sr2a([[
-  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #168')
-  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #168')
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #183')
+  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #183')
 
-  " #169
+  " #184
   normal 3hsra([
-  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #169')
-  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #169')
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #184')
+  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #184')
 
   call operator#sandwich#set('replace', 'char', 'cursor', 'inner_head')
 endfunction
@@ -1727,27 +1820,27 @@ function! s:suite.charwise_n_option_noremap() abort  "{{{
   xnoremap a{ a(
 
   """ on
-  " #170
+  " #185
   call setline('.', '{(foo)}')
   normal 0sr7l"
-  call g:assert.equals(getline('.'), '"(foo)"', 'failed at #170')
+  call g:assert.equals(getline('.'), '"(foo)"', 'failed at #185')
 
-  " #171
+  " #186
   call setline('.', '{(foo)}')
   normal 0lsr5l"
-  call g:assert.equals(getline('.'), '{(foo)}', 'failed at #171')
+  call g:assert.equals(getline('.'), '{(foo)}', 'failed at #186')
 
   """ off
-  " #172
+  " #187
   call operator#sandwich#set('replace', 'char', 'noremap', 0)
   call setline('.', '{(foo)}')
   normal 0sr7l"
-  call g:assert.equals(getline('.'), '{(foo)}', 'failed at #172')
+  call g:assert.equals(getline('.'), '{(foo)}', 'failed at #187')
 
-  " #173
+  " #188
   call setline('.', '{(foo)}')
   normal 0lsr5l"
-  call g:assert.equals(getline('.'), '{"foo"}', 'failed at #173')
+  call g:assert.equals(getline('.'), '{"foo"}', 'failed at #188')
 
   unlet! g:sandwich#recipes
   unlet! g:operator#sandwich#recipes
@@ -1761,27 +1854,27 @@ function! s:suite.charwise_n_option_regex() abort  "{{{
   let g:operator#sandwich#recipes = [{'buns': ['\d\+', '\d\+']}]
 
   """ off
-  " #174
+  " #189
   call setline('.', '\d\+foo\d\+')
   normal 0sr$"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #174')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #189')
 
-  " #175
+  " #190
   call setline('.', '888foo888')
   normal 0sr$"
-  call g:assert.equals(getline('.'), '"88foo88"', 'failed at #175')
+  call g:assert.equals(getline('.'), '"88foo88"', 'failed at #190')
 
   """ on
   call operator#sandwich#set('replace', 'char', 'regex', 1)
-  " #176
+  " #191
   call setline('.', '\d\+foo\d\+')
   normal 0sr$"
-  call g:assert.equals(getline('.'), '\d\+foo\d\+', 'failed at #176')
+  call g:assert.equals(getline('.'), '\d\+foo\d\+', 'failed at #191')
 
-  " #177
+  " #192
   call setline('.', '888foo888')
   normal 0sr$"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #177')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #192')
 
   call operator#sandwich#set('replace', 'char', 'regex', 0)
   unlet! g:sandwich#recipes
@@ -1790,66 +1883,66 @@ endfunction
 "}}}
 function! s:suite.charwise_n_option_skip_space() abort  "{{{
   """ on
-  " #178
+  " #193
   call setline('.', '"foo"')
   normal 0sr$(
-  call g:assert.equals(getline('.'), '(foo)', 'failed at #178')
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #193')
 
-  " #179
+  " #194
   call setline('.', ' "foo"')
   normal 0sr$(
-  call g:assert.equals(getline('.'), ' (foo)', 'failed at #179')
+  call g:assert.equals(getline('.'), ' (foo)', 'failed at #194')
 
-  " #180
+  " #195
   call setline('.', '"foo" ')
   normal 0sr$(
-  call g:assert.equals(getline('.'), '(foo) ', 'failed at #180')
+  call g:assert.equals(getline('.'), '(foo) ', 'failed at #195')
 
-  " #181
+  " #196
   " do not skip!
   call setline('.', ' "foo" ')
   normal 0sr$(
-  call g:assert.equals(getline('.'), '("foo")', 'failed at #181')
+  call g:assert.equals(getline('.'), '("foo")', 'failed at #196')
 
   """ off
   call operator#sandwich#set('replace', 'char', 'skip_space', 0)
-  " #182
+  " #197
   call setline('.', '"foo"')
   normal 0sr$(
-  call g:assert.equals(getline('.'), '(foo)', 'failed at #182')
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #197')
 
-  " #183
+  " #198
   call setline('.', ' "foo"')
   normal 0sr$(
-  call g:assert.equals(getline('.'), ' "foo"', 'failed at #183')
+  call g:assert.equals(getline('.'), ' "foo"', 'failed at #198')
 
-  " #184
+  " #199
   call setline('.', '"foo" ')
   normal 0sr$(
-  call g:assert.equals(getline('.'), '"foo" ', 'failed at #184')
+  call g:assert.equals(getline('.'), '"foo" ', 'failed at #199')
 
-  " #185
+  " #200
   " do not skip!
   call setline('.', ' "foo" ')
   normal 0sr$(
-  call g:assert.equals(getline('.'), '("foo")', 'failed at #185')
+  call g:assert.equals(getline('.'), '("foo")', 'failed at #200')
 
   call operator#sandwich#set('replace', 'char', 'skip_space', 1)
 endfunction
 "}}}
 function! s:suite.charwise_n_option_skip_char() abort "{{{
   """ off
-  " #186
+  " #201
   call setline('.', 'aa(foo)bb')
   normal 0sr$"
-  call g:assert.equals(getline('.'), 'aa(foo)bb', 'failed at #186')
+  call g:assert.equals(getline('.'), 'aa(foo)bb', 'failed at #201')
 
   """ on
   call operator#sandwich#set('replace', 'char', 'skip_char', 1)
-  " #187
+  " #202
   call setline('.', 'aa(foo)bb')
   normal 0sr$"
-  call g:assert.equals(getline('.'), 'aa"foo"bb', 'failed at #187')
+  call g:assert.equals(getline('.'), 'aa"foo"bb', 'failed at #202')
 
   call operator#sandwich#set('replace', 'char', 'skip_char', 0)
 endfunction
@@ -1857,10 +1950,10 @@ endfunction
 function! s:suite.charwise_n_option_command() abort  "{{{
   call operator#sandwich#set('replace', 'char', 'command', ['normal! `[dv`]'])
 
-  " #188
+  " #203
   call setline('.', '(foo)')
   normal 0sra("
-  call g:assert.equals(getline('.'), '""', 'failed at #188')
+  call g:assert.equals(getline('.'), '""', 'failed at #203')
 
   call operator#sandwich#set('replace', 'char', 'command', [])
 endfunction
@@ -1870,116 +1963,116 @@ function! s:suite.charwise_n_option_linewise() abort  "{{{
   call operator#sandwich#set('replace', 'char', 'linewise', 1)
 
   """ 1
-  " #189
+  " #204
   call append(0, ['(', 'foo', ')'])
   normal ggsr7l[
-  call g:assert.equals(getline(1),   '[',          'failed at #189')
-  call g:assert.equals(getline(2),   'foo',        'failed at #189')
-  call g:assert.equals(getline(3),   ']',          'failed at #189')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #189')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #189')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #189')
+  call g:assert.equals(getline(1),   '[',          'failed at #204')
+  call g:assert.equals(getline(2),   'foo',        'failed at #204')
+  call g:assert.equals(getline(3),   ']',          'failed at #204')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #204')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #204')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #204')
 
   %delete
 
-  " #190
+  " #205
   call append(0, ['(  ', 'foo', '  )'])
   normal ggsr11l[
-  call g:assert.equals(getline(1),   '[',          'failed at #190')
-  call g:assert.equals(getline(2),   'foo',        'failed at #190')
-  call g:assert.equals(getline(3),   ']',          'failed at #190')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #190')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #190')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #190')
+  call g:assert.equals(getline(1),   '[',          'failed at #205')
+  call g:assert.equals(getline(2),   'foo',        'failed at #205')
+  call g:assert.equals(getline(3),   ']',          'failed at #205')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #205')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #205')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #205')
 
   %delete
 
-  " #191
+  " #206
   call append(0, ['(aa', 'foo', 'aa)'])
   normal ggsr11l[
-  call g:assert.equals(getline(1),   '[aa',        'failed at #191')
-  call g:assert.equals(getline(2),   'foo',        'failed at #191')
-  call g:assert.equals(getline(3),   'aa]',        'failed at #191')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #191')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #191')
-  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #191')
+  call g:assert.equals(getline(1),   '[aa',        'failed at #206')
+  call g:assert.equals(getline(2),   'foo',        'failed at #206')
+  call g:assert.equals(getline(3),   'aa]',        'failed at #206')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #206')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #206')
+  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #206')
 
   %delete
 
-  " #192
+  " #207
   call append(0, ['(aa', 'foo', ')'])
   normal ggsr9l[
-  call g:assert.equals(getline(1),   '[aa',        'failed at #192')
-  call g:assert.equals(getline(2),   'foo',        'failed at #192')
-  call g:assert.equals(getline(3),   ']',          'failed at #192')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #192')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #192')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #192')
+  call g:assert.equals(getline(1),   '[aa',        'failed at #207')
+  call g:assert.equals(getline(2),   'foo',        'failed at #207')
+  call g:assert.equals(getline(3),   ']',          'failed at #207')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #207')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #207')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #207')
 
   %delete
 
-  " #193
+  " #208
   call append(0, ['(', 'foo', 'aa)'])
   normal ggsr9l[
-  call g:assert.equals(getline(1),   '[',          'failed at #193')
-  call g:assert.equals(getline(2),   'foo',        'failed at #193')
-  call g:assert.equals(getline(3),   'aa]',        'failed at #193')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #193')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #193')
-  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #193')
+  call g:assert.equals(getline(1),   '[',          'failed at #208')
+  call g:assert.equals(getline(2),   'foo',        'failed at #208')
+  call g:assert.equals(getline(3),   'aa]',        'failed at #208')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #208')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #208')
+  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #208')
 
   %delete
 
   call operator#sandwich#set('replace', 'char', 'linewise', 2)
 
   """ 2
-  " #194
+  " #209
   call append(0, ['(', 'foo', ')'])
   normal ggsr7l[
-  call g:assert.equals(getline(1),   '[',          'failed at #194')
-  call g:assert.equals(getline(2),   'foo',        'failed at #194')
-  call g:assert.equals(getline(3),   ']',          'failed at #194')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #194')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #194')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #194')
+  call g:assert.equals(getline(1),   '[',          'failed at #209')
+  call g:assert.equals(getline(2),   'foo',        'failed at #209')
+  call g:assert.equals(getline(3),   ']',          'failed at #209')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #209')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #209')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #209')
 
   %delete
 
-  " #195
+  " #210
   call append(0, ['(  ', 'foo', '  )'])
   normal ggsr11l[
-  call g:assert.equals(getline(1),   '[',          'failed at #195')
-  call g:assert.equals(getline(2),   'foo',        'failed at #195')
-  call g:assert.equals(getline(3),   ']',          'failed at #195')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #195')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #195')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #195')
+  call g:assert.equals(getline(1),   '[',          'failed at #210')
+  call g:assert.equals(getline(2),   'foo',        'failed at #210')
+  call g:assert.equals(getline(3),   ']',          'failed at #210')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #210')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #210')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #210')
 
   %delete
 
-  " #196
+  " #211
   call append(0, ['(aa', 'foo', 'aa)'])
   normal ggsr11l[
-  call g:assert.equals(getline(1),   '[',          'failed at #196')
-  call g:assert.equals(getline(2),   'foo',        'failed at #196')
-  call g:assert.equals(getline(3),   ']',          'failed at #196')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #196')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #196')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #196')
+  call g:assert.equals(getline(1),   '[',          'failed at #211')
+  call g:assert.equals(getline(2),   'foo',        'failed at #211')
+  call g:assert.equals(getline(3),   ']',          'failed at #211')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #211')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #211')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #211')
 
   %delete
 
-  " #197
+  " #212
   " FIXME: I have no idea what is the expexted behavior.
   call append(0, ['aa', '(foo)', 'bb'])
   normal ggjsr5l[
-  call g:assert.equals(getline(1),   'aa',         'failed at #197')
-  call g:assert.equals(getline(2),   '[',          'failed at #197')
-  call g:assert.equals(getline(3),   'bb',         'failed at #197')
-  call g:assert.equals(getline(4),   '',           'failed at #197')
-  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #197')
-  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #197')
-  call g:assert.equals(getpos("']"), [0, 3, 1, 0], 'failed at #197')
+  call g:assert.equals(getline(1),   'aa',         'failed at #212')
+  call g:assert.equals(getline(2),   '[',          'failed at #212')
+  call g:assert.equals(getline(3),   'bb',         'failed at #212')
+  call g:assert.equals(getline(4),   '',           'failed at #212')
+  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #212')
+  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #212')
+  call g:assert.equals(getpos("']"), [0, 3, 1, 0], 'failed at #212')
 
   set whichwrap&
 endfunction
@@ -1987,19 +2080,19 @@ endfunction
 function! s:suite.charwise_n_option_query_once() abort  "{{{
   """"" query_once
   """ off
-  " #198
+  " #213
   call setline('.', '"""foo"""')
   normal 03sr$([{
-  call g:assert.equals(getline('.'), '([{foo}])',  'failed at #198')
+  call g:assert.equals(getline('.'), '([{foo}])',  'failed at #213')
 
   %delete
 
   """ on
-  " #199
+  " #214
   call operator#sandwich#set('replace', 'char', 'query_once', 1)
   call setline('.', '"""foo"""')
   normal 03sr$(
-  call g:assert.equals(getline('.'), '(((foo)))',  'failed at #199')
+  call g:assert.equals(getline('.'), '(((foo)))',  'failed at #214')
 
   call operator#sandwich#set('replace', 'char', 'query_once', 0)
 endfunction
@@ -2009,17 +2102,17 @@ function! s:suite.charwise_n_option_expr() abort "{{{
   let g:operator#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'input':['a']}]
 
   """ 0
-  " #200
+  " #215
   call setline('.', '"foo"')
   normal 0sra"a
-  call g:assert.equals(getline('.'), '1+1foo1+2',  'failed at #200')
+  call g:assert.equals(getline('.'), '1+1foo1+2',  'failed at #215')
 
   """ 1
-  " #201
+  " #216
   call operator#sandwich#set('replace', 'char', 'expr', 1)
   call setline('.', '"foo"')
   normal 0sra"a
-  call g:assert.equals(getline('.'), '2foo3',  'failed at #201')
+  call g:assert.equals(getline('.'), '2foo3',  'failed at #216')
 
   """ 2
   " This case cannot be tested since this option makes difference only in
@@ -2031,240 +2124,240 @@ endfunction
 "}}}
 
 function! s:suite.charwise_x_default_recipes() abort "{{{
-  " #202
+  " #217
   call setline('.', '(foo)')
   normal 0va(sr[
-  call g:assert.equals(getline('.'), '[foo]',      'failed at #202')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #202')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #202')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #202')
+  call g:assert.equals(getline('.'), '[foo]',      'failed at #217')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #217')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #217')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #217')
 
-  " #203
+  " #218
   call setline('.', '[foo]')
   normal 0va[sr{
-  call g:assert.equals(getline('.'), '{foo}',      'failed at #203')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #203')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #203')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #203')
+  call g:assert.equals(getline('.'), '{foo}',      'failed at #218')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #218')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #218')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #218')
 
-  " #204
+  " #219
   call setline('.', '{foo}')
   normal 0va{sr<
-  call g:assert.equals(getline('.'), '<foo>',      'failed at #204')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #204')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #204')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #204')
+  call g:assert.equals(getline('.'), '<foo>',      'failed at #219')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #219')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #219')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #219')
 
-  " #205
+  " #220
   call setline('.', '<foo>')
   normal 0va<sr(
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #205')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #205')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #205')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #205')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #220')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #220')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #220')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #220')
 
-  " #206
+  " #221
   call setline('.', '(foo)')
   normal 0va(sr]
-  call g:assert.equals(getline('.'), '[foo]',      'failed at #206')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #206')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #206')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #206')
+  call g:assert.equals(getline('.'), '[foo]',      'failed at #221')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #221')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #221')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #221')
 
-  " #207
+  " #222
   call setline('.', '[foo]')
   normal 0va[sr}
-  call g:assert.equals(getline('.'), '{foo}',      'failed at #207')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #207')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #207')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #207')
+  call g:assert.equals(getline('.'), '{foo}',      'failed at #222')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #222')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #222')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #222')
 
-  " #208
+  " #223
   call setline('.', '{foo}')
   normal 0va{sr>
-  call g:assert.equals(getline('.'), '<foo>',      'failed at #208')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #208')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #208')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #208')
+  call g:assert.equals(getline('.'), '<foo>',      'failed at #223')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #223')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #223')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #223')
 
-  " #209
+  " #224
   call setline('.', '<foo>')
   normal 0va<sr)
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #209')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #209')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #209')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #209')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #224')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #224')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #224')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #224')
 endfunction
 "}}}
 function! s:suite.charwise_x_not_registered() abort "{{{
-  " #210
+  " #225
   call setline('.', 'afooa')
   normal 0viwsrb
-  call g:assert.equals(getline('.'), 'bfoob',      'failed at #210')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #210')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #210')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #210')
+  call g:assert.equals(getline('.'), 'bfoob',      'failed at #225')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #225')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #225')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #225')
 
-  " #211
+  " #226
   call setline('.', '+foo+')
   normal 0v$sr*
-  call g:assert.equals(getline('.'), '*foo*',      'failed at #211')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #211')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #211')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #211')
+  call g:assert.equals(getline('.'), '*foo*',      'failed at #226')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #226')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #226')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #226')
 endfunction
 "}}}
 function! s:suite.charwise_x_positioning() abort "{{{
-  " #212
+  " #227
   call setline('.', '(foo)bar')
   normal 0va(sr[
-  call g:assert.equals(getline('.'), '[foo]bar',   'failed at #212')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #212')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #212')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #212')
+  call g:assert.equals(getline('.'), '[foo]bar',   'failed at #227')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #227')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #227')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #227')
 
-  " #213
+  " #228
   call setline('.', 'foo(bar)')
   normal 0fbva(sr[
-  call g:assert.equals(getline('.'), 'foo[bar]',   'failed at #213')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #213')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #213')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0], 'failed at #213')
+  call g:assert.equals(getline('.'), 'foo[bar]',   'failed at #228')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #228')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #228')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0], 'failed at #228')
 
-  " #214
+  " #229
   call setline('.', 'foo(bar)baz')
   normal 0fbva(sr[
-  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #214')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0],  'failed at #214')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #214')
-  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #214')
+  call g:assert.equals(getline('.'), 'foo[bar]baz', 'failed at #229')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0],  'failed at #229')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #229')
+  call g:assert.equals(getpos("']"), [0, 1, 9, 0],  'failed at #229')
 
-  " #215
+  " #230
   set whichwrap=h,l
   call append(0, ['(foo', 'bar', 'baz)'])
   normal ggv12lsr[
-  call g:assert.equals(getline(1),   '[foo',       'failed at #215')
-  call g:assert.equals(getline(2),   'bar',        'failed at #215')
-  call g:assert.equals(getline(3),   'baz]',       'failed at #215')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #215')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #215')
-  call g:assert.equals(getpos("']"), [0, 3, 5, 0], 'failed at #215')
+  call g:assert.equals(getline(1),   '[foo',       'failed at #230')
+  call g:assert.equals(getline(2),   'bar',        'failed at #230')
+  call g:assert.equals(getline(3),   'baz]',       'failed at #230')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #230')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #230')
+  call g:assert.equals(getpos("']"), [0, 3, 5, 0], 'failed at #230')
   set whichwrap&
 endfunction
 "}}}
 function! s:suite.charwise_x_a_character() abort "{{{
-  " #216
+  " #231
   call setline('.', '(a)')
   normal 0va(sr[
-  call g:assert.equals(getline('.'), '[a]',        'failed at #216')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #216')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #216')
-  call g:assert.equals(getpos("']"), [0, 1, 4, 0], 'failed at #216')
+  call g:assert.equals(getline('.'), '[a]',        'failed at #231')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #231')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #231')
+  call g:assert.equals(getpos("']"), [0, 1, 4, 0], 'failed at #231')
 
   %delete
 
-  " #217
+  " #232
   call append(0, ['(', 'a', ')'])
   normal ggva(sr[
-  call g:assert.equals(getline(1),   '[',          'failed at #217')
-  call g:assert.equals(getline(2),   'a',          'failed at #217')
-  call g:assert.equals(getline(3),   ']',          'failed at #217')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #217')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #217')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #217')
+  call g:assert.equals(getline(1),   '[',          'failed at #232')
+  call g:assert.equals(getline(2),   'a',          'failed at #232')
+  call g:assert.equals(getline(3),   ']',          'failed at #232')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #232')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #232')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #232')
 
   %delete
 
-  " #218
+  " #233
   call append(0, ['(a', ')'])
   normal ggva(sr[
-  call g:assert.equals(getline(1),   '[a',         'failed at #218')
-  call g:assert.equals(getline(2),   ']',          'failed at #218')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #218')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #218')
-  call g:assert.equals(getpos("']"), [0, 2, 2, 0], 'failed at #218')
+  call g:assert.equals(getline(1),   '[a',         'failed at #233')
+  call g:assert.equals(getline(2),   ']',          'failed at #233')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #233')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #233')
+  call g:assert.equals(getpos("']"), [0, 2, 2, 0], 'failed at #233')
 
   %delete
 
-  " #219
+  " #234
   call append(0, ['(', 'a)'])
   normal ggva(sr[
-  call g:assert.equals(getline(1),   '[',          'failed at #219')
-  call g:assert.equals(getline(2),   'a]',         'failed at #219')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #219')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #219')
-  call g:assert.equals(getpos("']"), [0, 2, 3, 0], 'failed at #219')
+  call g:assert.equals(getline(1),   '[',          'failed at #234')
+  call g:assert.equals(getline(2),   'a]',         'failed at #234')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #234')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #234')
+  call g:assert.equals(getpos("']"), [0, 2, 3, 0], 'failed at #234')
 endfunction
 "}}}
 function! s:suite.charwise_x_nothing_inside() abort "{{{
-  " #220
+  " #235
   call setline('.', '()')
   normal 0va(sr[
-  call g:assert.equals(getline('.'), '[]',         'failed at #220')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #220')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #220')
-  call g:assert.equals(getpos("']"), [0, 1, 3, 0], 'failed at #220')
+  call g:assert.equals(getline('.'), '[]',         'failed at #235')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #235')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #235')
+  call g:assert.equals(getpos("']"), [0, 1, 3, 0], 'failed at #235')
 
-  " #221
+  " #236
   call setline('.', 'foo()bar')
   normal 03lva(sr[
-  call g:assert.equals(getline('.'), 'foo[]bar',   'failed at #221')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #221')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #221')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #221')
+  call g:assert.equals(getline('.'), 'foo[]bar',   'failed at #236')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #236')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #236')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #236')
 
   %delete
 
-  " #222
+  " #237
   call append(0, ['(', ')'])
   normal ggva(sr[
-  call g:assert.equals(getline(1),   '[',          'failed at #222')
-  call g:assert.equals(getline(2),   ']',          'failed at #222')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #222')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #222')
-  call g:assert.equals(getpos("']"), [0, 2, 2, 0], 'failed at #222')
+  call g:assert.equals(getline(1),   '[',          'failed at #237')
+  call g:assert.equals(getline(2),   ']',          'failed at #237')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #237')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #237')
+  call g:assert.equals(getpos("']"), [0, 2, 2, 0], 'failed at #237')
 endfunction
 "}}}
 function! s:suite.charwise_x_count() abort "{{{
-  " #223
+  " #238
   call setline('.', '([foo])')
   normal 0v%2sr[(
-  call g:assert.equals(getline('.'), '[(foo)]',    'failed at #223')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #223')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #223')
-  call g:assert.equals(getpos("']"), [0, 1, 8, 0], 'failed at #223')
+  call g:assert.equals(getline('.'), '[(foo)]',    'failed at #238')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #238')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #238')
+  call g:assert.equals(getpos("']"), [0, 1, 8, 0], 'failed at #238')
 
-  " #224
+  " #239
   call setline('.', '[({foo})]')
   normal 0v%3sr{[(
-  call g:assert.equals(getline('.'), '{[(foo)]}',   'failed at #224')
-  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #224')
-  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #224')
-  call g:assert.equals(getpos("']"), [0, 1, 10, 0], 'failed at #224')
+  call g:assert.equals(getline('.'), '{[(foo)]}',   'failed at #239')
+  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #239')
+  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #239')
+  call g:assert.equals(getpos("']"), [0, 1, 10, 0], 'failed at #239')
 
-  " #225
+  " #240
   call setline('.', '{[foo bar]}')
   normal 0v10l2sr[(
-  call g:assert.equals(getline('.'), '[(foo bar)]', 'failed at #225')
-  call g:assert.equals(getpos('.'),  [0, 1,  3, 0], 'failed at #225')
-  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #225')
-  call g:assert.equals(getpos("']"), [0, 1, 12, 0], 'failed at #225')
+  call g:assert.equals(getline('.'), '[(foo bar)]', 'failed at #240')
+  call g:assert.equals(getpos('.'),  [0, 1,  3, 0], 'failed at #240')
+  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #240')
+  call g:assert.equals(getpos("']"), [0, 1, 12, 0], 'failed at #240')
 
-  " #226
+  " #241
   call setline('.', 'foo{[bar]}baz')
   normal 03lv6l2sr[(
-  call g:assert.equals(getline('.'), 'foo[(bar)]baz', 'failed at #226')
-  call g:assert.equals(getpos('.'),  [0, 1,  6, 0],   'failed at #226')
-  call g:assert.equals(getpos("'["), [0, 1,  4, 0],   'failed at #226')
-  call g:assert.equals(getpos("']"), [0, 1, 11, 0],   'failed at #226')
+  call g:assert.equals(getline('.'), 'foo[(bar)]baz', 'failed at #241')
+  call g:assert.equals(getpos('.'),  [0, 1,  6, 0],   'failed at #241')
+  call g:assert.equals(getpos("'["), [0, 1,  4, 0],   'failed at #241')
+  call g:assert.equals(getpos("']"), [0, 1, 11, 0],   'failed at #241')
 
-  " #227
+  " #242
   call setline('.', 'foo({[bar]})baz')
   normal 03lv8l3sr{[(
-  call g:assert.equals(getline('.'), 'foo{[(bar)]}baz', 'failed at #227')
-  call g:assert.equals(getpos('.'),  [0, 1,  7, 0],     'failed at #227')
-  call g:assert.equals(getpos("'["), [0, 1,  4, 0],     'failed at #227')
-  call g:assert.equals(getpos("']"), [0, 1, 13, 0],     'failed at #227')
+  call g:assert.equals(getline('.'), 'foo{[(bar)]}baz', 'failed at #242')
+  call g:assert.equals(getpos('.'),  [0, 1,  7, 0],     'failed at #242')
+  call g:assert.equals(getpos("'["), [0, 1,  4, 0],     'failed at #242')
+  call g:assert.equals(getpos("']"), [0, 1, 13, 0],     'failed at #242')
 endfunction
 "}}}
 function! s:suite.charwise_x_breaking() abort "{{{
@@ -2275,49 +2368,49 @@ function! s:suite.charwise_x_breaking() abort "{{{
         \   {'buns': ["bb\nbbb\nbb", "bb\nbbb\nbb"], 'input':['b']},
         \ ]
 
-  " #228
+  " #243
   call append(0, ['aa', 'aaafooaaa', 'aa'])
   normal ggv14lsr(
-  call g:assert.equals(getline(1),   '(foo)',      'failed at #228')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #228')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #228')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #228')
+  call g:assert.equals(getline(1),   '(foo)',      'failed at #243')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #243')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #243')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #243')
 
   %delete
 
-  " #229
+  " #244
   call append(0, ['bb', 'bbb', 'bbfoobb', 'bbb', 'bb'])
   normal ggv20lsr(
-  call g:assert.equals(getline(1),   '(foo)',      'failed at #229')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #229')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #229')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #229')
+  call g:assert.equals(getline(1),   '(foo)',      'failed at #244')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #244')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #244')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #244')
 
   %delete
 
-  " #230
+  " #245
   call setline('.', '(foo)')
   normal 0v4lsra
-  call g:assert.equals(getline(1),   'aa',         'failed at #230')
-  call g:assert.equals(getline(2),   'aaafooaaa',  'failed at #230')
-  call g:assert.equals(getline(3),   'aa',         'failed at #230')
-  call g:assert.equals(getpos('.'),  [0, 2, 4, 0], 'failed at #230')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #230')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #230')
+  call g:assert.equals(getline(1),   'aa',         'failed at #245')
+  call g:assert.equals(getline(2),   'aaafooaaa',  'failed at #245')
+  call g:assert.equals(getline(3),   'aa',         'failed at #245')
+  call g:assert.equals(getpos('.'),  [0, 2, 4, 0], 'failed at #245')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #245')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #245')
 
   %delete
 
-  " #231
+  " #246
   call setline('.', '(foo)')
   normal 0v4lsrb
-  call g:assert.equals(getline(1),   'bb',         'failed at #231')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #231')
-  call g:assert.equals(getline(3),   'bbfoobb',    'failed at #231')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #231')
-  call g:assert.equals(getline(5),   'bb',         'failed at #231')
-  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #231')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #231')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #231')
+  call g:assert.equals(getline(1),   'bb',         'failed at #246')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #246')
+  call g:assert.equals(getline(3),   'bbfoobb',    'failed at #246')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #246')
+  call g:assert.equals(getline(5),   'bb',         'failed at #246')
+  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #246')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #246')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #246')
 endfunction
 "}}}
 function! s:suite.charwise_x_external_textobj() abort"{{{
@@ -2329,25 +2422,25 @@ function! s:suite.charwise_x_external_textobj() abort"{{{
         \   {'external': ['it', 'at']},
         \ ]
 
-  " #232
+  " #247
   call setline('.', '{[(foo)]}')
   normal 02lv4lsr"
-  call g:assert.equals(getline('.'), '{["foo"]}', 'failed at #232')
+  call g:assert.equals(getline('.'), '{["foo"]}', 'failed at #247')
 
-  " #233
+  " #248
   call setline('.', '{[(foo)]}')
   normal 0lv6lsr"
-  call g:assert.equals(getline('.'), '{"(foo)"}', 'failed at #233')
+  call g:assert.equals(getline('.'), '{"(foo)"}', 'failed at #248')
 
-  " #234
+  " #249
   call setline('.', '{[(foo)]}')
   normal 0v8lsr"
-  call g:assert.equals(getline('.'), '"[(foo)]"', 'failed at #234')
+  call g:assert.equals(getline('.'), '"[(foo)]"', 'failed at #249')
 
-  " #235
+  " #250
   call setline('.', '<title>foo</title>')
   normal 0v$sr"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #235')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #250')
 
   unlet g:sandwich#recipes
   unlet g:operator#sandwich#recipes
@@ -2356,68 +2449,68 @@ endfunction
 function! s:suite.charwise_x_option_cursor() abort  "{{{
   """"" cursor
   """ inner_head
-  " #236
+  " #251
   call setline('.', '(((foo)))')
   normal 0lv%2sr[[
-  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #236')
-  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #236')
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #251')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #251')
 
-  " #237
+  " #252
   normal 0va(sr[
-  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #237')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #237')
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #252')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #252')
 
   """ keep
-  " #238
+  " #253
   call operator#sandwich#set('replace', 'char', 'cursor', 'keep')
   call setline('.', '(((foo)))')
   normal 0lva(2sr[[
-  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #238')
-  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #238')
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #253')
+  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #253')
 
-  " #239
+  " #254
   normal va(sr[
-  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #239')
-  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #239')
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #254')
+  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #254')
 
   """ inner_tail
-  " #240
+  " #255
   call operator#sandwich#set('replace', 'char', 'cursor', 'inner_tail')
   call setline('.', '(((foo)))')
   normal 0lva(2sr[[
-  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #240')
-  call g:assert.equals(getpos('.'),  [0, 1, 6, 0], 'failed at #240')
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #255')
+  call g:assert.equals(getpos('.'),  [0, 1, 6, 0], 'failed at #255')
 
-  " #241
+  " #256
   normal va(sr[
-  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #241')
-  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #241')
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #256')
+  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #256')
 
   """ front
-  " #242
+  " #257
   call operator#sandwich#set('replace', 'char', 'cursor', 'front')
   call setline('.', '(((foo)))')
   normal 0lva(2sr[[
-  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #242')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #242')
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #257')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #257')
 
-  " #243
+  " #258
   normal va(sr[
-  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #243')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #243')
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #258')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #258')
 
   """ end
-  " #244
+  " #259
   call operator#sandwich#set('replace', 'char', 'cursor', 'end')
   call setline('.', '(((foo)))')
   normal 0lva(2sr[[
-  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #244')
-  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #244')
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #259')
+  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #259')
 
-  " #245
+  " #260
   normal va(sr[
-  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #245')
-  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #245')
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #260')
+  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #260')
 
   call operator#sandwich#set('replace', 'char', 'cursor', 'inner_head')
 endfunction
@@ -2430,27 +2523,27 @@ function! s:suite.charwise_x_option_noremap() abort  "{{{
   xnoremap a{ a(
 
   """ on
-  " #246
+  " #261
   call setline('.', '{(foo)}')
   normal 0v6lsr"
-  call g:assert.equals(getline('.'), '"(foo)"', 'failed at #246')
+  call g:assert.equals(getline('.'), '"(foo)"', 'failed at #261')
 
-  " #247
+  " #262
   call setline('.', '{(foo)}')
   normal 0lv4lsr"
-  call g:assert.equals(getline('.'), '{(foo)}', 'failed at #247')
+  call g:assert.equals(getline('.'), '{(foo)}', 'failed at #262')
 
   """ off
-  " #248
+  " #263
   call operator#sandwich#set('replace', 'char', 'noremap', 0)
   call setline('.', '{(foo)}')
   normal 0v6lsr"
-  call g:assert.equals(getline('.'), '{(foo)}', 'failed at #248')
+  call g:assert.equals(getline('.'), '{(foo)}', 'failed at #263')
 
-  " #249
+  " #264
   call setline('.', '{(foo)}')
   normal 0lv4lsr"
-  call g:assert.equals(getline('.'), '{"foo"}', 'failed at #249')
+  call g:assert.equals(getline('.'), '{"foo"}', 'failed at #264')
 
   unlet! g:sandwich#recipes
   unlet! g:operator#sandwich#recipes
@@ -2464,27 +2557,27 @@ function! s:suite.charwise_x_option_regex() abort  "{{{
   let g:operator#sandwich#recipes = [{'buns': ['\d\+', '\d\+']}]
 
   """ off
-  " #250
+  " #265
   call setline('.', '\d\+foo\d\+')
   normal 0v$sr"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #250')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #265')
 
-  " #251
+  " #266
   call setline('.', '888foo888')
   normal 0v$sr"
-  call g:assert.equals(getline('.'), '"88foo88"', 'failed at #251')
+  call g:assert.equals(getline('.'), '"88foo88"', 'failed at #266')
 
   """ on
   call operator#sandwich#set('replace', 'char', 'regex', 1)
-  " #252
+  " #267
   call setline('.', '\d\+foo\d\+')
   normal 0v$sr"
-  call g:assert.equals(getline('.'), '\d\+foo\d\+', 'failed at #252')
+  call g:assert.equals(getline('.'), '\d\+foo\d\+', 'failed at #267')
 
-  " #253
+  " #268
   call setline('.', '888foo888')
   normal 0v$sr"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #253')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #268')
 
   call operator#sandwich#set('replace', 'char', 'regex', 0)
   unlet! g:sandwich#recipes
@@ -2493,66 +2586,66 @@ endfunction
 "}}}
 function! s:suite.charwise_x_option_skip_space() abort  "{{{
   """ on
-  " #254
+  " #269
   call setline('.', '"foo"')
   normal 0v$sr(
-  call g:assert.equals(getline('.'), '(foo)', 'failed at #254')
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #269')
 
-  " #255
+  " #270
   call setline('.', ' "foo"')
   normal 0v$sr(
-  call g:assert.equals(getline('.'), ' (foo)', 'failed at #255')
+  call g:assert.equals(getline('.'), ' (foo)', 'failed at #270')
 
-  " #256
+  " #271
   call setline('.', '"foo" ')
   normal 0v$sr(
-  call g:assert.equals(getline('.'), '(foo) ', 'failed at #256')
+  call g:assert.equals(getline('.'), '(foo) ', 'failed at #271')
 
-  " #257
+  " #272
   " do not skip!
   call setline('.', ' "foo" ')
   normal 0v$sr(
-  call g:assert.equals(getline('.'), '("foo")', 'failed at #257')
+  call g:assert.equals(getline('.'), '("foo")', 'failed at #272')
 
   """ off
   call operator#sandwich#set('replace', 'char', 'skip_space', 0)
-  " #258
+  " #273
   call setline('.', '"foo"')
   normal 0v$sr(
-  call g:assert.equals(getline('.'), '(foo)', 'failed at #258')
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #273')
 
-  " #259
+  " #274
   call setline('.', ' "foo"')
   normal 0v$sr(
-  call g:assert.equals(getline('.'), ' "foo"', 'failed at #259')
+  call g:assert.equals(getline('.'), ' "foo"', 'failed at #274')
 
-  " #260
+  " #275
   call setline('.', '"foo" ')
   normal 0v$sr(
-  call g:assert.equals(getline('.'), '"foo" ', 'failed at #260')
+  call g:assert.equals(getline('.'), '"foo" ', 'failed at #275')
 
-  " #261
+  " #276
   " do not skip!
   call setline('.', ' "foo" ')
   normal 0v$sr(
-  call g:assert.equals(getline('.'), '("foo")', 'failed at #261')
+  call g:assert.equals(getline('.'), '("foo")', 'failed at #276')
 
   call operator#sandwich#set('replace', 'char', 'skip_space', 1)
 endfunction
 "}}}
 function! s:suite.charwise_x_option_skip_char() abort "{{{
   """ off
-  " #262
+  " #277
   call setline('.', 'aa(foo)bb')
   normal 0v$sr"
-  call g:assert.equals(getline('.'), 'aa(foo)bb', 'failed at #262')
+  call g:assert.equals(getline('.'), 'aa(foo)bb', 'failed at #277')
 
   """ on
   call operator#sandwich#set('replace', 'char', 'skip_char', 1)
-  " #263
+  " #278
   call setline('.', 'aa(foo)bb')
   normal 0v$sr"
-  call g:assert.equals(getline('.'), 'aa"foo"bb', 'failed at #263')
+  call g:assert.equals(getline('.'), 'aa"foo"bb', 'failed at #278')
 
   call operator#sandwich#set('replace', 'char', 'skip_char', 0)
 endfunction
@@ -2560,10 +2653,10 @@ endfunction
 function! s:suite.charwise_x_option_command() abort  "{{{
   call operator#sandwich#set('replace', 'char', 'command', ['normal! `[dv`]'])
 
-  " #264
+  " #279
   call setline('.', '(foo)')
   normal 0va(sr"
-  call g:assert.equals(getline('.'), '""', 'failed at #264')
+  call g:assert.equals(getline('.'), '""', 'failed at #279')
 
   call operator#sandwich#set('replace', 'char', 'command', [])
 endfunction
@@ -2573,116 +2666,116 @@ function! s:suite.charwise_x_option_linewise() abort  "{{{
   call operator#sandwich#set('replace', 'char', 'linewise', 1)
 
   """ 1
-  " #265
+  " #280
   call append(0, ['(', 'foo', ')'])
   normal ggv6lsr[
-  call g:assert.equals(getline(1),   '[',          'failed at #265')
-  call g:assert.equals(getline(2),   'foo',        'failed at #265')
-  call g:assert.equals(getline(3),   ']',          'failed at #265')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #265')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #265')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #265')
+  call g:assert.equals(getline(1),   '[',          'failed at #280')
+  call g:assert.equals(getline(2),   'foo',        'failed at #280')
+  call g:assert.equals(getline(3),   ']',          'failed at #280')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #280')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #280')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #280')
 
   %delete
 
-  " #266
+  " #281
   call append(0, ['(  ', 'foo', '  )'])
   normal ggv10lsr[
-  call g:assert.equals(getline(1),   '[',          'failed at #266')
-  call g:assert.equals(getline(2),   'foo',        'failed at #266')
-  call g:assert.equals(getline(3),   ']',          'failed at #266')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #266')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #266')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #266')
+  call g:assert.equals(getline(1),   '[',          'failed at #281')
+  call g:assert.equals(getline(2),   'foo',        'failed at #281')
+  call g:assert.equals(getline(3),   ']',          'failed at #281')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #281')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #281')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #281')
 
   %delete
 
-  " #267
+  " #282
   call append(0, ['(aa', 'foo', 'aa)'])
   normal ggv10lsr[
-  call g:assert.equals(getline(1),   '[aa',        'failed at #267')
-  call g:assert.equals(getline(2),   'foo',        'failed at #267')
-  call g:assert.equals(getline(3),   'aa]',        'failed at #267')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #267')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #267')
-  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #267')
+  call g:assert.equals(getline(1),   '[aa',        'failed at #282')
+  call g:assert.equals(getline(2),   'foo',        'failed at #282')
+  call g:assert.equals(getline(3),   'aa]',        'failed at #282')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #282')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #282')
+  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #282')
 
   %delete
 
-  " #268
+  " #283
   call append(0, ['(aa', 'foo', ')'])
   normal ggv8lsr[
-  call g:assert.equals(getline(1),   '[aa',        'failed at #268')
-  call g:assert.equals(getline(2),   'foo',        'failed at #268')
-  call g:assert.equals(getline(3),   ']',          'failed at #268')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #268')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #268')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #268')
+  call g:assert.equals(getline(1),   '[aa',        'failed at #283')
+  call g:assert.equals(getline(2),   'foo',        'failed at #283')
+  call g:assert.equals(getline(3),   ']',          'failed at #283')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #283')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #283')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #283')
 
   %delete
 
-  " #269
+  " #284
   call append(0, ['(', 'foo', 'aa)'])
   normal ggv8lsr[
-  call g:assert.equals(getline(1),   '[',          'failed at #269')
-  call g:assert.equals(getline(2),   'foo',        'failed at #269')
-  call g:assert.equals(getline(3),   'aa]',        'failed at #269')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #269')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #269')
-  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #269')
+  call g:assert.equals(getline(1),   '[',          'failed at #284')
+  call g:assert.equals(getline(2),   'foo',        'failed at #284')
+  call g:assert.equals(getline(3),   'aa]',        'failed at #284')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #284')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #284')
+  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #284')
 
   %delete
 
   call operator#sandwich#set('replace', 'char', 'linewise', 2)
 
   """ 2
-  " #270
+  " #285
   call append(0, ['(', 'foo', ')'])
   normal ggv6lsr[
-  call g:assert.equals(getline(1),   '[',          'failed at #270')
-  call g:assert.equals(getline(2),   'foo',        'failed at #270')
-  call g:assert.equals(getline(3),   ']',          'failed at #270')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #270')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #270')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #270')
+  call g:assert.equals(getline(1),   '[',          'failed at #285')
+  call g:assert.equals(getline(2),   'foo',        'failed at #285')
+  call g:assert.equals(getline(3),   ']',          'failed at #285')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #285')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #285')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #285')
 
   %delete
 
-  " #271
+  " #286
   call append(0, ['(  ', 'foo', '  )'])
   normal ggv10lsr[
-  call g:assert.equals(getline(1),   '[',          'failed at #271')
-  call g:assert.equals(getline(2),   'foo',        'failed at #271')
-  call g:assert.equals(getline(3),   ']',          'failed at #271')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #271')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #271')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #271')
+  call g:assert.equals(getline(1),   '[',          'failed at #286')
+  call g:assert.equals(getline(2),   'foo',        'failed at #286')
+  call g:assert.equals(getline(3),   ']',          'failed at #286')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #286')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #286')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #286')
 
   %delete
 
-  " #272
+  " #287
   call append(0, ['(aa', 'foo', 'aa)'])
   normal ggv10lsr[
-  call g:assert.equals(getline(1),   '[',          'failed at #272')
-  call g:assert.equals(getline(2),   'foo',        'failed at #272')
-  call g:assert.equals(getline(3),   ']',          'failed at #272')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #272')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #272')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #272')
+  call g:assert.equals(getline(1),   '[',          'failed at #287')
+  call g:assert.equals(getline(2),   'foo',        'failed at #287')
+  call g:assert.equals(getline(3),   ']',          'failed at #287')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #287')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #287')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #287')
 
   %delete
 
-  " #273
+  " #288
   " FIXME: I have no idea what is the expexted behavior.
   call append(0, ['aa', '(foo)', 'bb'])
   normal ggjv4lsr[
-  call g:assert.equals(getline(1),   'aa',         'failed at #273')
-  call g:assert.equals(getline(2),   '[',          'failed at #273')
-  call g:assert.equals(getline(3),   'bb',         'failed at #273')
-  call g:assert.equals(getline(4),   '',           'failed at #273')
-  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #273')
-  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #273')
-  call g:assert.equals(getpos("']"), [0, 3, 1, 0], 'failed at #273')
+  call g:assert.equals(getline(1),   'aa',         'failed at #288')
+  call g:assert.equals(getline(2),   '[',          'failed at #288')
+  call g:assert.equals(getline(3),   'bb',         'failed at #288')
+  call g:assert.equals(getline(4),   '',           'failed at #288')
+  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #288')
+  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #288')
+  call g:assert.equals(getpos("']"), [0, 3, 1, 0], 'failed at #288')
 
   set whichwrap&
 endfunction
@@ -2690,218 +2783,218 @@ endfunction
 
 " line-wise
 function! s:suite.linewise_n_default_recipes() abort "{{{
-  " #274
+  " #289
   call setline('.', '(foo)')
   normal srVl[
-  call g:assert.equals(getline('.'), '[foo]',      'failed at #274')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #274')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #274')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #274')
+  call g:assert.equals(getline('.'), '[foo]',      'failed at #289')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #289')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #289')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #289')
 
-  " #275
+  " #290
   call setline('.', '[foo]')
   normal srVl{
-  call g:assert.equals(getline('.'), '{foo}',      'failed at #275')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #275')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #275')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #275')
+  call g:assert.equals(getline('.'), '{foo}',      'failed at #290')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #290')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #290')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #290')
 
-  " #276
+  " #291
   call setline('.', '{foo}')
   normal srVl<
-  call g:assert.equals(getline('.'), '<foo>',      'failed at #276')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #276')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #276')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #276')
+  call g:assert.equals(getline('.'), '<foo>',      'failed at #291')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #291')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #291')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #291')
 
-  " #277
+  " #292
   call setline('.', '<foo>')
   normal srVl(
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #277')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #277')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #277')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #277')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #292')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #292')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #292')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #292')
 
   %delete
 
-  " #278
+  " #293
   call append(0, ['(', 'foo', ')'])
   normal ggsr2j]
-  call g:assert.equals(getline(1),   '[',          'failed at #278')
-  call g:assert.equals(getline(2),   'foo',        'failed at #278')
-  call g:assert.equals(getline(3),   ']',          'failed at #278')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #278')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #278')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #278')
+  call g:assert.equals(getline(1),   '[',          'failed at #293')
+  call g:assert.equals(getline(2),   'foo',        'failed at #293')
+  call g:assert.equals(getline(3),   ']',          'failed at #293')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #293')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #293')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #293')
 
-  " #279
+  " #294
   call append(0, ['[', 'foo', ']'])
   normal ggsr2j}
-  call g:assert.equals(getline(1),   '{',          'failed at #279')
-  call g:assert.equals(getline(2),   'foo',        'failed at #279')
-  call g:assert.equals(getline(3),   '}',          'failed at #279')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #279')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #279')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #279')
+  call g:assert.equals(getline(1),   '{',          'failed at #294')
+  call g:assert.equals(getline(2),   'foo',        'failed at #294')
+  call g:assert.equals(getline(3),   '}',          'failed at #294')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #294')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #294')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #294')
 
-  " #280
+  " #295
   call append(0, ['{', 'foo', '}'])
   normal ggsr2j>
-  call g:assert.equals(getline(1),   '<',          'failed at #280')
-  call g:assert.equals(getline(2),   'foo',        'failed at #280')
-  call g:assert.equals(getline(3),   '>',          'failed at #280')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #280')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #280')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #280')
+  call g:assert.equals(getline(1),   '<',          'failed at #295')
+  call g:assert.equals(getline(2),   'foo',        'failed at #295')
+  call g:assert.equals(getline(3),   '>',          'failed at #295')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #295')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #295')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #295')
 
-  " #281
+  " #296
   call append(0, ['<', 'foo', '>'])
   normal ggsr2j)
-  call g:assert.equals(getline(1),   '(',          'failed at #281')
-  call g:assert.equals(getline(2),   'foo',        'failed at #281')
-  call g:assert.equals(getline(3),   ')',          'failed at #281')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #281')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #281')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #281')
+  call g:assert.equals(getline(1),   '(',          'failed at #296')
+  call g:assert.equals(getline(2),   'foo',        'failed at #296')
+  call g:assert.equals(getline(3),   ')',          'failed at #296')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #296')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #296')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #296')
 endfunction
 "}}}
 function! s:suite.linewise_n_not_registered() abort "{{{
-  " #282
+  " #297
   call setline('.', 'afooa')
   normal srVlb
-  call g:assert.equals(getline('.'), 'bfoob',      'failed at #282')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #282')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #282')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #282')
+  call g:assert.equals(getline('.'), 'bfoob',      'failed at #297')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #297')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #297')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #297')
 
-  " #283
+  " #298
   call setline('.', '+foo+')
   normal srVl*
-  call g:assert.equals(getline('.'), '*foo*',      'failed at #283')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #283')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #283')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #283')
+  call g:assert.equals(getline('.'), '*foo*',      'failed at #298')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #298')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #298')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #298')
 
   %delete
 
-  " #282
+  " #297
   call append(0, ['a', 'foo', 'a'])
   normal ggsr2jb
-  call g:assert.equals(getline(1),   'b',          'failed at #282')
-  call g:assert.equals(getline(2),   'foo',        'failed at #282')
-  call g:assert.equals(getline(3),   'b',          'failed at #282')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #282')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #282')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #282')
+  call g:assert.equals(getline(1),   'b',          'failed at #297')
+  call g:assert.equals(getline(2),   'foo',        'failed at #297')
+  call g:assert.equals(getline(3),   'b',          'failed at #297')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #297')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #297')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #297')
 
   %delete
 
-  " #283
+  " #298
   call append(0, ['+', 'foo', '+'])
   normal ggsr2j*
-  call g:assert.equals(getline(1),   '*',          'failed at #283')
-  call g:assert.equals(getline(2),   'foo',        'failed at #283')
-  call g:assert.equals(getline(3),   '*',          'failed at #283')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #283')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #283')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #283')
+  call g:assert.equals(getline(1),   '*',          'failed at #298')
+  call g:assert.equals(getline(2),   'foo',        'failed at #298')
+  call g:assert.equals(getline(3),   '*',          'failed at #298')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #298')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #298')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #298')
 endfunction
 "}}}
 function! s:suite.linewise_n_positioning() abort "{{{
-  " #284
+  " #299
   call append(0, ['(', 'foo', 'bar', 'baz', ')'])
   normal ggsrVa([
-  call g:assert.equals(getline(1),   '[',          'failed at #284')
-  call g:assert.equals(getline(2),   'foo',        'failed at #284')
-  call g:assert.equals(getline(3),   'bar',        'failed at #284')
-  call g:assert.equals(getline(4),   'baz',        'failed at #284')
-  call g:assert.equals(getline(5),   ']',          'failed at #284')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #284')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #284')
-  call g:assert.equals(getpos("']"), [0, 5, 2, 0], 'failed at #284')
+  call g:assert.equals(getline(1),   '[',          'failed at #299')
+  call g:assert.equals(getline(2),   'foo',        'failed at #299')
+  call g:assert.equals(getline(3),   'bar',        'failed at #299')
+  call g:assert.equals(getline(4),   'baz',        'failed at #299')
+  call g:assert.equals(getline(5),   ']',          'failed at #299')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #299')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #299')
+  call g:assert.equals(getpos("']"), [0, 5, 2, 0], 'failed at #299')
 
   %delete
 
-  " #285
+  " #300
   call append(0, ['foo', '(', 'bar', ')', 'baz'])
   normal gg2jsrVa([
-  call g:assert.equals(getline(1),   'foo',        'failed at #285')
-  call g:assert.equals(getline(2),   '[',          'failed at #285')
-  call g:assert.equals(getline(3),   'bar',        'failed at #285')
-  call g:assert.equals(getline(4),   ']',          'failed at #285')
-  call g:assert.equals(getline(5),   'baz',        'failed at #285')
-  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #285')
-  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #285')
-  call g:assert.equals(getpos("']"), [0, 4, 2, 0], 'failed at #285')
+  call g:assert.equals(getline(1),   'foo',        'failed at #300')
+  call g:assert.equals(getline(2),   '[',          'failed at #300')
+  call g:assert.equals(getline(3),   'bar',        'failed at #300')
+  call g:assert.equals(getline(4),   ']',          'failed at #300')
+  call g:assert.equals(getline(5),   'baz',        'failed at #300')
+  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #300')
+  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #300')
+  call g:assert.equals(getpos("']"), [0, 4, 2, 0], 'failed at #300')
 
   %delete
 
-  " #286
+  " #301
   call append(0, ['(foo', 'bar', 'baz)'])
   normal ggsrVa([
-  call g:assert.equals(getline(1),   '[foo',       'failed at #286')
-  call g:assert.equals(getline(2),   'bar',        'failed at #286')
-  call g:assert.equals(getline(3),   'baz]',       'failed at #286')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #286')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #286')
-  call g:assert.equals(getpos("']"), [0, 3, 5, 0], 'failed at #286')
+  call g:assert.equals(getline(1),   '[foo',       'failed at #301')
+  call g:assert.equals(getline(2),   'bar',        'failed at #301')
+  call g:assert.equals(getline(3),   'baz]',       'failed at #301')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #301')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #301')
+  call g:assert.equals(getpos("']"), [0, 3, 5, 0], 'failed at #301')
 endfunction
 "}}}
 function! s:suite.linewise_n_nothing_inside() abort "{{{
-  " #287
+  " #302
   call setline('.', '()')
   normal srVa([
-  call g:assert.equals(getline('.'), '[]',         'failed at #287')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #287')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #287')
-  call g:assert.equals(getpos("']"), [0, 1, 3, 0], 'failed at #287')
+  call g:assert.equals(getline('.'), '[]',         'failed at #302')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #302')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #302')
+  call g:assert.equals(getpos("']"), [0, 1, 3, 0], 'failed at #302')
 
   %delete
 
-  " #288
+  " #303
   call append(0, ['(', ')'])
   normal ggsrVa([
-  call g:assert.equals(getline(1),   '[',          'failed at #288')
-  call g:assert.equals(getline(2),   ']',          'failed at #288')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #288')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #288')
-  call g:assert.equals(getpos("']"), [0, 2, 2, 0], 'failed at #288')
+  call g:assert.equals(getline(1),   '[',          'failed at #303')
+  call g:assert.equals(getline(2),   ']',          'failed at #303')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #303')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #303')
+  call g:assert.equals(getpos("']"), [0, 2, 2, 0], 'failed at #303')
 endfunction
 "}}}
 function! s:suite.linewise_n_count() abort "{{{
-  " #289
+  " #304
   call setline('.', '([foo])')
   normal 2srVl[(
-  call g:assert.equals(getline('.'), '[(foo)]',    'failed at #289')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #289')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #289')
-  call g:assert.equals(getpos("']"), [0, 1, 8, 0], 'failed at #289')
+  call g:assert.equals(getline('.'), '[(foo)]',    'failed at #304')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #304')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #304')
+  call g:assert.equals(getpos("']"), [0, 1, 8, 0], 'failed at #304')
 
-  " #290
+  " #305
   call setline('.', '[({foo})]')
   normal 3srVl{[(
-  call g:assert.equals(getline('.'), '{[(foo)]}',   'failed at #290')
-  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #290')
-  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #290')
-  call g:assert.equals(getpos("']"), [0, 1, 10, 0], 'failed at #290')
+  call g:assert.equals(getline('.'), '{[(foo)]}',   'failed at #305')
+  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #305')
+  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #305')
+  call g:assert.equals(getpos("']"), [0, 1, 10, 0], 'failed at #305')
 
   %delete
 
-  " #291
+  " #306
   call append(0, ['foo', '{', '[', '(', 'bar', ')', ']', '}', 'baz'])
   normal ggj3sr6j({[
-  call g:assert.equals(getline(1),   'foo',        'failed at #291')
-  call g:assert.equals(getline(2),   '(',          'failed at #291')
-  call g:assert.equals(getline(3),   '{',          'failed at #291')
-  call g:assert.equals(getline(4),   '[',          'failed at #291')
-  call g:assert.equals(getline(5),   'bar',        'failed at #291')
-  call g:assert.equals(getline(6),   ']',          'failed at #291')
-  call g:assert.equals(getline(7),   '}',          'failed at #291')
-  call g:assert.equals(getline(8),   ')',          'failed at #291')
-  call g:assert.equals(getline(9),   'baz',        'failed at #291')
-  call g:assert.equals(getpos('.'),  [0, 5, 1, 0], 'failed at #291')
-  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #291')
-  call g:assert.equals(getpos("']"), [0, 8, 2, 0], 'failed at #291')
+  call g:assert.equals(getline(1),   'foo',        'failed at #306')
+  call g:assert.equals(getline(2),   '(',          'failed at #306')
+  call g:assert.equals(getline(3),   '{',          'failed at #306')
+  call g:assert.equals(getline(4),   '[',          'failed at #306')
+  call g:assert.equals(getline(5),   'bar',        'failed at #306')
+  call g:assert.equals(getline(6),   ']',          'failed at #306')
+  call g:assert.equals(getline(7),   '}',          'failed at #306')
+  call g:assert.equals(getline(8),   ')',          'failed at #306')
+  call g:assert.equals(getline(9),   'baz',        'failed at #306')
+  call g:assert.equals(getpos('.'),  [0, 5, 1, 0], 'failed at #306')
+  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #306')
+  call g:assert.equals(getpos("']"), [0, 8, 2, 0], 'failed at #306')
 endfunction
 "}}}
 function! s:suite.linewise_n_breaking() abort "{{{
@@ -2910,77 +3003,77 @@ function! s:suite.linewise_n_breaking() abort "{{{
         \   {'buns': ["bb\nbbb\nbb", "bb\nbbb\nbb"], 'input':['b']},
         \ ]
 
-  " #292
+  " #307
   call append(0, ['aa', 'aaafooaaa', 'aa'])
   normal ggsr2j(
-  call g:assert.equals(getline(1),   '(foo)',      'failed at #292')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #292')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #292')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #292')
+  call g:assert.equals(getline(1),   '(foo)',      'failed at #307')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #307')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #307')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #307')
 
   %delete
 
-  " #293
+  " #308
   call append(0, ['bb', 'bbb', 'bbfoobb', 'bbb', 'bb'])
   normal ggsr4j(
-  call g:assert.equals(getline(1),   '(foo)',      'failed at #293')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #293')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #293')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #293')
+  call g:assert.equals(getline(1),   '(foo)',      'failed at #308')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #308')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #308')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #308')
 
   %delete
 
-  " #294
+  " #309
   call setline('.', '(foo)')
   normal srVla
-  call g:assert.equals(getline(1),   'aa',         'failed at #294')
-  call g:assert.equals(getline(2),   'aaafooaaa',  'failed at #294')
-  call g:assert.equals(getline(3),   'aa',         'failed at #294')
-  call g:assert.equals(getpos('.'),  [0, 2, 4, 0], 'failed at #294')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #294')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #294')
+  call g:assert.equals(getline(1),   'aa',         'failed at #309')
+  call g:assert.equals(getline(2),   'aaafooaaa',  'failed at #309')
+  call g:assert.equals(getline(3),   'aa',         'failed at #309')
+  call g:assert.equals(getpos('.'),  [0, 2, 4, 0], 'failed at #309')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #309')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #309')
 
   %delete
 
-  " #295
+  " #310
   call setline('.', '(foo)')
   normal srVlb
-  call g:assert.equals(getline(1),   'bb',         'failed at #295')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #295')
-  call g:assert.equals(getline(3),   'bbfoobb',    'failed at #295')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #295')
-  call g:assert.equals(getline(5),   'bb',         'failed at #295')
-  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #295')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #295')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #295')
+  call g:assert.equals(getline(1),   'bb',         'failed at #310')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #310')
+  call g:assert.equals(getline(3),   'bbfoobb',    'failed at #310')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #310')
+  call g:assert.equals(getline(5),   'bb',         'failed at #310')
+  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #310')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #310')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #310')
 
   %delete
 
-  " #296
+  " #311
   call append(0, ['aa', 'aaa', 'aa', 'aaa', 'foo', 'aaa', 'aa', 'aaa', 'aa'])
   normal gg2sr8j((
-  call g:assert.equals(getline(1),   '(',          'failed at #296')
-  call g:assert.equals(getline(2),   '(',          'failed at #296')
-  call g:assert.equals(getline(3),   'foo',        'failed at #296')
-  call g:assert.equals(getline(4),   ')',          'failed at #296')
-  call g:assert.equals(getline(5),   ')',          'failed at #296')
-  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #296')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #296')
-  call g:assert.equals(getpos("']"), [0, 5, 2, 0], 'failed at #296')
+  call g:assert.equals(getline(1),   '(',          'failed at #311')
+  call g:assert.equals(getline(2),   '(',          'failed at #311')
+  call g:assert.equals(getline(3),   'foo',        'failed at #311')
+  call g:assert.equals(getline(4),   ')',          'failed at #311')
+  call g:assert.equals(getline(5),   ')',          'failed at #311')
+  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #311')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #311')
+  call g:assert.equals(getpos("']"), [0, 5, 2, 0], 'failed at #311')
 
   %delete
 
-  " #297
+  " #312
   call append(0, ['bb', 'bbb', 'bb', 'bb', 'bbb', 'bb', 'foo', 'bb', 'bbb', 'bb', 'bb', 'bbb', 'bb'])
   normal gg2sr12j((
-  call g:assert.equals(getline(1),   '(',          'failed at #297')
-  call g:assert.equals(getline(2),   '(',          'failed at #297')
-  call g:assert.equals(getline(3),   'foo',        'failed at #297')
-  call g:assert.equals(getline(4),   ')',          'failed at #297')
-  call g:assert.equals(getline(5),   ')',          'failed at #297')
-  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #297')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #297')
-  call g:assert.equals(getpos("']"), [0, 5, 2, 0], 'failed at #297')
+  call g:assert.equals(getline(1),   '(',          'failed at #312')
+  call g:assert.equals(getline(2),   '(',          'failed at #312')
+  call g:assert.equals(getline(3),   'foo',        'failed at #312')
+  call g:assert.equals(getline(4),   ')',          'failed at #312')
+  call g:assert.equals(getline(5),   ')',          'failed at #312')
+  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #312')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #312')
+  call g:assert.equals(getpos("']"), [0, 5, 2, 0], 'failed at #312')
 
   unlet! g:operator#sandwich#recipes
 endfunction
@@ -2994,25 +3087,25 @@ function! s:suite.linewise_n_external_textobj() abort"{{{
         \   {'external': ['it', 'at']},
         \ ]
 
-  " #298
+  " #313
   call setline('.', '(foo)')
   normal srVl"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #298')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #313')
 
-  " #299
+  " #314
   call setline('.', '[foo]')
   normal srVl"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #299')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #314')
 
-  " #300
+  " #315
   call setline('.', '{foo}')
   normal srVl"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #300')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #315')
 
-  " #301
+  " #316
   call setline('.', '<title>foo</title>')
   normal srVl"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #301')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #316')
 
   unlet g:sandwich#recipes
   unlet g:operator#sandwich#recipes
@@ -3021,68 +3114,68 @@ endfunction
 function! s:suite.linewise_n_option_cursor() abort  "{{{
   """"" cursor
   """ inner_head
-  " #302
+  " #317
   call setline('.', '(((foo)))')
   normal 02srVl[[
-  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #302')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #302')
+  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #317')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #317')
 
-  " #303
+  " #318
   normal srVl(
-  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #303')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #303')
+  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #318')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #318')
 
   """ keep
-  " #304
+  " #319
   call operator#sandwich#set('replace', 'line', 'cursor', 'keep')
   call setline('.', '(((foo)))')
   normal 04l2srVl[[
-  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #304')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #304')
+  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #319')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #319')
 
-  " #305
+  " #320
   normal lsrVl(
-  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #305')
-  call g:assert.equals(getpos('.'),  [0, 1, 6, 0], 'failed at #305')
+  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #320')
+  call g:assert.equals(getpos('.'),  [0, 1, 6, 0], 'failed at #320')
 
   """ inner_tail
-  " #306
+  " #321
   call operator#sandwich#set('replace', 'line', 'cursor', 'inner_tail')
   call setline('.', '(((foo)))')
   normal 04l2srVl[[
-  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #306')
-  call g:assert.equals(getpos('.'),  [0, 1, 7, 0], 'failed at #306')
+  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #321')
+  call g:assert.equals(getpos('.'),  [0, 1, 7, 0], 'failed at #321')
 
-  " #307
+  " #322
   normal hsrVl(
-  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #307')
-  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #307')
+  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #322')
+  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #322')
 
   """ front
-  " #308
+  " #323
   call operator#sandwich#set('replace', 'line', 'cursor', 'front')
   call setline('.', '(((foo)))')
   normal 04l2srVl[[
-  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #308')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #308')
+  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #323')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #323')
 
-  " #309
+  " #324
   normal 3lsrVl(
-  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #309')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #309')
+  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #324')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #324')
 
   """ end
-  " #310
+  " #325
   call operator#sandwich#set('replace', 'line', 'cursor', 'end')
   call setline('.', '(((foo)))')
   normal 04l2srVl[[
-  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #310')
-  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #310')
+  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #325')
+  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #325')
 
-  " #311
+  " #326
   normal 3hsrVl(
-  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #311')
-  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #311')
+  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #326')
+  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #326')
 
   call operator#sandwich#set('replace', 'line', 'cursor', 'inner_head')
 endfunction
@@ -3095,27 +3188,27 @@ function! s:suite.linewise_n_option_noremap() abort  "{{{
   xnoremap a{ a(
 
   """ on
-  " #312
+  " #327
   call setline('.', '{foo}')
   normal 0srVl"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #312')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #327')
 
-  " #313
+  " #328
   call setline('.', '(foo)')
   normal 0srVl"
-  call g:assert.equals(getline('.'), '(foo)', 'failed at #313')
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #328')
 
   """ off
-  " #314
+  " #329
   call operator#sandwich#set('replace', 'line', 'noremap', 0)
   call setline('.', '{foo}')
   normal 0srVl"
-  call g:assert.equals(getline('.'), '{foo}', 'failed at #314')
+  call g:assert.equals(getline('.'), '{foo}', 'failed at #329')
 
-  " #315
+  " #330
   call setline('.', '(foo)')
   normal 0srVl"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #315')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #330')
 
   unlet! g:sandwich#recipes
   unlet! g:operator#sandwich#recipes
@@ -3129,27 +3222,27 @@ function! s:suite.linewise_n_option_regex() abort  "{{{
   let g:operator#sandwich#recipes = [{'buns': ['\d\+', '\d\+']}]
 
   """ off
-  " #316
+  " #331
   call setline('.', '\d\+foo\d\+')
   normal 0srVl"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #316')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #331')
 
-  " #317
+  " #332
   call setline('.', '888foo888')
   normal 0srVl"
-  call g:assert.equals(getline('.'), '"88foo88"', 'failed at #317')
+  call g:assert.equals(getline('.'), '"88foo88"', 'failed at #332')
 
   """ on
   call operator#sandwich#set('replace', 'line', 'regex', 1)
-  " #318
+  " #333
   call setline('.', '\d\+foo\d\+')
   normal 0srVl"
-  call g:assert.equals(getline('.'), '\d\+foo\d\+', 'failed at #318')
+  call g:assert.equals(getline('.'), '\d\+foo\d\+', 'failed at #333')
 
-  " #319
+  " #334
   call setline('.', '888foo888')
   normal 0srVl"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #319')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #334')
 
   call operator#sandwich#set('replace', 'line', 'regex', 0)
   unlet! g:sandwich#recipes
@@ -3158,66 +3251,66 @@ endfunction
 "}}}
 function! s:suite.linewise_n_option_skip_space() abort  "{{{
   """ on
-  " #320
+  " #335
   call setline('.', '"foo"')
   normal 0srVl(
-  call g:assert.equals(getline('.'), '(foo)', 'failed at #320')
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #335')
 
-  " #321
+  " #336
   call setline('.', ' "foo"')
   normal 0srVl(
-  call g:assert.equals(getline('.'), ' (foo)', 'failed at #321')
+  call g:assert.equals(getline('.'), ' (foo)', 'failed at #336')
 
-  " #322
+  " #337
   call setline('.', '"foo" ')
   normal 0srVl(
-  call g:assert.equals(getline('.'), '(foo) ', 'failed at #322')
+  call g:assert.equals(getline('.'), '(foo) ', 'failed at #337')
 
-  " #323
+  " #338
   " do not skip!
   call setline('.', ' "foo" ')
   normal 0srVl(
-  call g:assert.equals(getline('.'), '("foo")', 'failed at #323')
+  call g:assert.equals(getline('.'), '("foo")', 'failed at #338')
 
   """ off
   call operator#sandwich#set('replace', 'line', 'skip_space', 0)
-  " #324
+  " #339
   call setline('.', '"foo"')
   normal 0srVl(
-  call g:assert.equals(getline('.'), '(foo)', 'failed at #324')
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #339')
 
-  " #325
+  " #340
   call setline('.', ' "foo"')
   normal 0srVl(
-  call g:assert.equals(getline('.'), ' "foo"', 'failed at #325')
+  call g:assert.equals(getline('.'), ' "foo"', 'failed at #340')
 
-  " #326
+  " #341
   call setline('.', '"foo" ')
   normal 0srVl(
-  call g:assert.equals(getline('.'), '"foo" ', 'failed at #326')
+  call g:assert.equals(getline('.'), '"foo" ', 'failed at #341')
 
-  " #327
+  " #342
   " do not skip!
   call setline('.', ' "foo" ')
   normal 0srVl(
-  call g:assert.equals(getline('.'), '("foo")', 'failed at #327')
+  call g:assert.equals(getline('.'), '("foo")', 'failed at #342')
 
   call operator#sandwich#set('replace', 'line', 'skip_space', 1)
 endfunction
 "}}}
 function! s:suite.linewise_n_option_skip_char() abort "{{{
   """ off
-  " #328
+  " #343
   call setline('.', 'aa(foo)bb')
   normal 0srVl"
-  call g:assert.equals(getline('.'), 'aa(foo)bb', 'failed at #328')
+  call g:assert.equals(getline('.'), 'aa(foo)bb', 'failed at #343')
 
   """ on
   call operator#sandwich#set('replace', 'line', 'skip_char', 1)
-  " #329
+  " #344
   call setline('.', 'aa(foo)bb')
   normal 0srVl"
-  call g:assert.equals(getline('.'), 'aa"foo"bb', 'failed at #329')
+  call g:assert.equals(getline('.'), 'aa"foo"bb', 'failed at #344')
 
   call operator#sandwich#set('replace', 'line', 'skip_char', 0)
 endfunction
@@ -3225,10 +3318,10 @@ endfunction
 function! s:suite.linewise_n_option_command() abort  "{{{
   call operator#sandwich#set('replace', 'line', 'command', ['normal! `[dv`]'])
 
-  " #330
+  " #345
   call setline('.', '(foo)')
   normal 0srVl"
-  call g:assert.equals(getline('.'), '""', 'failed at #330')
+  call g:assert.equals(getline('.'), '""', 'failed at #345')
 
   call operator#sandwich#set('replace', 'line', 'command', [])
 endfunction
@@ -3237,134 +3330,134 @@ function! s:suite.linewise_n_option_linewise() abort  "{{{
   call operator#sandwich#set('replace', 'line', 'linewise', 0)
 
   """ 0
-  " #331
+  " #346
   call append(0, ['(', 'foo', ')'])
   normal ggsr2j[
-  call g:assert.equals(getline(1),   '[',          'failed at #331')
-  call g:assert.equals(getline(2),   'foo',        'failed at #331')
-  call g:assert.equals(getline(3),   ']',          'failed at #331')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #331')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #331')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #331')
+  call g:assert.equals(getline(1),   '[',          'failed at #346')
+  call g:assert.equals(getline(2),   'foo',        'failed at #346')
+  call g:assert.equals(getline(3),   ']',          'failed at #346')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #346')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #346')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #346')
 
   %delete
 
-  " #332
+  " #347
   call append(0, ['(  ', 'foo', '  )'])
   normal ggsr2j[
-  call g:assert.equals(getline(1),   '[  ',        'failed at #332')
-  call g:assert.equals(getline(2),   'foo',        'failed at #332')
-  call g:assert.equals(getline(3),   '  ]',        'failed at #332')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #332')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #332')
-  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #332')
+  call g:assert.equals(getline(1),   '[  ',        'failed at #347')
+  call g:assert.equals(getline(2),   'foo',        'failed at #347')
+  call g:assert.equals(getline(3),   '  ]',        'failed at #347')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #347')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #347')
+  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #347')
 
   %delete
 
-  " #333
+  " #348
   call append(0, ['(aa', 'foo', 'aa)'])
   normal ggsr2j[
-  call g:assert.equals(getline(1),   '[aa',        'failed at #333')
-  call g:assert.equals(getline(2),   'foo',        'failed at #333')
-  call g:assert.equals(getline(3),   'aa]',        'failed at #333')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #333')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #333')
-  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #333')
+  call g:assert.equals(getline(1),   '[aa',        'failed at #348')
+  call g:assert.equals(getline(2),   'foo',        'failed at #348')
+  call g:assert.equals(getline(3),   'aa]',        'failed at #348')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #348')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #348')
+  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #348')
 
   %delete
 
-  " #334
+  " #349
   call append(0, ['(aa', 'foo', ')'])
   normal ggsr2j[
-  call g:assert.equals(getline(1),   '[aa',        'failed at #334')
-  call g:assert.equals(getline(2),   'foo',        'failed at #334')
-  call g:assert.equals(getline(3),   ']',          'failed at #334')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #334')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #334')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #334')
+  call g:assert.equals(getline(1),   '[aa',        'failed at #349')
+  call g:assert.equals(getline(2),   'foo',        'failed at #349')
+  call g:assert.equals(getline(3),   ']',          'failed at #349')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #349')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #349')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #349')
 
   %delete
 
-  " #335
+  " #350
   call append(0, ['(', 'foo', 'aa)'])
   normal ggsr2j[
-  call g:assert.equals(getline(1),   '[',          'failed at #335')
-  call g:assert.equals(getline(2),   'foo',        'failed at #335')
-  call g:assert.equals(getline(3),   'aa]',        'failed at #335')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #335')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #335')
-  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #335')
+  call g:assert.equals(getline(1),   '[',          'failed at #350')
+  call g:assert.equals(getline(2),   'foo',        'failed at #350')
+  call g:assert.equals(getline(3),   'aa]',        'failed at #350')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #350')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #350')
+  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #350')
 
   %delete
 
   call operator#sandwich#set('replace', 'line', 'linewise', 2)
 
   """ 2
-  " #336
+  " #351
   call append(0, ['(', 'foo', ')'])
   normal ggsr2j[
-  call g:assert.equals(getline(1),   '[',          'failed at #336')
-  call g:assert.equals(getline(2),   'foo',        'failed at #336')
-  call g:assert.equals(getline(3),   ']',          'failed at #336')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #336')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #336')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #336')
+  call g:assert.equals(getline(1),   '[',          'failed at #351')
+  call g:assert.equals(getline(2),   'foo',        'failed at #351')
+  call g:assert.equals(getline(3),   ']',          'failed at #351')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #351')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #351')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #351')
 
   %delete
 
-  " #337
+  " #352
   call append(0, ['(  ', 'foo', '  )'])
   normal ggsr2j[
-  call g:assert.equals(getline(1),   '[',          'failed at #337')
-  call g:assert.equals(getline(2),   'foo',        'failed at #337')
-  call g:assert.equals(getline(3),   ']',          'failed at #337')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #337')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #337')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #337')
+  call g:assert.equals(getline(1),   '[',          'failed at #352')
+  call g:assert.equals(getline(2),   'foo',        'failed at #352')
+  call g:assert.equals(getline(3),   ']',          'failed at #352')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #352')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #352')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #352')
 
   %delete
 
-  " #338
+  " #353
   call append(0, ['(aa', 'foo', 'aa)'])
   normal ggsr2j[
-  call g:assert.equals(getline(1),   '[',          'failed at #338')
-  call g:assert.equals(getline(2),   'foo',        'failed at #338')
-  call g:assert.equals(getline(3),   ']',          'failed at #338')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #338')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #338')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #338')
+  call g:assert.equals(getline(1),   '[',          'failed at #353')
+  call g:assert.equals(getline(2),   'foo',        'failed at #353')
+  call g:assert.equals(getline(3),   ']',          'failed at #353')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #353')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #353')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #353')
 
   %delete
 
-  " #339
+  " #354
   " FIXME: I have no idea what is the expexted behavior.
   call append(0, ['aa', '(foo)', 'bb'])
   normal ggjsrVl[
-  call g:assert.equals(getline(1),   'aa',         'failed at #339')
-  call g:assert.equals(getline(2),   '[',          'failed at #339')
-  call g:assert.equals(getline(3),   'bb',         'failed at #339')
-  call g:assert.equals(getline(4),   '',           'failed at #339')
-  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #339')
-  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #339')
-  call g:assert.equals(getpos("']"), [0, 3, 1, 0], 'failed at #339')
+  call g:assert.equals(getline(1),   'aa',         'failed at #354')
+  call g:assert.equals(getline(2),   '[',          'failed at #354')
+  call g:assert.equals(getline(3),   'bb',         'failed at #354')
+  call g:assert.equals(getline(4),   '',           'failed at #354')
+  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #354')
+  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #354')
+  call g:assert.equals(getpos("']"), [0, 3, 1, 0], 'failed at #354')
 endfunction
 "}}}
 function! s:suite.linewise_n_option_query_once() abort  "{{{
   """"" query_once
   """ off
-  " #340
+  " #355
   call setline('.', '"""foo"""')
   normal 03srVl([{
-  call g:assert.equals(getline('.'), '([{foo}])',  'failed at #340')
+  call g:assert.equals(getline('.'), '([{foo}])',  'failed at #355')
 
   %delete
 
   """ on
-  " #341
+  " #356
   call operator#sandwich#set('replace', 'line', 'query_once', 1)
   call setline('.', '"""foo"""')
   normal 03srVl(
-  call g:assert.equals(getline('.'), '(((foo)))',  'failed at #341')
+  call g:assert.equals(getline('.'), '(((foo)))',  'failed at #356')
 
   call operator#sandwich#set('replace', 'line', 'query_once', 0)
 endfunction
@@ -3374,17 +3467,17 @@ function! s:suite.linewise_n_option_expr() abort "{{{
   let g:operator#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'input':['a']}]
 
   """ 0
-  " #342
+  " #357
   call setline('.', '"foo"')
   normal 0srVla
-  call g:assert.equals(getline('.'), '1+1foo1+2',  'failed at #342')
+  call g:assert.equals(getline('.'), '1+1foo1+2',  'failed at #357')
 
   """ 1
-  " #343
+  " #358
   call operator#sandwich#set('replace', 'line', 'expr', 1)
   call setline('.', '"foo"')
   normal 0srVla
-  call g:assert.equals(getline('.'), '2foo3',  'failed at #343')
+  call g:assert.equals(getline('.'), '2foo3',  'failed at #358')
 
   """ 2
   " This case cannot be tested since this option makes difference only in
@@ -3396,218 +3489,218 @@ endfunction
 "}}}
 
 function! s:suite.linewise_x_default_recipes() abort "{{{
-  " #344
+  " #359
   call setline('.', '(foo)')
   normal Vsr[
-  call g:assert.equals(getline('.'), '[foo]',      'failed at #344')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #344')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #344')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #344')
+  call g:assert.equals(getline('.'), '[foo]',      'failed at #359')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #359')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #359')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #359')
 
-  " #345
+  " #360
   call setline('.', '[foo]')
   normal Vsr{
-  call g:assert.equals(getline('.'), '{foo}',      'failed at #345')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #345')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #345')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #345')
+  call g:assert.equals(getline('.'), '{foo}',      'failed at #360')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #360')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #360')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #360')
 
-  " #346
+  " #361
   call setline('.', '{foo}')
   normal Vsr<
-  call g:assert.equals(getline('.'), '<foo>',      'failed at #346')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #346')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #346')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #346')
+  call g:assert.equals(getline('.'), '<foo>',      'failed at #361')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #361')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #361')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #361')
 
-  " #347
+  " #362
   call setline('.', '<foo>')
   normal Vsr(
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #347')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #347')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #347')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #347')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #362')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #362')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #362')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #362')
 
   %delete
 
-  " #348
+  " #363
   call append(0, ['(', 'foo', ')'])
   normal ggV2jsr]
-  call g:assert.equals(getline(1),   '[',          'failed at #348')
-  call g:assert.equals(getline(2),   'foo',        'failed at #348')
-  call g:assert.equals(getline(3),   ']',          'failed at #348')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #348')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #348')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #348')
+  call g:assert.equals(getline(1),   '[',          'failed at #363')
+  call g:assert.equals(getline(2),   'foo',        'failed at #363')
+  call g:assert.equals(getline(3),   ']',          'failed at #363')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #363')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #363')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #363')
 
-  " #349
+  " #364
   call append(0, ['[', 'foo', ']'])
   normal ggV2jsr}
-  call g:assert.equals(getline(1),   '{',          'failed at #349')
-  call g:assert.equals(getline(2),   'foo',        'failed at #349')
-  call g:assert.equals(getline(3),   '}',          'failed at #349')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #349')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #349')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #349')
+  call g:assert.equals(getline(1),   '{',          'failed at #364')
+  call g:assert.equals(getline(2),   'foo',        'failed at #364')
+  call g:assert.equals(getline(3),   '}',          'failed at #364')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #364')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #364')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #364')
 
-  " #350
+  " #365
   call append(0, ['{', 'foo', '}'])
   normal ggV2jsr>
-  call g:assert.equals(getline(1),   '<',          'failed at #350')
-  call g:assert.equals(getline(2),   'foo',        'failed at #350')
-  call g:assert.equals(getline(3),   '>',          'failed at #350')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #350')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #350')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #350')
+  call g:assert.equals(getline(1),   '<',          'failed at #365')
+  call g:assert.equals(getline(2),   'foo',        'failed at #365')
+  call g:assert.equals(getline(3),   '>',          'failed at #365')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #365')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #365')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #365')
 
-  " #351
+  " #366
   call append(0, ['<', 'foo', '>'])
   normal ggV2jsr)
-  call g:assert.equals(getline(1),   '(',          'failed at #351')
-  call g:assert.equals(getline(2),   'foo',        'failed at #351')
-  call g:assert.equals(getline(3),   ')',          'failed at #351')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #351')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #351')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #351')
+  call g:assert.equals(getline(1),   '(',          'failed at #366')
+  call g:assert.equals(getline(2),   'foo',        'failed at #366')
+  call g:assert.equals(getline(3),   ')',          'failed at #366')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #366')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #366')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #366')
 endfunction
 "}}}
 function! s:suite.linewise_x_not_registered() abort "{{{
-  " #352
+  " #367
   call setline('.', 'afooa')
   normal Vsrb
-  call g:assert.equals(getline('.'), 'bfoob',      'failed at #352')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #352')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #352')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #352')
+  call g:assert.equals(getline('.'), 'bfoob',      'failed at #367')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #367')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #367')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #367')
 
-  " #353
+  " #368
   call setline('.', '+foo+')
   normal Vsr*
-  call g:assert.equals(getline('.'), '*foo*',      'failed at #353')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #353')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #353')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #353')
+  call g:assert.equals(getline('.'), '*foo*',      'failed at #368')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #368')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #368')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #368')
 
   %delete
 
-  " #352
+  " #367
   call append(0, ['a', 'foo', 'a'])
   normal ggV2jsrb
-  call g:assert.equals(getline(1),   'b',          'failed at #352')
-  call g:assert.equals(getline(2),   'foo',        'failed at #352')
-  call g:assert.equals(getline(3),   'b',          'failed at #352')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #352')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #352')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #352')
+  call g:assert.equals(getline(1),   'b',          'failed at #367')
+  call g:assert.equals(getline(2),   'foo',        'failed at #367')
+  call g:assert.equals(getline(3),   'b',          'failed at #367')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #367')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #367')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #367')
 
   %delete
 
-  " #353
+  " #368
   call append(0, ['+', 'foo', '+'])
   normal ggV2jsr*
-  call g:assert.equals(getline(1),   '*',          'failed at #353')
-  call g:assert.equals(getline(2),   'foo',        'failed at #353')
-  call g:assert.equals(getline(3),   '*',          'failed at #353')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #353')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #353')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #353')
+  call g:assert.equals(getline(1),   '*',          'failed at #368')
+  call g:assert.equals(getline(2),   'foo',        'failed at #368')
+  call g:assert.equals(getline(3),   '*',          'failed at #368')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #368')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #368')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #368')
 endfunction
 "}}}
 function! s:suite.linewise_x_positioning() abort "{{{
-  " #354
+  " #369
   call append(0, ['(', 'foo', 'bar', 'baz', ')'])
   normal ggV4jsr[
-  call g:assert.equals(getline(1),   '[',          'failed at #354')
-  call g:assert.equals(getline(2),   'foo',        'failed at #354')
-  call g:assert.equals(getline(3),   'bar',        'failed at #354')
-  call g:assert.equals(getline(4),   'baz',        'failed at #354')
-  call g:assert.equals(getline(5),   ']',          'failed at #354')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #354')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #354')
-  call g:assert.equals(getpos("']"), [0, 5, 2, 0], 'failed at #354')
+  call g:assert.equals(getline(1),   '[',          'failed at #369')
+  call g:assert.equals(getline(2),   'foo',        'failed at #369')
+  call g:assert.equals(getline(3),   'bar',        'failed at #369')
+  call g:assert.equals(getline(4),   'baz',        'failed at #369')
+  call g:assert.equals(getline(5),   ']',          'failed at #369')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #369')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #369')
+  call g:assert.equals(getpos("']"), [0, 5, 2, 0], 'failed at #369')
 
   %delete
 
-  " #355
+  " #370
   call append(0, ['foo', '(', 'bar', ')', 'baz'])
   normal ggjV2jsr[
-  call g:assert.equals(getline(1),   'foo',        'failed at #355')
-  call g:assert.equals(getline(2),   '[',          'failed at #355')
-  call g:assert.equals(getline(3),   'bar',        'failed at #355')
-  call g:assert.equals(getline(4),   ']',          'failed at #355')
-  call g:assert.equals(getline(5),   'baz',        'failed at #355')
-  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #355')
-  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #355')
-  call g:assert.equals(getpos("']"), [0, 4, 2, 0], 'failed at #355')
+  call g:assert.equals(getline(1),   'foo',        'failed at #370')
+  call g:assert.equals(getline(2),   '[',          'failed at #370')
+  call g:assert.equals(getline(3),   'bar',        'failed at #370')
+  call g:assert.equals(getline(4),   ']',          'failed at #370')
+  call g:assert.equals(getline(5),   'baz',        'failed at #370')
+  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #370')
+  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #370')
+  call g:assert.equals(getpos("']"), [0, 4, 2, 0], 'failed at #370')
 
   %delete
 
-  " #356
+  " #371
   call append(0, ['(foo', 'bar', 'baz)'])
   normal ggV2jsr[
-  call g:assert.equals(getline(1),   '[foo',       'failed at #356')
-  call g:assert.equals(getline(2),   'bar',        'failed at #356')
-  call g:assert.equals(getline(3),   'baz]',       'failed at #356')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #356')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #356')
-  call g:assert.equals(getpos("']"), [0, 3, 5, 0], 'failed at #356')
+  call g:assert.equals(getline(1),   '[foo',       'failed at #371')
+  call g:assert.equals(getline(2),   'bar',        'failed at #371')
+  call g:assert.equals(getline(3),   'baz]',       'failed at #371')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #371')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #371')
+  call g:assert.equals(getpos("']"), [0, 3, 5, 0], 'failed at #371')
 endfunction
 "}}}
 function! s:suite.linewise_x_nothing_inside() abort "{{{
-  " #357
+  " #372
   call setline('.', '()')
   normal Vsr[
-  call g:assert.equals(getline('.'), '[]',         'failed at #357')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #357')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #357')
-  call g:assert.equals(getpos("']"), [0, 1, 3, 0], 'failed at #357')
+  call g:assert.equals(getline('.'), '[]',         'failed at #372')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #372')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #372')
+  call g:assert.equals(getpos("']"), [0, 1, 3, 0], 'failed at #372')
 
   %delete
 
-  " #358
+  " #373
   call append(0, ['(', ')'])
   normal ggVjsr[
-  call g:assert.equals(getline(1),   '[',          'failed at #358')
-  call g:assert.equals(getline(2),   ']',          'failed at #358')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #358')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #358')
-  call g:assert.equals(getpos("']"), [0, 2, 2, 0], 'failed at #358')
+  call g:assert.equals(getline(1),   '[',          'failed at #373')
+  call g:assert.equals(getline(2),   ']',          'failed at #373')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #373')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #373')
+  call g:assert.equals(getpos("']"), [0, 2, 2, 0], 'failed at #373')
 endfunction
 "}}}
 function! s:suite.linewise_x_count() abort "{{{
-  " #359
+  " #374
   call setline('.', '([foo])')
   normal V2sr[(
-  call g:assert.equals(getline('.'), '[(foo)]',    'failed at #359')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #359')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #359')
-  call g:assert.equals(getpos("']"), [0, 1, 8, 0], 'failed at #359')
+  call g:assert.equals(getline('.'), '[(foo)]',    'failed at #374')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #374')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #374')
+  call g:assert.equals(getpos("']"), [0, 1, 8, 0], 'failed at #374')
 
-  " #360
+  " #375
   call setline('.', '[({foo})]')
   normal V3sr{[(
-  call g:assert.equals(getline('.'), '{[(foo)]}',   'failed at #360')
-  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #360')
-  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #360')
-  call g:assert.equals(getpos("']"), [0, 1, 10, 0], 'failed at #360')
+  call g:assert.equals(getline('.'), '{[(foo)]}',   'failed at #375')
+  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #375')
+  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #375')
+  call g:assert.equals(getpos("']"), [0, 1, 10, 0], 'failed at #375')
 
   %delete
 
-  " #361
+  " #376
   call append(0, ['foo', '{', '[', '(', 'bar', ')', ']', '}', 'baz'])
   normal ggjV6j3sr({[
-  call g:assert.equals(getline(1),   'foo',        'failed at #361')
-  call g:assert.equals(getline(2),   '(',          'failed at #361')
-  call g:assert.equals(getline(3),   '{',          'failed at #361')
-  call g:assert.equals(getline(4),   '[',          'failed at #361')
-  call g:assert.equals(getline(5),   'bar',        'failed at #361')
-  call g:assert.equals(getline(6),   ']',          'failed at #361')
-  call g:assert.equals(getline(7),   '}',          'failed at #361')
-  call g:assert.equals(getline(8),   ')',          'failed at #361')
-  call g:assert.equals(getline(9),   'baz',        'failed at #361')
-  call g:assert.equals(getpos('.'),  [0, 5, 1, 0], 'failed at #361')
-  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #361')
-  call g:assert.equals(getpos("']"), [0, 8, 2, 0], 'failed at #361')
+  call g:assert.equals(getline(1),   'foo',        'failed at #376')
+  call g:assert.equals(getline(2),   '(',          'failed at #376')
+  call g:assert.equals(getline(3),   '{',          'failed at #376')
+  call g:assert.equals(getline(4),   '[',          'failed at #376')
+  call g:assert.equals(getline(5),   'bar',        'failed at #376')
+  call g:assert.equals(getline(6),   ']',          'failed at #376')
+  call g:assert.equals(getline(7),   '}',          'failed at #376')
+  call g:assert.equals(getline(8),   ')',          'failed at #376')
+  call g:assert.equals(getline(9),   'baz',        'failed at #376')
+  call g:assert.equals(getpos('.'),  [0, 5, 1, 0], 'failed at #376')
+  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #376')
+  call g:assert.equals(getpos("']"), [0, 8, 2, 0], 'failed at #376')
 endfunction
 "}}}
 function! s:suite.linewise_x_breaking() abort "{{{
@@ -3616,77 +3709,77 @@ function! s:suite.linewise_x_breaking() abort "{{{
         \   {'buns': ["bb\nbbb\nbb", "bb\nbbb\nbb"], 'input':['b']},
         \ ]
 
-  " #362
+  " #377
   call append(0, ['aa', 'aaafooaaa', 'aa'])
   normal ggV2jsr(
-  call g:assert.equals(getline(1),   '(foo)',      'failed at #362')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #362')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #362')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #362')
+  call g:assert.equals(getline(1),   '(foo)',      'failed at #377')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #377')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #377')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #377')
 
   %delete
 
-  " #363
+  " #378
   call append(0, ['bb', 'bbb', 'bbfoobb', 'bbb', 'bb'])
   normal ggV4jsr(
-  call g:assert.equals(getline(1),   '(foo)',      'failed at #363')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #363')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #363')
-  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #363')
+  call g:assert.equals(getline(1),   '(foo)',      'failed at #378')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #378')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #378')
+  call g:assert.equals(getpos("']"), [0, 1, 6, 0], 'failed at #378')
 
   %delete
 
-  " #364
+  " #379
   call setline('.', '(foo)')
   normal Vsra
-  call g:assert.equals(getline(1),   'aa',         'failed at #364')
-  call g:assert.equals(getline(2),   'aaafooaaa',  'failed at #364')
-  call g:assert.equals(getline(3),   'aa',         'failed at #364')
-  call g:assert.equals(getpos('.'),  [0, 2, 4, 0], 'failed at #364')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #364')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #364')
+  call g:assert.equals(getline(1),   'aa',         'failed at #379')
+  call g:assert.equals(getline(2),   'aaafooaaa',  'failed at #379')
+  call g:assert.equals(getline(3),   'aa',         'failed at #379')
+  call g:assert.equals(getpos('.'),  [0, 2, 4, 0], 'failed at #379')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #379')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #379')
 
   %delete
 
-  " #365
+  " #380
   call setline('.', '(foo)')
   normal Vsrb
-  call g:assert.equals(getline(1),   'bb',         'failed at #365')
-  call g:assert.equals(getline(2),   'bbb',        'failed at #365')
-  call g:assert.equals(getline(3),   'bbfoobb',    'failed at #365')
-  call g:assert.equals(getline(4),   'bbb',        'failed at #365')
-  call g:assert.equals(getline(5),   'bb',         'failed at #365')
-  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #365')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #365')
-  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #365')
+  call g:assert.equals(getline(1),   'bb',         'failed at #380')
+  call g:assert.equals(getline(2),   'bbb',        'failed at #380')
+  call g:assert.equals(getline(3),   'bbfoobb',    'failed at #380')
+  call g:assert.equals(getline(4),   'bbb',        'failed at #380')
+  call g:assert.equals(getline(5),   'bb',         'failed at #380')
+  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #380')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #380')
+  call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #380')
 
   %delete
 
-  " #366
+  " #381
   call append(0, ['aa', 'aaa', 'aa', 'aaa', 'foo', 'aaa', 'aa', 'aaa', 'aa'])
   normal ggV8j2sr((
-  call g:assert.equals(getline(1),   '(',          'failed at #366')
-  call g:assert.equals(getline(2),   '(',          'failed at #366')
-  call g:assert.equals(getline(3),   'foo',        'failed at #366')
-  call g:assert.equals(getline(4),   ')',          'failed at #366')
-  call g:assert.equals(getline(5),   ')',          'failed at #366')
-  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #366')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #366')
-  call g:assert.equals(getpos("']"), [0, 5, 2, 0], 'failed at #366')
+  call g:assert.equals(getline(1),   '(',          'failed at #381')
+  call g:assert.equals(getline(2),   '(',          'failed at #381')
+  call g:assert.equals(getline(3),   'foo',        'failed at #381')
+  call g:assert.equals(getline(4),   ')',          'failed at #381')
+  call g:assert.equals(getline(5),   ')',          'failed at #381')
+  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #381')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #381')
+  call g:assert.equals(getpos("']"), [0, 5, 2, 0], 'failed at #381')
 
   %delete
 
-  " #367
+  " #382
   call append(0, ['bb', 'bbb', 'bb', 'bb', 'bbb', 'bb', 'foo', 'bb', 'bbb', 'bb', 'bb', 'bbb', 'bb'])
   normal ggV12j2sr((
-  call g:assert.equals(getline(1),   '(',          'failed at #367')
-  call g:assert.equals(getline(2),   '(',          'failed at #367')
-  call g:assert.equals(getline(3),   'foo',        'failed at #367')
-  call g:assert.equals(getline(4),   ')',          'failed at #367')
-  call g:assert.equals(getline(5),   ')',          'failed at #367')
-  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #367')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #367')
-  call g:assert.equals(getpos("']"), [0, 5, 2, 0], 'failed at #367')
+  call g:assert.equals(getline(1),   '(',          'failed at #382')
+  call g:assert.equals(getline(2),   '(',          'failed at #382')
+  call g:assert.equals(getline(3),   'foo',        'failed at #382')
+  call g:assert.equals(getline(4),   ')',          'failed at #382')
+  call g:assert.equals(getline(5),   ')',          'failed at #382')
+  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #382')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #382')
+  call g:assert.equals(getpos("']"), [0, 5, 2, 0], 'failed at #382')
 
   unlet! g:operator#sandwich#recipes
 endfunction
@@ -3700,25 +3793,25 @@ function! s:suite.linewise_x_external_textobj() abort"{{{
         \   {'external': ['it', 'at']},
         \ ]
 
-  " #368
+  " #383
   call setline('.', '(foo)')
   normal Vsr"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #368')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #383')
 
-  " #369
+  " #384
   call setline('.', '[foo]')
   normal Vsr"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #369')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #384')
 
-  " #370
+  " #385
   call setline('.', '{foo}')
   normal Vsr"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #370')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #385')
 
-  " #371
+  " #386
   call setline('.', '<title>foo</title>')
   normal Vsr"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #371')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #386')
 
   unlet g:sandwich#recipes
   unlet g:operator#sandwich#recipes
@@ -3727,68 +3820,68 @@ endfunction
 function! s:suite.linewise_x_option_cursor() abort  "{{{
   """"" cursor
   """ inner_head
-  " #372
+  " #387
   call setline('.', '(((foo)))')
   normal 0V2sr[[
-  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #372')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #372')
+  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #387')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #387')
 
-  " #373
+  " #388
   normal Vsr(
-  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #373')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #373')
+  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #388')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #388')
 
   """ keep
-  " #374
+  " #389
   call operator#sandwich#set('replace', 'line', 'cursor', 'keep')
   call setline('.', '(((foo)))')
   normal 04lV2sr[[
-  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #374')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #374')
+  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #389')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #389')
 
-  " #375
+  " #390
   normal lVsr(
-  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #375')
-  call g:assert.equals(getpos('.'),  [0, 1, 6, 0], 'failed at #375')
+  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #390')
+  call g:assert.equals(getpos('.'),  [0, 1, 6, 0], 'failed at #390')
 
   """ inner_tail
-  " #376
+  " #391
   call operator#sandwich#set('replace', 'line', 'cursor', 'inner_tail')
   call setline('.', '(((foo)))')
   normal 04lV2sr[[
-  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #376')
-  call g:assert.equals(getpos('.'),  [0, 1, 7, 0], 'failed at #376')
+  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #391')
+  call g:assert.equals(getpos('.'),  [0, 1, 7, 0], 'failed at #391')
 
-  " #377
+  " #392
   normal hVsr(
-  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #377')
-  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #377')
+  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #392')
+  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #392')
 
   """ front
-  " #378
+  " #393
   call operator#sandwich#set('replace', 'line', 'cursor', 'front')
   call setline('.', '(((foo)))')
   normal 04lV2sr[[
-  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #378')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #378')
+  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #393')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #393')
 
-  " #379
+  " #394
   normal 3lVsr(
-  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #379')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #379')
+  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #394')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #394')
 
   """ end
-  " #380
+  " #395
   call operator#sandwich#set('replace', 'line', 'cursor', 'end')
   call setline('.', '(((foo)))')
   normal 04lV2sr[[
-  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #380')
-  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #380')
+  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #395')
+  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #395')
 
-  " #381
+  " #396
   normal 3hVsr(
-  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #381')
-  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #381')
+  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #396')
+  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #396')
 
   call operator#sandwich#set('replace', 'line', 'cursor', 'inner_head')
 endfunction
@@ -3801,27 +3894,27 @@ function! s:suite.linewise_x_option_noremap() abort  "{{{
   xnoremap a{ a(
 
   """ on
-  " #382
+  " #397
   call setline('.', '{foo}')
   normal Vsr"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #382')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #397')
 
-  " #383
+  " #398
   call setline('.', '(foo)')
   normal Vsr"
-  call g:assert.equals(getline('.'), '(foo)', 'failed at #383')
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #398')
 
   """ off
-  " #384
+  " #399
   call operator#sandwich#set('replace', 'line', 'noremap', 0)
   call setline('.', '{foo}')
   normal Vsr"
-  call g:assert.equals(getline('.'), '{foo}', 'failed at #384')
+  call g:assert.equals(getline('.'), '{foo}', 'failed at #399')
 
-  " #385
+  " #400
   call setline('.', '(foo)')
   normal Vsr"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #385')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #400')
 
   unlet! g:sandwich#recipes
   unlet! g:operator#sandwich#recipes
@@ -3835,27 +3928,27 @@ function! s:suite.linewise_x_option_regex() abort  "{{{
   let g:operator#sandwich#recipes = [{'buns': ['\d\+', '\d\+']}]
 
   """ off
-  " #386
+  " #401
   call setline('.', '\d\+foo\d\+')
   normal Vsr"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #386')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #401')
 
-  " #387
+  " #402
   call setline('.', '888foo888')
   normal Vsr"
-  call g:assert.equals(getline('.'), '"88foo88"', 'failed at #387')
+  call g:assert.equals(getline('.'), '"88foo88"', 'failed at #402')
 
   """ on
   call operator#sandwich#set('replace', 'line', 'regex', 1)
-  " #388
+  " #403
   call setline('.', '\d\+foo\d\+')
   normal Vsr"
-  call g:assert.equals(getline('.'), '\d\+foo\d\+', 'failed at #388')
+  call g:assert.equals(getline('.'), '\d\+foo\d\+', 'failed at #403')
 
-  " #389
+  " #404
   call setline('.', '888foo888')
   normal Vsr"
-  call g:assert.equals(getline('.'), '"foo"', 'failed at #389')
+  call g:assert.equals(getline('.'), '"foo"', 'failed at #404')
 
   call operator#sandwich#set('replace', 'line', 'regex', 0)
   unlet! g:sandwich#recipes
@@ -3864,66 +3957,66 @@ endfunction
 "}}}
 function! s:suite.linewise_x_option_skip_space() abort  "{{{
   """ on
-  " #390
+  " #405
   call setline('.', '"foo"')
   normal Vsr(
-  call g:assert.equals(getline('.'), '(foo)', 'failed at #390')
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #405')
 
-  " #391
+  " #406
   call setline('.', ' "foo"')
   normal Vsr(
-  call g:assert.equals(getline('.'), ' (foo)', 'failed at #391')
+  call g:assert.equals(getline('.'), ' (foo)', 'failed at #406')
 
-  " #392
+  " #407
   call setline('.', '"foo" ')
   normal Vsr(
-  call g:assert.equals(getline('.'), '(foo) ', 'failed at #392')
+  call g:assert.equals(getline('.'), '(foo) ', 'failed at #407')
 
-  " #393
+  " #408
   " do not skip!
   call setline('.', ' "foo" ')
   normal Vsr(
-  call g:assert.equals(getline('.'), '("foo")', 'failed at #393')
+  call g:assert.equals(getline('.'), '("foo")', 'failed at #408')
 
   """ off
   call operator#sandwich#set('replace', 'line', 'skip_space', 0)
-  " #394
+  " #409
   call setline('.', '"foo"')
   normal Vsr(
-  call g:assert.equals(getline('.'), '(foo)', 'failed at #394')
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #409')
 
-  " #395
+  " #410
   call setline('.', ' "foo"')
   normal Vsr(
-  call g:assert.equals(getline('.'), ' "foo"', 'failed at #395')
+  call g:assert.equals(getline('.'), ' "foo"', 'failed at #410')
 
-  " #396
+  " #411
   call setline('.', '"foo" ')
   normal Vsr(
-  call g:assert.equals(getline('.'), '"foo" ', 'failed at #396')
+  call g:assert.equals(getline('.'), '"foo" ', 'failed at #411')
 
-  " #397
+  " #412
   " do not skip!
   call setline('.', ' "foo" ')
   normal Vsr(
-  call g:assert.equals(getline('.'), '("foo")', 'failed at #397')
+  call g:assert.equals(getline('.'), '("foo")', 'failed at #412')
 
   call operator#sandwich#set('replace', 'line', 'skip_space', 1)
 endfunction
 "}}}
 function! s:suite.linewise_x_option_skip_char() abort "{{{
   """ off
-  " #398
+  " #413
   call setline('.', 'aa(foo)bb')
   normal Vsr"
-  call g:assert.equals(getline('.'), 'aa(foo)bb', 'failed at #398')
+  call g:assert.equals(getline('.'), 'aa(foo)bb', 'failed at #413')
 
   """ on
   call operator#sandwich#set('replace', 'line', 'skip_char', 1)
-  " #399
+  " #414
   call setline('.', 'aa(foo)bb')
   normal Vsr"
-  call g:assert.equals(getline('.'), 'aa"foo"bb', 'failed at #399')
+  call g:assert.equals(getline('.'), 'aa"foo"bb', 'failed at #414')
 
   call operator#sandwich#set('replace', 'line', 'skip_char', 0)
 endfunction
@@ -3931,10 +4024,10 @@ endfunction
 function! s:suite.linewise_x_option_command() abort  "{{{
   call operator#sandwich#set('replace', 'line', 'command', ['normal! `[dv`]'])
 
-  " #400
+  " #415
   call setline('.', '(foo)')
   normal Vsr"
-  call g:assert.equals(getline('.'), '""', 'failed at #400')
+  call g:assert.equals(getline('.'), '""', 'failed at #415')
 
   call operator#sandwich#set('replace', 'line', 'command', [])
 endfunction
@@ -3943,134 +4036,134 @@ function! s:suite.linewise_x_option_linewise() abort  "{{{
   call operator#sandwich#set('replace', 'line', 'linewise', 0)
 
   """ 0
-  " #401
+  " #416
   call append(0, ['(', 'foo', ')'])
   normal ggV2jsr[
-  call g:assert.equals(getline(1),   '[',          'failed at #401')
-  call g:assert.equals(getline(2),   'foo',        'failed at #401')
-  call g:assert.equals(getline(3),   ']',          'failed at #401')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #401')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #401')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #401')
+  call g:assert.equals(getline(1),   '[',          'failed at #416')
+  call g:assert.equals(getline(2),   'foo',        'failed at #416')
+  call g:assert.equals(getline(3),   ']',          'failed at #416')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #416')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #416')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #416')
 
   %delete
 
-  " #402
+  " #417
   call append(0, ['(  ', 'foo', '  )'])
   normal ggV2jsr[
-  call g:assert.equals(getline(1),   '[  ',        'failed at #402')
-  call g:assert.equals(getline(2),   'foo',        'failed at #402')
-  call g:assert.equals(getline(3),   '  ]',        'failed at #402')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #402')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #402')
-  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #402')
+  call g:assert.equals(getline(1),   '[  ',        'failed at #417')
+  call g:assert.equals(getline(2),   'foo',        'failed at #417')
+  call g:assert.equals(getline(3),   '  ]',        'failed at #417')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #417')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #417')
+  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #417')
 
   %delete
 
-  " #403
+  " #418
   call append(0, ['(aa', 'foo', 'aa)'])
   normal ggV2jsr[
-  call g:assert.equals(getline(1),   '[aa',        'failed at #403')
-  call g:assert.equals(getline(2),   'foo',        'failed at #403')
-  call g:assert.equals(getline(3),   'aa]',        'failed at #403')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #403')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #403')
-  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #403')
+  call g:assert.equals(getline(1),   '[aa',        'failed at #418')
+  call g:assert.equals(getline(2),   'foo',        'failed at #418')
+  call g:assert.equals(getline(3),   'aa]',        'failed at #418')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #418')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #418')
+  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #418')
 
   %delete
 
-  " #404
+  " #419
   call append(0, ['(aa', 'foo', ')'])
   normal ggV2jsr[
-  call g:assert.equals(getline(1),   '[aa',        'failed at #404')
-  call g:assert.equals(getline(2),   'foo',        'failed at #404')
-  call g:assert.equals(getline(3),   ']',          'failed at #404')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #404')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #404')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #404')
+  call g:assert.equals(getline(1),   '[aa',        'failed at #419')
+  call g:assert.equals(getline(2),   'foo',        'failed at #419')
+  call g:assert.equals(getline(3),   ']',          'failed at #419')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #419')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #419')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #419')
 
   %delete
 
-  " #405
+  " #420
   call append(0, ['(', 'foo', 'aa)'])
   normal ggV2jsr[
-  call g:assert.equals(getline(1),   '[',          'failed at #405')
-  call g:assert.equals(getline(2),   'foo',        'failed at #405')
-  call g:assert.equals(getline(3),   'aa]',        'failed at #405')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #405')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #405')
-  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #405')
+  call g:assert.equals(getline(1),   '[',          'failed at #420')
+  call g:assert.equals(getline(2),   'foo',        'failed at #420')
+  call g:assert.equals(getline(3),   'aa]',        'failed at #420')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #420')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #420')
+  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #420')
 
   %delete
 
   call operator#sandwich#set('replace', 'line', 'linewise', 2)
 
   """ 2
-  " #406
+  " #421
   call append(0, ['(', 'foo', ')'])
   normal ggV2jsr[
-  call g:assert.equals(getline(1),   '[',          'failed at #406')
-  call g:assert.equals(getline(2),   'foo',        'failed at #406')
-  call g:assert.equals(getline(3),   ']',          'failed at #406')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #406')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #406')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #406')
+  call g:assert.equals(getline(1),   '[',          'failed at #421')
+  call g:assert.equals(getline(2),   'foo',        'failed at #421')
+  call g:assert.equals(getline(3),   ']',          'failed at #421')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #421')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #421')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #421')
 
   %delete
 
-  " #407
+  " #422
   call append(0, ['(  ', 'foo', '  )'])
   normal ggV2jsr[
-  call g:assert.equals(getline(1),   '[',          'failed at #407')
-  call g:assert.equals(getline(2),   'foo',        'failed at #407')
-  call g:assert.equals(getline(3),   ']',          'failed at #407')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #407')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #407')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #407')
+  call g:assert.equals(getline(1),   '[',          'failed at #422')
+  call g:assert.equals(getline(2),   'foo',        'failed at #422')
+  call g:assert.equals(getline(3),   ']',          'failed at #422')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #422')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #422')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #422')
 
   %delete
 
-  " #408
+  " #423
   call append(0, ['(aa', 'foo', 'aa)'])
   normal ggV2jsr[
-  call g:assert.equals(getline(1),   '[',          'failed at #408')
-  call g:assert.equals(getline(2),   'foo',        'failed at #408')
-  call g:assert.equals(getline(3),   ']',          'failed at #408')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #408')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #408')
-  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #408')
+  call g:assert.equals(getline(1),   '[',          'failed at #423')
+  call g:assert.equals(getline(2),   'foo',        'failed at #423')
+  call g:assert.equals(getline(3),   ']',          'failed at #423')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #423')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #423')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #423')
 
   %delete
 
-  " #409
+  " #424
   " FIXME: I have no idea what is the expexted behavior.
   call append(0, ['aa', '(foo)', 'bb'])
   normal ggjVsr[
-  call g:assert.equals(getline(1),   'aa',         'failed at #409')
-  call g:assert.equals(getline(2),   '[',          'failed at #409')
-  call g:assert.equals(getline(3),   'bb',         'failed at #409')
-  call g:assert.equals(getline(4),   '',           'failed at #409')
-  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #409')
-  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #409')
-  call g:assert.equals(getpos("']"), [0, 3, 1, 0], 'failed at #409')
+  call g:assert.equals(getline(1),   'aa',         'failed at #424')
+  call g:assert.equals(getline(2),   '[',          'failed at #424')
+  call g:assert.equals(getline(3),   'bb',         'failed at #424')
+  call g:assert.equals(getline(4),   '',           'failed at #424')
+  call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #424')
+  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #424')
+  call g:assert.equals(getpos("']"), [0, 3, 1, 0], 'failed at #424')
 endfunction
 "}}}
 function! s:suite.linewise_x_option_query_once() abort  "{{{
   """"" query_once
   """ off
-  " #410
+  " #425
   call setline('.', '"""foo"""')
   normal V3sr([{
-  call g:assert.equals(getline('.'), '([{foo}])',  'failed at #410')
+  call g:assert.equals(getline('.'), '([{foo}])',  'failed at #425')
 
   %delete
 
   """ on
-  " #411
+  " #426
   call operator#sandwich#set('replace', 'line', 'query_once', 1)
   call setline('.', '"""foo"""')
   normal V3sr(
-  call g:assert.equals(getline('.'), '(((foo)))',  'failed at #411')
+  call g:assert.equals(getline('.'), '(((foo)))',  'failed at #426')
 
   call operator#sandwich#set('replace', 'line', 'query_once', 0)
 endfunction
@@ -4080,17 +4173,17 @@ function! s:suite.linewise_x_option_expr() abort "{{{
   let g:operator#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'input':['a']}]
 
   """ 0
-  " #412
+  " #427
   call setline('.', '"foo"')
   normal Vsra
-  call g:assert.equals(getline('.'), '1+1foo1+2',  'failed at #412')
+  call g:assert.equals(getline('.'), '1+1foo1+2',  'failed at #427')
 
   """ 1
-  " #413
+  " #428
   call operator#sandwich#set('replace', 'line', 'expr', 1)
   call setline('.', '"foo"')
   normal Vsra
-  call g:assert.equals(getline('.'), '2foo3',  'failed at #413')
+  call g:assert.equals(getline('.'), '2foo3',  'failed at #428')
 
   """ 2
   " This case cannot be tested since this option makes difference only in
@@ -4105,51 +4198,51 @@ endfunction
 function! s:suite.blockwise_n_default_recipes() abort "{{{
   set whichwrap=h,l
 
-  " #285
+  " #300
   call append(0, ['(foo)', '(bar)', '(baz)'])
   execute "normal ggsr\<C-v>17l["
-  call g:assert.equals(getline(1),   '[foo]',      'failed at #285')
-  call g:assert.equals(getline(2),   '[bar]',      'failed at #285')
-  call g:assert.equals(getline(3),   '[baz]',      'failed at #285')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #285')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #285')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #285')
+  call g:assert.equals(getline(1),   '[foo]',      'failed at #300')
+  call g:assert.equals(getline(2),   '[bar]',      'failed at #300')
+  call g:assert.equals(getline(3),   '[baz]',      'failed at #300')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #300')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #300')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #300')
 
   %delete
 
-  " #286
+  " #301
   call append(0, ['[foo]', '[bar]', '[baz]'])
   execute "normal ggsr\<C-v>17l{"
-  call g:assert.equals(getline(1),   '{foo}',      'failed at #286')
-  call g:assert.equals(getline(2),   '{bar}',      'failed at #286')
-  call g:assert.equals(getline(3),   '{baz}',      'failed at #286')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #286')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #286')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #286')
+  call g:assert.equals(getline(1),   '{foo}',      'failed at #301')
+  call g:assert.equals(getline(2),   '{bar}',      'failed at #301')
+  call g:assert.equals(getline(3),   '{baz}',      'failed at #301')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #301')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #301')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #301')
 
   %delete
 
-  " #287
+  " #302
   call append(0, ['{foo}', '{bar}', '{baz}'])
   execute "normal ggsr\<C-v>17l<"
-  call g:assert.equals(getline(1),   '<foo>',      'failed at #287')
-  call g:assert.equals(getline(2),   '<bar>',      'failed at #287')
-  call g:assert.equals(getline(3),   '<baz>',      'failed at #287')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #287')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #287')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #287')
+  call g:assert.equals(getline(1),   '<foo>',      'failed at #302')
+  call g:assert.equals(getline(2),   '<bar>',      'failed at #302')
+  call g:assert.equals(getline(3),   '<baz>',      'failed at #302')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #302')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #302')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #302')
 
   %delete
 
-  " #288
+  " #303
   call append(0, ['<foo>', '<bar>', '<baz>'])
   execute "normal ggsr\<C-v>17l("
-  call g:assert.equals(getline(1),   '(foo)',      'failed at #288')
-  call g:assert.equals(getline(2),   '(bar)',      'failed at #288')
-  call g:assert.equals(getline(3),   '(baz)',      'failed at #288')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #288')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #288')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #288')
+  call g:assert.equals(getline(1),   '(foo)',      'failed at #303')
+  call g:assert.equals(getline(2),   '(bar)',      'failed at #303')
+  call g:assert.equals(getline(3),   '(baz)',      'failed at #303')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #303')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #303')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #303')
 
   set whichwrap&
 endfunction
@@ -4157,25 +4250,25 @@ endfunction
 function! s:suite.blockwise_n_not_registered() abort "{{{
   set whichwrap=h,l
 
-  " #289
+  " #304
   call append(0, ['afooa', 'abara', 'abaza'])
   execute "normal ggsr\<C-v>17lb"
-  call g:assert.equals(getline(1),   'bfoob',      'failed at #289')
-  call g:assert.equals(getline(2),   'bbarb',      'failed at #289')
-  call g:assert.equals(getline(3),   'bbazb',      'failed at #289')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #289')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #289')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #289')
+  call g:assert.equals(getline(1),   'bfoob',      'failed at #304')
+  call g:assert.equals(getline(2),   'bbarb',      'failed at #304')
+  call g:assert.equals(getline(3),   'bbazb',      'failed at #304')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #304')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #304')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #304')
 
-  " #290
+  " #305
   call append(0, ['+foo+', '+bar+', '+baz+'])
   execute "normal ggsr\<C-v>17l*"
-  call g:assert.equals(getline(1),   '*foo*',      'failed at #290')
-  call g:assert.equals(getline(2),   '*bar*',      'failed at #290')
-  call g:assert.equals(getline(3),   '*baz*',      'failed at #290')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #290')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #290')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #290')
+  call g:assert.equals(getline(1),   '*foo*',      'failed at #305')
+  call g:assert.equals(getline(2),   '*bar*',      'failed at #305')
+  call g:assert.equals(getline(3),   '*baz*',      'failed at #305')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #305')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #305')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #305')
 
   set whichwrap&
 endfunction
@@ -4183,99 +4276,99 @@ endfunction
 function! s:suite.blockwise_n_positioning() abort "{{{
   set whichwrap=h,l
 
-  " #291
+  " #306
   call append(0, ['(foo)bar', '(foo)bar', '(foo)bar'])
   execute "normal ggsr\<C-v>23l["
-  call g:assert.equals(getline(1),   '[foo]bar',   'failed at #291')
-  call g:assert.equals(getline(2),   '[foo]bar',   'failed at #291')
-  call g:assert.equals(getline(3),   '[foo]bar',   'failed at #291')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #291')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #291')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #291')
+  call g:assert.equals(getline(1),   '[foo]bar',   'failed at #306')
+  call g:assert.equals(getline(2),   '[foo]bar',   'failed at #306')
+  call g:assert.equals(getline(3),   '[foo]bar',   'failed at #306')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #306')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #306')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #306')
 
   %delete
 
-  " #292
+  " #307
   call append(0, ['foo(bar)', 'foo(bar)', 'foo(bar)'])
   execute "normal gg3lsr\<C-v>23l["
-  call g:assert.equals(getline(1),   'foo[bar]',   'failed at #292')
-  call g:assert.equals(getline(2),   'foo[bar]',   'failed at #292')
-  call g:assert.equals(getline(3),   'foo[bar]',   'failed at #292')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #292')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #292')
-  call g:assert.equals(getpos("']"), [0, 3, 9, 0], 'failed at #292')
+  call g:assert.equals(getline(1),   'foo[bar]',   'failed at #307')
+  call g:assert.equals(getline(2),   'foo[bar]',   'failed at #307')
+  call g:assert.equals(getline(3),   'foo[bar]',   'failed at #307')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #307')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #307')
+  call g:assert.equals(getpos("']"), [0, 3, 9, 0], 'failed at #307')
 
   %delete
 
-  " #293
+  " #308
   call append(0, ['foo(bar)baz', 'foo(bar)baz', 'foo(bar)baz'])
   execute "normal gg3lsr\<C-v>29l["
-  call g:assert.equals(getline(1),   'foo[bar]baz', 'failed at #293')
-  call g:assert.equals(getline(2),   'foo[bar]baz', 'failed at #293')
-  call g:assert.equals(getline(3),   'foo[bar]baz', 'failed at #293')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0],  'failed at #293')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #293')
-  call g:assert.equals(getpos("']"), [0, 3, 9, 0],  'failed at #293')
+  call g:assert.equals(getline(1),   'foo[bar]baz', 'failed at #308')
+  call g:assert.equals(getline(2),   'foo[bar]baz', 'failed at #308')
+  call g:assert.equals(getline(3),   'foo[bar]baz', 'failed at #308')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0],  'failed at #308')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #308')
+  call g:assert.equals(getpos("']"), [0, 3, 9, 0],  'failed at #308')
 
   %delete
 
-  " #294
+  " #309
   call append(0, ['(foo)', '(bar)', 'bazbaz'])
   execute "normal ggsr\<C-v>17l["
-  call g:assert.equals(getline(1),   '[foo]',      'failed at #294')
-  call g:assert.equals(getline(2),   '[bar]',      'failed at #294')
-  call g:assert.equals(getline(3),   'bazbaz',     'failed at #294')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #294')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #294')
-  call g:assert.equals(getpos("']"), [0, 2, 6, 0], 'failed at #294')
+  call g:assert.equals(getline(1),   '[foo]',      'failed at #309')
+  call g:assert.equals(getline(2),   '[bar]',      'failed at #309')
+  call g:assert.equals(getline(3),   'bazbaz',     'failed at #309')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #309')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #309')
+  call g:assert.equals(getpos("']"), [0, 2, 6, 0], 'failed at #309')
 
   %delete
 
-  " #295
+  " #310
   call append(0, ['(foo)', 'barbar', '(baz)'])
   execute "normal ggsr\<C-v>18l["
-  call g:assert.equals(getline(1),   '[foo]',      'failed at #295')
-  call g:assert.equals(getline(2),   'barbar',     'failed at #295')
-  call g:assert.equals(getline(3),   '[baz]',      'failed at #295')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #295')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #295')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #295')
+  call g:assert.equals(getline(1),   '[foo]',      'failed at #310')
+  call g:assert.equals(getline(2),   'barbar',     'failed at #310')
+  call g:assert.equals(getline(3),   '[baz]',      'failed at #310')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #310')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #310')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #310')
 
   %delete
 
-  " #296
+  " #311
   call append(0, ['foofoo', '(bar)', '(baz)'])
   execute "normal ggsr\<C-v>18l["
-  call g:assert.equals(getline(1),   'foofoo',     'failed at #296')
-  call g:assert.equals(getline(2),   '[bar]',      'failed at #296')
-  call g:assert.equals(getline(3),   '[baz]',      'failed at #296')
-  call g:assert.equals(getpos('.'),  [0, 2, 2, 0], 'failed at #296')
-  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #296')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #296')
+  call g:assert.equals(getline(1),   'foofoo',     'failed at #311')
+  call g:assert.equals(getline(2),   '[bar]',      'failed at #311')
+  call g:assert.equals(getline(3),   '[baz]',      'failed at #311')
+  call g:assert.equals(getpos('.'),  [0, 2, 2, 0], 'failed at #311')
+  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #311')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #311')
 
   %delete
 
-  " #297
+  " #312
   call append(0, ['(foo)', '(baar)', '(baaz)'])
   execute "normal ggsr\<C-v>20l["
-  call g:assert.equals(getline(1),   '[foo]',      'failed at #297')
-  call g:assert.equals(getline(2),   '[baar]',     'failed at #297')
-  call g:assert.equals(getline(3),   '[baaz]',     'failed at #297')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #297')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #297')
-  call g:assert.equals(getpos("']"), [0, 3, 7, 0], 'failed at #297')
+  call g:assert.equals(getline(1),   '[foo]',      'failed at #312')
+  call g:assert.equals(getline(2),   '[baar]',     'failed at #312')
+  call g:assert.equals(getline(3),   '[baaz]',     'failed at #312')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #312')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #312')
+  call g:assert.equals(getpos("']"), [0, 3, 7, 0], 'failed at #312')
 
   %delete
 
-  " #298
+  " #313
   call append(0, ['(fooo)', '(bar)', '(baaz)'])
   execute "normal ggsr\<C-v>20l["
-  call g:assert.equals(getline(1),   '[fooo]',     'failed at #298')
-  call g:assert.equals(getline(2),   '[bar]',      'failed at #298')
-  call g:assert.equals(getline(3),   '[baaz]',     'failed at #298')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #298')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #298')
-  call g:assert.equals(getpos("']"), [0, 3, 7, 0], 'failed at #298')
+  call g:assert.equals(getline(1),   '[fooo]',     'failed at #313')
+  call g:assert.equals(getline(2),   '[bar]',      'failed at #313')
+  call g:assert.equals(getline(3),   '[baaz]',     'failed at #313')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #313')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #313')
+  call g:assert.equals(getpos("']"), [0, 3, 7, 0], 'failed at #313')
 
   set whichwrap&
 endfunction
@@ -4283,15 +4376,15 @@ endfunction
 function! s:suite.blockwise_n_a_character() abort "{{{
   set whichwrap=h,l
 
-  " #299
+  " #314
   call append(0, ['(a)', '(b)', '(c)'])
   execute "normal ggsr\<C-v>11l["
-  call g:assert.equals(getline(1),   '[a]',        'failed at #299')
-  call g:assert.equals(getline(2),   '[b]',        'failed at #299')
-  call g:assert.equals(getline(3),   '[c]',        'failed at #299')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #299')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #299')
-  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #299')
+  call g:assert.equals(getline(1),   '[a]',        'failed at #314')
+  call g:assert.equals(getline(2),   '[b]',        'failed at #314')
+  call g:assert.equals(getline(3),   '[c]',        'failed at #314')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #314')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #314')
+  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #314')
 
   set whichwrap&
 endfunction
@@ -4299,27 +4392,27 @@ endfunction
 function! s:suite.blockwise_n_nothing_inside() abort "{{{
   set whichwrap=h,l
 
-  " #300
+  " #315
   call append(0, ['()', '()', '()'])
   execute "normal ggsr\<C-v>8l["
-  call g:assert.equals(getline(1),   '[]',         'failed at #300')
-  call g:assert.equals(getline(2),   '[]',         'failed at #300')
-  call g:assert.equals(getline(3),   '[]',         'failed at #300')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #300')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #300')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #300')
+  call g:assert.equals(getline(1),   '[]',         'failed at #315')
+  call g:assert.equals(getline(2),   '[]',         'failed at #315')
+  call g:assert.equals(getline(3),   '[]',         'failed at #315')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #315')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #315')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #315')
 
   %delete
 
-  " #301
+  " #316
   call append(0, ['foo()bar', 'foo()bar', 'foo()bar'])
   execute "normal gg3lsr\<C-v>20l["
-  call g:assert.equals(getline(1),   'foo[]bar',   'failed at #301')
-  call g:assert.equals(getline(2),   'foo[]bar',   'failed at #301')
-  call g:assert.equals(getline(3),   'foo[]bar',   'failed at #301')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #301')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #301')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #301')
+  call g:assert.equals(getline(1),   'foo[]bar',   'failed at #316')
+  call g:assert.equals(getline(2),   'foo[]bar',   'failed at #316')
+  call g:assert.equals(getline(3),   'foo[]bar',   'failed at #316')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #316')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #316')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #316')
 
   set whichwrap&
 endfunction
@@ -4327,63 +4420,63 @@ endfunction
 function! s:suite.blockwise_n_count() abort "{{{
   set whichwrap=h,l
 
-  " #302
+  " #317
   call append(0, ['[(foo)]', '[(bar)]', '[(baz)]'])
   execute "normal gg3sr\<C-v>23l({"
-  call g:assert.equals(getline(1),   '({foo})',    'failed at #302')
-  call g:assert.equals(getline(2),   '({bar})',    'failed at #302')
-  call g:assert.equals(getline(3),   '({baz})',    'failed at #302')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #302')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #302')
-  call g:assert.equals(getpos("']"), [0, 3, 8, 0], 'failed at #302')
+  call g:assert.equals(getline(1),   '({foo})',    'failed at #317')
+  call g:assert.equals(getline(2),   '({bar})',    'failed at #317')
+  call g:assert.equals(getline(3),   '({baz})',    'failed at #317')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #317')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #317')
+  call g:assert.equals(getpos("']"), [0, 3, 8, 0], 'failed at #317')
 
   %delete
 
-  " #303
+  " #318
   call append(0, ['{[(foo)]}', '{[(bar)]}', '{[(baz)]}'])
   execute "normal gg3sr\<C-v>29l({["
-  call g:assert.equals(getline(1),   '({[foo]})',   'failed at #303')
-  call g:assert.equals(getline(2),   '({[bar]})',   'failed at #303')
-  call g:assert.equals(getline(3),   '({[baz]})',   'failed at #303')
-  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #303')
-  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #303')
-  call g:assert.equals(getpos("']"), [0, 3, 10, 0], 'failed at #303')
+  call g:assert.equals(getline(1),   '({[foo]})',   'failed at #318')
+  call g:assert.equals(getline(2),   '({[bar]})',   'failed at #318')
+  call g:assert.equals(getline(3),   '({[baz]})',   'failed at #318')
+  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #318')
+  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #318')
+  call g:assert.equals(getpos("']"), [0, 3, 10, 0], 'failed at #318')
 
   %delete
 
-  " #304
+  " #319
   call append(0, ['{[afoob]}', '{[(bar)]}', '{[(baz)]}'])
   execute "normal gg3sr\<C-v>29l({["
-  call g:assert.equals(getline(1),   '({afoob})',   'failed at #304')
-  call g:assert.equals(getline(2),   '({[bar]})',   'failed at #304')
-  call g:assert.equals(getline(3),   '({[baz]})',   'failed at #304')
-  call g:assert.equals(getpos('.'),  [0, 1,  3, 0], 'failed at #304')
-  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #304')
-  call g:assert.equals(getpos("']"), [0, 3, 10, 0], 'failed at #304')
+  call g:assert.equals(getline(1),   '({afoob})',   'failed at #319')
+  call g:assert.equals(getline(2),   '({[bar]})',   'failed at #319')
+  call g:assert.equals(getline(3),   '({[baz]})',   'failed at #319')
+  call g:assert.equals(getpos('.'),  [0, 1,  3, 0], 'failed at #319')
+  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #319')
+  call g:assert.equals(getpos("']"), [0, 3, 10, 0], 'failed at #319')
 
   %delete
 
-  " #305
+  " #320
   call append(0, ['{[(foo)]}', '{[abarb]}', '{[(baz)]}'])
   execute "normal gg3sr\<C-v>29l({["
-  call g:assert.equals(getline(1),   '({[foo]})',   'failed at #305')
-  call g:assert.equals(getline(2),   '({abarb})',   'failed at #305')
-  call g:assert.equals(getline(3),   '({[baz]})',   'failed at #305')
-  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #305')
-  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #305')
-  call g:assert.equals(getpos("']"), [0, 3, 10, 0], 'failed at #305')
+  call g:assert.equals(getline(1),   '({[foo]})',   'failed at #320')
+  call g:assert.equals(getline(2),   '({abarb})',   'failed at #320')
+  call g:assert.equals(getline(3),   '({[baz]})',   'failed at #320')
+  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #320')
+  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #320')
+  call g:assert.equals(getpos("']"), [0, 3, 10, 0], 'failed at #320')
 
   %delete
 
-  " #306
+  " #321
   call append(0, ['{[(foo)]}', '{[(bar)]}', '{[abazb]}'])
   execute "normal gg3sr\<C-v>29l({["
-  call g:assert.equals(getline(1),   '({[foo]})',   'failed at #306')
-  call g:assert.equals(getline(2),   '({[bar]})',   'failed at #306')
-  call g:assert.equals(getline(3),   '({abazb})',   'failed at #306')
-  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #306')
-  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #306')
-  call g:assert.equals(getpos("']"), [0, 3, 10, 0], 'failed at #306')
+  call g:assert.equals(getline(1),   '({[foo]})',   'failed at #321')
+  call g:assert.equals(getline(2),   '({[bar]})',   'failed at #321')
+  call g:assert.equals(getline(3),   '({abazb})',   'failed at #321')
+  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #321')
+  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #321')
+  call g:assert.equals(getpos("']"), [0, 3, 10, 0], 'failed at #321')
 
   set whichwrap&
 endfunction
@@ -4399,39 +4492,39 @@ function! s:suite.blockwise_n_external_textobj() abort "{{{
         \   {'external': ['it', 'at']},
         \ ]
 
-  " #307
+  " #322
   call append(0, ['(foo)', '(bar)', '(baz)'])
   execute "normal ggsr\<C-v>17l\""
-  call g:assert.equals(getline(1), '"foo"', 'failed at #307')
-  call g:assert.equals(getline(2), '"bar"', 'failed at #307')
-  call g:assert.equals(getline(3), '"baz"', 'failed at #307')
+  call g:assert.equals(getline(1), '"foo"', 'failed at #322')
+  call g:assert.equals(getline(2), '"bar"', 'failed at #322')
+  call g:assert.equals(getline(3), '"baz"', 'failed at #322')
 
   %delete
 
-  " #308
+  " #323
   call append(0, ['[foo]', '[bar]', '[baz]'])
   execute "normal ggsr\<C-v>17l\""
-  call g:assert.equals(getline(1), '"foo"', 'failed at #308')
-  call g:assert.equals(getline(2), '"bar"', 'failed at #308')
-  call g:assert.equals(getline(3), '"baz"', 'failed at #308')
+  call g:assert.equals(getline(1), '"foo"', 'failed at #323')
+  call g:assert.equals(getline(2), '"bar"', 'failed at #323')
+  call g:assert.equals(getline(3), '"baz"', 'failed at #323')
 
   %delete
 
-  " #309
+  " #324
   call append(0, ['{foo}', '{bar}', '{baz}'])
   execute "normal ggsr\<C-v>17l\""
-  call g:assert.equals(getline(1), '"foo"', 'failed at #309')
-  call g:assert.equals(getline(2), '"bar"', 'failed at #309')
-  call g:assert.equals(getline(3), '"baz"', 'failed at #309')
+  call g:assert.equals(getline(1), '"foo"', 'failed at #324')
+  call g:assert.equals(getline(2), '"bar"', 'failed at #324')
+  call g:assert.equals(getline(3), '"baz"', 'failed at #324')
 
   %delete
 
-  " #310
+  " #325
   call append(0, ['<title>foo</title>', '<title>bar</title>', '<title>baz</title>'])
   execute "normal ggsr\<C-v>56l\""
-  call g:assert.equals(getline(1), '"foo"', 'failed at #310')
-  call g:assert.equals(getline(2), '"bar"', 'failed at #310')
-  call g:assert.equals(getline(3), '"baz"', 'failed at #310')
+  call g:assert.equals(getline(1), '"foo"', 'failed at #325')
+  call g:assert.equals(getline(2), '"bar"', 'failed at #325')
+  call g:assert.equals(getline(3), '"baz"', 'failed at #325')
 
   set whichwrap&
   unlet g:sandwich#recipes
@@ -4443,96 +4536,96 @@ function! s:suite.blockwise_n_option_cursor() abort  "{{{
 
   """"" cursor
   """ inner_head
-  " #311
+  " #326
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg2sr\<C-v>29l[]"
-  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #311')
-  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #311')
-  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #311')
-  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #311')
+  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #326')
+  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #326')
+  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #326')
+  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #326')
 
-  " #312
+  " #327
   execute "normal sr\<C-v>25l["
-  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #312')
-  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #312')
-  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #312')
-  call g:assert.equals(getpos('.'), [0, 1, 4, 0], 'failed at #312')
+  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #327')
+  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #327')
+  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #327')
+  call g:assert.equals(getpos('.'), [0, 1, 4, 0], 'failed at #327')
 
   %delete
 
   """ keep
-  " #313
+  " #328
   call operator#sandwich#set('replace', 'block', 'cursor', 'keep')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg2sr\<C-v>29l[]"
-  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #313')
-  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #313')
-  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #313')
-  call g:assert.equals(getpos('.'), [0, 1, 1, 0], 'failed at #313')
+  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #328')
+  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #328')
+  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #328')
+  call g:assert.equals(getpos('.'), [0, 1, 1, 0], 'failed at #328')
 
-  " #314
+  " #329
   execute "normal 2lsr\<C-v>25l["
-  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #314')
-  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #314')
-  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #314')
-  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #314')
+  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #329')
+  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #329')
+  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #329')
+  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #329')
 
   %delete
 
   """ inner_tail
-  " #315
+  " #330
   call operator#sandwich#set('replace', 'block', 'cursor', 'inner_tail')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg2sr\<C-v>29l[]"
-  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #315')
-  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #315')
-  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #315')
-  call g:assert.equals(getpos('.'), [0, 3, 7, 0], 'failed at #315')
+  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #330')
+  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #330')
+  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #330')
+  call g:assert.equals(getpos('.'), [0, 3, 7, 0], 'failed at #330')
 
-  " #316
+  " #331
   execute "normal gg2lsr\<C-v>25l["
-  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #316')
-  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #316')
-  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #316')
-  call g:assert.equals(getpos('.'), [0, 3, 6, 0], 'failed at #316')
+  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #331')
+  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #331')
+  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #331')
+  call g:assert.equals(getpos('.'), [0, 3, 6, 0], 'failed at #331')
 
   %delete
 
   """ front
-  " #317
+  " #332
   call operator#sandwich#set('replace', 'block', 'cursor', 'front')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg2sr\<C-v>29l[]"
-  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #317')
-  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #317')
-  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #317')
-  call g:assert.equals(getpos('.'), [0, 1, 1, 0], 'failed at #317')
+  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #332')
+  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #332')
+  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #332')
+  call g:assert.equals(getpos('.'), [0, 1, 1, 0], 'failed at #332')
 
-  " #318
+  " #333
   execute "normal 2lsr\<C-v>25l["
-  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #318')
-  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #318')
-  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #318')
-  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #318')
+  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #333')
+  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #333')
+  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #333')
+  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #333')
 
   %delete
 
   """ end
-  " #319
+  " #334
   call operator#sandwich#set('replace', 'block', 'cursor', 'end')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg2sr\<C-v>29l[]"
-  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #319')
-  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #319')
-  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #319')
-  call g:assert.equals(getpos('.'), [0, 3, 9, 0], 'failed at #319')
+  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #334')
+  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #334')
+  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #334')
+  call g:assert.equals(getpos('.'), [0, 3, 9, 0], 'failed at #334')
 
-  " #320
+  " #335
   execute "normal 6h2ksr\<C-v>25l["
-  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #320')
-  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #320')
-  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #320')
-  call g:assert.equals(getpos('.'), [0, 3, 7, 0], 'failed at #320')
+  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #335')
+  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #335')
+  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #335')
+  call g:assert.equals(getpos('.'), [0, 3, 7, 0], 'failed at #335')
 
   set whichwrap&
   call operator#sandwich#set('replace', 'block', 'cursor', 'inner_head')
@@ -4548,41 +4641,41 @@ function! s:suite.blockwise_n_option_noremap() abort  "{{{
   xnoremap a{ a(
 
   """ on
-  " #321
+  " #336
   call append(0, ['{foo}', '{bar}', '{baz}'])
   execute "normal ggsr\<C-v>17l\""
-  call g:assert.equals(getline(1), '"foo"', 'failed at #321')
-  call g:assert.equals(getline(2), '"bar"', 'failed at #321')
-  call g:assert.equals(getline(3), '"baz"', 'failed at #321')
+  call g:assert.equals(getline(1), '"foo"', 'failed at #336')
+  call g:assert.equals(getline(2), '"bar"', 'failed at #336')
+  call g:assert.equals(getline(3), '"baz"', 'failed at #336')
 
   %delete
 
-  " #322
+  " #337
   call append(0, ['(foo)', '(bar)', '(baz)'])
   execute "normal ggsr\<C-v>17l\""
-  call g:assert.equals(getline(1), '(foo)', 'failed at #322')
-  call g:assert.equals(getline(2), '(bar)', 'failed at #322')
-  call g:assert.equals(getline(3), '(baz)', 'failed at #322')
+  call g:assert.equals(getline(1), '(foo)', 'failed at #337')
+  call g:assert.equals(getline(2), '(bar)', 'failed at #337')
+  call g:assert.equals(getline(3), '(baz)', 'failed at #337')
 
   %delete
 
   """ off
-  " #323
+  " #338
   call operator#sandwich#set('replace', 'block', 'noremap', 0)
   call append(0, ['{foo}', '{bar}', '{baz}'])
   execute "normal ggsr\<C-v>17l\""
-  call g:assert.equals(getline(1), '{foo}', 'failed at #323')
-  call g:assert.equals(getline(2), '{bar}', 'failed at #323')
-  call g:assert.equals(getline(3), '{baz}', 'failed at #323')
+  call g:assert.equals(getline(1), '{foo}', 'failed at #338')
+  call g:assert.equals(getline(2), '{bar}', 'failed at #338')
+  call g:assert.equals(getline(3), '{baz}', 'failed at #338')
 
   %delete
 
-  " #324
+  " #339
   call append(0, ['(foo)', '(bar)', '(baz)'])
   execute "normal ggsr\<C-v>17l\""
-  call g:assert.equals(getline(1), '"foo"', 'failed at #324')
-  call g:assert.equals(getline(2), '"bar"', 'failed at #324')
-  call g:assert.equals(getline(3), '"baz"', 'failed at #324')
+  call g:assert.equals(getline(1), '"foo"', 'failed at #339')
+  call g:assert.equals(getline(2), '"bar"', 'failed at #339')
+  call g:assert.equals(getline(3), '"baz"', 'failed at #339')
 
   set whichwrap&
   unlet! g:sandwich#recipes
@@ -4598,41 +4691,41 @@ function! s:suite.blockwise_n_option_regex() abort  "{{{
   let g:operator#sandwich#recipes = [{'buns': ['\d\+', '\d\+']}]
 
   """ off
-  " #325
+  " #340
   call append(0, ['\d\+foo\d\+', '\d\+bar\d\+', '\d\+baz\d\+'])
   execute "normal ggsr\<C-v>35l\""
-  call g:assert.equals(getline(1), '"foo"', 'failed at #325')
-  call g:assert.equals(getline(2), '"bar"', 'failed at #325')
-  call g:assert.equals(getline(3), '"baz"', 'failed at #325')
+  call g:assert.equals(getline(1), '"foo"', 'failed at #340')
+  call g:assert.equals(getline(2), '"bar"', 'failed at #340')
+  call g:assert.equals(getline(3), '"baz"', 'failed at #340')
 
   %delete
 
-  " #326
+  " #341
   call append(0, ['888foo888', '888bar888', '888baz888'])
   execute "normal ggsr\<C-v>29l\""
-  call g:assert.equals(getline(1), '"88foo88"', 'failed at #326')
-  call g:assert.equals(getline(2), '"88bar88"', 'failed at #326')
-  call g:assert.equals(getline(3), '"88baz88"', 'failed at #326')
+  call g:assert.equals(getline(1), '"88foo88"', 'failed at #341')
+  call g:assert.equals(getline(2), '"88bar88"', 'failed at #341')
+  call g:assert.equals(getline(3), '"88baz88"', 'failed at #341')
 
   %delete
 
   """ on
   call operator#sandwich#set('replace', 'block', 'regex', 1)
-  " #327
+  " #342
   call append(0, ['\d\+foo\d\+', '\d\+bar\d\+', '\d\+baz\d\+'])
   execute "normal ggsr\<C-v>35l\""
-  call g:assert.equals(getline(1), '\d\+foo\d\+', 'failed at #327')
-  call g:assert.equals(getline(2), '\d\+bar\d\+', 'failed at #327')
-  call g:assert.equals(getline(3), '\d\+baz\d\+', 'failed at #327')
+  call g:assert.equals(getline(1), '\d\+foo\d\+', 'failed at #342')
+  call g:assert.equals(getline(2), '\d\+bar\d\+', 'failed at #342')
+  call g:assert.equals(getline(3), '\d\+baz\d\+', 'failed at #342')
 
   %delete
 
-  " #328
+  " #343
   call append(0, ['888foo888', '888bar888', '888baz888'])
   execute "normal ggsr\<C-v>29l\""
-  call g:assert.equals(getline(1), '"foo"', 'failed at #328')
-  call g:assert.equals(getline(2), '"bar"', 'failed at #328')
-  call g:assert.equals(getline(3), '"baz"', 'failed at #328')
+  call g:assert.equals(getline(1), '"foo"', 'failed at #343')
+  call g:assert.equals(getline(2), '"bar"', 'failed at #343')
+  call g:assert.equals(getline(3), '"baz"', 'failed at #343')
 
   set whichwrap&
   call operator#sandwich#set('replace', 'block', 'regex', 0)
@@ -4644,79 +4737,79 @@ function! s:suite.blockwise_n_option_skip_space() abort  "{{{
   set whichwrap=h,l
 
   """ on
-  " #329
+  " #344
   call append(0, ['"foo"', '"bar"', '"baz"'])
   execute "normal ggsr\<C-v>17l("
-  call g:assert.equals(getline(1), '(foo)', 'failed at #329')
-  call g:assert.equals(getline(2), '(bar)', 'failed at #329')
-  call g:assert.equals(getline(3), '(baz)', 'failed at #329')
+  call g:assert.equals(getline(1), '(foo)', 'failed at #344')
+  call g:assert.equals(getline(2), '(bar)', 'failed at #344')
+  call g:assert.equals(getline(3), '(baz)', 'failed at #344')
 
   %delete
 
-  " #330
+  " #345
   call append(0, [' "foo"', ' "bar"', ' "baz"'])
   execute "normal ggsr\<C-v>20l("
-  call g:assert.equals(getline(1), ' (foo)', 'failed at #330')
-  call g:assert.equals(getline(2), ' (bar)', 'failed at #330')
-  call g:assert.equals(getline(3), ' (baz)', 'failed at #330')
+  call g:assert.equals(getline(1), ' (foo)', 'failed at #345')
+  call g:assert.equals(getline(2), ' (bar)', 'failed at #345')
+  call g:assert.equals(getline(3), ' (baz)', 'failed at #345')
 
   %delete
 
-  " #331
+  " #346
   call append(0, ['"foo" ', '"bar" ', '"baz" '])
   execute "normal ggsr\<C-v>20l("
-  call g:assert.equals(getline(1), '(foo) ', 'failed at #331')
-  call g:assert.equals(getline(2), '(bar) ', 'failed at #331')
-  call g:assert.equals(getline(3), '(baz) ', 'failed at #331')
+  call g:assert.equals(getline(1), '(foo) ', 'failed at #346')
+  call g:assert.equals(getline(2), '(bar) ', 'failed at #346')
+  call g:assert.equals(getline(3), '(baz) ', 'failed at #346')
 
   %delete
 
-  " #332
+  " #347
   " do not skip!
   call append(0, [' "foo" ', ' "bar" ', ' "baz" '])
   execute "normal ggsr\<C-v>23l("
-  call g:assert.equals(getline(1), '("foo")', 'failed at #332')
-  call g:assert.equals(getline(2), '("bar")', 'failed at #332')
-  call g:assert.equals(getline(3), '("baz")', 'failed at #332')
+  call g:assert.equals(getline(1), '("foo")', 'failed at #347')
+  call g:assert.equals(getline(2), '("bar")', 'failed at #347')
+  call g:assert.equals(getline(3), '("baz")', 'failed at #347')
 
   %delete
 
   """ off
   call operator#sandwich#set('replace', 'block', 'skip_space', 0)
-  " #333
+  " #348
   call append(0, ['"foo"', '"bar"', '"baz"'])
   execute "normal ggsr\<C-v>17l("
-  call g:assert.equals(getline(1), '(foo)', 'failed at #333')
-  call g:assert.equals(getline(2), '(bar)', 'failed at #333')
-  call g:assert.equals(getline(3), '(baz)', 'failed at #333')
+  call g:assert.equals(getline(1), '(foo)', 'failed at #348')
+  call g:assert.equals(getline(2), '(bar)', 'failed at #348')
+  call g:assert.equals(getline(3), '(baz)', 'failed at #348')
 
   %delete
 
-  " #334
+  " #349
   call append(0, [' "foo"', ' "bar"', ' "baz"'])
   execute "normal ggsr\<C-v>20l("
-  call g:assert.equals(getline(1), ' "foo"', 'failed at #334')
-  call g:assert.equals(getline(2), ' "bar"', 'failed at #334')
-  call g:assert.equals(getline(3), ' "baz"', 'failed at #334')
+  call g:assert.equals(getline(1), ' "foo"', 'failed at #349')
+  call g:assert.equals(getline(2), ' "bar"', 'failed at #349')
+  call g:assert.equals(getline(3), ' "baz"', 'failed at #349')
 
   %delete
 
-  " #335
+  " #350
   call append(0, ['"foo" ', '"bar" ', '"baz" '])
   execute "normal ggsr\<C-v>20l("
-  call g:assert.equals(getline(1), '"foo" ', 'failed at #335')
-  call g:assert.equals(getline(2), '"bar" ', 'failed at #335')
-  call g:assert.equals(getline(3), '"baz" ', 'failed at #335')
+  call g:assert.equals(getline(1), '"foo" ', 'failed at #350')
+  call g:assert.equals(getline(2), '"bar" ', 'failed at #350')
+  call g:assert.equals(getline(3), '"baz" ', 'failed at #350')
 
   %delete
 
-  " #336
+  " #351
   " do not skip!
   call append(0, [' "foo" ', ' "bar" ', ' "baz" '])
   execute "normal ggsr\<C-v>23l("
-  call g:assert.equals(getline(1), '("foo")', 'failed at #336')
-  call g:assert.equals(getline(2), '("bar")', 'failed at #336')
-  call g:assert.equals(getline(3), '("baz")', 'failed at #336')
+  call g:assert.equals(getline(1), '("foo")', 'failed at #351')
+  call g:assert.equals(getline(2), '("bar")', 'failed at #351')
+  call g:assert.equals(getline(3), '("baz")', 'failed at #351')
 
   set whichwrap&
   call operator#sandwich#set('replace', 'block', 'skip_space', 1)
@@ -4726,23 +4819,23 @@ function! s:suite.blockwise_n_option_skip_char() abort "{{{
   set whichwrap=h,l
 
   """ off
-  " #337
+  " #352
   call append(0, ['aa(foo)bb', 'aa(bar)bb', 'aa(baz)bb'])
   execute "normal ggsr\<C-v>29l\""
-  call g:assert.equals(getline(1), 'aa(foo)bb', 'failed at #337')
-  call g:assert.equals(getline(2), 'aa(bar)bb', 'failed at #337')
-  call g:assert.equals(getline(3), 'aa(baz)bb', 'failed at #337')
+  call g:assert.equals(getline(1), 'aa(foo)bb', 'failed at #352')
+  call g:assert.equals(getline(2), 'aa(bar)bb', 'failed at #352')
+  call g:assert.equals(getline(3), 'aa(baz)bb', 'failed at #352')
 
   %delete
 
   """ on
   call operator#sandwich#set('replace', 'block', 'skip_char', 1)
-  " #338
+  " #353
   call append(0, ['aa(foo)bb', 'aa(bar)bb', 'aa(baz)bb'])
   execute "normal ggsr\<C-v>29l\""
-  call g:assert.equals(getline(1), 'aa"foo"bb', 'failed at #338')
-  call g:assert.equals(getline(2), 'aa"bar"bb', 'failed at #338')
-  call g:assert.equals(getline(3), 'aa"baz"bb', 'failed at #338')
+  call g:assert.equals(getline(1), 'aa"foo"bb', 'failed at #353')
+  call g:assert.equals(getline(2), 'aa"bar"bb', 'failed at #353')
+  call g:assert.equals(getline(3), 'aa"baz"bb', 'failed at #353')
 
   set whichwrap&
   call operator#sandwich#set('replace', 'block', 'skip_char', 0)
@@ -4752,12 +4845,12 @@ function! s:suite.blockwise_n_option_command() abort  "{{{
   set whichwrap=h,l
   call operator#sandwich#set('replace', 'block', 'command', ["normal! `[d\<C-v>`]"])
 
-  " #339
+  " #354
   call append(0, ['(foo)', '(bar)', '(baz)'])
   execute "normal ggsr\<C-v>17l\""
-  call g:assert.equals(getline(1), '""', 'failed at #339')
-  call g:assert.equals(getline(2), '""', 'failed at #339')
-  call g:assert.equals(getline(3), '""', 'failed at #339')
+  call g:assert.equals(getline(1), '""', 'failed at #354')
+  call g:assert.equals(getline(2), '""', 'failed at #354')
+  call g:assert.equals(getline(3), '""', 'failed at #354')
 
   set whichwrap&
   call operator#sandwich#set('replace', 'block', 'command', [])
@@ -4768,23 +4861,23 @@ function! s:suite.blockwise_n_option_query_once() abort  "{{{
 
   """"" query_once
   """ off
-  " #339
+  " #354
   call append(0, ['"""foo"""', '"""bar"""', '"""baz"""'])
   execute "normal gg3sr\<C-v>29l([{"
-  call g:assert.equals(getline(1), '([{foo}])',  'failed at #339')
-  call g:assert.equals(getline(2), '([{bar}])',  'failed at #339')
-  call g:assert.equals(getline(3), '([{baz}])',  'failed at #339')
+  call g:assert.equals(getline(1), '([{foo}])',  'failed at #354')
+  call g:assert.equals(getline(2), '([{bar}])',  'failed at #354')
+  call g:assert.equals(getline(3), '([{baz}])',  'failed at #354')
 
   %delete
 
   """ on
-  " #340
+  " #355
   call operator#sandwich#set('replace', 'block', 'query_once', 1)
   call append(0, ['"""foo"""', '"""bar"""', '"""baz"""'])
   execute "normal gg3sr\<C-v>29l("
-  call g:assert.equals(getline(1), '(((foo)))',  'failed at #340')
-  call g:assert.equals(getline(2), '(((bar)))',  'failed at #340')
-  call g:assert.equals(getline(3), '(((baz)))',  'failed at #340')
+  call g:assert.equals(getline(1), '(((foo)))',  'failed at #355')
+  call g:assert.equals(getline(2), '(((bar)))',  'failed at #355')
+  call g:assert.equals(getline(3), '(((baz)))',  'failed at #355')
 
   set whichwrap&
   call operator#sandwich#set('replace', 'block', 'query_once', 0)
@@ -4796,19 +4889,19 @@ function! s:suite.blockwise_n_option_expr() abort "{{{
   let g:operator#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'input':['a']}]
 
   """ 0
-  " #341
+  " #356
   call append(0, ['"foo"', '"bar"', '"baz"'])
   execute "normal ggsr\<C-v>17la"
-  call g:assert.equals(getline('.'), '1+1foo1+2',  'failed at #341')
+  call g:assert.equals(getline('.'), '1+1foo1+2',  'failed at #356')
 
   %delete
 
   """ 1
-  " #342
+  " #357
   call operator#sandwich#set('replace', 'block', 'expr', 1)
   call append(0, ['"foo"', '"bar"', '"baz"'])
   execute "normal ggsr\<C-v>17la"
-  call g:assert.equals(getline('.'), '2foo3',  'failed at #342')
+  call g:assert.equals(getline('.'), '2foo3',  'failed at #357')
 
   """ 2
   " This case cannot be tested since this option makes difference only in
@@ -4821,193 +4914,12 @@ endfunction
 "}}}
 
 function! s:suite.blockwise_x_default_recipes() abort "{{{
-  " #343
+  " #358
   call append(0, ['(foo)', '(bar)', '(baz)'])
   execute "normal gg\<C-v>2j4lsr["
-  call g:assert.equals(getline(1),   '[foo]',      'failed at #343')
-  call g:assert.equals(getline(2),   '[bar]',      'failed at #343')
-  call g:assert.equals(getline(3),   '[baz]',      'failed at #343')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #343')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #343')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #343')
-
-  %delete
-
-  " #344
-  call append(0, ['[foo]', '[bar]', '[baz]'])
-  execute "normal gg\<C-v>2j4lsr{"
-  call g:assert.equals(getline(1),   '{foo}',      'failed at #344')
-  call g:assert.equals(getline(2),   '{bar}',      'failed at #344')
-  call g:assert.equals(getline(3),   '{baz}',      'failed at #344')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #344')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #344')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #344')
-
-  %delete
-
-  " #345
-  call append(0, ['{foo}', '{bar}', '{baz}'])
-  execute "normal gg\<C-v>2j4lsr<"
-  call g:assert.equals(getline(1),   '<foo>',      'failed at #345')
-  call g:assert.equals(getline(2),   '<bar>',      'failed at #345')
-  call g:assert.equals(getline(3),   '<baz>',      'failed at #345')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #345')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #345')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #345')
-
-  %delete
-
-  " #346
-  call append(0, ['<foo>', '<bar>', '<baz>'])
-  execute "normal gg\<C-v>2j4lsr("
-  call g:assert.equals(getline(1),   '(foo)',      'failed at #346')
-  call g:assert.equals(getline(2),   '(bar)',      'failed at #346')
-  call g:assert.equals(getline(3),   '(baz)',      'failed at #346')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #346')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #346')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #346')
-endfunction
-"}}}
-function! s:suite.blockwise_x_not_registered() abort "{{{
-  " #347
-  call append(0, ['afooa', 'abara', 'abaza'])
-  execute "normal gg\<C-v>2j4lsrb"
-  call g:assert.equals(getline(1),   'bfoob',      'failed at #347')
-  call g:assert.equals(getline(2),   'bbarb',      'failed at #347')
-  call g:assert.equals(getline(3),   'bbazb',      'failed at #347')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #347')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #347')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #347')
-
-  " #348
-  call append(0, ['+foo+', '+bar+', '+baz+'])
-  execute "normal gg\<C-v>2j4lsr*"
-  call g:assert.equals(getline(1),   '*foo*',      'failed at #348')
-  call g:assert.equals(getline(2),   '*bar*',      'failed at #348')
-  call g:assert.equals(getline(3),   '*baz*',      'failed at #348')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #348')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #348')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #348')
-endfunction
-"}}}
-function! s:suite.blockwise_x_positioning() abort "{{{
-  " #349
-  call append(0, ['(foo)bar', '(foo)bar', '(foo)bar'])
-  execute "normal gg\<C-v>2j4lsr["
-  call g:assert.equals(getline(1),   '[foo]bar',   'failed at #349')
-  call g:assert.equals(getline(2),   '[foo]bar',   'failed at #349')
-  call g:assert.equals(getline(3),   '[foo]bar',   'failed at #349')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #349')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #349')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #349')
-
-  %delete
-
-  " #350
-  call append(0, ['foo(bar)', 'foo(bar)', 'foo(bar)'])
-  execute "normal gg3l\<C-v>2j4lsr["
-  call g:assert.equals(getline(1),   'foo[bar]',   'failed at #350')
-  call g:assert.equals(getline(2),   'foo[bar]',   'failed at #350')
-  call g:assert.equals(getline(3),   'foo[bar]',   'failed at #350')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #350')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #350')
-  call g:assert.equals(getpos("']"), [0, 3, 9, 0], 'failed at #350')
-
-  %delete
-
-  " #351
-  call append(0, ['foo(bar)baz', 'foo(bar)baz', 'foo(bar)baz'])
-  execute "normal gg3l\<C-v>2j4lsr["
-  call g:assert.equals(getline(1),   'foo[bar]baz', 'failed at #351')
-  call g:assert.equals(getline(2),   'foo[bar]baz', 'failed at #351')
-  call g:assert.equals(getline(3),   'foo[bar]baz', 'failed at #351')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0],  'failed at #351')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #351')
-  call g:assert.equals(getpos("']"), [0, 3, 9, 0],  'failed at #351')
-
-  %delete
-
-  " #352
-  call append(0, ['(foo)', '(bar)', 'bazbaz'])
-  execute "normal gg\<C-v>2j4lsr["
-  call g:assert.equals(getline(1),   '[foo]',      'failed at #352')
-  call g:assert.equals(getline(2),   '[bar]',      'failed at #352')
-  call g:assert.equals(getline(3),   'bazbaz',     'failed at #352')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #352')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #352')
-  call g:assert.equals(getpos("']"), [0, 2, 6, 0], 'failed at #352')
-
-  %delete
-
-  " #353
-  call append(0, ['(foo)', 'barbar', '(baz)'])
-  execute "normal gg\<C-v>2j4lsr["
-  call g:assert.equals(getline(1),   '[foo]',      'failed at #353')
-  call g:assert.equals(getline(2),   'barbar',     'failed at #353')
-  call g:assert.equals(getline(3),   '[baz]',      'failed at #353')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #353')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #353')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #353')
-
-  %delete
-
-  " #354
-  call append(0, ['foofoo', '(bar)', '(baz)'])
-  execute "normal gg\<C-v>2j4lsr["
-  call g:assert.equals(getline(1),   'foofoo',     'failed at #354')
-  call g:assert.equals(getline(2),   '[bar]',      'failed at #354')
-  call g:assert.equals(getline(3),   '[baz]',      'failed at #354')
-  call g:assert.equals(getpos('.'),  [0, 2, 2, 0], 'failed at #354')
-  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #354')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #354')
-
-  %delete
-
-  " #355
-  call append(0, ['(foo)', '(baar)', '(baaz)'])
-  execute "normal gg\<C-v>2j5lsr["
-  call g:assert.equals(getline(1),   '[foo]',      'failed at #355')
-  call g:assert.equals(getline(2),   '[baar]',     'failed at #355')
-  call g:assert.equals(getline(3),   '[baaz]',     'failed at #355')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #355')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #355')
-  call g:assert.equals(getpos("']"), [0, 3, 7, 0], 'failed at #355')
-
-  %delete
-
-  " #356
-  call append(0, ['(fooo)', '(bar)', '(baaz)'])
-  execute "normal gg\<C-v>2j5lsr["
-  call g:assert.equals(getline(1),   '[fooo]',     'failed at #356')
-  call g:assert.equals(getline(2),   '[bar]',      'failed at #356')
-  call g:assert.equals(getline(3),   '[baaz]',     'failed at #356')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #356')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #356')
-  call g:assert.equals(getpos("']"), [0, 3, 7, 0], 'failed at #356')
-
-  %delete
-
-  " #357
-  call append(0, ['(fooo)', '(baar)', '(baz)'])
-  set virtualedit=block
-  execute "normal gg\<C-v>2j5lsr["
-  call g:assert.equals(getline(1),   '[fooo]',     'failed at #357')
-  call g:assert.equals(getline(2),   '[baar]',     'failed at #357')
-  call g:assert.equals(getline(3),   '[baz]',      'failed at #357')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #357')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #357')
-  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #357')
-  set virtualedit&
-
-  %delete
-
-  """ terminal-extended block-wise visual mode
-  " #358
-  call append(0, ['"fooo"', '"baaar"', '"baz"'])
-  execute "normal gg\<C-v>2j$sr("
-  call g:assert.equals(getline(1),   '(fooo)',     'failed at #358')
-  call g:assert.equals(getline(2),   '(baaar)',    'failed at #358')
-  call g:assert.equals(getline(3),   '(baz)',      'failed at #358')
+  call g:assert.equals(getline(1),   '[foo]',      'failed at #358')
+  call g:assert.equals(getline(2),   '[bar]',      'failed at #358')
+  call g:assert.equals(getline(3),   '[baz]',      'failed at #358')
   call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #358')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #358')
   call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #358')
@@ -5015,122 +4927,303 @@ function! s:suite.blockwise_x_positioning() abort "{{{
   %delete
 
   " #359
-  call append(0, ['"foooo"', '"bar"', '"baaz"'])
-  execute "normal gg\<C-v>2j$sr("
-  call g:assert.equals(getline(1),   '(foooo)',    'failed at #359')
-  call g:assert.equals(getline(2),   '(bar)',      'failed at #359')
-  call g:assert.equals(getline(3),   '(baaz)',     'failed at #359')
+  call append(0, ['[foo]', '[bar]', '[baz]'])
+  execute "normal gg\<C-v>2j4lsr{"
+  call g:assert.equals(getline(1),   '{foo}',      'failed at #359')
+  call g:assert.equals(getline(2),   '{bar}',      'failed at #359')
+  call g:assert.equals(getline(3),   '{baz}',      'failed at #359')
   call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #359')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #359')
-  call g:assert.equals(getpos("']"), [0, 3, 7, 0], 'failed at #359')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #359')
 
   %delete
 
   " #360
-  call append(0, ['"fooo"', '', '"baz"'])
-  execute "normal gg\<C-v>2j$sr("
-  call g:assert.equals(getline(1),   '(fooo)',     'failed at #360')
-  call g:assert.equals(getline(2),   '',           'failed at #360')
-  call g:assert.equals(getline(3),   '(baz)',      'failed at #360')
+  call append(0, ['{foo}', '{bar}', '{baz}'])
+  execute "normal gg\<C-v>2j4lsr<"
+  call g:assert.equals(getline(1),   '<foo>',      'failed at #360')
+  call g:assert.equals(getline(2),   '<bar>',      'failed at #360')
+  call g:assert.equals(getline(3),   '<baz>',      'failed at #360')
   call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #360')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #360')
   call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #360')
-endfunction
-"}}}
-function! s:suite.blockwise_x_a_character() abort "{{{
-  " #361
-  call append(0, ['(a)', '(b)', '(c)'])
-  execute "normal gg\<C-v>2j2lsr["
-  call g:assert.equals(getline(1),   '[a]',        'failed at #361')
-  call g:assert.equals(getline(2),   '[b]',        'failed at #361')
-  call g:assert.equals(getline(3),   '[c]',        'failed at #361')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #361')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #361')
-  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #361')
-endfunction
-"}}}
-function! s:suite.blockwise_x_nothing_inside() abort "{{{
-  " #362
-  call append(0, ['()', '()', '()'])
-  execute "normal gg\<C-v>2jlsr["
-  call g:assert.equals(getline(1),   '[]',         'failed at #362')
-  call g:assert.equals(getline(2),   '[]',         'failed at #362')
-  call g:assert.equals(getline(3),   '[]',         'failed at #362')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #362')
-  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #362')
-  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #362')
 
   %delete
 
+  " #361
+  call append(0, ['<foo>', '<bar>', '<baz>'])
+  execute "normal gg\<C-v>2j4lsr("
+  call g:assert.equals(getline(1),   '(foo)',      'failed at #361')
+  call g:assert.equals(getline(2),   '(bar)',      'failed at #361')
+  call g:assert.equals(getline(3),   '(baz)',      'failed at #361')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #361')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #361')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #361')
+endfunction
+"}}}
+function! s:suite.blockwise_x_not_registered() abort "{{{
+  " #362
+  call append(0, ['afooa', 'abara', 'abaza'])
+  execute "normal gg\<C-v>2j4lsrb"
+  call g:assert.equals(getline(1),   'bfoob',      'failed at #362')
+  call g:assert.equals(getline(2),   'bbarb',      'failed at #362')
+  call g:assert.equals(getline(3),   'bbazb',      'failed at #362')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #362')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #362')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #362')
+
   " #363
-  call append(0, ['foo()bar', 'foo()bar', 'foo()bar'])
-  execute "normal gg3l\<C-v>2jlsr["
-  call g:assert.equals(getline(1),   'foo[]bar',   'failed at #363')
-  call g:assert.equals(getline(2),   'foo[]bar',   'failed at #363')
-  call g:assert.equals(getline(3),   'foo[]bar',   'failed at #363')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #363')
-  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #363')
+  call append(0, ['+foo+', '+bar+', '+baz+'])
+  execute "normal gg\<C-v>2j4lsr*"
+  call g:assert.equals(getline(1),   '*foo*',      'failed at #363')
+  call g:assert.equals(getline(2),   '*bar*',      'failed at #363')
+  call g:assert.equals(getline(3),   '*baz*',      'failed at #363')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #363')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #363')
   call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #363')
 endfunction
 "}}}
-function! s:suite.blockwise_x_count() abort "{{{
+function! s:suite.blockwise_x_positioning() abort "{{{
   " #364
-  call append(0, ['[(foo)]', '[(bar)]', '[(baz)]'])
-  execute "normal gg\<C-v>2j6l3sr({"
-  call g:assert.equals(getline(1),   '({foo})',    'failed at #364')
-  call g:assert.equals(getline(2),   '({bar})',    'failed at #364')
-  call g:assert.equals(getline(3),   '({baz})',    'failed at #364')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #364')
+  call append(0, ['(foo)bar', '(foo)bar', '(foo)bar'])
+  execute "normal gg\<C-v>2j4lsr["
+  call g:assert.equals(getline(1),   '[foo]bar',   'failed at #364')
+  call g:assert.equals(getline(2),   '[foo]bar',   'failed at #364')
+  call g:assert.equals(getline(3),   '[foo]bar',   'failed at #364')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #364')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #364')
-  call g:assert.equals(getpos("']"), [0, 3, 8, 0], 'failed at #364')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #364')
 
   %delete
 
   " #365
-  call append(0, ['{[(foo)]}', '{[(bar)]}', '{[(baz)]}'])
-  execute "normal gg\<C-v>2j8l3sr({["
-  call g:assert.equals(getline(1),   '({[foo]})',   'failed at #365')
-  call g:assert.equals(getline(2),   '({[bar]})',   'failed at #365')
-  call g:assert.equals(getline(3),   '({[baz]})',   'failed at #365')
-  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #365')
-  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #365')
-  call g:assert.equals(getpos("']"), [0, 3, 10, 0], 'failed at #365')
+  call append(0, ['foo(bar)', 'foo(bar)', 'foo(bar)'])
+  execute "normal gg3l\<C-v>2j4lsr["
+  call g:assert.equals(getline(1),   'foo[bar]',   'failed at #365')
+  call g:assert.equals(getline(2),   'foo[bar]',   'failed at #365')
+  call g:assert.equals(getline(3),   'foo[bar]',   'failed at #365')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #365')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #365')
+  call g:assert.equals(getpos("']"), [0, 3, 9, 0], 'failed at #365')
 
   %delete
 
   " #366
-  call append(0, ['{[afoob]}', '{[(bar)]}', '{[(baz)]}'])
-  execute "normal gg\<C-v>2j8l3sr({["
-  call g:assert.equals(getline(1),   '({afoob})',   'failed at #366')
-  call g:assert.equals(getline(2),   '({[bar]})',   'failed at #366')
-  call g:assert.equals(getline(3),   '({[baz]})',   'failed at #366')
-  call g:assert.equals(getpos('.'),  [0, 1,  3, 0], 'failed at #366')
-  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #366')
-  call g:assert.equals(getpos("']"), [0, 3, 10, 0], 'failed at #366')
+  call append(0, ['foo(bar)baz', 'foo(bar)baz', 'foo(bar)baz'])
+  execute "normal gg3l\<C-v>2j4lsr["
+  call g:assert.equals(getline(1),   'foo[bar]baz', 'failed at #366')
+  call g:assert.equals(getline(2),   'foo[bar]baz', 'failed at #366')
+  call g:assert.equals(getline(3),   'foo[bar]baz', 'failed at #366')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0],  'failed at #366')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0],  'failed at #366')
+  call g:assert.equals(getpos("']"), [0, 3, 9, 0],  'failed at #366')
 
   %delete
 
   " #367
-  call append(0, ['{[(foo)]}', '{[abarb]}', '{[(baz)]}'])
-  execute "normal gg\<C-v>2j8l3sr({["
-  call g:assert.equals(getline(1),   '({[foo]})',   'failed at #367')
-  call g:assert.equals(getline(2),   '({abarb})',   'failed at #367')
-  call g:assert.equals(getline(3),   '({[baz]})',   'failed at #367')
-  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #367')
-  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #367')
-  call g:assert.equals(getpos("']"), [0, 3, 10, 0], 'failed at #367')
+  call append(0, ['(foo)', '(bar)', 'bazbaz'])
+  execute "normal gg\<C-v>2j4lsr["
+  call g:assert.equals(getline(1),   '[foo]',      'failed at #367')
+  call g:assert.equals(getline(2),   '[bar]',      'failed at #367')
+  call g:assert.equals(getline(3),   'bazbaz',     'failed at #367')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #367')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #367')
+  call g:assert.equals(getpos("']"), [0, 2, 6, 0], 'failed at #367')
 
   %delete
 
   " #368
+  call append(0, ['(foo)', 'barbar', '(baz)'])
+  execute "normal gg\<C-v>2j4lsr["
+  call g:assert.equals(getline(1),   '[foo]',      'failed at #368')
+  call g:assert.equals(getline(2),   'barbar',     'failed at #368')
+  call g:assert.equals(getline(3),   '[baz]',      'failed at #368')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #368')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #368')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #368')
+
+  %delete
+
+  " #369
+  call append(0, ['foofoo', '(bar)', '(baz)'])
+  execute "normal gg\<C-v>2j4lsr["
+  call g:assert.equals(getline(1),   'foofoo',     'failed at #369')
+  call g:assert.equals(getline(2),   '[bar]',      'failed at #369')
+  call g:assert.equals(getline(3),   '[baz]',      'failed at #369')
+  call g:assert.equals(getpos('.'),  [0, 2, 2, 0], 'failed at #369')
+  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #369')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #369')
+
+  %delete
+
+  " #370
+  call append(0, ['(foo)', '(baar)', '(baaz)'])
+  execute "normal gg\<C-v>2j5lsr["
+  call g:assert.equals(getline(1),   '[foo]',      'failed at #370')
+  call g:assert.equals(getline(2),   '[baar]',     'failed at #370')
+  call g:assert.equals(getline(3),   '[baaz]',     'failed at #370')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #370')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #370')
+  call g:assert.equals(getpos("']"), [0, 3, 7, 0], 'failed at #370')
+
+  %delete
+
+  " #371
+  call append(0, ['(fooo)', '(bar)', '(baaz)'])
+  execute "normal gg\<C-v>2j5lsr["
+  call g:assert.equals(getline(1),   '[fooo]',     'failed at #371')
+  call g:assert.equals(getline(2),   '[bar]',      'failed at #371')
+  call g:assert.equals(getline(3),   '[baaz]',     'failed at #371')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #371')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #371')
+  call g:assert.equals(getpos("']"), [0, 3, 7, 0], 'failed at #371')
+
+  %delete
+
+  " #372
+  call append(0, ['(fooo)', '(baar)', '(baz)'])
+  set virtualedit=block
+  execute "normal gg\<C-v>2j5lsr["
+  call g:assert.equals(getline(1),   '[fooo]',     'failed at #372')
+  call g:assert.equals(getline(2),   '[baar]',     'failed at #372')
+  call g:assert.equals(getline(3),   '[baz]',      'failed at #372')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #372')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #372')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #372')
+  set virtualedit&
+
+  %delete
+
+  """ terminal-extended block-wise visual mode
+  " #373
+  call append(0, ['"fooo"', '"baaar"', '"baz"'])
+  execute "normal gg\<C-v>2j$sr("
+  call g:assert.equals(getline(1),   '(fooo)',     'failed at #373')
+  call g:assert.equals(getline(2),   '(baaar)',    'failed at #373')
+  call g:assert.equals(getline(3),   '(baz)',      'failed at #373')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #373')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #373')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #373')
+
+  %delete
+
+  " #374
+  call append(0, ['"foooo"', '"bar"', '"baaz"'])
+  execute "normal gg\<C-v>2j$sr("
+  call g:assert.equals(getline(1),   '(foooo)',    'failed at #374')
+  call g:assert.equals(getline(2),   '(bar)',      'failed at #374')
+  call g:assert.equals(getline(3),   '(baaz)',     'failed at #374')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #374')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #374')
+  call g:assert.equals(getpos("']"), [0, 3, 7, 0], 'failed at #374')
+
+  %delete
+
+  " #375
+  call append(0, ['"fooo"', '', '"baz"'])
+  execute "normal gg\<C-v>2j$sr("
+  call g:assert.equals(getline(1),   '(fooo)',     'failed at #375')
+  call g:assert.equals(getline(2),   '',           'failed at #375')
+  call g:assert.equals(getline(3),   '(baz)',      'failed at #375')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #375')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #375')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #375')
+endfunction
+"}}}
+function! s:suite.blockwise_x_a_character() abort "{{{
+  " #376
+  call append(0, ['(a)', '(b)', '(c)'])
+  execute "normal gg\<C-v>2j2lsr["
+  call g:assert.equals(getline(1),   '[a]',        'failed at #376')
+  call g:assert.equals(getline(2),   '[b]',        'failed at #376')
+  call g:assert.equals(getline(3),   '[c]',        'failed at #376')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #376')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #376')
+  call g:assert.equals(getpos("']"), [0, 3, 4, 0], 'failed at #376')
+endfunction
+"}}}
+function! s:suite.blockwise_x_nothing_inside() abort "{{{
+  " #377
+  call append(0, ['()', '()', '()'])
+  execute "normal gg\<C-v>2jlsr["
+  call g:assert.equals(getline(1),   '[]',         'failed at #377')
+  call g:assert.equals(getline(2),   '[]',         'failed at #377')
+  call g:assert.equals(getline(3),   '[]',         'failed at #377')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #377')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #377')
+  call g:assert.equals(getpos("']"), [0, 3, 3, 0], 'failed at #377')
+
+  %delete
+
+  " #378
+  call append(0, ['foo()bar', 'foo()bar', 'foo()bar'])
+  execute "normal gg3l\<C-v>2jlsr["
+  call g:assert.equals(getline(1),   'foo[]bar',   'failed at #378')
+  call g:assert.equals(getline(2),   'foo[]bar',   'failed at #378')
+  call g:assert.equals(getline(3),   'foo[]bar',   'failed at #378')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #378')
+  call g:assert.equals(getpos("'["), [0, 1, 4, 0], 'failed at #378')
+  call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #378')
+endfunction
+"}}}
+function! s:suite.blockwise_x_count() abort "{{{
+  " #379
+  call append(0, ['[(foo)]', '[(bar)]', '[(baz)]'])
+  execute "normal gg\<C-v>2j6l3sr({"
+  call g:assert.equals(getline(1),   '({foo})',    'failed at #379')
+  call g:assert.equals(getline(2),   '({bar})',    'failed at #379')
+  call g:assert.equals(getline(3),   '({baz})',    'failed at #379')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #379')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #379')
+  call g:assert.equals(getpos("']"), [0, 3, 8, 0], 'failed at #379')
+
+  %delete
+
+  " #380
+  call append(0, ['{[(foo)]}', '{[(bar)]}', '{[(baz)]}'])
+  execute "normal gg\<C-v>2j8l3sr({["
+  call g:assert.equals(getline(1),   '({[foo]})',   'failed at #380')
+  call g:assert.equals(getline(2),   '({[bar]})',   'failed at #380')
+  call g:assert.equals(getline(3),   '({[baz]})',   'failed at #380')
+  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #380')
+  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #380')
+  call g:assert.equals(getpos("']"), [0, 3, 10, 0], 'failed at #380')
+
+  %delete
+
+  " #381
+  call append(0, ['{[afoob]}', '{[(bar)]}', '{[(baz)]}'])
+  execute "normal gg\<C-v>2j8l3sr({["
+  call g:assert.equals(getline(1),   '({afoob})',   'failed at #381')
+  call g:assert.equals(getline(2),   '({[bar]})',   'failed at #381')
+  call g:assert.equals(getline(3),   '({[baz]})',   'failed at #381')
+  call g:assert.equals(getpos('.'),  [0, 1,  3, 0], 'failed at #381')
+  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #381')
+  call g:assert.equals(getpos("']"), [0, 3, 10, 0], 'failed at #381')
+
+  %delete
+
+  " #382
+  call append(0, ['{[(foo)]}', '{[abarb]}', '{[(baz)]}'])
+  execute "normal gg\<C-v>2j8l3sr({["
+  call g:assert.equals(getline(1),   '({[foo]})',   'failed at #382')
+  call g:assert.equals(getline(2),   '({abarb})',   'failed at #382')
+  call g:assert.equals(getline(3),   '({[baz]})',   'failed at #382')
+  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #382')
+  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #382')
+  call g:assert.equals(getpos("']"), [0, 3, 10, 0], 'failed at #382')
+
+  %delete
+
+  " #383
   call append(0, ['{[(foo)]}', '{[(bar)]}', '{[abazb]}'])
   execute "normal gg\<C-v>2j8l3sr({["
-  call g:assert.equals(getline(1),   '({[foo]})',   'failed at #368')
-  call g:assert.equals(getline(2),   '({[bar]})',   'failed at #368')
-  call g:assert.equals(getline(3),   '({abazb})',   'failed at #368')
-  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #368')
-  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #368')
-  call g:assert.equals(getpos("']"), [0, 3, 10, 0], 'failed at #368')
+  call g:assert.equals(getline(1),   '({[foo]})',   'failed at #383')
+  call g:assert.equals(getline(2),   '({[bar]})',   'failed at #383')
+  call g:assert.equals(getline(3),   '({abazb})',   'failed at #383')
+  call g:assert.equals(getpos('.'),  [0, 1,  4, 0], 'failed at #383')
+  call g:assert.equals(getpos("'["), [0, 1,  1, 0], 'failed at #383')
+  call g:assert.equals(getpos("']"), [0, 3, 10, 0], 'failed at #383')
 endfunction
 "}}}
 function! s:suite.blockwise_x_external_textobj() abort "{{{
@@ -5142,39 +5235,39 @@ function! s:suite.blockwise_x_external_textobj() abort "{{{
         \   {'external': ['it', 'at']},
         \ ]
 
-  " #369
+  " #384
   call append(0, ['(foo)', '(bar)', '(baz)'])
   execute "normal gg\<C-v>2j4lsr\""
-  call g:assert.equals(getline(1), '"foo"', 'failed at #369')
-  call g:assert.equals(getline(2), '"bar"', 'failed at #369')
-  call g:assert.equals(getline(3), '"baz"', 'failed at #369')
+  call g:assert.equals(getline(1), '"foo"', 'failed at #384')
+  call g:assert.equals(getline(2), '"bar"', 'failed at #384')
+  call g:assert.equals(getline(3), '"baz"', 'failed at #384')
 
   %delete
 
-  " #370
+  " #385
   call append(0, ['[foo]', '[bar]', '[baz]'])
   execute "normal gg\<C-v>2j4lsr\""
-  call g:assert.equals(getline(1), '"foo"', 'failed at #370')
-  call g:assert.equals(getline(2), '"bar"', 'failed at #370')
-  call g:assert.equals(getline(3), '"baz"', 'failed at #370')
+  call g:assert.equals(getline(1), '"foo"', 'failed at #385')
+  call g:assert.equals(getline(2), '"bar"', 'failed at #385')
+  call g:assert.equals(getline(3), '"baz"', 'failed at #385')
 
   %delete
 
-  " #371
+  " #386
   call append(0, ['{foo}', '{bar}', '{baz}'])
   execute "normal gg\<C-v>2j4lsr\""
-  call g:assert.equals(getline(1), '"foo"', 'failed at #371')
-  call g:assert.equals(getline(2), '"bar"', 'failed at #371')
-  call g:assert.equals(getline(3), '"baz"', 'failed at #371')
+  call g:assert.equals(getline(1), '"foo"', 'failed at #386')
+  call g:assert.equals(getline(2), '"bar"', 'failed at #386')
+  call g:assert.equals(getline(3), '"baz"', 'failed at #386')
 
   %delete
 
-  " #372
+  " #387
   call append(0, ['<title>foo</title>', '<title>bar</title>', '<title>baz</title>'])
   execute "normal gg\<C-v>2j17lsr\""
-  call g:assert.equals(getline(1), '"foo"', 'failed at #372')
-  call g:assert.equals(getline(2), '"bar"', 'failed at #372')
-  call g:assert.equals(getline(3), '"baz"', 'failed at #372')
+  call g:assert.equals(getline(1), '"foo"', 'failed at #387')
+  call g:assert.equals(getline(2), '"bar"', 'failed at #387')
+  call g:assert.equals(getline(3), '"baz"', 'failed at #387')
 
   unlet g:sandwich#recipes
   unlet g:operator#sandwich#recipes
@@ -5183,96 +5276,96 @@ endfunction
 function! s:suite.blockwise_x_option_cursor() abort  "{{{
   """"" cursor
   """ inner_head
-  " #373
+  " #388
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg\<C-v>2j8l2sr[]"
-  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #373')
-  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #373')
-  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #373')
-  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #373')
+  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #388')
+  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #388')
+  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #388')
+  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #388')
 
-  " #374
+  " #389
   execute "normal \<C-v>2j4lsr["
-  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #374')
-  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #374')
-  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #374')
-  call g:assert.equals(getpos('.'), [0, 1, 4, 0], 'failed at #374')
+  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #389')
+  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #389')
+  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #389')
+  call g:assert.equals(getpos('.'), [0, 1, 4, 0], 'failed at #389')
 
   %delete
 
   """ keep
-  " #375
+  " #390
   call operator#sandwich#set('replace', 'block', 'cursor', 'keep')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg\<C-v>2j8l2sr[]"
-  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #375')
-  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #375')
-  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #375')
-  call g:assert.equals(getpos('.'), [0, 3, 9, 0], 'failed at #375')
+  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #390')
+  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #390')
+  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #390')
+  call g:assert.equals(getpos('.'), [0, 3, 9, 0], 'failed at #390')
 
-  " #376
+  " #391
   execute "normal 2h\<C-v>2k4hsr["
-  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #376')
-  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #376')
-  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #376')
-  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #376')
+  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #391')
+  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #391')
+  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #391')
+  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #391')
 
   %delete
 
   """ inner_tail
-  " #377
+  " #392
   call operator#sandwich#set('replace', 'block', 'cursor', 'inner_tail')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg\<C-v>2j8l2sr[]"
-  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #377')
-  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #377')
-  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #377')
-  call g:assert.equals(getpos('.'), [0, 3, 7, 0], 'failed at #377')
+  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #392')
+  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #392')
+  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #392')
+  call g:assert.equals(getpos('.'), [0, 3, 7, 0], 'failed at #392')
 
-  " #378
+  " #393
   execute "normal gg2l\<C-v>2j4lsr["
-  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #378')
-  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #378')
-  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #378')
-  call g:assert.equals(getpos('.'), [0, 3, 6, 0], 'failed at #378')
+  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #393')
+  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #393')
+  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #393')
+  call g:assert.equals(getpos('.'), [0, 3, 6, 0], 'failed at #393')
 
   %delete
 
   """ front
-  " #379
+  " #394
   call operator#sandwich#set('replace', 'block', 'cursor', 'front')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg\<C-v>2j8l2sr[]"
-  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #379')
-  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #379')
-  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #379')
-  call g:assert.equals(getpos('.'), [0, 1, 1, 0], 'failed at #379')
+  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #394')
+  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #394')
+  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #394')
+  call g:assert.equals(getpos('.'), [0, 1, 1, 0], 'failed at #394')
 
-  " #380
+  " #395
   execute "normal 2l\<C-v>2j4lsr["
-  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #380')
-  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #380')
-  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #380')
-  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #380')
+  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #395')
+  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #395')
+  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #395')
+  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #395')
 
   %delete
 
   """ end
-  " #381
+  " #396
   call operator#sandwich#set('replace', 'block', 'cursor', 'end')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg\<C-v>2j8l2sr[]"
-  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #381')
-  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #381')
-  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #381')
-  call g:assert.equals(getpos('.'), [0, 3, 9, 0], 'failed at #381')
+  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #396')
+  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #396')
+  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #396')
+  call g:assert.equals(getpos('.'), [0, 3, 9, 0], 'failed at #396')
 
-  " #382
+  " #397
   execute "normal 6h2k\<C-v>2j4lsr["
-  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #382')
-  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #382')
-  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #382')
-  call g:assert.equals(getpos('.'), [0, 3, 7, 0], 'failed at #382')
+  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #397')
+  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #397')
+  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #397')
+  call g:assert.equals(getpos('.'), [0, 3, 7, 0], 'failed at #397')
 
   call operator#sandwich#set('replace', 'block', 'cursor', 'inner_head')
 endfunction
@@ -5285,41 +5378,41 @@ function! s:suite.blockwise_x_option_noremap() abort  "{{{
   xnoremap a{ a(
 
   """ on
-  " #383
+  " #398
   call append(0, ['{foo}', '{bar}', '{baz}'])
   execute "normal gg\<C-v>2j4lsr\""
-  call g:assert.equals(getline(1), '"foo"', 'failed at #383')
-  call g:assert.equals(getline(2), '"bar"', 'failed at #383')
-  call g:assert.equals(getline(3), '"baz"', 'failed at #383')
+  call g:assert.equals(getline(1), '"foo"', 'failed at #398')
+  call g:assert.equals(getline(2), '"bar"', 'failed at #398')
+  call g:assert.equals(getline(3), '"baz"', 'failed at #398')
 
   %delete
 
-  " #384
+  " #399
   call append(0, ['(foo)', '(bar)', '(baz)'])
   execute "normal gg\<C-v>2j4lsr\""
-  call g:assert.equals(getline(1), '(foo)', 'failed at #384')
-  call g:assert.equals(getline(2), '(bar)', 'failed at #384')
-  call g:assert.equals(getline(3), '(baz)', 'failed at #384')
+  call g:assert.equals(getline(1), '(foo)', 'failed at #399')
+  call g:assert.equals(getline(2), '(bar)', 'failed at #399')
+  call g:assert.equals(getline(3), '(baz)', 'failed at #399')
 
   %delete
 
   """ off
-  " #385
+  " #400
   call operator#sandwich#set('replace', 'block', 'noremap', 0)
   call append(0, ['{foo}', '{bar}', '{baz}'])
   execute "normal gg\<C-v>2j4lsr\""
-  call g:assert.equals(getline(1), '{foo}', 'failed at #385')
-  call g:assert.equals(getline(2), '{bar}', 'failed at #385')
-  call g:assert.equals(getline(3), '{baz}', 'failed at #385')
+  call g:assert.equals(getline(1), '{foo}', 'failed at #400')
+  call g:assert.equals(getline(2), '{bar}', 'failed at #400')
+  call g:assert.equals(getline(3), '{baz}', 'failed at #400')
 
   %delete
 
-  " #386
+  " #401
   call append(0, ['(foo)', '(bar)', '(baz)'])
   execute "normal gg\<C-v>2j4lsr\""
-  call g:assert.equals(getline(1), '"foo"', 'failed at #386')
-  call g:assert.equals(getline(2), '"bar"', 'failed at #386')
-  call g:assert.equals(getline(3), '"baz"', 'failed at #386')
+  call g:assert.equals(getline(1), '"foo"', 'failed at #401')
+  call g:assert.equals(getline(2), '"bar"', 'failed at #401')
+  call g:assert.equals(getline(3), '"baz"', 'failed at #401')
 
   unlet! g:sandwich#recipes
   unlet! g:operator#sandwich#recipes
@@ -5333,41 +5426,41 @@ function! s:suite.blockwise_x_option_regex() abort  "{{{
   let g:operator#sandwich#recipes = [{'buns': ['\d\+', '\d\+']}]
 
   """ off
-  " #387
+  " #402
   call append(0, ['\d\+foo\d\+', '\d\+bar\d\+', '\d\+baz\d\+'])
   execute "normal gg\<C-v>2j10lsr\""
-  call g:assert.equals(getline(1), '"foo"', 'failed at #387')
-  call g:assert.equals(getline(2), '"bar"', 'failed at #387')
-  call g:assert.equals(getline(3), '"baz"', 'failed at #387')
+  call g:assert.equals(getline(1), '"foo"', 'failed at #402')
+  call g:assert.equals(getline(2), '"bar"', 'failed at #402')
+  call g:assert.equals(getline(3), '"baz"', 'failed at #402')
 
   %delete
 
-  " #388
+  " #403
   call append(0, ['888foo888', '888bar888', '888baz888'])
   execute "normal gg\<C-v>2j8lsr\""
-  call g:assert.equals(getline(1), '"88foo88"', 'failed at #388')
-  call g:assert.equals(getline(2), '"88bar88"', 'failed at #388')
-  call g:assert.equals(getline(3), '"88baz88"', 'failed at #388')
+  call g:assert.equals(getline(1), '"88foo88"', 'failed at #403')
+  call g:assert.equals(getline(2), '"88bar88"', 'failed at #403')
+  call g:assert.equals(getline(3), '"88baz88"', 'failed at #403')
 
   %delete
 
   """ on
   call operator#sandwich#set('replace', 'block', 'regex', 1)
-  " #389
+  " #404
   call append(0, ['\d\+foo\d\+', '\d\+bar\d\+', '\d\+baz\d\+'])
   execute "normal gg\<C-v>2j10lsr\""
-  call g:assert.equals(getline(1), '\d\+foo\d\+', 'failed at #389')
-  call g:assert.equals(getline(2), '\d\+bar\d\+', 'failed at #389')
-  call g:assert.equals(getline(3), '\d\+baz\d\+', 'failed at #389')
+  call g:assert.equals(getline(1), '\d\+foo\d\+', 'failed at #404')
+  call g:assert.equals(getline(2), '\d\+bar\d\+', 'failed at #404')
+  call g:assert.equals(getline(3), '\d\+baz\d\+', 'failed at #404')
 
   %delete
 
-  " #390
+  " #405
   call append(0, ['888foo888', '888bar888', '888baz888'])
   execute "normal gg\<C-v>2j8lsr\""
-  call g:assert.equals(getline(1), '"foo"', 'failed at #390')
-  call g:assert.equals(getline(2), '"bar"', 'failed at #390')
-  call g:assert.equals(getline(3), '"baz"', 'failed at #390')
+  call g:assert.equals(getline(1), '"foo"', 'failed at #405')
+  call g:assert.equals(getline(2), '"bar"', 'failed at #405')
+  call g:assert.equals(getline(3), '"baz"', 'failed at #405')
 
   call operator#sandwich#set('replace', 'block', 'regex', 0)
   unlet! g:sandwich#recipes
@@ -5376,102 +5469,102 @@ endfunction
 "}}}
 function! s:suite.blockwise_x_option_skip_space() abort  "{{{
   """ on
-  " #391
+  " #406
   call append(0, ['"foo"', '"bar"', '"baz"'])
   execute "normal gg\<C-v>2j4lsr("
-  call g:assert.equals(getline(1), '(foo)', 'failed at #391')
-  call g:assert.equals(getline(2), '(bar)', 'failed at #391')
-  call g:assert.equals(getline(3), '(baz)', 'failed at #391')
+  call g:assert.equals(getline(1), '(foo)', 'failed at #406')
+  call g:assert.equals(getline(2), '(bar)', 'failed at #406')
+  call g:assert.equals(getline(3), '(baz)', 'failed at #406')
 
   %delete
 
-  " #392
+  " #407
   call append(0, [' "foo"', ' "bar"', ' "baz"'])
   execute "normal gg0\<C-v>2j5lsr("
-  call g:assert.equals(getline(1), ' (foo)', 'failed at #392')
-  call g:assert.equals(getline(2), ' (bar)', 'failed at #392')
-  call g:assert.equals(getline(3), ' (baz)', 'failed at #392')
+  call g:assert.equals(getline(1), ' (foo)', 'failed at #407')
+  call g:assert.equals(getline(2), ' (bar)', 'failed at #407')
+  call g:assert.equals(getline(3), ' (baz)', 'failed at #407')
 
   %delete
 
-  " #393
+  " #408
   call append(0, ['"foo" ', '"bar" ', '"baz" '])
   execute "normal gg\<C-v>2j5lsr("
-  call g:assert.equals(getline(1), '(foo) ', 'failed at #393')
-  call g:assert.equals(getline(2), '(bar) ', 'failed at #393')
-  call g:assert.equals(getline(3), '(baz) ', 'failed at #393')
+  call g:assert.equals(getline(1), '(foo) ', 'failed at #408')
+  call g:assert.equals(getline(2), '(bar) ', 'failed at #408')
+  call g:assert.equals(getline(3), '(baz) ', 'failed at #408')
 
   %delete
 
-  " #394
+  " #409
   " do not skip!
   call append(0, [' "foo" ', ' "bar" ', ' "baz" '])
   execute "normal gg0\<C-v>2j6lsr("
-  call g:assert.equals(getline(1), '("foo")', 'failed at #394')
-  call g:assert.equals(getline(2), '("bar")', 'failed at #394')
-  call g:assert.equals(getline(3), '("baz")', 'failed at #394')
+  call g:assert.equals(getline(1), '("foo")', 'failed at #409')
+  call g:assert.equals(getline(2), '("bar")', 'failed at #409')
+  call g:assert.equals(getline(3), '("baz")', 'failed at #409')
 
   %delete
 
   """ off
   call operator#sandwich#set('replace', 'block', 'skip_space', 0)
-  " #395
+  " #410
   call append(0, ['"foo"', '"bar"', '"baz"'])
   execute "normal gg\<C-v>2j4lsr("
-  call g:assert.equals(getline(1), '(foo)', 'failed at #395')
-  call g:assert.equals(getline(2), '(bar)', 'failed at #395')
-  call g:assert.equals(getline(3), '(baz)', 'failed at #395')
+  call g:assert.equals(getline(1), '(foo)', 'failed at #410')
+  call g:assert.equals(getline(2), '(bar)', 'failed at #410')
+  call g:assert.equals(getline(3), '(baz)', 'failed at #410')
 
   %delete
 
-  " #396
+  " #411
   call append(0, [' "foo"', ' "bar"', ' "baz"'])
   execute "normal gg0\<C-v>2j5lsr("
-  call g:assert.equals(getline(1), ' "foo"', 'failed at #396')
-  call g:assert.equals(getline(2), ' "bar"', 'failed at #396')
-  call g:assert.equals(getline(3), ' "baz"', 'failed at #396')
+  call g:assert.equals(getline(1), ' "foo"', 'failed at #411')
+  call g:assert.equals(getline(2), ' "bar"', 'failed at #411')
+  call g:assert.equals(getline(3), ' "baz"', 'failed at #411')
 
   %delete
 
-  " #397
+  " #412
   call append(0, ['"foo" ', '"bar" ', '"baz" '])
   execute "normal gg\<C-v>2j5lsr("
-  call g:assert.equals(getline(1), '"foo" ', 'failed at #397')
-  call g:assert.equals(getline(2), '"bar" ', 'failed at #397')
-  call g:assert.equals(getline(3), '"baz" ', 'failed at #397')
+  call g:assert.equals(getline(1), '"foo" ', 'failed at #412')
+  call g:assert.equals(getline(2), '"bar" ', 'failed at #412')
+  call g:assert.equals(getline(3), '"baz" ', 'failed at #412')
 
   %delete
 
-  " #398
+  " #413
   " do not skip!
   call append(0, [' "foo" ', ' "bar" ', ' "baz" '])
   execute "normal gg0\<C-v>2j6lsr("
-  call g:assert.equals(getline(1), '("foo")', 'failed at #398')
-  call g:assert.equals(getline(2), '("bar")', 'failed at #398')
-  call g:assert.equals(getline(3), '("baz")', 'failed at #398')
+  call g:assert.equals(getline(1), '("foo")', 'failed at #413')
+  call g:assert.equals(getline(2), '("bar")', 'failed at #413')
+  call g:assert.equals(getline(3), '("baz")', 'failed at #413')
 
   call operator#sandwich#set('replace', 'block', 'skip_space', 1)
 endfunction
 "}}}
 function! s:suite.blockwise_x_option_skip_char() abort "{{{
   """ off
-  " #399
+  " #414
   call append(0, ['aa(foo)bb', 'aa(bar)bb', 'aa(baz)bb'])
   execute "normal gg\<C-v>2j8lsr\""
-  call g:assert.equals(getline(1), 'aa(foo)bb', 'failed at #399')
-  call g:assert.equals(getline(2), 'aa(bar)bb', 'failed at #399')
-  call g:assert.equals(getline(3), 'aa(baz)bb', 'failed at #399')
+  call g:assert.equals(getline(1), 'aa(foo)bb', 'failed at #414')
+  call g:assert.equals(getline(2), 'aa(bar)bb', 'failed at #414')
+  call g:assert.equals(getline(3), 'aa(baz)bb', 'failed at #414')
 
   %delete
 
   """ on
   call operator#sandwich#set('replace', 'block', 'skip_char', 1)
-  " #400
+  " #415
   call append(0, ['aa(foo)bb', 'aa(bar)bb', 'aa(baz)bb'])
   execute "normal gg\<C-v>2j8lsr\""
-  call g:assert.equals(getline(1), 'aa"foo"bb', 'failed at #400')
-  call g:assert.equals(getline(2), 'aa"bar"bb', 'failed at #400')
-  call g:assert.equals(getline(3), 'aa"baz"bb', 'failed at #400')
+  call g:assert.equals(getline(1), 'aa"foo"bb', 'failed at #415')
+  call g:assert.equals(getline(2), 'aa"bar"bb', 'failed at #415')
+  call g:assert.equals(getline(3), 'aa"baz"bb', 'failed at #415')
 
   call operator#sandwich#set('replace', 'block', 'skip_char', 0)
 endfunction
@@ -5479,12 +5572,12 @@ endfunction
 function! s:suite.blockwise_x_option_command() abort  "{{{
   call operator#sandwich#set('replace', 'block', 'command', ["normal! `[d\<C-v>`]"])
 
-  " #401
+  " #416
   call append(0, ['(foo)', '(bar)', '(baz)'])
   execute "normal gg\<C-v>2j4lsr\""
-  call g:assert.equals(getline(1), '""', 'failed at #401')
-  call g:assert.equals(getline(2), '""', 'failed at #401')
-  call g:assert.equals(getline(3), '""', 'failed at #401')
+  call g:assert.equals(getline(1), '""', 'failed at #416')
+  call g:assert.equals(getline(2), '""', 'failed at #416')
+  call g:assert.equals(getline(3), '""', 'failed at #416')
 
   call operator#sandwich#set('replace', 'block', 'command', [])
 endfunction
@@ -5492,23 +5585,23 @@ endfunction
 function! s:suite.blockwise_x_option_query_once() abort  "{{{
   """"" query_once
   """ off
-  " #401
+  " #416
   call append(0, ['"""foo"""', '"""bar"""', '"""baz"""'])
   execute "normal gg\<C-v>2j8l3sr([{"
-  call g:assert.equals(getline(1), '([{foo}])',  'failed at #401')
-  call g:assert.equals(getline(2), '([{bar}])',  'failed at #401')
-  call g:assert.equals(getline(3), '([{baz}])',  'failed at #401')
+  call g:assert.equals(getline(1), '([{foo}])',  'failed at #416')
+  call g:assert.equals(getline(2), '([{bar}])',  'failed at #416')
+  call g:assert.equals(getline(3), '([{baz}])',  'failed at #416')
 
   %delete
 
   """ on
-  " #402
+  " #417
   call operator#sandwich#set('replace', 'block', 'query_once', 1)
   call append(0, ['"""foo"""', '"""bar"""', '"""baz"""'])
   execute "normal gg\<C-v>2j8l3sr("
-  call g:assert.equals(getline(1), '(((foo)))',  'failed at #402')
-  call g:assert.equals(getline(2), '(((bar)))',  'failed at #402')
-  call g:assert.equals(getline(3), '(((baz)))',  'failed at #402')
+  call g:assert.equals(getline(1), '(((foo)))',  'failed at #417')
+  call g:assert.equals(getline(2), '(((bar)))',  'failed at #417')
+  call g:assert.equals(getline(3), '(((baz)))',  'failed at #417')
 
   call operator#sandwich#set('replace', 'block', 'query_once', 0)
 endfunction
@@ -5518,19 +5611,19 @@ function! s:suite.blockwise_x_option_expr() abort "{{{
   let g:operator#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'input':['a']}]
 
   """ 0
-  " #403
+  " #418
   call append(0, ['"foo"', '"bar"', '"baz"'])
   execute "normal gg\<C-v>2j4lsra"
-  call g:assert.equals(getline('.'), '1+1foo1+2',  'failed at #403')
+  call g:assert.equals(getline('.'), '1+1foo1+2',  'failed at #418')
 
   %delete
 
   """ 1
-  " #404
+  " #419
   call operator#sandwich#set('replace', 'block', 'expr', 1)
   call append(0, ['"foo"', '"bar"', '"baz"'])
   execute "normal gg\<C-v>2j4lsra"
-  call g:assert.equals(getline('.'), '2foo3',  'failed at #404')
+  call g:assert.equals(getline('.'), '2foo3',  'failed at #419')
 
   """ 2
   " This case cannot be tested since this option makes difference only in
@@ -5549,29 +5642,29 @@ function! s:suite.function_interface() abort  "{{{
         \   {'buns': ['[', ']']},
         \ ]
 
-  " #405
+  " #420
   call setline('.', '(foo)')
   normal 0sra([
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #405')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #405')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #420')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #420')
 
-  " #406
+  " #421
   call setline('.', '[foo]')
   normal 0sra[(
-  call g:assert.equals(getline('.'), '(foo(',      'failed at #406')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #406')
+  call g:assert.equals(getline('.'), '(foo(',      'failed at #421')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #421')
 
-  " #407
+  " #422
   call setline('.', '(foo)')
   normal 0ssra([
-  call g:assert.equals(getline('.'), '[foo[',      'failed at #407')
-  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #407')
+  call g:assert.equals(getline('.'), '[foo[',      'failed at #422')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #422')
 
-  " #408
+  " #423
   call setline('.', '[foo]')
   normal 0ssra[(
-  call g:assert.equals(getline('.'), '[foo]',      'failed at #408')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #408')
+  call g:assert.equals(getline('.'), '[foo]',      'failed at #423')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #423')
 endfunction
 "}}}
 
