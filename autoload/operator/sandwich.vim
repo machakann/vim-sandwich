@@ -222,6 +222,7 @@ function! operator#sandwich#query1st(kind, mode, ...) abort "{{{
   for stuff in operator.basket
     let stuff.cursor         = operator.cursor
     let stuff.modmark        = operator.modmark
+    let stuff.view           = operator.view
     " NOTE: stuff.opt.filter is actually does not depend on the motionwise.
     let stuff.opt            = copy(operator.opt)
     let stuff.opt.filter     = printf('v:key =~# ''\%%(%s\)''',
@@ -779,6 +780,7 @@ function! s:query(recipes) dict abort  "{{{
 
   let id_list = []
   if opt.highlight
+    call winrestview(self.view)
     for act in acts
       let id_list += s:highlight_add(act)
     endfor
@@ -1001,6 +1003,7 @@ function! s:initialize(kind, motionwise) dict abort "{{{
     for stuff in self.basket
       let stuff.cursor         = self.cursor
       let stuff.modmark        = self.modmark
+      let stuff.view           = self.view
       let stuff.opt            = copy(self.opt)
       let stuff.opt.filter     = printf('v:key =~# ''\%%(%s\)''',
             \ join(keys(s:default_opt[a:kind][a:motionwise]), '\|'))
