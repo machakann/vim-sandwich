@@ -1032,8 +1032,6 @@ function! s:synchronize(recipe) abort "{{{
 endfunction
 "}}}
 function! s:finalize() dict abort "{{{
-  let self.state = 0
-
   if self.opt.latestjump
     call setpos("''", [0] + self.cursor + [0])
   endif
@@ -1041,6 +1039,13 @@ function! s:finalize() dict abort "{{{
   if !self.done
     call winrestview(self.view)
   endif
+
+  " flash echoing
+  if !self.state
+    echo ''
+  endif
+
+  let self.state = 0
 endfunction
 "}}}
 function! s:recipes_integrate(kind, mode, opt) dict abort  "{{{
