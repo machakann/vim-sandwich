@@ -1124,6 +1124,17 @@ g:operator#sandwich#highlight_duration
 
 
 
+				*g:operator#sandwich#hide_cursor*
+g:operator#sandwich#hide_cursor
+	If the value is true (1), then the cursor is hidden while a pair of
+	buns are hilighted in waiting user input.
+>
+	" Add this line into your vimrc
+	let g:operator#sandwich#hide_cursor = 1
+<
+
+
+
 ------------------------------------------------------------------------------
 |g:operator#sandwich#default_recipes| has a unique recipe:
 >

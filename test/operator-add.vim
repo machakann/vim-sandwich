@@ -3714,5 +3714,25 @@ function! s:suite.function_interface() abort  "{{{
 endfunction
 "}}}
 
+" global option
+function! s:suite.global_option_hide_cursor() abort "{{{
+  " #344
+  call setline('.', 'foo')
+  let guicursor = &guicursor
+  let t_ve = &t_ve
+  normal 0saiw(
+  call g:assert.equals(&guicursor, guicursor, 'failed at #344')
+  call g:assert.equals(&t_ve, t_ve,           'failed at #344')
+
+  " #345
+  call setline('.', 'foo')
+  set guicursor=o:hor30
+  set t_ve=
+  normal 0saiw(
+  call g:assert.equals(&guicursor, 'o:hor30', 'failed at #345')
+  call g:assert.equals(&t_ve,      '',        'failed at #345')
+endfunction
+"}}}
+
 " vim:set foldmethod=marker:
 " vim:set commentstring="%s:

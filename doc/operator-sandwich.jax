@@ -1,4 +1,4 @@
-*operator-sandwich.jax*	日本語ヘルプ	Last change:07-Jul-2015.
+*operator-sandwich.jax*	日本語ヘルプ	Last change:10-Jul-2015.
 
 “挟まれた”テキストを編集するためのオペレータです。
 
@@ -1108,6 +1108,17 @@ g:operator#sandwich#timeoutlen		*g:operator#sandwich#timeoutlen*
 g:operator#sandwich#highlight_duration
 	囲みを外すオペレータにおけるハイライトが持続する時間をミリ秒単位で指定
 	します。デフォルト値は 200 です。
+
+
+
+				*g:operator#sandwich#hide_cursor*
+g:operator#sandwich#hide_cursor
+	値が真(1)の場合、ユーザー入力を待って buns のペアーをハイライトしてい
+	る間、カーソルを隠します。
+>
+	" Add this line into your vimrc
+	let g:operator#sandwich#hide_cursor = 1
+<
 
 
 

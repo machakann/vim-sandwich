@@ -985,6 +985,7 @@ function! s:initialize(kind, motionwise) dict abort "{{{
   let self.opt.timeoutlen = self.opt.timeoutlen < 0 ? 0 : self.opt.timeoutlen
   let self.opt.duration = s:get('highlight_duration', 200)
   let self.opt.duration = self.opt.timeoutlen < 0 ? 0 : self.opt.duration
+  let self.opt.hide_cursor = s:get('hide_cursor', 0)
   let self.cursor.inner_head = region.head
   let self.cursor.inner_tail = region.tail
   call self.opt.default.update(deepcopy(g:operator#sandwich#options[a:kind][a:motionwise]))
@@ -1018,6 +1019,16 @@ function! s:initialize(kind, motionwise) dict abort "{{{
         let act.opt     = stuff.opt
       endfor
     endfor
+
+    " hide_cursor
+    if self.opt.hide_cursor
+      if has('gui_running')
+        let self.opt.cursor_info = &guicursor
+        set guicursor+=o:block-NONE
+      else
+        let self.opt.cursor_info = &t_ve
+      endif
+    endif
   else
     let self.view = winsaveview()
     let self.modmark.head = copy(s:null_pos)
@@ -1287,6 +1298,16 @@ function! s:finalize() dict abort  "{{{
       call setpos('.', cursor + [cursor[2]])
     else
       call setpos('.', cursor)
+    endif
+  endif
+
+  " restore cursor (if needed)
+  if self.state && self.opt.hide_cursor
+    if has('gui_running')
+      set guicursor&
+      let &guicursor = self.opt.cursor_info
+    else
+      let &t_ve = self.opt.cursor_info
     endif
   endif
 
