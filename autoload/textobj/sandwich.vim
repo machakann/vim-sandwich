@@ -3,7 +3,6 @@
 "       region is employed for 'external' user-defined textobjects, it makes
 "       impossible to repeat by dot command. Thus, 'external' is checked by
 "       using visual selection (xmap) in any case.
-" TODO: add a way to use user defined filter
 " TODO: add a 'skip_expr' option, like {skip} argument for searchpair()
 
 """ NOTE: Whole design (-: string or number, *: functions, []: list, {}: dictionary) "{{{

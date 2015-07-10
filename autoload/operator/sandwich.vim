@@ -1,6 +1,5 @@
 " operator-sandwich: wrap by buns!
 " TODO: add 'at' option
-" TODO: add a way to use user defined filter
 
 
 """ NOTE: Whole design (-: string or number, *: functions, []: list, {}: dictionary) "{{{
