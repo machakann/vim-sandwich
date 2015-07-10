@@ -1111,17 +1111,6 @@ g:operator#sandwich#highlight_duration
 
 
 
-				*g:operator#sandwich#hide_cursor*
-g:operator#sandwich#hide_cursor
-	値が真(1)の場合、ユーザー入力を待って buns のペアーをハイライトしてい
-	る間、カーソルを隠します。
->
-	" Add this line into your vimrc
-	let g:operator#sandwich#hide_cursor = 1
-<
-
-
-
 ------------------------------------------------------------------------------
 |g:operator#sandwich#default_recipes| は一つのユニークなレシピを持っています。
 >
