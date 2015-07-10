@@ -12,7 +12,7 @@
 "   - a_or_i                : 'a' or 'i'. It means 'a sandwich' or 'inner sandwich'. See :help text-objects.
 "   - mode                  : 'o' or 'x'. Which mode the keymapping is called.
 "   - count                 : Positive integer. The assigned {count}
-"   []cursor                : [Linked from stuffs.cursor] The original position of the cursor
+"   []cursor                : [Linked from stuff.cursor] The original position of the cursor
 "   {}view                  : The dictionary to restore the view when it starts.
 "   - done                  : If the textobject could find the target and select, then 1. Otherwise 0.
 "   - visualmode            : If the textobject is called in blockwise visual mode, then '<C-v>'. Otherwise 'v'.
@@ -21,10 +21,10 @@
 "     []integrated          : The recipes which are the integrated result of all recipes. This is the one used practically.
 "     * integrate           : The function to set operator.recipes.integrated.
 "   {}opt
-"     {}arg                 : [Linked from stuffs.opt.arg] The options given through the 3rd argument of textobj#sandwich#auto(). This has the highest priority to use.
+"     {}arg                 : [Linked from stuff.opt.arg] The options given through the 3rd argument of textobj#sandwich#auto(). This has the highest priority to use.
 "       * clear             : The function to clear the containts.
 "       * update            : The function to update the containts.
-"     {}default             : [Linked from stuffs.opt.default] The default options
+"     {}default             : [Linked from stuff.opt.default] The default options
 "       * clear             : The function to clear the containts.
 "       * update            : The function to update the containts.
 "   {}clock                 : The object to measure the time.
@@ -38,7 +38,7 @@
 "     * erapsed             : The function to check the erapsed time from zerotime substituting losstime.
 "     * stop                : The function to stop the measurement.
 "   []basket                : The list holding information and histories for the action.
-"     {}stuffs
+"     {}stuff
 "       []buns              : [Linked from act.buns] The list consisted of two strings to add to/replace the edges.
 "       - state             : 0 or 1. If it is called by keymapping, it is 1. If it is called by dot command, it is 0.
 "       - a_or_i            : 'a' or 'i'. It means 'a sandwich' or 'inner sandwich'. See :help text-objects.
@@ -80,7 +80,7 @@
 "     * searchpos           : The wrap function of searchpos() for search_without_nest.
 "     * skip                : The function to judge whether skip the candidate or not in search.
 "     * get_buns            : The function to return the buns which are actually used.
-"   []candidates            : The copies of candidate stuffs.
+"   []candidates            : The copies of candidate stuff.
 "   * query                 : The function to ask user to input.
 "   * start                 : The function to start operation.
 "   * initialize            : The function to initialize.
@@ -687,8 +687,8 @@ function! s:range_next() dict abort  "{{{
   endif
 endfunction
 "}}}
-" stuffs object "{{{
-let s:stuffs = {
+" stuff object "{{{
+let s:stuff = {
       \   'buns'    : [],
       \   'external': [],
       \   'searchby': '',
@@ -831,28 +831,28 @@ function! s:initialize() dict abort  "{{{
       let has_buns     = has_key(recipe, 'buns')
       let has_external = has_key(recipe, 'external')
       if has_buns || has_external
-        let stuffs = deepcopy(s:stuffs)
+        let stuff = deepcopy(s:stuff)
 
         if has_buns
-          let stuffs.buns     = remove(recipe, 'buns')
-          let stuffs.searchby = 'buns'
+          let stuff.buns     = remove(recipe, 'buns')
+          let stuff.searchby = 'buns'
         else
-          let stuffs.external = remove(recipe, 'external')
-          let stuffs.searchby = 'external'
+          let stuff.external = remove(recipe, 'external')
+          let stuff.searchby = 'external'
         endif
 
-        let stuffs.state  = self.state
-        let stuffs.a_or_i = self.a_or_i
-        let stuffs.mode   = self.mode
-        let stuffs.cursor = self.cursor
-        let stuffs.clock  = self.clock
-        let stuffs.evaluated  = 0
-        let stuffs.visualmode = self.visualmode
-        let stuffs.coord.head = copy(self.cursor)
-        let stuffs.visualmark = self.visualmark
+        let stuff.state  = self.state
+        let stuff.a_or_i = self.a_or_i
+        let stuff.mode   = self.mode
+        let stuff.cursor = self.cursor
+        let stuff.clock  = self.clock
+        let stuff.evaluated  = 0
+        let stuff.visualmode = self.visualmode
+        let stuff.coord.head = copy(self.cursor)
+        let stuff.visualmark = self.visualmark
 
-        let stuffs.opt     = copy(self.opt)
-        let opt            = stuffs.opt
+        let stuff.opt      = copy(self.opt)
+        let opt            = stuff.opt
         let opt.filter     = printf('v:key =~# ''\%%(%s\)''',
                 \ join(keys(s:default_opt[self.kind]), '\|'))
         let opt.recipe     = deepcopy(s:opt)
@@ -861,7 +861,7 @@ function! s:initialize() dict abort  "{{{
         call opt.recipe.update(recipe)
         call opt.integrate()
 
-        let range        = stuffs.range
+        let range        = stuff.range
         let range.valid  = 1
         let range.top    = self.cursor[0]
         let range.bottom = self.cursor[0]
@@ -876,7 +876,7 @@ function! s:initialize() dict abort  "{{{
           let range.botlim = lineend
         endif
 
-        let self.basket += [stuffs]
+        let self.basket += [stuff]
       endif
     endfor
   else
@@ -884,16 +884,16 @@ function! s:initialize() dict abort  "{{{
     let self.view   = winsaveview()
 
     " prepare basket
-    for stuffs in self.basket
-      let stuffs.state  = self.state
-      let stuffs.cursor = self.cursor
-      let stuffs.coord.head = copy(self.cursor)
-      let stuffs.coord.tail = copy(s:null_coord)
-      let stuffs.coord.inner_head = copy(s:null_coord)
-      let stuffs.coord.inner_tail = copy(s:null_coord)
+    for stuff in self.basket
+      let stuff.state  = self.state
+      let stuff.cursor = self.cursor
+      let stuff.coord.head = copy(self.cursor)
+      let stuff.coord.tail = copy(s:null_coord)
+      let stuff.coord.inner_head = copy(s:null_coord)
+      let stuff.coord.inner_tail = copy(s:null_coord)
 
-      let opt          = stuffs.opt
-      let range        = stuffs.range
+      let opt          = stuff.opt
+      let range        = stuff.range
       let range.valid  = 1
       let range.top    = self.cursor[0]
       let range.bottom = self.cursor[0]
@@ -923,17 +923,17 @@ function! s:select() dict abort  "{{{
 
   " gather candidate
   while filter(copy(self.basket), 'v:val.range.valid') != []
-    for stuffs in self.basket
-      if stuffs.searchby ==# 'buns'
-        if stuffs.opt.integrated.nesting
-          call stuffs.search_with_nest(self)
+    for stuff in self.basket
+      if stuff.searchby ==# 'buns'
+        if stuff.opt.integrated.nesting
+          call stuff.search_with_nest(self)
         else
-          call stuffs.search_without_nest(self)
+          call stuff.search_without_nest(self)
         endif
-      elseif stuffs.searchby ==# 'external'
-        call stuffs.get_region(self)
+      elseif stuff.searchby ==# 'external'
+        call stuff.get_region(self)
       else
-        let stuffs.range.valid = 0
+        let stuff.range.valid = 0
       endif
     endfor
 

@@ -16,23 +16,23 @@
 "     []synchro              : The recipes which are used for the cooperation with textobj-sandwich. It works only on delete and replace action.
 "     []integrated           : The recipes which are the integrated result of all recipes. This is the one used practically.
 "     * integrate            : The function to set operator.recipes.integrated.
-"   {}cursor                 : [Linked from stuffs.cursor] The infomation to set the final position of the cursor
+"   {}cursor                 : [Linked from stuff.cursor] The infomation to set the final position of the cursor
 "     []inner_head           : The left upper edge of the assigned region. It is used in default
 "     []keep                 : The original position of the cursor. This is not valid when it started by dot command.
 "     []inner_tail           : The right bottom edge of the assigned region.
-"   {}modmark                : [Linked from stuffs.modmark] The positions of both edges of the modified region.
+"   {}modmark                : [Linked from stuff.modmark] The positions of both edges of the modified region.
 "   {}opt
-"     {}arg                  : [Linked from stuffs.opt.arg] The options given through the 3rd argument of operator#sandwich#prerequisite(). This has higher priority than default.
+"     {}arg                  : [Linked from stuff.opt.arg] The options given through the 3rd argument of operator#sandwich#prerequisite(). This has higher priority than default.
 "       * clear              : The function to clear the containts.
 "       * update             : The function to update the containts.
-"     {}default              : [Linked from stuffs.opt.default] The default options
+"     {}default              : [Linked from stuff.opt.default] The default options
 "       * clear              : The function to clear the containts.
 "       * update             : The function to update the containts.
 "   []basket                 : The list holding information and histories for the action.
-"     {}stuffs
+"     {}stuff
 "       []buns               : The list consisted of two strings to add to/replace the edges.
 "       - num                : The number of processed regions in one count. It could be more than 1 only in block wise visual mode.
-"       - done               : If the stuffs has been processed properly then 1, otehrwise 0.
+"       - done               : If the stuff has been processed properly then 1, otehrwise 0.
 "       {}cursor             : [Linked from act.cursor] Linked to operator.cursor.
 "       {}modmark            : [Linked from act.modmark] Linked to operator.modmark.
 "       {}clock              : The object to measure the time.
@@ -60,9 +60,9 @@
 "         {}act              : The information and functions to execute an action.
 "           {}region         : The both edges of processed region.
 "           {}target         : The target position to process.
-"           {}cursor         : Linked to stuffs.cursor
-"           {}modmark        : Linked to stuffs.modmark
-"           {}opt            : Linked to stuffs.opt
+"           {}cursor         : Linked to stuff.cursor
+"           {}modmark        : Linked to stuff.modmark
+"           {}opt            : Linked to stuff.opt
 "           * add_once       : The function to execute an adding action.
 "           * delete_once    : The function to execute an delete action.
 "           * replace_once   : The function to execute an replace action.
@@ -209,52 +209,52 @@ function! operator#sandwich#query1st(kind, mode, ...) abort "{{{
   let operator.opt.timeoutlen = s:get('timeoutlen', &timeoutlen)
   let operator.opt.timeoutlen = operator.opt.timeoutlen < 0 ? 0 : operator.opt.timeoutlen
 
-  " build stuffs
-  let stuffs       = deepcopy(s:stuffs)
-  let stuffs.state = 0
-  let stuffs.num   = operator.num
-  let stuffs.acts  = map(range(operator.num), 'deepcopy(s:act)')
+  " build stuff
+  let stuff       = deepcopy(s:stuff)
+  let stuff.state = 0
+  let stuff.num   = operator.num
+  let stuff.acts  = map(range(operator.num), 'deepcopy(s:act)')
 
   " put stuffs as needed
-  let operator.basket = map(range(operator.count), 'deepcopy(stuffs)')
+  let operator.basket = map(range(operator.count), 'deepcopy(stuff)')
 
   " connect links
-  for stuffs in operator.basket
-    let stuffs.cursor         = operator.cursor
-    let stuffs.modmark        = operator.modmark
-    " NOTE: stuffs.opt.filter is actually does not depend on the motionwise.
-    let stuffs.opt            = copy(operator.opt)
-    let stuffs.opt.filter     = printf('v:key =~# ''\%%(%s\)''',
+  for stuff in operator.basket
+    let stuff.cursor         = operator.cursor
+    let stuff.modmark        = operator.modmark
+    " NOTE: stuff.opt.filter is actually does not depend on the motionwise.
+    let stuff.opt            = copy(operator.opt)
+    let stuff.opt.filter     = printf('v:key =~# ''\%%(%s\)''',
           \ join(keys(s:default_opt[a:kind]['char']), '\|'))
-    let stuffs.opt.recipe     = deepcopy(s:opt)
-    let stuffs.opt.integrated = deepcopy(s:opt)
-    let stuffs.opt.integrate  = function('s:opt_integrate')
-    call stuffs.opt.integrate()
-    for act in stuffs.acts
-      let act.state   = stuffs.state
-      let act.cursor  = stuffs.cursor
-      let act.modmark = stuffs.modmark
-      let act.opt     = stuffs.opt
+    let stuff.opt.recipe     = deepcopy(s:opt)
+    let stuff.opt.integrated = deepcopy(s:opt)
+    let stuff.opt.integrate  = function('s:opt_integrate')
+    call stuff.opt.integrate()
+    for act in stuff.acts
+      let act.state   = stuff.state
+      let act.cursor  = stuff.cursor
+      let act.modmark = stuff.modmark
+      let act.opt     = stuff.opt
     endfor
   endfor
 
   " pick 'recipe' up and query prefered buns
   call operator.recipes.integrate(a:kind, 'all', a:mode)
   for i in range(operator.count)
-    let stuffs = operator.basket[i]
-    let opt = stuffs.opt
+    let stuff = operator.basket[i]
+    let opt = stuff.opt
 
-    call stuffs.query(operator.recipes.integrated)
-    if stuffs.buns == [] || len(stuffs.buns) < 2
+    call stuff.query(operator.recipes.integrated)
+    if stuff.buns == [] || len(stuff.buns) < 2
       break
     endif
 
     if operator.count > 1 && i == 0 && operator.state && opt.integrated.query_once
       for _i in range(1, len(operator.basket) - 1)
-        let _stuffs = operator.basket[_i]
-        call extend(_stuffs.buns, stuffs.buns, 'force')
-        call _stuffs.opt.recipe.update(stuffs.opt.recipe)
-        call _stuffs.opt.integrated()
+        let _stuff = operator.basket[_i]
+        call extend(_stuff.buns, stuff.buns, 'force')
+        call _stuff.opt.recipe.update(stuff.opt.recipe)
+        call _stuff.opt.integrated()
       endfor
       break
     endif
@@ -445,7 +445,7 @@ function! s:add_once(buns, undojoin, done, next_act) dict abort "{{{
       call s:shift_for_add(self.cursor.keep,       target, a:buns, indent, is_linewise)
       call s:shift_for_add(self.cursor.inner_tail, target, a:buns, indent, is_linewise)
 
-      " update next_stuffs
+      " update next_act
       let a:next_act.region.head = copy(head)
       let a:next_act.region.tail = s:get_left_pos(tail)
 
@@ -533,7 +533,7 @@ function! s:delete_once(done, next_act) dict abort  "{{{
     call s:shift_for_delete(self.cursor.keep,       target, deletion, is_linewise)
     call s:shift_for_delete(self.cursor.inner_tail, target, deletion, is_linewise)
 
-    " update next_stuffs
+    " update next_act
     let a:next_act.region.head = copy(head)
     let a:next_act.region.tail = copy(tail)
 
@@ -648,7 +648,7 @@ function! s:replace_once(buns, undojoin, done, next_act) dict abort "{{{
       endif
     endif
 
-    " update next stuffs
+    " update next_act
     let a:next_act.region.head = next_head
     let a:next_act.region.tail = next_tail
 
@@ -928,8 +928,8 @@ function! s:get_buns() dict abort  "{{{
   return buns
 endfunction
 "}}}
-" stuffs object {{{
-let s:stuffs = {
+" stuff object {{{
+let s:stuff = {
       \   'buns'   : [],
       \   'num'    : 1,
       \   'done'   : 0,
@@ -940,10 +940,10 @@ let s:stuffs = {
       \   'acts'   : [],
       \   'evaluated': 0,
       \ }
-let s:stuffs.query    = function('s:query')
-let s:stuffs.show     = function('s:show')
-let s:stuffs.command  = function('s:command')
-let s:stuffs.get_buns = function('s:get_buns')
+let s:stuff.query    = function('s:query')
+let s:stuff.show     = function('s:show')
+let s:stuff.command  = function('s:command')
+let s:stuff.get_buns = function('s:get_buns')
 "}}}
 
 function! s:execute(kind, motionwise) dict abort  "{{{
@@ -988,31 +988,31 @@ function! s:initialize(kind, motionwise) dict abort "{{{
   call self.opt.default.update(deepcopy(g:operator#sandwich#options[a:kind][a:motionwise]))
 
   if self.state
-    " build stuffs
-    let stuffs       = deepcopy(s:stuffs)
-    let stuffs.state = self.state
-    let stuffs.num   = self.num
-    let stuffs.acts  = map(range(self.num), 'deepcopy(s:act)')
+    " build stuff
+    let stuff       = deepcopy(s:stuff)
+    let stuff.state = self.state
+    let stuff.num   = self.num
+    let stuff.acts  = map(range(self.num), 'deepcopy(s:act)')
 
     " put stuffs as needed
-    let self.basket = map(range(self.count), 'deepcopy(stuffs)')
+    let self.basket = map(range(self.count), 'deepcopy(stuff)')
 
     " connect links
-    for stuffs in self.basket
-      let stuffs.cursor         = self.cursor
-      let stuffs.modmark        = self.modmark
-      let stuffs.opt            = copy(self.opt)
-      let stuffs.opt.filter     = printf('v:key =~# ''\%%(%s\)''',
+    for stuff in self.basket
+      let stuff.cursor         = self.cursor
+      let stuff.modmark        = self.modmark
+      let stuff.opt            = copy(self.opt)
+      let stuff.opt.filter     = printf('v:key =~# ''\%%(%s\)''',
             \ join(keys(s:default_opt[a:kind][a:motionwise]), '\|'))
-      let stuffs.opt.recipe     = deepcopy(s:opt)
-      let stuffs.opt.integrated = deepcopy(s:opt)
-      let stuffs.opt.integrate  = function('s:opt_integrate')
-      call stuffs.opt.integrate()
-      for act in stuffs.acts
-        let act.state   = stuffs.state
-        let act.cursor  = stuffs.cursor
-        let act.modmark = stuffs.modmark
-        let act.opt     = stuffs.opt
+      let stuff.opt.recipe     = deepcopy(s:opt)
+      let stuff.opt.integrated = deepcopy(s:opt)
+      let stuff.opt.integrate  = function('s:opt_integrate')
+      call stuff.opt.integrate()
+      for act in stuff.acts
+        let act.state   = stuff.state
+        let act.cursor  = stuff.cursor
+        let act.modmark = stuff.modmark
+        let act.opt     = stuff.opt
       endfor
     endfor
   else
@@ -1020,30 +1020,30 @@ function! s:initialize(kind, motionwise) dict abort "{{{
     let self.modmark.head = copy(s:null_pos)
     let self.modmark.tail = copy(s:null_pos)
 
-    for stuffs in self.basket
-      let stuffs.state = self.state
-      let stuffs.num   = self.num
-      let stuffs.done  = 0
-      call stuffs.opt.integrate()
+    for stuff in self.basket
+      let stuff.state = self.state
+      let stuff.num   = self.num
+      let stuff.done  = 0
+      call stuff.opt.integrate()
 
-      let lack = self.num - len(stuffs.acts)
+      let lack = self.num - len(stuff.acts)
       if lack > 0
         let fillings = map(range(lack), 'deepcopy(s:act)')
         for act in fillings
-          let act.cursor  = stuffs.cursor
-          let act.modmark = stuffs.modmark
-          let act.opt     = stuffs.opt
+          let act.cursor  = stuff.cursor
+          let act.modmark = stuff.modmark
+          let act.opt     = stuff.opt
         endfor
-        let stuffs.acts += fillings
+        let stuff.acts += fillings
       endif
-      call map(stuffs.acts, 'extend(v:val, {"state": 0}, "force")')
+      call map(stuff.acts, 'extend(v:val, {"state": 0}, "force")')
     endfor
   endif
 
   " set initial values
-  let stuffs = self.basket[0]
+  let stuff = self.basket[0]
   for j in range(self.num)
-    let act = stuffs.acts[j]
+    let act = stuff.acts[j]
     let act.region = copy(region_list[j])
   endfor
 endfunction
@@ -1108,12 +1108,12 @@ endfunction
 function! s:add() dict abort "{{{
   let undojoin = 0
   for i in range(self.count)
-    let stuffs = self.basket[i]
-    let next_stuffs = get(self.basket, i + 1, deepcopy(stuffs))
-    let opt = stuffs.opt.integrated
+    let stuff = self.basket[i]
+    let next_stuff = get(self.basket, i + 1, deepcopy(stuff))
+    let opt = stuff.opt.integrated
 
     for j in range(self.num)
-      let act = stuffs.acts[j]
+      let act = stuff.acts[j]
       let act.target.head1 = copy(act.region.head)
       let act.target.tail1 = act.target.head1
       let act.target.head2 = copy(act.region.tail)
@@ -1123,33 +1123,33 @@ function! s:add() dict abort "{{{
     if self.state
       " query preferable buns
       call winrestview(self.view)
-      call stuffs.query(self.recipes.integrated)
+      call stuff.query(self.recipes.integrated)
     endif
-    if stuffs.buns == [] || len(stuffs.buns) < 2
+    if stuff.buns == [] || len(stuff.buns) < 2
       break
     endif
 
     if self.count > 1 && i == 0 && self.state && opt.query_once
       for _i in range(1, len(self.basket) - 1)
-        let _stuffs = self.basket[_i]
-        call extend(_stuffs.buns, stuffs.buns, 'force')
-        call _stuffs.opt.recipe.update(stuffs.opt.recipe)
-        call _stuffs.opt.integrate()
+        let _stuff = self.basket[_i]
+        call extend(_stuff.buns, stuff.buns, 'force')
+        call _stuff.opt.recipe.update(stuff.opt.recipe)
+        call _stuff.opt.integrate()
       endfor
       let self.state = 0
     endif
 
-    let buns = stuffs.get_buns()
-    for j in range(stuffs.num)
-      let act      = stuffs.acts[j]
-      let next_act = next_stuffs.acts[j]
-      let [undojoin, stuffs.done]
-            \ = act.add_once(buns, undojoin, stuffs.done, next_act)
+    let buns = stuff.get_buns()
+    for j in range(stuff.num)
+      let act      = stuff.acts[j]
+      let next_act = next_stuff.acts[j]
+      let [undojoin, stuff.done]
+            \ = act.add_once(buns, undojoin, stuff.done, next_act)
     endfor
     let undojoin = self.state ? 1 : 0
 
-    if stuffs.done && opt.command != []
-      call stuffs.command()
+    if stuff.done && opt.command != []
+      call stuff.command()
     endif
   endfor
 endfunction
@@ -1159,30 +1159,30 @@ function! s:delete() dict abort  "{{{
   let duration  = self.opt.duration
 
   for i in range(self.count)
-    let stuffs = self.basket[i]
-    let next_stuffs = get(self.basket, i + 1, deepcopy(stuffs))
+    let stuff = self.basket[i]
+    let next_stuff = get(self.basket, i + 1, deepcopy(stuff))
 
     for j in range(self.num)
-      let act = stuffs.acts[j]
+      let act = stuff.acts[j]
       call act.search(self.recipes.integrated)
     endfor
-    if filter(copy(stuffs.acts), 's:is_valid_4pos(v:val.target)') == []
+    if filter(copy(stuff.acts), 's:is_valid_4pos(v:val.target)') == []
       break
     endif
 
-    if !hi_exited && stuffs.opt.integrated.highlight && duration > 0
+    if !hi_exited && stuff.opt.integrated.highlight && duration > 0
       call winrestview(self.view)
-      let hi_exited = stuffs.show()
+      let hi_exited = stuff.show()
     endif
 
-    for j in range(stuffs.num)
-      let act      = stuffs.acts[j]
-      let next_act = next_stuffs.acts[j]
-      let stuffs.done = act.delete_once(stuffs.done, next_act)
+    for j in range(stuff.num)
+      let act      = stuff.acts[j]
+      let next_act = next_stuff.acts[j]
+      let stuff.done = act.delete_once(stuff.done, next_act)
     endfor
 
-    if stuffs.done && stuffs.opt.integrated.command != []
-      call stuffs.command()
+    if stuff.done && stuff.opt.integrated.command != []
+      call stuff.command()
     endif
   endfor
 endfunction
@@ -1193,48 +1193,48 @@ function! s:replace() dict abort  "{{{
 
   let undojoin = 0
   for i in range(self.count)
-    let stuffs = self.basket[i]
-    let next_stuffs = get(self.basket, i + 1, deepcopy(stuffs))
-    let opt = stuffs.opt.integrated
+    let stuff = self.basket[i]
+    let next_stuff = get(self.basket, i + 1, deepcopy(stuff))
+    let opt = stuff.opt.integrated
 
     for j in range(self.num)
-      let act = stuffs.acts[j]
+      let act = stuff.acts[j]
       call act.search(self.recipes.integrated)
     endfor
-    if filter(copy(stuffs.acts), 's:is_valid_4pos(v:val.target)') == []
+    if filter(copy(stuff.acts), 's:is_valid_4pos(v:val.target)') == []
       break
     endif
 
     if self.state
       " query preferable buns
       call winrestview(self.view)
-      call stuffs.query(self.recipes.integrated)
+      call stuff.query(self.recipes.integrated)
     endif
-    if stuffs.buns == [] || len(stuffs.buns) < 2
+    if stuff.buns == [] || len(stuff.buns) < 2
       break
     endif
 
     if self.count > 1 && i == 0 && self.state && opt.query_once
       for _i in range(1, len(self.basket) - 1)
-        let _stuffs = self.basket[_i]
-        call extend(_stuffs.buns, stuffs.buns, 'force')
-        call _stuffs.opt.recipe.update(stuffs.opt.recipe)
-        call _stuffs.opt.integrate()
+        let _stuff = self.basket[_i]
+        call extend(_stuff.buns, stuff.buns, 'force')
+        call _stuff.opt.recipe.update(stuff.opt.recipe)
+        call _stuff.opt.integrate()
       endfor
       let self.state = 0
     endif
 
-    let buns = stuffs.get_buns()
-    for j in range(stuffs.num)
-      let act      = stuffs.acts[j]
-      let next_act = next_stuffs.acts[j]
-      let [undojoin, stuffs.done]
-            \ = act.replace_once(buns, undojoin, stuffs.done, next_act)
+    let buns = stuff.get_buns()
+    for j in range(stuff.num)
+      let act      = stuff.acts[j]
+      let next_act = next_stuff.acts[j]
+      let [undojoin, stuff.done]
+            \ = act.replace_once(buns, undojoin, stuff.done, next_act)
     endfor
     let undojoin = self.state ? 1 : 0
 
-    if stuffs.done && opt.command != []
-      call stuffs.command()
+    if stuff.done && opt.command != []
+      call stuff.command()
     endif
   endfor
 endfunction
@@ -1258,9 +1258,9 @@ function! s:finalize() dict abort  "{{{
     " set cursor position
     let cursor_opt = 'inner_head'
     for i in range(self.count - 1, 0, -1)
-      let stuffs = self.basket[i]
-      if stuffs.done
-        let cursor_opt = stuffs.opt.integrated.cursor
+      let stuff = self.basket[i]
+      if stuff.done
+        let cursor_opt = stuff.opt.integrated.cursor
         let cursor_opt = cursor_opt =~# '^\%(keep\|inner_\%(head\|tail\)\|front\|end\)$'
                       \ ? cursor_opt : 'inner_head'
         break
