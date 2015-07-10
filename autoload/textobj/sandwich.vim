@@ -606,6 +606,7 @@ function! s:is_valid_candidate(textobj) dict abort "{{{
   if self.mode !=# 'x'
     let visual_mode_affair = 1
   else
+    " self.visualmode ==# 'V' never comes.
     if self.visualmode ==# 'v'
       let visual_mode_affair = s:is_ahead(visualmark.head, head)
                           \ || s:is_ahead(tail, visualmark.tail)
