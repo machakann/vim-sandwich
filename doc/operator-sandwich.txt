@@ -1,4 +1,4 @@
-*operator-sandwich.txt*			Last change:07-Jul-2015.
+*operator-sandwich.txt*			Last change:10-Jul-2015.
 
 The operator plugin to edit sandwiched textobjects.
 
@@ -66,16 +66,16 @@ INTRODUCTION				*operator-sandwich-introduction*
 |<Plug>(operator-sandwich-replace)|.
 
 |<Plug>(operator-sandwich-add)| is an operator to add surroundings to a
-textobject. This keymapping is mapped to sa in default. For example, assume
+textobject. This keymapping is mapped to `sa` in default. For example, assume
 that the cursor is on the foo in a text:
 >
 	foo
 <
-press saiw", then you will get the following.
+press `saiw"`, then you will get the following.
 >
 	"foo"
 <
-Or if you press saiw(, then you will get the following.
+Or if you press `saiw(`, then you will get the following.
 >
 	(foo)
 <
@@ -90,20 +90,20 @@ textobject. This keymapping is not mapped to any key in normal mode, if you
 want to try please assign it to your preferable key. This operator delete
 surroundings if the texts at the both ends of selected region are registered
 in recipes or are just same characters. For example, assume that it is mapped
-to sd and the cursor is on the (foo) in a text:
+to `sd` and the cursor is on the (foo) in a text:
 >
 	(foo)
 <
-press sda( deletes the parenthesis since the default textobject |a(| assigns
+press `sda(` deletes the parenthesis since the default textobject |a(| assigns
 the region surrounded by "(" and ")" including them.
 >
 	foo
 <
 It works for "foo" as same with the keypress sd2i" (|iquote|). In practice,
-however, |<Plug>(operator-sandwich-delete)| is not assigned to sd in normal
+however, |<Plug>(operator-sandwich-delete)| is not assigned to `sd` in normal
 mode. Because this operator works well with |textobj-sandwich| which is
-implemented to search and select a regions surrounded. Therefore, sd is mapped
-to the key combination with the textobject in advance. See
+implemented to search and select a regions surrounded. Therefore, `sd` is
+mapped to the key combination with the textobject in advance. See
 |sandwich-keymappings|.
 
 |<Plug>(operator-sandwich-replace)| is an operator to replace surroundings to
@@ -111,19 +111,20 @@ a textobject. This keymapping is not mapped to any key in normal mode, if you
 want to try please assign it to your preferable key. This operator replace
 surroundings if the texts at the both ends of selected region are registered
 in recipes or are just same characters. For example, assume that it is mapped
-to sr and the cursor is on the (foo) in a text:
+to `sr` and the cursor is on the (foo) in a text:
 >
 	(foo)
 <
-press sra(", then the operator replace "(" and ")" to '"'.
+press `sra("`, then the operator replace "(" and ")" to '"'.
 >
 	"foo"
 <
 The order is that the deletion, "(" and ")", is the first and then the
 addition, '"', comes the next. The deleted and added text is chosen in the
 same manner with |<Plug>(operator-sandwich-delete)| and
-|<Plug>(operator-sandwich-add)|. In practice, sr is used by the default
-keymappings in combination with |textobj-sandwich| in the same reason with sd.
+|<Plug>(operator-sandwich-add)|. In practice, `sr` is used by the default
+keymappings in combination with |textobj-sandwich| in the same reason with
+`sd`.
 See |sandwich-keymappings|.
 
 ------------------------------------------------------------------------------
@@ -135,14 +136,15 @@ this.
 
 For example, 3|d||iw| deletes two words and a intermediate space. There are
 two points to tell the count, but they are not distinguished. That is,
-3diw and d3iw is fundamentally the same. If both of two points are used, the
-count is their product, 3d2iw and 2d3iw is identical to 6diw or d6iw.
+`3diw` and `d3iw` is fundamentally the same. If both of two points are used,
+the count is their product, `3d2iw` and `2d3iw` is identical to `6diw` or
+`d6iw.`
 
 In contrast, as for the case of |operator-sandwich|, these three operators
 distinguish the count depending on the point to be told. These operators takes
 only the first count for own use and the second count is passed to the
-following textobject. For example, 2sa3iw(( surrounds two words and a space by
-two set of parenthesis.
+following textobject. For example, `2sa3iw((` surrounds two words and a space
+by two set of parenthesis.
 >
 	foo bar   --->   ((foo bar))
 <
@@ -158,7 +160,7 @@ following 3 by 3 region is selected:
 	bar
 	baz
 <
-press sa(
+press `sa(`
 >
 	(foo)
 	(bar)
@@ -172,7 +174,7 @@ selected:
 	ccc
 	dddd
 <
-press sa(
+press `sa(`
 >
 	(a)
 	(bb)
@@ -188,7 +190,7 @@ the selection until the each end of lines.
 	cc
 	d
 <
-Start from a in the first line, press <C-v>3j$sa(, then you will get:
+Start from a in the first line, press `<C-v>3j$sa(`, then you will get:
 >
 	(aaaa)
 	(bbb)
@@ -204,11 +206,11 @@ KEYMAPPINGS				*operator-sandwich-keymappings*
 This plugin prepares following keymappings. |<Plug>(operator-sandwich-add)|,
 |<Plug>(operator-sandwich-delete)| and |<Plug>(operator-sandwich-replace)| are
 valid in normal and visual mode in principle. |<Plug>(operator-sandwich-add)|
-is mapped to the keysequences sa in default, while
+is mapped to the keysequences `sa` in default, while
 |<Plug>(operator-sandwich-delete)| and |<Plug>(operator-sandwich-replace)| are
-mappded to the key sequences sd and sr respectively only in visual mode. sd
-and sr are used by the compound mappings with |textobj-sandwich| in normal
-mode. See |sandwich-keymappings|.
+mappded to the key sequences `sd` and `sr` respectively only in visual mode.
+`sd` and `sr` are used by the compound mappings with |textobj-sandwich| in
+normal mode. See |sandwich-keymappings|.
 
 function	keymappings				default keymappings
 --------------------------------------------------------------------------
@@ -289,8 +291,8 @@ Practical examples are in |sandwich-keymappings|.
  nmap sd(
  \ <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-synchro-count)a(
 <
-A key sequence 2sd( is identical to 2<Plug>(operator-sandwich-delete)2a( in
-this case.
+A key sequence `2sd(` is identical to `2<Plug>(operator-sandwich-delete)2a(`
+in this case.
 
 
 
@@ -302,7 +304,7 @@ this case.
  nmap sd(
  \ <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)a(
 <
-A key sequence 2sd( is identical to <Plug>(operator-sandwich-delete)2a( in
+A key sequence `2sd(` is identical to `<Plug>(operator-sandwich-delete)2a(` in
 this case.
 
 
@@ -534,7 +536,7 @@ external
 	  \ ]
 <
 	NOTE: Registered textobjects should work correctly in visual mode.
-	NOTE: Not all the user defined textobjects are not guaranteed to work.
+	NOTE: Not all the user defined textobjects are guaranteed to work.
 
 
 
@@ -1138,7 +1140,7 @@ g:operator#sandwich#highlight_duration
 The meanings of these options are explained already. The important thing is
 that this recipe can be called by f key press and realizes the instant
 definition of recipe. This recipe is used like this. First call this recipe,
-for example, press saiwf on bar.
+for example, press `saiwf` on bar.
 >
 	bar
 <
