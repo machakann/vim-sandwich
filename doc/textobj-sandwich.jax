@@ -1,4 +1,4 @@
-*textobj-sandwich.jax*	日本語ヘルプ	Last change:07-Jul-2015.
+*textobj-sandwich.jax*	日本語ヘルプ	Last change:10-Jul-2015.
 
 “挟まれた”テキストを検索し選択するためのテキストオブジェクトです。
 
@@ -663,6 +663,30 @@ skip_regex
 	" Press dib
 	" baaaaaaaar   --->   bar
 <
+	例えば、シングルクオーテーションに囲まれた領域内の連続した二つのシング
+	ルクオーテーションは一つのシングルクオーテーションとみなされます。
+>
+	:echo 'foo''bar'		" -> foo'bar
+<
+	これをスキップするのにこのオプションが使えます。
+>
+	let g:sandwich#recipes += [
+	  \   {
+	  \     'buns': ["'", "'"],
+	  \     'filetype': ['vim'],
+	  \     'expand_range': 0,
+	  \     'skip_regex':
+	  \       [
+	  \         "[^']\\%(''\\)*\\%#\\zs''",
+	  \         "[^']\\%(''\\)*'\\%#\\zs'",
+	  \       ],
+	  \     'quoteescape': 1,
+	  \     'match_syntax': 2,
+	  \   }
+	  \ ]
+<
+	検索の間、内部的にカーソルを動かしているので、カーソルを表す正規表現の
+	|\%#| が使えます。
 
 
 
