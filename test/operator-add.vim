@@ -5,12 +5,15 @@ function! s:suite.before_each() abort "{{{
   set filetype=
   set whichwrap&
   set autoindent&
+  set guicursor&
+  set t_ve&
   silent! mapc!
   silent! ounmap ii
   silent! ounmap ssa
   call operator#sandwich#set_default()
   unlet! g:sandwich#recipes
   unlet! g:operator#sandwich#recipes
+  unlet! g:operator#sandwich#hide_cursor
 endfunction
 "}}}
 function! s:suite.after() abort "{{{
@@ -3716,6 +3719,8 @@ endfunction
 
 " global option
 function! s:suite.global_option_hide_cursor() abort "{{{
+  let g:operator#sandwich#hide_cursor = 1
+
   " #344
   call setline('.', 'foo')
   let guicursor = &guicursor
