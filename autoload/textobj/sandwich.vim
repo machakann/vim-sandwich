@@ -42,7 +42,7 @@
 "       []buns              : [Linked from act.buns] The list consisted of two strings to add to/replace the edges.
 "       - state             : 0 or 1. If it is called by keymapping, it is 1. If it is called by dot command, it is 0.
 "       - a_or_i            : 'a' or 'i'. It means 'a sandwich' or 'inner sandwich'. See :help text-objects.
-"       - mode              : 'o' or 'x'. Which mode the keymapping is called.
+"       - mode              : 'o' or 'x' or 'n'. Which mode the keymapping is called.
 "       - visualmode        : If the textobject is called in blockwise visual mode, then '<C-v>'. Otherwise 'v'.
 "       - syntax            : The place to put the name of displayed syntax for skipping in search.
 "       - evaluated         : If the buns are evaluated by opt.integrated.expr feature, then 1.

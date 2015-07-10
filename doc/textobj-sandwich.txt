@@ -165,22 +165,37 @@ keymappings~
 <Plug>(textobj-sandwich-auto-i)		*<Plug>(textobj-sandwich-auto-i)*
 	The textobject mapping to search and select a sandwiched text
 	automatically. This keymapping selects inside surroundings. The
-	surroundings are not included.
+	surroundings are not included. This keymapping is mapped to `ib` of
+	operator-pending mode and visual mode in default. This keymapping
+	could be mapped to operator-pending mode |:omap|, to visual mode
+	|:xmap|, and also to normal mode |:nmap|.
 
 <Plug>(textobj-sandwich-auto-a)		*<Plug>(textobj-sandwich-auto-a)*
 	The textobject mapping to search and select a sandwiched text
 	automatically. This keymapping selects sandwiched text including
-	surroundings.
+	surroundings. This keymapping is mapped to `ab` of operator-pending
+	mode and visual mode in default. This keymapping could be mapped to
+	operator-pending mode |:omap|, to visual mode |:xmap|, and also to
+	normal mode |:nmap|.
+
 
 <Plug>(textobj-sandwich-query-i)	*<Plug>(textobj-sandwich-query-i)*
 	The textobject mapping to search and select a sandwiched text
 	depending on a user input. This keymapping selects inside
-	surroundings. The surroundings are not included.
+	surroundings. The surroundings are not included. This keymapping is
+	mapped to `is` of operator-pending mode and visual mode in default.
+	This keymapping could be mapped to operator-pending mode |:omap|, to
+	visual mode |:xmap|, and also to normal mode |:nmap|.
+
 
 <Plug>(textobj-sandwich-query-a)	*<Plug>(textobj-sandwich-query-a)*
 	The textobject mapping to search and select a sandwiched text
 	depending on a user input. This keymapping selects sandwiched text
-	including surroundings.
+	including surroundings. This keymapping is mapped to `as` of
+	operator-pending mode and visual mode in default. This keymapping
+	could be mapped to operator-pending mode |:omap|, to visual mode
+	|:xmap|, and also to normal mode |:nmap|.
+
 
 
 
