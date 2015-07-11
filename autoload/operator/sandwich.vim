@@ -90,10 +90,8 @@
 " Others are converted to OperatorSandwichError:Unknown. It should not be observed.
 "}}}
 
-" variables"{{{
-let s:type_num   = type(0)
-let s:type_list  = type([])
-let s:type_dict  = type({})
+" variables "{{{
+" null valiables
 let s:null_coord = [0, 0]
 let s:null_pos   = [0, 0, 0, 0]
 let s:null_2pos  = {
@@ -107,12 +105,23 @@ let s:null_4pos  = {
       \   'tail2': copy(s:null_pos),
       \ }
 
-" patchs & features
+" types
+let s:type_num  = type(0)
+let s:type_list = type([])
+let s:type_dict = type({})
+
+" patchs
 if v:version > 704 || (v:version == 704 && has('patch237'))
   let s:has_patch_7_4_771 = has('patch-7.4.771')
+  let s:has_patch_7_4_310 = has('patch-7.4.310')
 else
   let s:has_patch_7_4_771 = v:version > 704 || (v:version == 704 && has('patch771'))
+  let s:has_patch_7_4_310 = v:version > 704 || (v:version == 704 && has('patch310'))
 endif
+
+" features
+let s:has_reltime_and_float = has('reltime') && has('float')
+let s:has_gui_running = has('gui_running')
 "}}}
 
 """ Public funcs
@@ -336,7 +345,7 @@ function! s:clock_start() dict abort  "{{{
       let self.paused = 0
     endif
   else
-    if has('reltime') && has('float')
+    if s:has_reltime_and_float
       let self.zerotime = reltime()
       let self.started  = 1
     endif
@@ -1027,7 +1036,7 @@ function! s:initialize(kind, motionwise) dict abort "{{{
     endfor
 
     " hide_cursor
-    if has('gui_running')
+    if s:has_gui_running
       let self.cursor_info = &guicursor
       set guicursor+=o:block-NONE
     else
@@ -1297,7 +1306,7 @@ function! s:finalize() dict abort  "{{{
               \ : cursor_opt ==# 'end' && modmark.tail != s:null_pos ? s:get_left_pos(modmark.tail)
               \ : self.cursor['inner_head']
     endif
-    if v:version > 704 || (v:version == 704 && has('patch310'))
+    if s:has_patch_7_4_310
       " set curswant explicitly
       call setpos('.', cursor + [cursor[2]])
     else
@@ -1306,7 +1315,7 @@ function! s:finalize() dict abort  "{{{
   endif
 
   " restore cursor
-  if has('gui_running')
+  if s:has_gui_running
     set guicursor&
     let &guicursor = self.cursor_info
   else
