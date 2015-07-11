@@ -984,7 +984,7 @@ function! s:initialize(kind, motionwise) dict abort "{{{
   let self.opt.timeoutlen = s:get('timeoutlen', &timeoutlen)
   let self.opt.timeoutlen = self.opt.timeoutlen < 0 ? 0 : self.opt.timeoutlen
   let self.opt.duration = s:get('highlight_duration', 200)
-  let self.opt.duration = self.opt.timeoutlen < 0 ? 0 : self.opt.duration
+  let self.opt.duration = self.opt.duration < 0 ? 0 : self.opt.duration
   let self.cursor.inner_head = region.head
   let self.cursor.inner_tail = region.tail
   call self.opt.default.update(deepcopy(g:operator#sandwich#options[a:kind][a:motionwise]))
