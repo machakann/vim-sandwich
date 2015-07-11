@@ -106,6 +106,13 @@ let s:null_4pos  = {
       \   'head2': copy(s:null_pos),
       \   'tail2': copy(s:null_pos),
       \ }
+
+" patchs & features
+if v:version > 704 || (v:version == 704 && has('patch237'))
+  let s:has_patch_7_4_771 = has('patch-7.4.771')
+else
+  let s:has_patch_7_4_771 = v:version > 704 || (v:version == 704 && has('patch771'))
+endif
 "}}}
 
 """ Public funcs
@@ -1529,16 +1536,7 @@ function! s:check_edges(head, tail, candidate, opt) abort  "{{{
   if head1 != a:head[1:2] | return s:null_4pos | endif
 
   call setpos('.', a:tail)
-  " workaround for unicode string (because of a bug of vim)
-  " If the cursor is on a unicode character(uc), searchpos(uc, 'bce', stopline) always returns [0, 0],
-  " though searchpos(uc, 'bce') returns a correct value.
-  if a:tail[1] == line('$') && a:tail[2] == col([line('$'), '$'])
-    normal! h
-    let tail2 = searchpos(patterns[1], 'e', a:head[1])
-  else
-    normal! l
-    let tail2 = searchpos(patterns[1], 'be', a:head[1])
-  endif
+  let tail2 = s:searchpos_bce(a:tail, patterns[1], a:head[1])
 
   if tail2 != a:tail[1:2] | return s:null_4pos | endif
 
@@ -1569,7 +1567,7 @@ function! s:search_edges(head, tail, candidate, opt) abort "{{{
   let head1 = searchpos(patterns[0], 'c', a:tail[1])
 
   call setpos('.', a:tail)
-  let tail2 = searchpos(patterns[1], 'bce', a:head[1])
+  let tail2 = s:searchpos_bce(a:tail, patterns[1], a:head[1])
 
   if head1 == s:null_coord || tail2 == s:null_coord
         \ || s:is_equal_or_ahead(s:c2p(head1), s:c2p(tail2))
@@ -1700,6 +1698,26 @@ function! s:get_external_diff_region(head, tail, candidate, opt) abort  "{{{
     return s:null_4pos
   endif
 endfunction
+"}}}
+" function! s:searchpos_bce(curpos, pattern, stopline)  "{{{
+if s:has_patch_7_4_771
+  function! s:searchpos_bce(curpos, pattern, stopline) abort
+    return searchpos(a:pattern, 'bce', a:stopline)
+  endfunction
+else
+  " workaround for unicode string (because of a bug of vim)
+  " If the cursor is on a unicode character(uc), searchpos(uc, 'bce', stopline) always returns [0, 0],
+  " though searchpos(uc, 'bce') returns a correct value.
+  function! s:searchpos_bce(curpos, pattern, stopline) abort
+    if a:curpos[1] == line('$') && a:curpos[2] == col([line('$'), '$'])
+      normal! h
+      return searchpos(a:pattern, 'e', a:stopline)
+    else
+      normal! l
+      return searchpos(a:pattern, 'be', a:stopline)
+    endif
+  endfunction
+endif
 "}}}
 
 " position shifting
