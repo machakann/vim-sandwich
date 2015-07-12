@@ -1,5 +1,5 @@
 " The set of operator/textobj plugins to do well with 'sandwich' like structure
-" Last Change: 16-May-2015.
+" Last Change: 12-Jul-2015.
 " Maintainer : Masaaki Nakamura <mckn@outlook.jp>
 
 " License    : NYSL
@@ -10,6 +10,14 @@ if &compatible || exists("g:loaded_sandwich")
   finish
 endif
 let g:loaded_sandwich = 1
+
+" intrinsic keymappings
+nnoremap <Plug>(sandwich-i) i
+nnoremap <Plug>(sandwich-o) o
+nnoremap <Plug>(sandwich-O) O
+nnoremap <Plug>(sandwich-v) v
+nnoremap <Plug>(sandwich-V) V
+nnoremap <Plug>(sandwich-CTRL-v) <C-v>
 
 """ default keymappings
 " If g:sandwich_no_default_key_mappings has been defined, then quit immediately.

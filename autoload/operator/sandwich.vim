@@ -1,5 +1,7 @@
 " operator-sandwich: wrap by buns!
-" TODO: add 'at' option
+" TODO: Add 'at' option
+" TODO: Give API to get information from operator object.
+"       It would be helpful for users in use of 'expr_filter' and 'command' option.
 
 
 """ NOTE: Whole design (-: string or number, *: functions, []: list, {}: dictionary) "{{{
@@ -10,6 +12,7 @@
 "   - mode                   : 'n' or 'x'. Which mode the keymapping is called.
 "   - blockwidth             : The width of selected region in blockwise visual mode.
 "   - extended               : 0 or 1. If it is called in blockwise visual mode with extending the terminal edges to line ends, then 1. Otherwise 0
+"   - keepable               : 0 or 1. If 1, 'keep' of 'cursor' local option is valid also in dot repeating.
 "   {}view                   : The dictionary to restore the view when the operarion starts.
 "   {}recipes
 "     []arg                  : The recipes which are forced to be used given through the 4th argument of operator#sandwich#prerequisite().
@@ -128,9 +131,6 @@ let s:has_gui_running = has('gui_running')
 " Prerequisite
 function! operator#sandwich#prerequisite(kind, mode, ...) abort "{{{
   " make new operator object
-  if !exists('g:operator#sandwich#object')
-    let g:operator#sandwich#object = {}
-  endif
   let g:operator#sandwich#object = deepcopy(s:operator)
 
   " prerequisite
@@ -307,6 +307,20 @@ function! operator#sandwich#release_count() abort  "{{{
   else
     return ''
   endif
+endfunction
+"}}}
+function! operator#sandwich#predot() abort  "{{{
+  if exists('g:operator#sandwich#object')
+    let operator = g:operator#sandwich#object
+    let operator.keepable = 1
+    let operator.cursor.keep[0:3] = getpos('.')[0:3]
+  endif
+  return ''
+endfunction
+"}}}
+function! operator#sandwich#dot() abort  "{{{
+  call operator#sandwich#predot()
+  return '.'
 endfunction
 "}}}
 
@@ -1294,18 +1308,21 @@ function! s:finalize() dict abort  "{{{
       endif
     endfor
 
-    if self.state
+    if self.state || self.keepable
       let cursor = cursor_opt =~# '^\%(keep\|inner_\%(head\|tail\)\)$' ? self.cursor[cursor_opt]
               \ : cursor_opt ==# 'front' && modmark.head != s:null_pos ? modmark.head
               \ : cursor_opt ==# 'end' && modmark.tail != s:null_pos ? s:get_left_pos(modmark.tail)
               \ : self.cursor['inner_head']
+      let self.keepable = 0
     else
-      " In the case of dot repeat, there is no way to keep original position.
+      " In the case of dot repeat, it is impossible to keep original position
+      " unless self.keepable == 1.
       let cursor = cursor_opt =~# '^inner_\%(head\|tail\)$' ? self.cursor[cursor_opt]
               \ : cursor_opt ==# 'front' && modmark.head != s:null_pos ? modmark.head
               \ : cursor_opt ==# 'end' && modmark.tail != s:null_pos ? s:get_left_pos(modmark.tail)
               \ : self.cursor['inner_head']
     endif
+
     if s:has_patch_7_4_310
       " set curswant explicitly
       call setpos('.', cursor + [cursor[2]])
@@ -1353,6 +1370,7 @@ let s:operator = {
       \   'view'      : {},
       \   'blockwidth': 0,
       \   'extended'  : 0,
+      \   'keepable'  : 0,
       \   'recipes'   : {
       \     'arg'       : [],
       \     'synchro'   : [],

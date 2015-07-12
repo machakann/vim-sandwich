@@ -1,5 +1,5 @@
 " The vim operator plugin to do well with 'sandwich' like structure
-" Last Change: 23-May-2015.
+" Last Change: 12-Jul-2015.
 " Maintainer : Masaaki Nakamura <mckn@outlook.jp>
 
 " License    : NYSL
@@ -27,14 +27,8 @@ xnoremap <silent> <Plug>(operator-sandwich-replace-query1st) <Esc>:call operator
 " supplementary keymappings
 onoremap <expr><silent> <Plug>(operator-sandwich-synchro-count) operator#sandwich#synchro_count()
 onoremap <expr><silent> <Plug>(operator-sandwich-release-count) operator#sandwich#release_count()
-
-" intrinsic keymappings
-nnoremap <Plug>(sandwich-i) i
-nnoremap <Plug>(sandwich-o) o
-nnoremap <Plug>(sandwich-O) O
-nnoremap <Plug>(sandwich-v) v
-nnoremap <Plug>(sandwich-V) V
-nnoremap <Plug>(sandwich-CTRL-v) <C-v>
+nnoremap <expr><silent> <Plug>(operator-sandwich-predot) operator#sandwich#predot()
+nnoremap <expr><silent> <Plug>(operator-sandwich-dot)    operator#sandwich#dot()
 
 " highlight group
 highlight link OperatorSandwichBuns IncSearch

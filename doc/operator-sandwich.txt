@@ -1,4 +1,4 @@
-*operator-sandwich.txt*			Last change:10-Jul-2015.
+*operator-sandwich.txt*			Last change:12-Jul-2015.
 
 The operator plugin to edit sandwiched textobjects.
 
@@ -50,6 +50,7 @@ MISCELLANEOUS			|operator-sandwich-miscellaneous|
   Highlighting by matchit.vim is confusing.
   Why does not the add operator skip white spaces in character-wise motion?
   Why the default mappings for the delete/replace operators were not defined?
+  I want to keep cursor position even after dot repeating.
 
 ==============================================================================
 TL;DR
@@ -291,8 +292,8 @@ Practical examples are in |sandwich-keymappings|.
  nmap sd(
  \ <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-synchro-count)a(
 <
-A key sequence `2sd(` is identical to `2<Plug>(operator-sandwich-delete)2a(`
-in this case.
+	A key sequence `2sd(` is identical to
+	`2<Plug>(operator-sandwich-delete)2a(` in this case.
 
 
 
@@ -304,8 +305,41 @@ in this case.
  nmap sd(
  \ <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)a(
 <
-A key sequence `2sd(` is identical to `<Plug>(operator-sandwich-delete)2a(` in
-this case.
+	A key sequence `2sd(` is identical to
+	`<Plug>(operator-sandwich-delete)2a(` in this case.
+
+
+
+There are two supplementary keymappings to make dot repeating more convenient.
+These keymappings relates to a local option, "cursor". There are the choice
+"keep" of "cursor" option to keep cursor position after an operator action.
+This feature is not valid with dot repeating in default. However if you really
+need, these keymappings realize it. Note that it is possible to conflict with
+other plugins, please use either one which is appropriate for your
+environment. See a topic of a local option "cursor" in
+|operator-sandwich-configuration|.
+
+				*<Plug>(operator-sandwich-predot)*
+<Plug>(operator-sandwich-predot)
+	The keymapping activates the choice "keep" of the "cursor" option with
+	dot repeating. This keymapping itself does not send key sequence of
+	|.|. Map this key ahead of |.| key sequence. If you are using other
+	plugins which make keymapping to |.| key, use this keymapping. For
+	example, if you are using repeat.vim (vimscript #2136), use this
+	keymapping. Add the following line into your vimrc.
+>
+	nmap . <Plug>(operator-sandwich-predot)<Plug>(RepeatDot)
+<
+
+				*<Plug>(operator-sandwich-dot)*
+<Plug>(operator-sandwich-dot)
+	The keymapping activates the choice "keep" of the "cursor" option with
+	dot repeating. This keymapping itself sends key sequence of |.|. If
+	you are not using any other plugin which makes keymapping to |.| key,
+	use this keymapping. Add the following line into your vimrc.
+>
+	nmap . <Plug>(operator-sandwich-dot)
+<
 
 
 
@@ -772,8 +806,11 @@ cursor
 	             (foo)
                          # : end
 <
-	NOTE: Unfortunately, "keep" option cannot be used in |.| command. In
-	      that case automatically falls back to "inner_head" option.
+	NOTE: Unfortunately, "keep" option cannot be used in |.| command
+	      in default. In that case automatically falls back to
+	      "inner_head" option. If needed, use a supplementary keymapping,
+	      |<Plug>(operator-sandwich-predot)| or
+	      |<Plug>(operator-sandwich-dot)|.
 
 	Default values
 	  * add
@@ -1279,6 +1316,26 @@ Why the default mappings for the delete/replace operators were not defined?~
 	and |<Plug>(operator-sandwich-replace)| can work with any
 	motions/textobjects as far as matching their working condition. If you
 	are interested, please map them somewhere you want and try!
+
+
+
+I want to keep cursor position even after dot repeating.~
+	The item "keep" of the local option "cursor" is not valid with dot
+	repeating in default. However, if necessary, using either
+	|<Plug>(operator-sandwich-predot)| or |<Plug>(operator-sandwich-dot)|,
+	it can enable the feature. If you are using other plugins which make
+	keymappings to |.| key, use |<Plug>(operator-sandwich-predot)|. For
+	example, if you are using repeat.vim (vimscript #2136), add the
+	following line into your vimrc.
+>
+	nmap . <Plug>(operator-sandwich-predot)<Plug>(RepeatDot)
+<
+	Otherwise use |<Plug>(operator-sandwich-dot)|.
+>
+	nmap . <Plug>(operator-sandwich-dot)
+<
+	See each detailed description of |<Plug>(operator-sandwich-predot)|
+	and |<Plug>(operator-sandwich-dot)|.
 
 
 

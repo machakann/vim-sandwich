@@ -1,4 +1,4 @@
-*operator-sandwich.jax*	日本語ヘルプ	Last change:10-Jul-2015.
+*operator-sandwich.jax*	日本語ヘルプ	Last change:12-Jul-2015.
 
 “挟まれた”テキストを編集するためのオペレータです。
 
@@ -50,6 +50,7 @@ MISCELLANEOUS			|operator-sandwich-miscellaneous|
   matchit.vim のハイライトがかぶって邪魔
   文字列を囲むオペレータの文字指向の場合だけ空白をスキップしないのはなぜ？
   なぜ囲みを外す/置換するオペレータのキーマッピングはデフォルトで提供されない?
+  ドットコマンドでもカーソル位置を保存・復元したい
 
 ==============================================================================
 TL;DR
@@ -279,8 +280,8 @@ query-1st 系列キーマッピング~
  nmap sd(
  \ <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-synchro-count)a(
 <
-このキーマッピングでは 2sd( は 2<Plug>(operator-sandwich-delete)2a( に等しくな
-ります。
+	このキーマッピングでは 2sd( は 2<Plug>(operator-sandwich-delete)2a( に
+	等しくなります。
 
 
 
@@ -292,8 +293,41 @@ query-1st 系列キーマッピング~
  nmap sd(
  \ <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)a(
 <
-このキーマッピングでは 2sd( は <Plug>(operator-sandwich-delete)2a( に等しくな
-ります。
+	このキーマッピングでは 2sd( は <Plug>(operator-sandwich-delete)2a( に
+	等しくなります。
+
+
+
+ドットコマンドを便利にする補助的なキーマッピングが二種あります。これらは local
+option の "cursor" に関係しており、このオプションの選択肢 "keep" を |.| コマン
+ドリピート時にも有効にするために使われます。カーソル位置を編集後にも保つための
+このオプションはデフォルトでは |.| コマンドリピート時には有効にならないのです
+が、以下のどちらかのキーマッピングを使用することで有効にすることができます。他
+のプラグインとキーマッピングが衝突する恐れがあるので、環境によって適切なほうを
+使用してください。 |operator-sandwich-configuration| の local option 中 cursor
+オプションの項もご覧ください。
+
+				*<Plug>(operator-sandwich-predot)*
+<Plug>(operator-sandwich-predot)
+	このキーマッピングは local option "cursor" の "keep" を |.| コマンドで
+	も有効にするために使われます。このキーマッピング自体は |.| キーを送ら
+	ないので、 |.| キーシークエンスを送るマッピングに先駆けるようにマップ
+	してください。 |.| キーにマップするような他のプラグイン、例えば
+	repeat.vim (vimscript #2136) をお使いの場合に使います。次の行を vimrc
+	に追加してください。
+>
+	nmap . <Plug>(operator-sandwich-predot)<Plug>(RepeatDot)
+<
+
+				*<Plug>(operator-sandwich-dot)*
+<Plug>(operator-sandwich-dot)
+	このキーマッピングは local option "cursor" の "keep" を |.| コマンドで
+	も有効にするために使われます。このキーマッピング自体が |.| キーを送る
+	ので、 |.| キーにマップするようなプラグインをお使いでなければこちらを
+	使用してください。次の行を vimrc に追加します。
+>
+	nmap . <Plug>(operator-sandwich-dot)
+<
 
 
 
@@ -764,8 +798,11 @@ cursor
                          # : end
 <
 	NOTE: 残念ながら "keep" オプションは |.| コマンドでの繰り返しの際に
-	      カーソル位置を復元できません。自動的に "inner_head" へフォール
-	      バックします。
+	      デフォルトではカーソル位置を復元できません。自動的に
+	      "inner_head" へフォールバックします。必要であれば補助キーマッピ
+	      ング |<Plug>(operator-sandwich-predot)| か
+	      |<Plug>(operator-sandwich-dot)| を |.| キーにマッピングすること
+	      でこの機能を有効にすることができます。
 
 	デフォルト値
 	  * add
@@ -1264,6 +1301,27 @@ matchit.vim のハイライトがかぶって邪魔~
 	ことができますので興味があれば試してみてください。
 	|<Plug>(operator-sandwich-delete)|
 	|<Plug>(operator-sandwich-replace)|
+
+
+
+ドットコマンドでもカーソル位置を保存・復元したい~
+	local option "cursor" の "keep" はデフォルトでは |.| コマンドリピート
+	では有効ではありません。しかし必要であれば、
+	|<Plug>(operator-sandwich-predot)| か |<Plug>(operator-sandwich-dot)|
+	を |.| キーにマッピングすることでこの機能を有効にすることができます。
+	もし他に |.| コマンドにマップするようなプラグインをご使用の場合は
+	|<Plug>(operator-sandwich-predot)| を使います。例えば repeat.vim
+	(vimscript #2136) をご使用の場合は次の行を vimrc へ追加します。
+>
+	nmap . <Plug>(operator-sandwich-predot)<Plug>(RepeatDot)
+<
+	そのようなプラグインを使ってない場合は |<Plug>(operator-sandwich-dot)|
+	を使います。
+>
+	nmap . <Plug>(operator-sandwich-dot)
+<
+	|<Plug>(operator-sandwich-predot)| 及び
+	|<Plug>(operator-sandwich-dot)| それぞれの詳しい説明もご覧ください。
 
 
 
