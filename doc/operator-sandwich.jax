@@ -776,12 +776,12 @@ operator#sandwich#set_default()		*operator#sandwich#set_default()*
 
 cursor
 	オペレータが編集後のカーソル位置を指定するオプションです。
-	"innner_head", "keep", "inner_tail", "front", "end" が使用可能です。
+	"innner_head", "keep", "inner_tail", "head", "tail" が使用可能です。
 	  inner_head: 囲みの内側の文字列の先頭
 	  keep      : 処理開始時のカーソル位置をできる限り復元する
 	  inner_tail: 囲みの内側の文字列の末尾
-	  front     : 前方の囲みの先頭
-	  end       : 後方の囲みの末尾
+	  head      : 前方の囲みの先頭
+	  tail      : 後方の囲みの末尾
 >
          #                 : cursor
 	foo   --->   (foo)
@@ -793,9 +793,9 @@ cursor
                        #   : keep
 	             (foo)
 
-                     #     : front
+                     #     : head
 	             (foo)
-                         # : end
+                         # : tail
 <
 	NOTE: 残念ながら "keep" オプションは |.| コマンドでの繰り返しの際に
 	      デフォルトではカーソル位置を復元できません。自動的に

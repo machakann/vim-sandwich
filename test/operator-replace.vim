@@ -1783,9 +1783,9 @@ function! s:suite.charwise_n_option_cursor() abort  "{{{
   call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #180')
   call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #180')
 
-  """ front
+  """ head
   " #181
-  call operator#sandwich#set('replace', 'char', 'cursor', 'front')
+  call operator#sandwich#set('replace', 'char', 'cursor', 'head')
   call setline('.', '(((foo)))')
   normal 04l2sr2a([[
   call g:assert.equals(getline('.'), '([[foo]])',  'failed at #181')
@@ -1796,9 +1796,9 @@ function! s:suite.charwise_n_option_cursor() abort  "{{{
   call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #182')
   call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #182')
 
-  """ end
+  """ tail
   " #183
-  call operator#sandwich#set('replace', 'char', 'cursor', 'end')
+  call operator#sandwich#set('replace', 'char', 'cursor', 'tail')
   call setline('.', '(((foo)))')
   normal 04l2sr2a([[
   call g:assert.equals(getline('.'), '([[foo]])',  'failed at #183')
@@ -2486,9 +2486,9 @@ function! s:suite.charwise_x_option_cursor() abort  "{{{
   call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #256')
   call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #256')
 
-  """ front
+  """ head
   " #257
-  call operator#sandwich#set('replace', 'char', 'cursor', 'front')
+  call operator#sandwich#set('replace', 'char', 'cursor', 'head')
   call setline('.', '(((foo)))')
   normal 0lva(2sr[[
   call g:assert.equals(getline('.'), '([[foo]])',  'failed at #257')
@@ -2499,9 +2499,9 @@ function! s:suite.charwise_x_option_cursor() abort  "{{{
   call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #258')
   call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #258')
 
-  """ end
+  """ tail
   " #259
-  call operator#sandwich#set('replace', 'char', 'cursor', 'end')
+  call operator#sandwich#set('replace', 'char', 'cursor', 'tail')
   call setline('.', '(((foo)))')
   normal 0lva(2sr[[
   call g:assert.equals(getline('.'), '([[foo]])',  'failed at #259')
@@ -3151,9 +3151,9 @@ function! s:suite.linewise_n_option_cursor() abort  "{{{
   call g:assert.equals(getline('.'), '([(foo)])',  'failed at #322')
   call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #322')
 
-  """ front
+  """ head
   " #323
-  call operator#sandwich#set('replace', 'line', 'cursor', 'front')
+  call operator#sandwich#set('replace', 'line', 'cursor', 'head')
   call setline('.', '(((foo)))')
   normal 04l2srVl[[
   call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #323')
@@ -3164,9 +3164,9 @@ function! s:suite.linewise_n_option_cursor() abort  "{{{
   call g:assert.equals(getline('.'), '([(foo)])',  'failed at #324')
   call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #324')
 
-  """ end
+  """ tail
   " #325
-  call operator#sandwich#set('replace', 'line', 'cursor', 'end')
+  call operator#sandwich#set('replace', 'line', 'cursor', 'tail')
   call setline('.', '(((foo)))')
   normal 04l2srVl[[
   call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #325')
@@ -3857,9 +3857,9 @@ function! s:suite.linewise_x_option_cursor() abort  "{{{
   call g:assert.equals(getline('.'), '([(foo)])',  'failed at #392')
   call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #392')
 
-  """ front
+  """ head
   " #393
-  call operator#sandwich#set('replace', 'line', 'cursor', 'front')
+  call operator#sandwich#set('replace', 'line', 'cursor', 'head')
   call setline('.', '(((foo)))')
   normal 04lV2sr[[
   call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #393')
@@ -3870,9 +3870,9 @@ function! s:suite.linewise_x_option_cursor() abort  "{{{
   call g:assert.equals(getline('.'), '([(foo)])',  'failed at #394')
   call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #394')
 
-  """ end
+  """ tail
   " #395
-  call operator#sandwich#set('replace', 'line', 'cursor', 'end')
+  call operator#sandwich#set('replace', 'line', 'cursor', 'tail')
   call setline('.', '(((foo)))')
   normal 04lV2sr[[
   call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #395')
@@ -4591,9 +4591,9 @@ function! s:suite.blockwise_n_option_cursor() abort  "{{{
 
   %delete
 
-  """ front
+  """ head
   " #332
-  call operator#sandwich#set('replace', 'block', 'cursor', 'front')
+  call operator#sandwich#set('replace', 'block', 'cursor', 'head')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg2sr\<C-v>29l[]"
   call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #332')
@@ -4610,9 +4610,9 @@ function! s:suite.blockwise_n_option_cursor() abort  "{{{
 
   %delete
 
-  """ end
+  """ tail
   " #334
-  call operator#sandwich#set('replace', 'block', 'cursor', 'end')
+  call operator#sandwich#set('replace', 'block', 'cursor', 'tail')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg2sr\<C-v>29l[]"
   call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #334')
@@ -5331,9 +5331,9 @@ function! s:suite.blockwise_x_option_cursor() abort  "{{{
 
   %delete
 
-  """ front
+  """ head
   " #394
-  call operator#sandwich#set('replace', 'block', 'cursor', 'front')
+  call operator#sandwich#set('replace', 'block', 'cursor', 'head')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg\<C-v>2j8l2sr[]"
   call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #394')
@@ -5350,9 +5350,9 @@ function! s:suite.blockwise_x_option_cursor() abort  "{{{
 
   %delete
 
-  """ end
+  """ tail
   " #396
-  call operator#sandwich#set('replace', 'block', 'cursor', 'end')
+  call operator#sandwich#set('replace', 'block', 'cursor', 'tail')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg\<C-v>2j8l2sr[]"
   call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #396')

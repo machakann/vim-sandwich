@@ -1302,7 +1302,7 @@ function! s:finalize() dict abort  "{{{
       let stuff = self.basket[i]
       if stuff.done
         let cursor_opt = stuff.opt.integrated.cursor
-        let cursor_opt = cursor_opt =~# '^\%(keep\|inner_\%(head\|tail\)\|front\|end\)$'
+        let cursor_opt = cursor_opt =~# '^\%(keep\|\%(inner_\)\?\%(head\|tail\)\)$'
                       \ ? cursor_opt : 'inner_head'
         break
       endif
@@ -1310,16 +1310,16 @@ function! s:finalize() dict abort  "{{{
 
     if self.state || self.keepable
       let cursor = cursor_opt =~# '^\%(keep\|inner_\%(head\|tail\)\)$' ? self.cursor[cursor_opt]
-              \ : cursor_opt ==# 'front' && modmark.head != s:null_pos ? modmark.head
-              \ : cursor_opt ==# 'end' && modmark.tail != s:null_pos ? s:get_left_pos(modmark.tail)
+              \ : cursor_opt ==# 'head' && modmark.head != s:null_pos ? modmark.head
+              \ : cursor_opt ==# 'tail' && modmark.tail != s:null_pos ? s:get_left_pos(modmark.tail)
               \ : self.cursor['inner_head']
       let self.keepable = 0
     else
       " In the case of dot repeat, it is impossible to keep original position
       " unless self.keepable == 1.
       let cursor = cursor_opt =~# '^inner_\%(head\|tail\)$' ? self.cursor[cursor_opt]
-              \ : cursor_opt ==# 'front' && modmark.head != s:null_pos ? modmark.head
-              \ : cursor_opt ==# 'end' && modmark.tail != s:null_pos ? s:get_left_pos(modmark.tail)
+              \ : cursor_opt ==# 'head' && modmark.head != s:null_pos ? modmark.head
+              \ : cursor_opt ==# 'tail' && modmark.tail != s:null_pos ? s:get_left_pos(modmark.tail)
               \ : self.cursor['inner_head']
     endif
 
@@ -1377,11 +1377,11 @@ let s:operator = {
       \     'integrated': [],
       \   },
       \   'cursor': {
-      \     'front'     : copy(s:null_pos),
+      \     'head'      : copy(s:null_pos),
       \     'inner_head': copy(s:null_pos),
       \     'keep'      : copy(s:null_pos),
       \     'inner_tail': copy(s:null_pos),
-      \     'end'       : copy(s:null_pos),
+      \     'tail'      : copy(s:null_pos),
       \   },
       \   'modmark': copy(s:null_2pos),
       \   'opt': {

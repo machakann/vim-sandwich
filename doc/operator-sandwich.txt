@@ -784,13 +784,13 @@ operator#sandwich#set_default()		*operator#sandwich#set_default()*
 
 cursor
 	This is a local option which determines the cursor position after
-	an action. "inner_head", "keep", "inner_tail", "front" and "end" can
+	an action. "inner_head", "keep", "inner_tail", "head" and "tail" can
 	be used.
 	  inner_head: the head of a surrounded text
 	  keep      : the same position at start
 	  inner_tail: the tail of a surrounded text
-	  front     : the head of the former surrounding
-	  end       : the tail of the latter surrounding
+	  head      : the head of the former surrounding
+	  tail      : the tail of the latter surrounding
 >
          #                 : cursor
 	foo   --->   (foo)
@@ -802,9 +802,9 @@ cursor
                        #   : keep
 	             (foo)
 
-                     #     : front
+                     #     : head
 	             (foo)
-                         # : end
+                         # : tail
 <
 	NOTE: Unfortunately, "keep" option cannot be used in |.| command
 	      in default. In that case automatically falls back to
