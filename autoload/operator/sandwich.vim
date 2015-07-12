@@ -2144,7 +2144,7 @@ if exists('g:operator#sandwich#default_recipes')
   unlockvar! g:operator#sandwich#default_recipes
 endif
 let g:operator#sandwich#default_recipes = [
-      \   {'buns': ['input("operator-sandwich:head: ")', 'input("operator-sandwich:tail: ")'], 'kind': ['add', 'replace'], 'expr': 1, 'input': ['f']},
+      \   {'buns': ['input("operator-sandwich:head: ")', 'input("operator-sandwich:tail: ")'], 'kind': ['add', 'replace'], 'expr': 1, 'input': ['i']},
       \ ]
 lockvar! g:operator#sandwich#default_recipes
 "}}}

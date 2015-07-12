@@ -1,4 +1,4 @@
-*textobj-sandwich.txt*			Last change:10-Jul-2015.
+*textobj-sandwich.txt*			Last change:12-Jul-2015.
 
 The textobject plugin to search and select sandwiched textobjects.
 
@@ -910,13 +910,13 @@ g:textobj#sandwich#latest_jump		*g:textobj#sandwich#latest_jump*
 	\    'expr': 1,
 	\    'regex': 1,
 	\    'synchro': 1,
-	\    'input': ['f']
+	\    'input': ['i']
 	\ },
 <
 The meanings of these options are explained already. The important thing is
 that this recipe can be called by f key press and realizes the instant
 definition of recipe. This recipe is used like this. First call this recipe,
-for example, press `disf` on foobarbaz.
+for example, press `disi` on foobarbaz.
 >
 	foobarbaz
 <

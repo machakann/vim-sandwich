@@ -1171,13 +1171,13 @@ g:operator#sandwich#highlight_duration
 	\    ],
 	\    'kind': ['add', 'replace'],
 	\    'expr': 1,
-	\    'input': ['f']
+	\    'input': ['i']
 	\ },
 <
 The meanings of these options are explained already. The important thing is
 that this recipe can be called by f key press and realizes the instant
 definition of recipe. This recipe is used like this. First call this recipe,
-for example, press `saiwf` on bar.
+for example, press `saiwi` on bar.
 >
 	bar
 <
