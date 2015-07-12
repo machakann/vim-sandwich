@@ -790,7 +790,7 @@ cursor
 	  keep      : the same position at start
 	  inner_tail: the tail of a surrounded text
 	  front     : the head of the former surrounding
-	  tail      : the tail of the latter surrounding
+	  end       : the tail of the latter surrounding
 >
          #                 : cursor
 	foo   --->   (foo)
