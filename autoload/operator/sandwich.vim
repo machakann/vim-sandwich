@@ -1048,14 +1048,6 @@ function! s:initialize(kind, motionwise) dict abort "{{{
         let act.opt     = stuff.opt
       endfor
     endfor
-
-    " hide_cursor
-    if s:has_gui_running
-      let self.cursor_info = &guicursor
-      set guicursor+=o:block-NONE
-    else
-      let self.cursor_info = &t_ve
-    endif
   else
     let self.view = winsaveview()
     let self.modmark.head = copy(s:null_pos)
@@ -1087,6 +1079,14 @@ function! s:initialize(kind, motionwise) dict abort "{{{
     let act = stuff.acts[j]
     let act.region = copy(region_list[j])
   endfor
+
+  " hide_cursor
+  if s:has_gui_running
+    let self.cursor_info = &guicursor
+    set guicursor+=o:block-NONE
+  else
+    let self.cursor_info = &t_ve
+  endif
 endfunction
 "}}}
 function! s:split(region) dict abort  "{{{
