@@ -1469,7 +1469,7 @@ function! s:doautocmd(name) abort "{{{
   try
     execute 'silent doautocmd <nomodeline> User ' . a:name
   catch
-    let errormsg = printf('operator-sandwich: An error occurred in autocmd %s. [%s] %s', a:name, v:throwpoint, v:exeception)
+    let errormsg = printf('operator-sandwich: An error occurred in autocmd %s. [%s] %s', a:name, v:throwpoint, v:exception)
     echohl ErrorMsg
     echomsg errormsg
     echohl NONE
