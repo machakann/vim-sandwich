@@ -1,4 +1,4 @@
-*operator-sandwich.txt*			Last change:12-Jul-2015.
+*operator-sandwich.txt*			Last change:17-Jul-2015.
 
 The operator plugin to edit sandwiched textobjects.
 
@@ -37,6 +37,10 @@ CONFIGURATION			|operator-sandwich-configuration|
     command
     query_once
     expr
+    autoindent
+    indentkeys
+    indentkeys+
+    indentkeys-
     regex
     skip_char
   GLOBAL OPTIONS
@@ -762,6 +766,10 @@ g:operator#sandwich#options		*g:operator#sandwich#options*
 	    - command			(for all kinds)
 	    - query_once		(for add and replace)
 	    - expr			(for add and replace)
+	    - autoindent		(for add and replace)
+	    - indentkeys		(for add and replace)
+	    - indentkeys-		(for add and replace)
+	    - indentkeys+		(for add and replace)
 	    - regex			(for delete and replace)
 	    - skip_char			(for delete and replace)
 
@@ -1086,6 +1094,100 @@ expr
 
 
 
+autoindent
+	This option is used in order to control vim autoindent feature in an
+	operator action. The value is an integer and the numbers from 1 to 3
+	correspond to vim built-in options 'autoindent', 'smartindent' and
+	'cindent' respectively. If the value is 0, then never use autoindent
+	function. If the value is negative integer, then it does not change
+	any setting, just use the current autoindent setting. In case you
+	want to use 'indentexpr' option, the value would be a negative
+	integer.
+
+	  * -n : Current settings (if it is not empty, then 'indentexpr')
+	  *  0 : 'noautoindent', 'nosmartindent', 'nocindent', 'noindentexpr'
+	  *  1 : 'autoindent'
+	  *  2 : 'smartindent'
+	  *  3 : 'cindent'
+
+	If "buns" include line breaks, it would be better to think about this
+	option. Practically the value 1 ('autoindent') would be helpful in
+	many cases, at least it is easier to expect its result. The other
+	positive integers sometime cause unexpected results, use them with
+	care.
+>
+	let g:sandwich#recipes += [
+	  \   {'buns': ['{', '}'], 'motionwise': ['line'], 'autoindent': 3},
+	  \ ]
+<
+	Default values
+	  * add
+	    - char : 1
+	    - line : 1
+	    - block: 1
+	  * replace
+	    - char : 1
+	    - line : 1
+	    - block: 1
+
+
+
+indentkeys
+indentkeys+
+indentkeys-
+	These options are used in order to change 'indentkeys' or 'cinkeys'
+	option temporary in an action. The format is identical to 'cinkeys'.
+	The value of "indentkeys" is set as written directly, as if the string
+	was assigned to the {value} of |:set| indentkeys={value}. Similar to
+	that, "indentkeys+" and "indentkeys-" is set as if they are assigned
+	to the {value} of |:set| indentkeys+={value} or
+	|:set| indentkeys-={value}. See |:set+=| and |:set-=|. One thing there
+	is a difference from |:set-=| is that user does not need to mind about
+	the order of items. |:set-=| depends on the order of items.
+>
+	:set indentkeys?    " -> 0{,0},:,0#,!^F,o,O,e
+	:set indentkeys-=0},0{
+	:set indentkeys?    " -> 0{,0},:,0#,!^F,o,O,e
+
+	" '0{' and '0}' are not removed,
+	" because there is not the strings '0},0{'
+
+	:set indentkeys-=0}
+	:set indentkeys?    " -> 0{,:,0#,!^F,o,O,e
+	:set indentkeys-=0{
+	:set indentkeys?    " -> :,0#,!^F,o,O,e
+<
+	In contrast to that, user does not need to care about the order of
+	items for the local option "indentkeys-". Simply list the items to be
+	removed.
+>
+	let g:sandwich#recipes += [
+	  \   {'buns': ['[', ']'], 'filetype': ['tex'], 'indentkeys-': '[,]'}
+	  \ ]
+
+	" This is same as the above
+	"let g:sandwich#recipes += [
+	"  \   {'buns': ['[', ']'], 'filetype': ['tex'], 'indentkeys-': '],['}
+	"  \ ]
+<
+	If 'indentexpr' is empty and 'cindent' is valid, these options are
+	applied to 'cinkeys'.
+
+	The applying order of these options is "indentkeys" -> "indentkeys+"
+	-> "indentkeys-".
+
+	Default values
+	  * add
+	    - char : ''
+	    - line : ''
+	    - block: ''
+	  * replace
+	    - char : ''
+	    - line : ''
+	    - block: ''
+
+
+
 regex
 	If this option is true, requisite "buns" is regarded as regular
 	expressions. If this option is true, the recipe is not used for
@@ -1169,9 +1271,10 @@ g:operator#sandwich#highlight_duration
 	\        'input("operator-sandwich:head: ")',
 	\        'input("operator-sandwich:tail: ")'
 	\    ],
-	\    'kind': ['add', 'replace'],
-	\    'expr': 1,
-	\    'input': ['i']
+	\    'kind'  : ['add', 'replace'],
+	\    'action': ['add']
+	\    'expr'  : 1,
+	\    'input' : ['i']
 	\ },
 <
 The meanings of these options are explained already. The important thing is

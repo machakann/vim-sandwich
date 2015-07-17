@@ -9,3 +9,8 @@ function! TextobjCoord(l1, c1, l2, c2) abort
   normal! o
   call cursor(a:l2, a:c2)
 endfunction
+
+function! TestIndent() abort
+  " always the indent of the previous nonbland line + shiftwidth()
+  return indent(prevnonblank(v:lnum)) + shiftwidth()
+endfunction

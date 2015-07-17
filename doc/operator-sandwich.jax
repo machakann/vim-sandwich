@@ -1,4 +1,4 @@
-*operator-sandwich.jax*	日本語ヘルプ	Last change:12-Jul-2015.
+*operator-sandwich.jax*	日本語ヘルプ	Last change:17-Jul-2015.
 
 “挟まれた”テキストを編集するためのオペレータです。
 
@@ -37,6 +37,10 @@ CONFIGURATION			|operator-sandwich-configuration|
     command
     query_once
     expr
+    autoindent
+    indentkeys
+    indentkeys+
+    indentkeys-
     regex
     skip_char
   GLOBAL OPTIONS
@@ -754,6 +758,10 @@ g:operator#sandwich#options		*g:operator#sandwich#options*
 	    - command			(for all kinds)
 	    - query_once		(for add and replace)
 	    - expr			(for add and replace)
+	    - autoindent		(for add and replace)
+	    - indentkeys		(for add and replace)
+	    - indentkeys-		(for add and replace)
+	    - indentkeys+		(for add and replace)
 	    - regex			(for delete and replace)
 	    - skip_char			(for delete and replace)
 
@@ -1074,6 +1082,98 @@ expr
 
 
 
+autoindent
+	このオプションはオペレーターによる編集中の自動インデント機能を指定する
+	のにつかわれます。値には整数を指定します。1～3の整数にそれぞれ vim の
+	オプション 'autoindent', 'smartindent', 'cindent' が対応しています。値
+	が 0 の場合はすべての自動インデント機能を停止します。値が負数の場合は
+	設定を変更せず、現行の設定をそのまま使います。もし vim の 'indentexpr'
+	オプションを使用したい場合には負数を指定するとよいでしょう。
+
+	  * -n : 設定を変更しない ('indentexpr' が空でなければそれが使われる)
+	  *  0 : 'noautoindent', 'nosmartindent', 'nocindent', 'noindentexpr'
+	  *  1 : 'autoindent'
+	  *  2 : 'smartindent'
+	  *  3 : 'cindent'
+
+	"buns" が改行を含む場合にはこのオプションについて考える必要があるかも
+	しれません。実用的にはほとんどの場合 1 ('autoindent') を指定するのがよ
+	い選択でしょう。少なくとも予期せぬ結果を招くことは少ないと思われます。
+	その他の選択については注意深くご使用ください。
+>
+	let g:sandwich#recipes += [
+	  \   {'buns': ['{', '}'], 'motionwise': ['line'], 'autoindent': 3},
+	  \ ]
+<
+	Default values
+	  * add
+	    - char : 1
+	    - line : 1
+	    - block: 1
+	  * replace
+	    - char : 1
+	    - line : 1
+	    - block: 1
+
+
+
+indentkeys
+indentkeys+
+indentkeys-
+	これらのオプションはオペレーター編集中に vim のオプション 'indentkeys'
+	あるいは 'cinkeys' オプションの値を指定するためのオプションです。書式
+	は 'cinkeys' オプションと同様です。"indentkeys" オプションの値は
+				|:set| indentkeys={value}
+	の {value} のように設定されます。同じように "indentkeys+",
+	"indentkeys-" オプションの値はそれぞれ、
+	                        |:set| indentkeys+={value}
+	                        |:set| indentkeys-={value}
+	{value} のように設定されます。ただし一点だけ違いがあり、
+	|:set| indentkeys-={value} の場合は、次のようにその順番に処理が依存し
+	ます。
+>
+	:set indentkeys?    " -> 0{,0},:,0#,!^F,o,O,e
+	:set indentkeys-=0},0{
+	:set indentkeys?    " -> 0{,0},:,0#,!^F,o,O,e
+
+	" '0{' and '0}' は取り除かれていない、
+	" なぜなら '0},0{' という文字列は 'indentkeys' の中にないからである。
+
+	:set indentkeys-=0}
+	:set indentkeys?    " -> 0{,:,0#,!^F,o,O,e
+	:set indentkeys-=0{
+	:set indentkeys?    " -> :,0#,!^F,o,O,e
+<
+	これに対し "indentkeys-" オプションの場合は順番を気にする必要はありま
+	せん。単純にコンマ区切りで列挙してください。
+>
+	let g:sandwich#recipes += [
+	  \   {'buns': ['[', ']'], 'filetype': ['tex'], 'indentkeys-': '[,]'}
+	  \ ]
+
+	" This is same as the above
+	"let g:sandwich#recipes += [
+	"  \   {'buns': ['[', ']'], 'filetype': ['tex'], 'indentkeys-': '],['}
+	"  \ ]
+<
+	もし、 'indentexpr' オプションが空で 'cindent' が有効なら自動的に
+	'cinkeys' へ処理が切り替わります。
+
+	処理される順番は "indentkeys" -> "indentkeys+" -> "indentkeys-" のよう
+	になっています。
+
+	Default values
+	  * add
+	    - char : ''
+	    - line : ''
+	    - block: ''
+	  * replace
+	    - char : ''
+	    - line : ''
+	    - block: ''
+
+
+
 regex
 	もしこのオプションの値が真なら "buns" は正規表現だとみなされます。また
 	このオプションが真の場合は文字列を囲む/囲みを置換するオペレータでの挿
@@ -1156,9 +1256,10 @@ g:operator#sandwich#highlight_duration
 	\        'input("operator-sandwich:head: ")',
 	\        'input("operator-sandwich:tail: ")'
 	\    ],
-	\    'kind': ['add', 'replace'],
-	\    'expr': 1,
-	\    'input': ['i']
+	\    'kind'  : ['add', 'replace'],
+	\    'action': ['add']
+	\    'expr'  : 1,
+	\    'input' : ['i']
 	\ },
 <
 一つ一つの要素の意味は上で説明されています。重要なのはこのレシピが f という

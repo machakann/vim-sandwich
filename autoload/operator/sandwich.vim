@@ -65,6 +65,7 @@
 "           {}target         : The target position to process.
 "           {}cursor         : Linked to stuff.cursor
 "           {}modmark        : Linked to stuff.modmark
+"           {}indent         : Informations to save and restore autoindent features.
 "           {}opt            : Linked to stuff.opt
 "           * add_once       : The function to execute an adding action.
 "           * delete_once    : The function to execute an delete action.
@@ -430,8 +431,10 @@ function! s:add_once(buns, undojoin, done, next_act) dict abort "{{{
     if s:is_valid_4pos(target)
           \ && s:is_equal_or_ahead(target.head2, target.head1)
       let target.head2[0:3] = s:get_right_pos(target.head2)
+      call self.set_indent()
 
       try
+        echom string([&l:cindent, &l:indentexpr, &l:cinkeys, &l:indentkeys])
         call setpos('.', target.head2)
         if opt.linewise
           execute undojoin_cmd . startinsert_o . a:buns[1]
@@ -453,6 +456,8 @@ function! s:add_once(buns, undojoin, done, next_act) dict abort "{{{
         let head = getpos("'[")
       catch /^Vim\%((\a\+)\)\=:E21/
         throw 'OperatorSandwichError:Add:ReadOnly'
+      finally
+        call self.restore_indent()
       endtry
 
       " get tail
@@ -604,6 +609,7 @@ function! s:replace_once(buns, undojoin, done, next_act) dict abort "{{{
     let deletion = ['', '']
     let reg = [getreg('"'), getregtype('"')]
     let cmd = "silent normal! \"\"dv:call setpos('\.', %s)\<CR>"
+    call self.set_indent()
     try
       call setpos('.', target.head2)
       let @@ = ''
@@ -641,6 +647,7 @@ function! s:replace_once(buns, undojoin, done, next_act) dict abort "{{{
       throw 'OperatorSandwichError:Replace:ReadOnly'
     finally
       call setreg('"', reg[0], reg[1])
+      call self.restore_indent()
     endtry
 
     " update tail
@@ -785,17 +792,107 @@ function! s:search(recipes) dict abort "{{{
   let self.target = target
 endfunction
 "}}}
+function! s:set_indent() dict abort "{{{
+  let opt    = self.opt.integrated
+  let indent = self.indent
+
+  call extend(indent, {
+        \   'restore_indent': 0,
+        \   'autoindent': [&l:autoindent, &l:smartindent, &l:cindent, &l:indentexpr],
+        \   'restore_indentkeys': 0,
+        \   'indentkeys': '',
+        \ }, 'force')
+
+  " set autoindent options
+  if opt.autoindent == 0
+    let [&l:autoindent, &l:smartindent, &l:cindent, &l:indentexpr] = [0, 0, 0, '']
+    let indent.restore_indent = 1
+  elseif opt.autoindent == 1
+    let [&l:autoindent, &l:smartindent, &l:cindent, &l:indentexpr] = [1, 0, 0, '']
+    let indent.restore_indent = 1
+  elseif opt.autoindent == 2
+    let [&l:smartindent, &l:cindent, &l:indentexpr] = [1, 0, '']
+    let indent.restore_indent = 1
+  elseif opt.autoindent == 3
+    let [&l:cindent, &l:indentexpr] = [1, '']
+    let indent.restore_indent = 1
+  endif
+
+  " set indentkeys
+  if &l:indentexpr !=# ''
+    let indent.indentkeys = &l:indentkeys
+    call self.set_indentkeys('indentkeys')
+  elseif &l:cindent
+    let indent.indentkeys = &l:cinkeys
+    call self.set_indentkeys('cinkeys')
+  endif
+endfunction
+"}}}
+function! s:restore_indent() dict abort  "{{{
+  let opt    = self.opt.integrated
+  let indent = self.indent
+
+  " restore indentkeys first
+  if indent.restore_indentkeys
+    if &l:indentexpr !=# ''
+      let &l:indentkeys = indent.indentkeys
+    elseif &l:cindent
+      let &l:cinkeys = indent.indentkeys
+    endif
+  endif
+
+  " restore autoindent options
+  if indent.restore_indent
+    if opt.autoindent == 0
+      let [&l:autoindent, &l:smartindent, &l:cindent, &l:indentexpr] = indent.autoindent
+    elseif opt.autoindent == 1
+      let [&l:autoindent, &l:smartindent, &l:cindent, &l:indentexpr] = indent.autoindent
+    elseif opt.autoindent == 2
+      let [&l:smartindent, &l:cindent, &l:indentexpr] = indent.autoindent[1:]
+    elseif opt.autoindent == 3
+      let [&l:cindent, &l:indentexpr] = indent.autoindent[2:]
+    endif
+  endif
+endfunction
+"}}}
+function! s:set_indentkeys(indentkeys) dict abort  "{{{
+  let opt    = self.opt.integrated
+  let indent = self.indent
+
+  if opt['indentkeys'] !=# ''
+    execute 'setlocal ' . a:indentkeys . '=' . opt['indentkeys']
+    let indent.restore_indentkeys = 1
+  endif
+
+  if opt['indentkeys+'] !=# ''
+    execute 'setlocal ' . a:indentkeys . '+=' . opt['indentkeys+']
+    let indent.restore_indentkeys = 1
+  endif
+
+  if opt['indentkeys-'] !=# ''
+    " It looks there is no way to add ',' itself to 'indentkeys'
+    for item in split(opt['indentkeys-'], ',')
+      execute 'setlocal ' . a:indentkeys . '-=' . item
+    endfor
+    let indent.restore_indentkeys = 1
+  endif
+endfunction
+"}}}
 " act object  {{{
 let s:act = {
       \   'region' : copy(s:null_2pos),
       \   'target' : copy(s:null_4pos),
       \   'cursor' : {},
       \   'modmark': {},
+      \   'indent' : {},
       \ }
 let s:act.add_once     = function('s:add_once')
 let s:act.delete_once  = function('s:delete_once')
 let s:act.replace_once = function('s:replace_once')
 let s:act.search       = function('s:search')
+let s:act.set_indent   = function('s:set_indent')
+let s:act.restore_indent = function('s:restore_indent')
+let s:act.set_indentkeys = function('s:set_indentkeys')
 "}}}
 
 function! s:query(recipes) dict abort  "{{{
@@ -2041,6 +2138,16 @@ function! s:highlight_del(id) abort "{{{
 endfunction
 "}}}
 
+" alternative of 'normal! o' and 'normal! O' with same indentation
+function! s:add_newline(lnum, o, ...) abort  "{{{
+  let lnum = a:o ==# 'O' ? a:lnum - 1 : a:lnum
+  let indent = a:0 > 0 ? a:1 : indent(a:lnum)
+  call append(lnum, repeat(' ', indent))
+  call setpos('.', [0, lnum + 1, col([lnum + 1, '$']), 0])
+  retab!
+endfunction
+"}}}
+
 " miscellaneous
 function! s:get_cursorchar(pos) abort "{{{
   let reg = [getreg('"'), getregtype('"')]
@@ -2144,7 +2251,7 @@ if exists('g:operator#sandwich#default_recipes')
   unlockvar! g:operator#sandwich#default_recipes
 endif
 let g:operator#sandwich#default_recipes = [
-      \   {'buns': ['input("operator-sandwich:head: ")', 'input("operator-sandwich:tail: ")'], 'kind': ['add', 'replace'], 'expr': 1, 'input': ['i']},
+      \   {'buns': ['input("operator-sandwich:head: ")', 'input("operator-sandwich:tail: ")'], 'kind': ['add', 'replace'], 'action': ['add'], 'expr': 1, 'input': ['i']},
       \ ]
 lockvar! g:operator#sandwich#default_recipes
 "}}}
@@ -2153,15 +2260,18 @@ lockvar! g:operator#sandwich#default_recipes
 let s:default_opt = {}
 let s:default_opt.add = {}
 let s:default_opt.add.char = {
-      \   'cursor'    : 'inner_head',
-      \   'query_once': 0,
-      \   'expr'      : 0,
-      \   'noremap'   : 1,
-      \   'skip_space': 0,
-      \   'highlight' : 1,
-      \   'command'   : [],
-      \   'linewise'  : 0,
-      \   'addition'  : 1,
+      \   'cursor'     : 'inner_head',
+      \   'query_once' : 0,
+      \   'expr'       : 0,
+      \   'noremap'    : 1,
+      \   'skip_space' : 0,
+      \   'highlight'  : 1,
+      \   'command'    : [],
+      \   'linewise'   : 0,
+      \   'autoindent' : 1,
+      \   'indentkeys' : '',
+      \   'indentkeys+': '',
+      \   'indentkeys-': '',
       \ }
 let s:default_opt.add.line = {
       \   'cursor'    : 'inner_head',
@@ -2172,7 +2282,10 @@ let s:default_opt.add.line = {
       \   'highlight' : 1,
       \   'command'   : [],
       \   'linewise'  : 1,
-      \   'addition'  : 1,
+      \   'autoindent' : 1,
+      \   'indentkeys' : '',
+      \   'indentkeys+': '',
+      \   'indentkeys-': '',
       \ }
 let s:default_opt.add.block = {
       \   'cursor'    : 'inner_head',
@@ -2183,7 +2296,10 @@ let s:default_opt.add.block = {
       \   'highlight' : 1,
       \   'command'   : [],
       \   'linewise'  : 0,
-      \   'addition'  : 1,
+      \   'autoindent' : 1,
+      \   'indentkeys' : '',
+      \   'indentkeys+': '',
+      \   'indentkeys-': '',
       \ }
 let s:default_opt.delete = {}
 let s:default_opt.delete.char = {
@@ -2195,7 +2311,6 @@ let s:default_opt.delete.char = {
       \   'highlight' : 1,
       \   'command'   : [],
       \   'linewise'  : 0,
-      \   'deletion'  : 1,
       \ }
 let s:default_opt.delete.line = {
       \   'cursor'    : 'inner_head',
@@ -2206,7 +2321,6 @@ let s:default_opt.delete.line = {
       \   'highlight' : 1,
       \   'command'   : [],
       \   'linewise'  : 1,
-      \   'deletion'  : 1,
       \ }
 let s:default_opt.delete.block = {
       \   'cursor'    : 'inner_head',
@@ -2217,7 +2331,6 @@ let s:default_opt.delete.block = {
       \   'highlight' : 1,
       \   'command'   : [],
       \   'linewise'  : 0,
-      \   'deletion'  : 1,
       \ }
 let s:default_opt.replace = {}
 let s:default_opt.replace.char = {
@@ -2231,8 +2344,10 @@ let s:default_opt.replace.char = {
       \   'highlight' : 1,
       \   'command'   : [],
       \   'linewise'  : 0,
-      \   'addition'  : 1,
-      \   'deletion'  : 1,
+      \   'autoindent' : 1,
+      \   'indentkeys' : '',
+      \   'indentkeys+': '',
+      \   'indentkeys-': '',
       \ }
 let s:default_opt.replace.line = {
       \   'cursor'    : 'inner_head',
@@ -2245,8 +2360,10 @@ let s:default_opt.replace.line = {
       \   'highlight' : 1,
       \   'command'   : [],
       \   'linewise'  : 1,
-      \   'addition'  : 1,
-      \   'deletion'  : 1,
+      \   'autoindent' : 1,
+      \   'indentkeys' : '',
+      \   'indentkeys+': '',
+      \   'indentkeys-': '',
       \ }
 let s:default_opt.replace.block = {
       \   'cursor'    : 'inner_head',
@@ -2259,8 +2376,10 @@ let s:default_opt.replace.block = {
       \   'highlight' : 1,
       \   'command'   : [],
       \   'linewise'  : 0,
-      \   'addition'  : 1,
-      \   'deletion'  : 1,
+      \   'autoindent' : 1,
+      \   'indentkeys' : '',
+      \   'indentkeys+': '',
+      \   'indentkeys-': '',
       \ }
 function! s:initialize_options(...) abort  "{{{
   let manner = a:0 ? a:1 : 'keep'
