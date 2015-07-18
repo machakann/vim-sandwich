@@ -434,7 +434,6 @@ function! s:add_once(buns, undojoin, done, next_act) dict abort "{{{
       call self.set_indent()
 
       try
-        echom string([&l:cindent, &l:indentexpr, &l:cinkeys, &l:indentkeys])
         call setpos('.', target.head2)
         if opt.linewise
           execute undojoin_cmd . startinsert_o . a:buns[1]
