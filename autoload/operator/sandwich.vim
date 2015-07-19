@@ -1024,10 +1024,11 @@ function! s:show() dict abort "{{{
 endfunction
 "}}}
 function! s:command() dict abort  "{{{
+  let modmark = self.modmark
   let head = getpos("'[")
   let tail = getpos("']")
-  call setpos("'[", self.cursor.inner_head)
-  call setpos("']", self.cursor.inner_tail)
+  call setpos("'[", modmark.head)
+  call setpos("']", modmark.tail)
   for cmd in self.opt.integrated.command
     execute cmd
   endfor

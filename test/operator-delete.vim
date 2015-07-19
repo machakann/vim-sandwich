@@ -1077,14 +1077,12 @@ function! s:suite.charwise_n_option_skip_char() abort "{{{
 endfunction
 "}}}
 function! s:suite.charwise_n_option_command() abort  "{{{
-  call operator#sandwich#set('delete', 'char', 'command', ['normal! `[dv`]'])
+  call operator#sandwich#set('delete', 'char', 'command', ['normal! `[d`]'])
 
   " #125
   call setline('.', '(foo)')
   normal 0sda(
   call g:assert.equals(getline('.'), '', 'failed at #125')
-
-  call operator#sandwich#set('delete', 'char', 'command', [])
 endfunction
 "}}}
 function! s:suite.charwise_n_option_linewise() abort  "{{{
@@ -1636,14 +1634,12 @@ function! s:suite.charwise_x_option_skip_char() abort "{{{
 endfunction
 "}}}
 function! s:suite.charwise_x_option_command() abort  "{{{
-  call operator#sandwich#set('delete', 'char', 'command', ['normal! `[dv`]'])
+  call operator#sandwich#set('delete', 'char', 'command', ['normal! `[d`]'])
 
   " #132
   call setline('.', '(foo)')
   normal 0va(sd
   call g:assert.equals(getline('.'), '', 'failed at #132')
-
-  call operator#sandwich#set('delete', 'char', 'command', [])
 endfunction
 "}}}
 function! s:suite.charwise_x_option_linewise() abort  "{{{
@@ -2313,14 +2309,12 @@ function! s:suite.linewise_n_option_skip_char() abort "{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_option_command() abort  "{{{
-  call operator#sandwich#set('delete', 'line', 'command', ['normal! `[dv`]'])
+  call operator#sandwich#set('delete', 'line', 'command', ['normal! `[d`]'])
 
   " #208
   call setline('.', '(foo)')
   normal 0sdVl
   call g:assert.equals(getline('.'), '', 'failed at #208')
-
-  call operator#sandwich#set('delete', 'line', 'command', [])
 endfunction
 "}}}
 function! s:suite.linewise_n_option_linewise() abort  "{{{
@@ -2992,14 +2986,12 @@ function! s:suite.linewise_x_option_skip_char() abort "{{{
 endfunction
 "}}}
 function! s:suite.linewise_x_option_command() abort  "{{{
-  call operator#sandwich#set('delete', 'line', 'command', ['normal! `[dv`]'])
+  call operator#sandwich#set('delete', 'line', 'command', ['normal! `[d`]'])
 
   " #282
   call setline('.', '(foo)')
   normal 0Vsd
   call g:assert.equals(getline('.'), '', 'failed at #282')
-
-  call operator#sandwich#set('delete', 'line', 'command', [])
 endfunction
 "}}}
 function! s:suite.linewise_x_option_linewise() abort  "{{{
@@ -3823,7 +3815,7 @@ endfunction
 "}}}
 function! s:suite.blockwise_n_option_command() abort  "{{{
   set whichwrap=h,l
-  call operator#sandwich#set('delete', 'block', 'command', ['normal! `[dv`]'])
+  call operator#sandwich#set('delete', 'block', 'command', ['normal! `[d`]'])
 
   " #354
   call append(0, ['(foo)', '(bar)', '(baz)'])
@@ -3831,9 +3823,6 @@ function! s:suite.blockwise_n_option_command() abort  "{{{
   call g:assert.equals(getline(1), '', 'failed at #354')
   call g:assert.equals(getline(2), '', 'failed at #354')
   call g:assert.equals(getline(3), '', 'failed at #354')
-
-  set whichwrap&
-  call operator#sandwich#set('delete', 'block', 'command', [])
 endfunction
 "}}}
 
@@ -4546,7 +4535,7 @@ function! s:suite.blockwise_x_option_skip_char() abort "{{{
 endfunction
 "}}}
 function! s:suite.blockwise_x_option_command() abort  "{{{
-  call operator#sandwich#set('delete', 'block', 'command', ['normal! `[dv`]'])
+  call operator#sandwich#set('delete', 'block', 'command', ['normal! `[d`]'])
 
   " #419
   call append(0, ['(foo)', '(bar)', '(baz)'])
@@ -4554,8 +4543,6 @@ function! s:suite.blockwise_x_option_command() abort  "{{{
   call g:assert.equals(getline(1), '', 'failed at #419')
   call g:assert.equals(getline(2), '', 'failed at #419')
   call g:assert.equals(getline(3), '', 'failed at #419')
-
-  call operator#sandwich#set('delete', 'block', 'command', [])
 endfunction
 "}}}
 

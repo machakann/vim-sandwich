@@ -136,17 +136,13 @@ let g:sandwich#recipes += [
       \     'buns'        : ['{', '}'],
       \     'motionwise'  : ['line'],
       \     'kind'        : ['add'],
-      \     'command'     : ["'[,']normal! >>"],
-      \     'nesting'     : 1,
-      \     'match_syntax': 1,
+      \     'command'     : ["'[+1,']-1normal! >>"],
       \   },
       \   {
       \     'buns'        : ['{', '}'],
       \     'motionwise'  : ['line'],
       \     'kind'        : ['delete'],
       \     'command'     : ["'[,']normal! <<"],
-      \     'nesting'     : 1,
-      \     'match_syntax': 1,
       \   }
       \ ]
 ```

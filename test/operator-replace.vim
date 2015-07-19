@@ -1970,14 +1970,12 @@ function! s:suite.charwise_n_option_skip_char() abort "{{{
 endfunction
 "}}}
 function! s:suite.charwise_n_option_command() abort  "{{{
-  call operator#sandwich#set('replace', 'char', 'command', ['normal! `[dv`]'])
+  call operator#sandwich#set('replace', 'char', 'command', ['normal! `[d`]'])
 
   " #207
-  call setline('.', '(foo)')
-  normal 0sra("
-  call g:assert.equals(getline('.'), '""', 'failed at #207')
-
-  call operator#sandwich#set('replace', 'char', 'command', [])
+  call setline('.', '[(foo)]')
+  normal 0ffsra("
+  call g:assert.equals(getline('.'), '[]', 'failed at #207')
 endfunction
 "}}}
 function! s:suite.charwise_n_option_linewise() abort  "{{{
@@ -3376,14 +3374,12 @@ function! s:suite.charwise_x_option_skip_char() abort "{{{
 endfunction
 "}}}
 function! s:suite.charwise_x_option_command() abort  "{{{
-  call operator#sandwich#set('replace', 'char', 'command', ['normal! `[dv`]'])
+  call operator#sandwich#set('replace', 'char', 'command', ['normal! `[d`]'])
 
   " #318
-  call setline('.', '(foo)')
-  normal 0va(sr"
-  call g:assert.equals(getline('.'), '""', 'failed at #318')
-
-  call operator#sandwich#set('replace', 'char', 'command', [])
+  call setline('.', '[(foo)]')
+  normal 0ffva(sr"
+  call g:assert.equals(getline('.'), '[]', 'failed at #318')
 endfunction
 "}}}
 function! s:suite.charwise_x_option_linewise() abort  "{{{
@@ -4769,15 +4765,14 @@ endfunction
 "}}}
 function! s:suite.linewise_n_option_command() abort  "{{{
   call operator#sandwich#set('replace', 'line', 'linewise', 1)
-
-  call operator#sandwich#set('replace', 'line', 'command', ['normal! `[dv`]'])
+  call operator#sandwich#set('replace', 'line', 'command', ['normal! `[d`]'])
 
   " #419
-  call setline('.', '(foo)')
-  normal 0srVl"
-  call g:assert.equals(getline('.'), '""', 'failed at #419')
-
-  call operator#sandwich#set('replace', 'line', 'command', [])
+  call append(0, ['[', '(foo)', ']'])
+  normal ggjsrVl"
+  call g:assert.equals(getline(1), '[', 'failed at #419')
+  call g:assert.equals(getline(2), '',  'failed at #419')
+  call g:assert.equals(getline(3), ']', 'failed at #419')
 endfunction
 "}}}
 function! s:suite.linewise_n_option_linewise() abort  "{{{
@@ -6281,15 +6276,14 @@ endfunction
 "}}}
 function! s:suite.linewise_x_option_command() abort  "{{{
   call operator#sandwich#set('replace', 'line', 'linewise', 1)
-
-  call operator#sandwich#set('replace', 'line', 'command', ['normal! `[dv`]'])
+  call operator#sandwich#set('replace', 'line', 'command', ['normal! `[d`]'])
 
   " #524
-  call setline('.', '(foo)')
-  normal Vsr"
-  call g:assert.equals(getline('.'), '""', 'failed at #524')
-
-  call operator#sandwich#set('replace', 'line', 'command', [])
+  call append(0, ['[', '(foo)', ']'])
+  normal ggjVsr"
+  call g:assert.equals(getline(1), '[', 'failed at #524')
+  call g:assert.equals(getline(2), '',  'failed at #524')
+  call g:assert.equals(getline(3), ']', 'failed at #524')
 endfunction
 "}}}
 function! s:suite.linewise_x_option_linewise() abort  "{{{
@@ -7904,12 +7898,9 @@ function! s:suite.blockwise_n_option_command() abort  "{{{
   " #627
   call append(0, ['(foo)', '(bar)', '(baz)'])
   execute "normal ggsr\<C-v>17l\""
-  call g:assert.equals(getline(1), '""', 'failed at #627')
-  call g:assert.equals(getline(2), '""', 'failed at #627')
-  call g:assert.equals(getline(3), '""', 'failed at #627')
-
-  set whichwrap&
-  call operator#sandwich#set('replace', 'block', 'command', [])
+  call g:assert.equals(getline(1), '', 'failed at #627')
+  call g:assert.equals(getline(2), '', 'failed at #627')
+  call g:assert.equals(getline(3), '', 'failed at #627')
 endfunction
 "}}}
 function! s:suite.blockwise_n_option_query_once() abort  "{{{
@@ -9350,9 +9341,9 @@ function! s:suite.blockwise_x_option_command() abort  "{{{
   " #724
   call append(0, ['(foo)', '(bar)', '(baz)'])
   execute "normal gg\<C-v>2j4lsr\""
-  call g:assert.equals(getline(1), '""', 'failed at #724')
-  call g:assert.equals(getline(2), '""', 'failed at #724')
-  call g:assert.equals(getline(3), '""', 'failed at #724')
+  call g:assert.equals(getline(1), '', 'failed at #724')
+  call g:assert.equals(getline(2), '', 'failed at #724')
+  call g:assert.equals(getline(3), '', 'failed at #724')
 
   call operator#sandwich#set('replace', 'block', 'command', [])
 endfunction

@@ -1085,12 +1085,10 @@ endfunction
 function! s:suite.charwise_n_option_command() abort  "{{{
   """"" command
   " #122
-  call operator#sandwich#set('add', 'char', 'command', ['normal! `[dv`]'])
-  call setline('.', 'foo')
-  normal 0saiw(
-  call g:assert.equals(getline('.'), '()',  'failed at #122')
-
-  call operator#sandwich#set('add', 'char', 'command', [])
+  call operator#sandwich#set('add', 'char', 'command', ['normal! `[d`]'])
+  call setline('.', '"foo"')
+  normal 0ffsaiw(
+  call g:assert.equals(getline('.'), '""',  'failed at #122')
 endfunction
 "}}}
 function! s:suite.charwise_n_option_linewise() abort "{{{
@@ -2143,10 +2141,10 @@ endfunction
 function! s:suite.charwise_x_option_command() abort  "{{{
   """"" command
   " #193
-  call operator#sandwich#set('add', 'char', 'command', ["normal! `[dv`]"])
-  call setline('.', 'foo')
-  normal 0viwsa(
-  call g:assert.equals(getline('.'), '()',  'failed at #193')
+  call operator#sandwich#set('add', 'char', 'command', ["normal! `[d`]"])
+  call setline('.', '"foo"')
+  normal 0ffviwsa(
+  call g:assert.equals(getline('.'), '""',  'failed at #193')
 
   call operator#sandwich#set('add', 'char', 'command', [])
 endfunction
@@ -3391,14 +3389,11 @@ endfunction
 function! s:suite.linewise_n_option_command() abort  "{{{
   """"" command
   " #266
-  call operator#sandwich#set('add', 'line', 'command', ["normal! `[dv`]"])
-  call setline('.', 'foo')
-  normal 0saViw(
-  call g:assert.equals(getline(1), '(', 'failed at #266')
-  call g:assert.equals(getline(2), '',  'failed at #266')
-  call g:assert.equals(getline(3), ')', 'failed at #266')
-
-  call operator#sandwich#set('add', 'line', 'command', [])
+  call operator#sandwich#set('add', 'line', 'command', ["normal! `[d`]"])
+  call append(0, ['[', 'foo', ']'])
+  normal ggjsaViw(
+  call g:assert.equals(getline(1), '[', 'failed at #266')
+  call g:assert.equals(getline(2), ']', 'failed at #266')
 endfunction
 "}}}
 function! s:suite.linewise_n_option_linewise() abort "{{{
@@ -4634,14 +4629,11 @@ endfunction
 function! s:suite.linewise_x_option_command() abort  "{{{
   """"" command
   " #334
-  call operator#sandwich#set('add', 'line', 'command', ["normal! `[dv`]"])
-  call setline('.', 'foo')
-  normal Vsa(
-  call g:assert.equals(getline(1), '(', 'failed at #334')
-  call g:assert.equals(getline(2), '',  'failed at #334')
-  call g:assert.equals(getline(3), ')', 'failed at #334')
-
-  call operator#sandwich#set('add', 'line', 'command', [])
+  call operator#sandwich#set('add', 'line', 'command', ["normal! `[d`]"])
+  call append(0, ['[', 'foo', ']'])
+  normal ggjVsa(
+  call g:assert.equals(getline(1), '[', 'failed at #334')
+  call g:assert.equals(getline(2), ']', 'failed at #334')
 endfunction
 "}}}
 function! s:suite.linewise_x_option_linewise() abort "{{{
@@ -5938,12 +5930,10 @@ endfunction
 function! s:suite.blockwise_n_option_command() abort  "{{{
   """"" command
   " #413
-  call operator#sandwich#set('add', 'block', 'command', ['normal! `[dv`]'])
-  call setline('.', 'foo')
-  execute "normal 0sa\<C-v>iw("
-  call g:assert.equals(getline('.'), '()',  'failed at #413')
-
-  call operator#sandwich#set('add', 'block', 'command', [])
+  call operator#sandwich#set('add', 'block', 'command', ['normal! `[d`]'])
+  call setline('.', '"foo"')
+  execute "normal 0ffsa\<C-v>iw("
+  call g:assert.equals(getline('.'), '""',  'failed at #413')
 endfunction
 "}}}
 function! s:suite.blockwise_n_option_linewise() abort "{{{
@@ -7178,12 +7168,10 @@ endfunction
 function! s:suite.blockwise_x_option_command() abort  "{{{
   """"" command
   " #461
-  call operator#sandwich#set('add', 'block', 'command', ['normal! `[dv`]'])
-  call setline('.', 'foo')
-  execute "normal 0\<C-v>iwsa("
-  call g:assert.equals(getline('.'), '()',  'failed at #461')
-
-  call operator#sandwich#set('add', 'block', 'command', [])
+  call operator#sandwich#set('add', 'block', 'command', ['normal! `[d`]'])
+  call setline('.', '"foo"')
+  execute "normal 0ff\<C-v>iwsa("
+  call g:assert.equals(getline('.'), '""',  'failed at #461')
 endfunction
 "}}}
 function! s:suite.blockwise_x_option_linewise() abort "{{{

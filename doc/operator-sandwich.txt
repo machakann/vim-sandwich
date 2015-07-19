@@ -1024,14 +1024,14 @@ linewise
 
 command
 	This is a list of commands which is executed after an action. After an
-	action, the marks |'[| and |']| is set at the head and tail of a
-	surrounded text temporally.
+	action, the marks |'[| and |']| would be set at the head and the tail
+	of the modified region in each action.
 >
 	let g:sandwich#recipes += [
 	  \    {
 	  \      'buns'    : ['{', '}'],
 	  \      'linewise': 1,
-	  \      'command' : ["'[,']normal! >>"]
+	  \      'command' : ["'[+1,']-1normal! >>"]
 	  \    },
 	  \ ]
 	" Press saiw{
