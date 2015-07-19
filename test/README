@@ -1,0 +1,6 @@
+Use themis.vim (https://github.com/thinca/vim-themis)
+
+1. git clone https://github.com/thinca/vim-themis.git
+2. cd path/to/vim-sandwich
+3. path/to/vim-themis/bin/themis      (Linux)
+   path/to/vim-themis/bin/themis.bat  (Windows)
