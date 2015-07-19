@@ -10124,5 +10124,31 @@ function! s:suite.function_interface() abort  "{{{
 endfunction
 "}}}
 
+" Undo
+function! s:suite.undo() abort  "{{{
+  " #763
+  call setline('.', '(((foo)))')
+  " set undo point (see :help :undojoin)
+  let &undolevels = &undolevels
+  normal 0sr$"
+  normal! u
+  call g:assert.equals(getline('.'), '(((foo)))', 'failed at #763')
+
+  " #764
+  call setline('.', '(((foo)))')
+  let &undolevels = &undolevels
+  normal 02sr$""
+  normal! u
+  call g:assert.equals(getline('.'), '(((foo)))', 'failed at #764')
+
+  " #765
+  call setline('.', '(((foo)))')
+  let &undolevels = &undolevels
+  normal 03sr$"""
+  normal! u
+  call g:assert.equals(getline('.'), '(((foo)))', 'failed at #765')
+endfunction
+"}}}
+
 " vim:set foldmethod=marker:
 " vim:set commentstring="%s:
