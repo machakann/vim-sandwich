@@ -1,6 +1,10 @@
 vim-sandwich
 ============
 
+[![Build Status](https://travis-ci.org/machakann/vim-sandwich.svg)](https://travis-ci.org/machakann/vim-sandwich)
+[![Build status](https://ci.appveyor.com/api/projects/status/8hgvi5410lceq53x/branch/master?svg=true)](https://ci.appveyor.com/project/machakann/vim-sandwich/branch/master)
+
+
 **sandwich.vim** is a set of operator and textobject plugins to add/delete/replace surroundings of a sandwiched textobject, like `(foo)`, `"bar"`.
 
 # Quick start

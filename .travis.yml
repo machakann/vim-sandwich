@@ -1,0 +1,8 @@
+language: generic
+
+install:
+    - git clone https://github.com/thinca/vim-themis
+
+script:
+    - vim --version
+    - ./vim-themis/bin/themis test/
