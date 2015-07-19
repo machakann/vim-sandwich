@@ -1,9 +1,5 @@
 language: generic
 
-env:
-  - PPA=yes
-  - PPA=no
-
 install:
   - if [ x"$PPA" == "xyes" ] ; then sudo add-apt-repository ppa:pi-rho/dev -y; fi
   - sudo apt-get update -q
