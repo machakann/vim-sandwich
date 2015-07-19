@@ -5,7 +5,7 @@ vim-sandwich
 [![Build status](https://ci.appveyor.com/api/projects/status/8hgvi5410lceq53x/branch/master?svg=true)](https://ci.appveyor.com/project/machakann/vim-sandwich/branch/master)
 
 
-**sandwich.vim** is a set of operator and textobject plugins to add/delete/replace surroundings of a sandwiched textobject, like `(foo)`, `"bar"`.
+**sandwich.vim** is a set of operator and textobject plugins to add/delete/replace surroundings of a sandwiched textobject, like _(foo)_, _"bar"_.
 
 # Quick start
 
@@ -260,5 +260,5 @@ let g:textobj#sandwich#recipes += [
  func(arg)   --->   arg
 ```
 
-# Demo
+### Demo
 ![sandwich.vim](http://art61.photozou.jp/pub/986/3080986/photo/225310353_org.v1437233331.gif)
