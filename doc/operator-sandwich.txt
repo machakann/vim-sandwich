@@ -870,7 +870,7 @@ highlight
 
 skip_space
 	This option enables to skip spaces at both ends of a assigned region.
-	If the value is true, adjust the both ends to skip white spaces.
+	If the value is 1, adjust the both ends to skip white spaces.
 >
 	let g:sandwich#recipes += [
 	  \   {'buns': ['(', ')'], 'skip_space': 0}
@@ -895,6 +895,8 @@ skip_space
 	" Press sda"
 	"   ?"foo"   --->  ?foo    : ? is space
 <
+	If the value is 2, adjust the both ends to skip white spaces even
+	though the both ends are white spaces.
 
 	Default values
 	  * add
@@ -902,13 +904,13 @@ skip_space
 	    - line : 1
 	    - block: 1
 	  * delete
-	    - char : 1
-	    - line : 1
-	    - block: 1
+	    - char : 2
+	    - line : 2
+	    - block: 2
 	  * replace
-	    - char : 1
-	    - line : 1
-	    - block: 1
+	    - char : 2
+	    - line : 2
+	    - block: 2
 
 
 

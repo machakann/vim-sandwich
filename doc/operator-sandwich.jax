@@ -862,8 +862,8 @@ highlight
 
 
 skip_space
-	値が真なら、指定された文字列の両端がスペースであった場合にこれらをスキ
-	ップします。
+	値が 1 なら、指定された文字列の両端がスペースであった場合にこれらをス
+	キップします。
 >
 	let g:sandwich#recipes += [
 	  \   {'buns': ['(', ')'], 'skip_space': 0}
@@ -887,6 +887,7 @@ skip_space
 	" Press sda"
 	"   ?"foo"   --->  ?foo    : ? is space
 <
+	両端が空白の場合にもこれをスキップするためには値を 2 にします。
 
 	デフォルト値
 	  * add
@@ -895,11 +896,11 @@ skip_space
 	    - block: 1
 	  * delete
 	    - char : 1
-	    - line : 1
+	    - line : 2
 	    - block: 1
 	  * replace
 	    - char : 1
-	    - line : 1
+	    - line : 2
 	    - block: 1
 
 

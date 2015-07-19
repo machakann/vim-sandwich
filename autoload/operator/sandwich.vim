@@ -737,7 +737,7 @@ function! s:search(recipes) dict abort "{{{
       if i == 1 || opt.integrated.skip_space
         let head_c = s:get_cursorchar(head)
         let tail_c = s:get_cursorchar(tail)
-        if head_c ==# tail_c
+        if head_c ==# tail_c && !(opt.integrated.skip_space == 2 && head_c =~# '\s')
           let target = {
                 \   'head1': head, 'tail1': head,
                 \   'head2': tail, 'tail2': tail,
@@ -2305,7 +2305,7 @@ let s:default_opt.delete.line = {
       \   'cursor'    : 'inner_head',
       \   'noremap'   : 1,
       \   'regex'     : 0,
-      \   'skip_space': 1,
+      \   'skip_space': 2,
       \   'skip_char' : 0,
       \   'highlight' : 1,
       \   'command'   : [],
@@ -2344,7 +2344,7 @@ let s:default_opt.replace.line = {
       \   'regex'     : 0,
       \   'expr'      : 0,
       \   'noremap'   : 1,
-      \   'skip_space': 1,
+      \   'skip_space': 2,
       \   'skip_char' : 0,
       \   'highlight' : 1,
       \   'command'   : [],
