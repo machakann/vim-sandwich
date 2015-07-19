@@ -2137,16 +2137,6 @@ function! s:highlight_del(id) abort "{{{
 endfunction
 "}}}
 
-" alternative of 'normal! o' and 'normal! O' with same indentation
-function! s:add_newline(lnum, o, ...) abort  "{{{
-  let lnum = a:o ==# 'O' ? a:lnum - 1 : a:lnum
-  let indent = a:0 > 0 ? a:1 : indent(a:lnum)
-  call append(lnum, repeat(' ', indent))
-  call setpos('.', [0, lnum + 1, col([lnum + 1, '$']), 0])
-  retab!
-endfunction
-"}}}
-
 " miscellaneous
 function! s:get_cursorchar(pos) abort "{{{
   let reg = [getreg('"'), getregtype('"')]
