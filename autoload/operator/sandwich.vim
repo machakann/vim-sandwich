@@ -2358,7 +2358,7 @@ let s:default_opt.replace.line = {
       \   'skip_char' : 0,
       \   'highlight' : 1,
       \   'command'   : [],
-      \   'linewise'  : 1,
+      \   'linewise'  : 0,
       \   'autoindent' : 1,
       \   'indentkeys' : '',
       \   'indentkeys+': '',

@@ -4145,6 +4145,8 @@ endfunction
 
 " line-wise
 function! s:suite.linewise_n_default_recipes() abort "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   " #351
   call setline('.', '(foo)')
   normal srVl[
@@ -4221,6 +4223,8 @@ function! s:suite.linewise_n_default_recipes() abort "{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_not_registered() abort "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   " #359
   call setline('.', 'afooa')
   normal srVlb
@@ -4263,6 +4267,8 @@ function! s:suite.linewise_n_not_registered() abort "{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_positioning() abort "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   " #361
   call append(0, ['(', 'foo', 'bar', 'baz', ')'])
   normal ggsrVa([
@@ -4303,6 +4309,8 @@ function! s:suite.linewise_n_positioning() abort "{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_nothing_inside() abort "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   " #364
   call setline('.', '()')
   normal srVa([
@@ -4324,6 +4332,8 @@ function! s:suite.linewise_n_nothing_inside() abort "{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_count() abort "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   " #366
   call setline('.', '([foo])')
   normal 2srVl[(
@@ -4360,6 +4370,8 @@ function! s:suite.linewise_n_count() abort "{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_breaking() abort "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   let g:operator#sandwich#recipes = [
         \   {'buns': ["aa\naaa", "aaa\naa"], 'input':['a']},
         \   {'buns': ["bb\nbbb\nbb", "bb\nbbb\nbb"], 'input':['b']},
@@ -4441,6 +4453,8 @@ function! s:suite.linewise_n_breaking() abort "{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_external_textobj() abort"{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   let g:sandwich#recipes = []
   let g:operator#sandwich#recipes = [
         \   {'external': ['i{', 'a{']},
@@ -4474,6 +4488,8 @@ function! s:suite.linewise_n_external_textobj() abort"{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_option_cursor() abort  "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   """"" cursor
   """ inner_head
   " #379
@@ -4543,6 +4559,8 @@ function! s:suite.linewise_n_option_cursor() abort  "{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_option_noremap() abort  "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   """"" noremap
   let g:sandwich#recipes = []
   let g:operator#sandwich#recipes = [{'external': ['i{', 'a{']}]
@@ -4580,6 +4598,8 @@ function! s:suite.linewise_n_option_noremap() abort  "{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_option_regex() abort  "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   let g:sandwich#recipes = []
   let g:operator#sandwich#recipes = [{'buns': ['\d\+', '\d\+']}]
 
@@ -4612,6 +4632,8 @@ function! s:suite.linewise_n_option_regex() abort  "{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_option_skip_space() abort  "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   """ on
   " #397
   call setline('.', '"foo"')
@@ -4661,6 +4683,8 @@ function! s:suite.linewise_n_option_skip_space() abort  "{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_option_skip_char() abort "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   """ off
   " #405
   call setline('.', 'aa(foo)bb')
@@ -4678,6 +4702,8 @@ function! s:suite.linewise_n_option_skip_char() abort "{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_option_command() abort  "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   call operator#sandwich#set('replace', 'line', 'command', ['normal! `[dv`]'])
 
   " #407
@@ -4689,6 +4715,8 @@ function! s:suite.linewise_n_option_command() abort  "{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_option_linewise() abort  "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   call operator#sandwich#set('replace', 'line', 'linewise', 0)
 
   """ 0
@@ -4805,6 +4833,8 @@ function! s:suite.linewise_n_option_linewise() abort  "{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_option_query_once() abort  "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   """"" query_once
   """ off
   " #417
@@ -4825,6 +4855,8 @@ function! s:suite.linewise_n_option_query_once() abort  "{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_option_expr() abort "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   """"" expr
   let g:operator#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'input':['a']}]
 
@@ -4850,6 +4882,8 @@ function! s:suite.linewise_n_option_expr() abort "{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_option_autoindent() abort  "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   set expandtab
   set shiftwidth=4
   set softtabstop=4
@@ -5477,6 +5511,7 @@ function! s:suite.linewise_n_option_indentkeys() abort  "{{{
 
   %delete
   call operator#sandwich#set_default()
+  call operator#sandwich#set('replace', 'line', 'linewise', 2)
   call operator#sandwich#set('replace', 'line', 'autoindent', 3)
 
   " #447
@@ -5500,6 +5535,7 @@ function! s:suite.linewise_n_option_indentkeys() abort  "{{{
 
   %delete
   call operator#sandwich#set_default()
+  call operator#sandwich#set('replace', 'line', 'linewise', 2)
   call operator#sandwich#set('replace', 'line', 'autoindent', 3)
 
   " #448
@@ -5526,6 +5562,7 @@ function! s:suite.linewise_n_option_indentkeys() abort  "{{{
 
   """ indentkeys
   setlocal indentexpr=TestIndent()
+  call operator#sandwich#set('replace', 'line', 'linewise', 2)
   call operator#sandwich#set('replace', 'line', 'autoindent', -1)
 
   " #449
@@ -5549,6 +5586,7 @@ function! s:suite.linewise_n_option_indentkeys() abort  "{{{
 
   %delete
   call operator#sandwich#set_default()
+  call operator#sandwich#set('replace', 'line', 'linewise', 2)
   call operator#sandwich#set('replace', 'line', 'autoindent', -1)
 
   " #450
@@ -5572,6 +5610,7 @@ function! s:suite.linewise_n_option_indentkeys() abort  "{{{
 
   %delete
   call operator#sandwich#set_default()
+  call operator#sandwich#set('replace', 'line', 'linewise', 2)
   call operator#sandwich#set('replace', 'line', 'autoindent', -1)
 
   " #451
@@ -5596,6 +5635,8 @@ endfunction
 "}}}
 
 function! s:suite.linewise_x_default_recipes() abort "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   " #452
   call setline('.', '(foo)')
   normal Vsr[
@@ -5672,6 +5713,8 @@ function! s:suite.linewise_x_default_recipes() abort "{{{
 endfunction
 "}}}
 function! s:suite.linewise_x_not_registered() abort "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   " #460
   call setline('.', 'afooa')
   normal Vsrb
@@ -5714,6 +5757,8 @@ function! s:suite.linewise_x_not_registered() abort "{{{
 endfunction
 "}}}
 function! s:suite.linewise_x_positioning() abort "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   " #462
   call append(0, ['(', 'foo', 'bar', 'baz', ')'])
   normal ggV4jsr[
@@ -5754,6 +5799,8 @@ function! s:suite.linewise_x_positioning() abort "{{{
 endfunction
 "}}}
 function! s:suite.linewise_x_nothing_inside() abort "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   " #465
   call setline('.', '()')
   normal Vsr[
@@ -5775,6 +5822,8 @@ function! s:suite.linewise_x_nothing_inside() abort "{{{
 endfunction
 "}}}
 function! s:suite.linewise_x_count() abort "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   " #467
   call setline('.', '([foo])')
   normal V2sr[(
@@ -5811,6 +5860,8 @@ function! s:suite.linewise_x_count() abort "{{{
 endfunction
 "}}}
 function! s:suite.linewise_x_breaking() abort "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   let g:operator#sandwich#recipes = [
         \   {'buns': ["aa\naaa", "aaa\naa"], 'input':['a']},
         \   {'buns': ["bb\nbbb\nbb", "bb\nbbb\nbb"], 'input':['b']},
@@ -5892,6 +5943,8 @@ function! s:suite.linewise_x_breaking() abort "{{{
 endfunction
 "}}}
 function! s:suite.linewise_x_external_textobj() abort"{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   let g:sandwich#recipes = []
   let g:operator#sandwich#recipes = [
         \   {'external': ['i{', 'a{']},
@@ -5925,6 +5978,8 @@ function! s:suite.linewise_x_external_textobj() abort"{{{
 endfunction
 "}}}
 function! s:suite.linewise_x_option_cursor() abort  "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   """"" cursor
   """ inner_head
   " #480
@@ -5994,6 +6049,8 @@ function! s:suite.linewise_x_option_cursor() abort  "{{{
 endfunction
 "}}}
 function! s:suite.linewise_x_option_noremap() abort  "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   """"" noremap
   let g:sandwich#recipes = []
   let g:operator#sandwich#recipes = [{'external': ['i{', 'a{']}]
@@ -6031,6 +6088,8 @@ function! s:suite.linewise_x_option_noremap() abort  "{{{
 endfunction
 "}}}
 function! s:suite.linewise_x_option_regex() abort  "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   let g:sandwich#recipes = []
   let g:operator#sandwich#recipes = [{'buns': ['\d\+', '\d\+']}]
 
@@ -6063,6 +6122,8 @@ function! s:suite.linewise_x_option_regex() abort  "{{{
 endfunction
 "}}}
 function! s:suite.linewise_x_option_skip_space() abort  "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   """ on
   " #498
   call setline('.', '"foo"')
@@ -6112,6 +6173,8 @@ function! s:suite.linewise_x_option_skip_space() abort  "{{{
 endfunction
 "}}}
 function! s:suite.linewise_x_option_skip_char() abort "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   """ off
   " #506
   call setline('.', 'aa(foo)bb')
@@ -6129,6 +6192,8 @@ function! s:suite.linewise_x_option_skip_char() abort "{{{
 endfunction
 "}}}
 function! s:suite.linewise_x_option_command() abort  "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   call operator#sandwich#set('replace', 'line', 'command', ['normal! `[dv`]'])
 
   " #508
@@ -6140,6 +6205,8 @@ function! s:suite.linewise_x_option_command() abort  "{{{
 endfunction
 "}}}
 function! s:suite.linewise_x_option_linewise() abort  "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   call operator#sandwich#set('replace', 'line', 'linewise', 0)
 
   """ 0
@@ -6256,6 +6323,8 @@ function! s:suite.linewise_x_option_linewise() abort  "{{{
 endfunction
 "}}}
 function! s:suite.linewise_x_option_query_once() abort  "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   """"" query_once
   """ off
   " #518
@@ -6276,6 +6345,8 @@ function! s:suite.linewise_x_option_query_once() abort  "{{{
 endfunction
 "}}}
 function! s:suite.linewise_x_option_expr() abort "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   """"" expr
   let g:operator#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'input':['a']}]
 
@@ -6301,6 +6372,8 @@ function! s:suite.linewise_x_option_expr() abort "{{{
 endfunction
 "}}}
 function! s:suite.linewise_x_option_autoindent() abort  "{{{
+  call operator#sandwich#set('replace', 'line', 'linewise', 1)
+
   set expandtab
   set shiftwidth=4
   set softtabstop=4
@@ -6928,6 +7001,7 @@ function! s:suite.linewise_x_option_indentkeys() abort  "{{{
 
   %delete
   call operator#sandwich#set_default()
+  call operator#sandwich#set('replace', 'line', 'linewise', 2)
   call operator#sandwich#set('replace', 'line', 'autoindent', 3)
 
   " #548
@@ -6951,6 +7025,7 @@ function! s:suite.linewise_x_option_indentkeys() abort  "{{{
 
   %delete
   call operator#sandwich#set_default()
+  call operator#sandwich#set('replace', 'line', 'linewise', 2)
   call operator#sandwich#set('replace', 'line', 'autoindent', 3)
 
   " #549
@@ -6977,6 +7052,7 @@ function! s:suite.linewise_x_option_indentkeys() abort  "{{{
 
   """ indentkeys
   setlocal indentexpr=TestIndent()
+  call operator#sandwich#set('replace', 'line', 'linewise', 2)
   call operator#sandwich#set('replace', 'line', 'autoindent', -1)
 
   " #550
@@ -7000,6 +7076,7 @@ function! s:suite.linewise_x_option_indentkeys() abort  "{{{
 
   %delete
   call operator#sandwich#set_default()
+  call operator#sandwich#set('replace', 'line', 'linewise', 2)
   call operator#sandwich#set('replace', 'line', 'autoindent', -1)
 
   " #551
@@ -7023,6 +7100,7 @@ function! s:suite.linewise_x_option_indentkeys() abort  "{{{
 
   %delete
   call operator#sandwich#set_default()
+  call operator#sandwich#set('replace', 'line', 'linewise', 2)
   call operator#sandwich#set('replace', 'line', 'autoindent', -1)
 
   " #552
