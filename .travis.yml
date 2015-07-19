@@ -12,7 +12,6 @@ install:
 
 before_script:
   - vim --version
-  - vint --version
 
 script:
   - ./vim-themis/bin/themis
