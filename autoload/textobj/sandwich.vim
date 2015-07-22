@@ -89,9 +89,7 @@
 "}}}
 
 " variables "{{{
-let s:type_num    = type(0)
-let s:type_str    = type('')
-let s:type_list   = type([])
+" null valiables
 let s:null_coord  = [0, 0]
 let s:null_2coord = {
       \   'head': copy(s:null_coord),
@@ -104,13 +102,13 @@ let s:null_4coord = {
       \   'inner_tail': copy(s:null_coord),
       \ }
 
-if v:version > 704 || (v:version == 704 && has('patch457'))
-  let s:cursorhold = "\<CursorHold>"
-else
-  let s:plug_cap = "\<Plug>"
-  let s:cursorhold = s:plug_cap[0:1] . '`'
-  unlet plug_cap
-endif
+" types
+let s:type_num    = type(0)
+let s:type_str    = type('')
+let s:type_list   = type([])
+
+" features
+let s:has_reltime_and_float = has('reltime') && has('float')
 "}}}
 
 """ Public funcs
@@ -213,7 +211,7 @@ function! s:clock_start() dict abort  "{{{
       let self.paused = 0
     endif
   else
-    if has('reltime') && has('float')
+    if s:has_reltime_and_float
       let self.zerotime = reltime()
       let self.started  = 1
     endif
@@ -743,8 +741,6 @@ function! s:query() dict abort  "{{{
         sleep 20m
         continue
       endif
-    elseif c ==# s:cursorhold
-      continue
     endif
 
     let c = type(c) == s:type_num ? nr2char(c) : c

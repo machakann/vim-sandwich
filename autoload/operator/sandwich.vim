@@ -82,7 +82,7 @@
 """ NOTE: Presumable Errors list"{{{
 " Handled in s:doautcmd()
 "   --> Some error in doautocmd.
-" 
+"
 " Handled in s:restview()
 "   --> Could not restore tabpage or window after doautocmd.
 "
@@ -221,15 +221,14 @@ function! operator#sandwich#query1st(kind, mode, ...) abort "{{{
   let arg_opt = get(a:000, 0, {})
   let arg_recipes = get(a:000, 1, [])
   call operator#sandwich#prerequisite(a:kind, a:mode, arg_opt, arg_recipes)
-  let operator     = g:operator#sandwich#object
+  let operator = g:operator#sandwich#object
   let operator.num = 1
   let operator.opt.timeoutlen = s:get('timeoutlen', &timeoutlen)
   let operator.opt.timeoutlen = operator.opt.timeoutlen < 0 ? 0 : operator.opt.timeoutlen
+  call operator.opt.default.update({'highlight': 0, 'query_once': 1})
 
   " build stuff
-  let stuff       = deepcopy(s:stuff)
-  let stuff.state = 0
-  let stuff.num   = operator.num
+  let stuff = deepcopy(s:stuff)
   let stuff.acts  = map(range(operator.num), 'deepcopy(s:act)')
 
   " put stuffs as needed
@@ -239,7 +238,6 @@ function! operator#sandwich#query1st(kind, mode, ...) abort "{{{
   for stuff in operator.basket
     let stuff.cursor         = operator.cursor
     let stuff.modmark        = operator.modmark
-    let stuff.view           = operator.view
     " NOTE: stuff.opt.filter is actually does not depend on the motionwise.
     let stuff.opt            = copy(operator.opt)
     let stuff.opt.filter     = printf('v:key =~# ''\%%(%s\)''',
@@ -249,7 +247,6 @@ function! operator#sandwich#query1st(kind, mode, ...) abort "{{{
     let stuff.opt.integrate  = function('s:opt_integrate')
     call stuff.opt.integrate()
     for act in stuff.acts
-      let act.state   = stuff.state
       let act.cursor  = stuff.cursor
       let act.modmark = stuff.modmark
       let act.opt     = stuff.opt
@@ -906,7 +903,6 @@ function! s:query(recipes) dict abort  "{{{
 
   let id_list = []
   if opt.highlight
-    call winrestview(self.view)
     for act in acts
       let id_list += s:highlight_add(act)
     endfor
@@ -1118,10 +1114,8 @@ function! s:initialize(kind, motionwise) dict abort "{{{
 
   if self.state
     " build stuff
-    let stuff       = deepcopy(s:stuff)
-    let stuff.state = self.state
-    let stuff.num   = self.num
-    let stuff.acts  = map(range(self.num), 'deepcopy(s:act)')
+    let stuff = deepcopy(s:stuff)
+    let stuff.acts = map(range(self.num), 'deepcopy(s:act)')
 
     " put stuffs as needed
     let self.basket = map(range(self.count), 'deepcopy(stuff)')
@@ -1130,7 +1124,6 @@ function! s:initialize(kind, motionwise) dict abort "{{{
     for stuff in self.basket
       let stuff.cursor         = self.cursor
       let stuff.modmark        = self.modmark
-      let stuff.view           = self.view
       let stuff.opt            = copy(self.opt)
       let stuff.opt.filter     = printf('v:key =~# ''\%%(%s\)''',
             \ join(keys(s:default_opt[a:kind][a:motionwise]), '\|'))
@@ -1139,7 +1132,6 @@ function! s:initialize(kind, motionwise) dict abort "{{{
       let stuff.opt.integrate  = function('s:opt_integrate')
       call stuff.opt.integrate()
       for act in stuff.acts
-        let act.state   = stuff.state
         let act.cursor  = stuff.cursor
         let act.modmark = stuff.modmark
         let act.opt     = stuff.opt
@@ -1151,9 +1143,7 @@ function! s:initialize(kind, motionwise) dict abort "{{{
     let self.modmark.tail = copy(s:null_pos)
 
     for stuff in self.basket
-      let stuff.state = self.state
-      let stuff.num   = self.num
-      let stuff.done  = 0
+      let stuff.done = 0
       call stuff.opt.integrate()
 
       let lack = self.num - len(stuff.acts)
@@ -1174,7 +1164,7 @@ function! s:initialize(kind, motionwise) dict abort "{{{
   let stuff = self.basket[0]
   for j in range(self.num)
     let act = stuff.acts[j]
-    let act.region = copy(region_list[j])
+    let act.region = region_list[j]
   endfor
 
   " hide_cursor
@@ -1278,7 +1268,7 @@ function! s:add() dict abort "{{{
     endif
 
     let buns = stuff.get_buns()
-    for j in range(stuff.num)
+    for j in range(self.num)
       let act      = stuff.acts[j]
       let next_act = next_stuff.acts[j]
       let [undojoin, stuff.done]
@@ -1313,7 +1303,7 @@ function! s:delete() dict abort  "{{{
       let hi_exited = stuff.show()
     endif
 
-    for j in range(stuff.num)
+    for j in range(self.num)
       let act      = stuff.acts[j]
       let next_act = next_stuff.acts[j]
       let stuff.done = act.delete_once(stuff.done, next_act)
@@ -1363,7 +1353,7 @@ function! s:replace() dict abort  "{{{
     endif
 
     let buns = stuff.get_buns()
-    for j in range(stuff.num)
+    for j in range(self.num)
       let act      = stuff.acts[j]
       let next_act = next_stuff.acts[j]
       let [undojoin, stuff.done]
