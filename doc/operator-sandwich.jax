@@ -1,4 +1,4 @@
-*operator-sandwich.jax*	日本語ヘルプ	Last change:19-Jul-2015.
+*operator-sandwich.jax*	日本語ヘルプ	Last change:23-Jul-2015.
 
 “挟まれた”テキストを編集するためのオペレータです。
 
@@ -1070,6 +1070,35 @@ expr
 	let g:sandwich#recipes += [
 	  \   {'buns': ['@@', '@@'], 'expr': 1, 'input': ['@']}
 	  \ ]
+<
+	NOTE: もし式が |getchar()| や |input()| でユーザーに入力を求める場合、
+	      |operator-sandwich| の囲みを外すオペレータや |textobj-sandwich|
+	      の |<Plug>(textobj-sandwich-auto-i)| や
+	      |<Plug>(textobj-sandwich-auto-a)| で不都合が出ることがあります。
+	      この問題を避けるために、 "kind" フィルター及び "action" フィルタ
+	      ーを併用することが推奨されます。例えば次のレシピは html スタイル
+	      のタグで囲むことを目的として、タグ名の入力をユーザーに求めます。
+>
+	let g:operator#sandwich#recipes += [
+	  \   {
+	  \     'buns'    : ['TagInput(1)', 'TagInput(0)'],
+	  \     'expr'    : 1,
+	  \     'filetype': ['html'],
+	  \     'kind'    : ['add', 'replace'],
+	  \     'action'  : ['add'],
+	  \     'input'   : ['t'],
+	  \   },
+	  \ ]
+
+	function! TagInput(is_head) abort
+	  if a:is_head
+	    let s:TagLast = input('Tag: ')
+	    let tag = printf('<%s>', s:TagLast)
+	  else
+	    let tag = printf('</%s>', matchstr(s:TagLast, '^\a[^[:blank:]>/]*'))
+	  endif
+	  return tag
+	endfunction
 <
 	デフォルト値
 	  * add

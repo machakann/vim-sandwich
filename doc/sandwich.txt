@@ -1,4 +1,4 @@
-*sandwich.txt*				Last change:23-May-2015.
+*sandwich.txt*				Last change:23-Jul-2015.
 
 The set of operator and textobject plugins to edit sandwiched textobjects.
 
@@ -47,8 +47,8 @@ read following descriptions and each help for operator/textobject,
 ==============================================================================
 INTRODUCTION				*sandwich-introduction*
 
-This plugin serves functions to add/delete/replace surroundings of sandwiched
-texts. These functions are implemented genuinely by utilizing
+This plugin provides functions to add/delete/replace surroundings of
+sandwiched texts. These functions are implemented genuinely by utilizing
 operator/textobject framework. Their action can be repeated by |.| command
 without any dependency. It consists of two parts, |operator-sandwich| and
 |textobj-sandwich|. These two cooperate gracefully to realize the

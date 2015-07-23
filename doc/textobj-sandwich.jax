@@ -1,4 +1,4 @@
-*textobj-sandwich.jax*	日本語ヘルプ	Last change:12-Jul-2015.
+*textobj-sandwich.jax*	日本語ヘルプ	Last change:23-Jul-2015.
 
 “挟まれた”テキストを検索し選択するためのテキストオブジェクトです。
 
@@ -727,6 +727,29 @@ expr
 	let g:sandwich#recipes += [
 	  \   {'buns': ['@@', '@@'], 'expr': 1, 'input': ['@']}
 	  \ ]
+<
+	NOTE: もし式が |getchar()| や |input()| でユーザーに入力を求める場合、
+	      |operator-sandwich| の囲みを外すオペレータや |textobj-sandwich|
+	      の |<Plug>(textobj-sandwich-auto-i)| や
+	      |<Plug>(textobj-sandwich-auto-a)| で不都合が出ることがあります。
+	      この問題を避けるために、 "kind" フィルター及び "synchro" オプシ
+	      ョンを併用することが推奨されます。例えば次のレシピは二文字の入力
+	      を求め、その二文字に囲まれたテキストを選択します。
+>
+	let g:textobj#sandwich#recipes += [
+	  \    {
+	  \      'buns': ['GetChar()', 'GetChar()'],
+	  \      'kind': ['query'],
+	  \      'expr': 1,
+	  \      'synchro': 1,
+	  \      'input': ['f']
+	  \    },
+	  \ ]
+
+	function! GetChar() abort
+	  let c = getchar()
+	  return type(c) == type(0) ? nr2char(c) : c
+	endfunction
 <
 	デフォルト値
 	  * query: 0
