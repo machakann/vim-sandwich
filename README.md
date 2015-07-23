@@ -14,9 +14,9 @@ Press `sa{motion/textobject}{addition}`.
 For example, a key sequence `saiw(` makes **foo** to **(foo)**.
 
 ### Delete
-Press sdb or `sd{deletion}`.
+Press `sdb` or `sd{deletion}`.
 For example, key sequences `sdb` or `sd(` makes **(foo)** to **foo**.
-`sdb` searchs a set of surrounding automatically.
+`sdb` searches a set of surrounding automatically.
 
 ### Replace
 Press `srb{addition}` or `sr{deletion}{addition}`.
@@ -26,10 +26,10 @@ That's all. Now you already know enough about `sandwich.vim`.
 
 # Design
 
-This plugin serves functions to add/delete/replace surroundings of a sandwiched text. These functions are implemented genuinely by utilizing operator/textobject framework. Thus their action can be repeated by `.` command without any dependency. It consists of two parts, **operator-sandwich** and **textobj-sandwich**.
+This plugin provides functions to add/delete/replace surroundings of a sandwiched text. These functions are implemented genuinely by utilizing operator/textobject framework. Thus their action can be repeated by `.` command without any dependency. It consists of two parts, **operator-sandwich** and **textobj-sandwich**.
 
 ### operator-sandwich
-A sandwiched text could be resolved into two parts, `{surrounding}` and `{surrounded text}`.
+A sandwiched text could be resolved into two parts, {surrounding} and {surrounded text}.
 
 * Add surroundings: mapped to the key sequence `sa`
     * {surrounded text}   --->   {surrounding}{surrounded text}{surrounding}
