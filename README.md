@@ -1,7 +1,6 @@
 vim-sandwich
 ============
 
-[![Build Status](https://travis-ci.org/machakann/vim-sandwich.svg)](https://travis-ci.org/machakann/vim-sandwich)
 [![Build status](https://ci.appveyor.com/api/projects/status/8hgvi5410lceq53x/branch/master?svg=true)](https://ci.appveyor.com/project/machakann/vim-sandwich/branch/master)
 
 
@@ -196,3 +195,10 @@ let g:sandwich#recipes += [
 
 ### Demo
 ![sandwich.vim](http://art61.photozou.jp/pub/986/3080986/photo/225500462_org.v1437577755.gif)
+
+# Pioneers
+* [vim-surround](https://github.com/tpope/vim-surround)
+* [vim-operator-surround](https://github.com/rhysd/vim-operator-surround)
+* [vim-textobj-multiblock](https://github.com/osyo-manga/vim-textobj-multiblock)
+* [vim-textobj-anyblock](https://github.com/rhysd/vim-textobj-anyblock)
+* [vim-textobj-between](https://github.com/thinca/vim-textobj-between)
