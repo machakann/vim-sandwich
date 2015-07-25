@@ -79,7 +79,7 @@
 "   * {add, delete, replace} : Functions to execute shared processes in each kind of operations.
 "   * finalize               : The function to set modified marks after all operations.
 "}}}
-""" NOTE: Presumable Errors list"{{{
+""" NOTE: Presumable Errors list  "{{{
 " Handled in s:doautcmd()
 "   --> Some error in doautocmd.
 "
@@ -1639,10 +1639,7 @@ function! s:get_right_pos(pos) abort  "{{{
 endfunction
 "}}}
 function! s:check_edges(head, tail, candidate, opt) abort  "{{{
-  let patterns = a:opt.regex
-             \ ? deepcopy(a:candidate.buns)
-             \ : map(deepcopy(a:candidate.buns), 's:escape(v:val)')
-  let patterns = map(patterns, 'substitute(v:val, ''\n'', ''\\n'', ''g'')')
+  let patterns = s:get_patterns(a:candidate, a:opt)
 
   call setpos('.', a:head)
   let head1 = searchpos(patterns[0], 'c', a:tail[1])
@@ -1672,10 +1669,7 @@ function! s:check_edges(head, tail, candidate, opt) abort  "{{{
 endfunction
 "}}}
 function! s:search_edges(head, tail, candidate, opt) abort "{{{
-  let patterns = a:opt.regex
-             \ ? deepcopy(a:candidate.buns)
-             \ : map(deepcopy(a:candidate.buns), 's:escape(v:val)')
-  let patterns = map(patterns, 'substitute(v:val, ''\n'', ''\n'', ''g'')')
+  let patterns = s:get_patterns(a:candidate, a:opt)
 
   call setpos('.', a:head)
   let head1 = searchpos(patterns[0], 'c', a:tail[1])
@@ -1704,6 +1698,17 @@ function! s:search_edges(head, tail, candidate, opt) abort "{{{
         \   'head2': head2, 'tail2': tail2,
         \ }
   return map(target, 's:c2p(v:val)')
+endfunction
+"}}}
+function! s:get_patterns(candidate, opt) abort "{{{
+  let patterns = deepcopy(a:candidate.buns)
+  if !a:opt.regex
+    let patterns = map(patterns, 's:escape(v:val)')
+  endif
+
+  " substitute a break "\n" to a regular expression pattern '\n'
+  let patterns = map(patterns, 'substitute(v:val, ''\n'', ''\\n'', ''g'')')
+  return patterns
 endfunction
 "}}}
 function! s:skip_space(pos, flag, stopline) abort  "{{{

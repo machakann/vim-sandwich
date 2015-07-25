@@ -1,4 +1,4 @@
-*textobj-sandwich.txt*			Last change:23-Jul-2015.
+*textobj-sandwich.txt*			Last change:25-Jul-2015.
 
 The textobject plugin to search and select sandwiched textobjects.
 
@@ -674,7 +674,7 @@ skip_regex
 	" baaaaaaaar   --->   bar
 <
 	For instance, successive two quotes, '', inside a quote wrapped string
-	literal is regarded as a quote.
+	literal is regarded as a quote in vimscript.
 >
 	:echo 'foo''bar'		" -> foo'bar
 <
@@ -766,7 +766,11 @@ synchro
 	operators. When a recipe is passed to the operators, "replace" and
 	"delete" is automatically added to "kind" filter if the recipe has
 	"kind" key and does not have both "delete" and "replace" in the list.
+	In addition to that, "delete" item would be added to "action" filter
+	if the recipe is not valid in "delete" action.
 	See |operator-sandwich-configuration|.
+
+	NOTE: This feature is not valid with visual mode selection.
 
 	Default values
 	  * query: 0

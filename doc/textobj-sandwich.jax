@@ -1,4 +1,4 @@
-*textobj-sandwich.jax*	日本語ヘルプ	Last change:23-Jul-2015.
+*textobj-sandwich.jax*	日本語ヘルプ	Last change:25-Jul-2015.
 
 “挟まれた”テキストを検索し選択するためのテキストオブジェクトです。
 
@@ -676,8 +676,9 @@ skip_regex
 	" Press dib
 	" baaaaaaaar   --->   bar
 <
-	例えば、シングルクオーテーションに囲まれた領域内の連続した二つのシング
-	ルクオーテーションは一つのシングルクオーテーションとみなされます。
+	例えば vimscript では、シングルクオーテーションに囲まれた領域内の連続
+	した二つのシングルクオーテーションは一つのシングルクオーテーションとみ
+	なされます。
 >
 	:echo 'foo''bar'		" -> foo'bar
 <
@@ -764,9 +765,12 @@ synchro
 	のオプションは |g:textobj#sandwich#recipes| 内の "expr" オプションで評
 	価されたレシピをこれらのオペレータと連携させるのに役にたつでしょう。レ
 	シピが渡される際に "kind" キーをもち、 "delete" と "replace" の両方を
-	持たない場合、 "kind" フィルターに "replace" and "delete" が自動的に追
-	加されます。
+	持たない場合、 "kind" フィルターに "replace" と "delete" が自動的に追
+	加されます。また、"action" フィルターを持ち "delete" が有効でない場合
+	"action" フィルターに "delete" が追加されます。
 	こちらの項もご覧ください。 |operator-sandwich-configuration|
+
+	NOTE: この機能はビジュアル選択に対しては意味を持ちません。
 
 	デフォルト値
 	  * query: 0

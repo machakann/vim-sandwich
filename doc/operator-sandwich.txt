@@ -1,4 +1,4 @@
-*operator-sandwich.txt*			Last change:23-Jul-2015.
+*operator-sandwich.txt*			Last change:25-Jul-2015.
 
 The operator plugin to edit sandwiched textobjects.
 
@@ -1077,11 +1077,13 @@ expr
 	If this option is 1 or 2, requisite "buns" is evaluated as expression.
 	If this option is 1, "buns" are evaluated once and repeat it by |.|
 	command. If this option is 2, "buns" are evaluated every times in |.|
-	repeating. For example, the following recipe adds the text in the
-	unnamed register. (ref. |let-@|, |quotequote|)
+	repeating. If you want to match deleted/replaced surroundings by
+	expressions, use "synchro" option of |textobj-sandwich| together. For
+	example, the following recipe adds the text in the unnamed register.
+	(ref. |let-@|, |quotequote|)
 >
 	let g:sandwich#recipes += [
-	  \   {'buns': ['@@', '@@'], 'expr': 1, 'input': ['@']}
+	  \   {'buns': ['@@', '@@'], 'expr': 1, 'synchro': 1, 'input': ['@']}
 	  \ ]
 <
 	NOTE: If the expressions query user something by |getchar()| or

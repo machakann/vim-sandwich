@@ -526,7 +526,7 @@ function! s:get_region(textobj) dict abort "{{{
   endtry
 endfunction
 "}}}
-function! s:searchpos(pattern, flag, stopline, timeout, is_head) dict abort"{{{
+function! s:searchpos(pattern, flag, stopline, timeout, is_head) dict abort "{{{
   let flag = a:flag
   if a:pattern !=# ''
     let coord = searchpos(a:pattern, flag, a:stopline, a:timeout)
@@ -994,16 +994,9 @@ function! s:select() dict abort  "{{{
     endif
 
     " For the cooperation with operator-sandwich
-    if elected.opt.integrated.synchro
-      let recipe = {}
-      if elected.searchby ==# 'buns'
-        call extend(recipe, {'buns': elected.buns})
-      elseif elected.searchby ==# 'external'
-        call extend(recipe, {'external': elected.external})
-        call extend(recipe, {'excursus': [elected.range.count, [0] + elected.cursor + [0]]})
-      endif
-      call extend(recipe, elected.opt.recipe)
-      call self.synchronize(recipe)
+    if elected.opt.integrated.synchro && exists('g:operator#sandwich#object')
+          \ && v:operator ==# 'g@' && &operatorfunc =~# '^operator#sandwich#\%(delete\|replace\)'
+      call self.synchronize(elected)
     endif
 
     let self.done = 1
@@ -1014,17 +1007,28 @@ function! s:select() dict abort  "{{{
   endif
 endfunction
 "}}}
-function! s:synchronize(recipe) abort "{{{
-  if exists('g:operator#sandwich#object')
-        \ && &operatorfunc =~# '^operator#sandwich#\%(delete\|replace\)'
-    let filter = 'v:key !=# "clear" && v:key !=# "update"'
-    call filter(a:recipe, filter)
-    if has_key(a:recipe, 'kind') && filter(copy(a:recipe.kind), 'v:val ==# "delete" || v:val ==# "replace"') == []
-      let a:recipe.kind += ['delete', 'replace']
-      let a:recipe.addition = 0
-    endif
-    let g:operator#sandwich#object.recipes.synchro = [a:recipe]
+function! s:synchronize(elected) abort "{{{
+  let recipe = {}
+  if a:elected.searchby ==# 'buns'
+    call extend(recipe, {'buns': a:elected.buns})
+  elseif a:elected.searchby ==# 'external'
+    call extend(recipe, {'external': a:elected.external})
+    call extend(recipe, {'excursus': [a:elected.range.count, [0] + a:elected.cursor + [0]]})
   endif
+  let filter = 'v:key !=# "clear" && v:key !=# "update"'
+  call extend(recipe, filter(a:elected.opt.recipe, filter))
+
+  " If the recipe has 'kind' key and has no 'delete', 'replace' keys, then add these items.
+  if has_key(recipe, 'kind') && filter(copy(recipe.kind), 'v:val ==# "delete" || v:val ==# "replace"') == []
+    let recipe.kind += ['delete', 'replace']
+  endif
+
+  " Add 'delete' item to 'action' filter, if the recipe is not valid in 'delete' action.
+  if has_key(recipe, 'action') && filter(copy(recipe.action), 'v:val ==# "delete"') == []
+    let recipe.action += ['delete']
+  endif
+
+  let g:operator#sandwich#object.recipes.synchro = [recipe]
 endfunction
 "}}}
 function! s:finalize() dict abort "{{{
