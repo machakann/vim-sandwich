@@ -118,9 +118,11 @@ let s:type_dict = type({})
 if v:version > 704 || (v:version == 704 && has('patch237'))
   let s:has_patch_7_4_771 = has('patch-7.4.771')
   let s:has_patch_7_4_310 = has('patch-7.4.310')
+  let s:has_patch_7_4_362 = has('patch-7.4.362')
 else
-  let s:has_patch_7_4_771 = v:version > 704 || (v:version == 704 && has('patch771'))
-  let s:has_patch_7_4_310 = v:version > 704 || (v:version == 704 && has('patch310'))
+  let s:has_patch_7_4_771 = v:version == 704 && has('patch771')
+  let s:has_patch_7_4_310 = v:version == 704 && has('patch310')
+  let s:has_patch_7_4_362 = v:version == 704 && has('patch362')
 endif
 
 " features
@@ -903,9 +905,7 @@ function! s:query(recipes) dict abort  "{{{
 
   let id_list = []
   if opt.highlight
-    for act in acts
-      let id_list += s:highlight_add(act)
-    endfor
+    let id_list = s:highlight_add(acts)
   endif
   redraw
 
@@ -984,20 +984,16 @@ function! s:show() dict abort "{{{
   let clock = self.clock
   let acts  = self.acts
   let hi_exited = 0
-  let duration  = self.opt.duration
 
   try
-    let id_list = []
-    for act in acts
-      let id_list += s:highlight_add(act)
-    endfor
+    let id_list = s:highlight_add(acts)
     redraw
 
     let c = 0
     call clock.start()
     while c == 0
       let c = getchar(0)
-      if clock.started && clock.erapsed() > duration
+      if clock.started && clock.erapsed() > self.opt.duration
         break
       endif
       sleep 20m
@@ -1284,7 +1280,6 @@ endfunction
 "}}}
 function! s:delete() dict abort  "{{{
   let hi_exited = 0
-  let duration  = self.opt.duration
 
   for i in range(self.count)
     let stuff = self.basket[i]
@@ -1298,7 +1293,7 @@ function! s:delete() dict abort  "{{{
       break
     endif
 
-    if !hi_exited && stuff.opt.integrated.highlight && duration > 0
+    if !hi_exited && stuff.opt.integrated.highlight && self.opt.duration> 0
       call winrestview(self.view)
       let hi_exited = stuff.show()
     endif
@@ -2064,65 +2059,18 @@ endfunction
 "}}}
 
 " highlight
-function! s:highlight_add(...) abort  "{{{
-  let n          = 0
-  let order      = []
+function! s:highlight_add(acts) abort  "{{{
   let order_list = []
-  for act in a:000
+  for act in a:acts
     let target = act.target
-    let head1 = target.head1
-    let tail1 = target.tail1
-    let head2 = target.head2
-    let tail2 = target.tail2
-    for lnum in range(head1[1], tail1[1])
-      if head1[1] == tail1[1]
-        let order += [head1[1:2] + [tail1[2] - head1[2] + 1]]
-      else
-        if lnum == head1[1]
-          let order += [head1[1:2] + [col([lnum, '$']) - head1[2] + 1]]
-        elseif lnum == tail1[1]
-          let order += [[lnum, 1] + [tail1[2]]]
-        else
-          let order += [[lnum, 1] + [col([lnum, '$'])]]
-        endif
-      endif
-
-      if n == 7
-        let order_list += [order]
-        let n = 0
-      else
-        let n += 1
-      endif
-    endfor
-    let order_list += [order]
-
-    for lnum in range(head2[1], tail2[1])
-      if head2[1] == tail2[1]
-        let order += [head2[1:2] + [tail2[2] - head2[2] + 1]]
-      else
-        if lnum == head2[1]
-          let order += [head2[1:2] + [col([lnum, '$']) - head2[2] + 1]]
-        elseif lnum == tail2[1]
-          let order += [[lnum, 1] + [tail2[2]]]
-        else
-          let order += [[lnum, 1] + [col([lnum, '$'])]]
-        endif
-      endif
-
-      if n == 7
-        let order_list += [order]
-        let n = 0
-      else
-        let n += 1
-      endif
-    endfor
+    call s:highlight_order(order_list, target.head1, target.tail1)
+    call s:highlight_order(order_list, target.head2, target.tail2)
   endfor
-  let order_list += [order]
 
   let id_list    = []
   if order_list != []
     for order in order_list
-      let id_list += [matchaddpos('OperatorSandwichBuns', order)]
+      let id_list += s:matchaddpos('OperatorSandwichBuns', order)
     endfor
   endif
   return id_list
@@ -2131,6 +2079,58 @@ endfunction
 function! s:highlight_del(id) abort "{{{
   return matchdelete(a:id)
 endfunction
+"}}}
+function! s:highlight_order(order_list, head, tail) abort "{{{
+  if a:head != s:null_pos && a:tail != s:null_pos && s:is_equal_or_ahead(a:tail, a:head)
+    let n     = 0
+    let order = []
+
+    for lnum in range(a:head[1], a:tail[1])
+      if a:head[1] == a:tail[1]
+        let order += [a:head[1:2] + [a:tail[2] - a:head[2] + 1]]
+      else
+        if lnum == a:head[1]
+          let order += [a:head[1:2] + [col([lnum, '$']) - a:head[2] + 1]]
+        elseif lnum == a:tail[1]
+          let order += [[lnum, 1] + [a:tail[2]]]
+        else
+          let order += [[lnum]]
+        endif
+      endif
+
+      if n == 7
+        call add(a:order_list, order)
+        let order = []
+        let n = 0
+      else
+        let n += 1
+      endif
+    endfor
+
+    if order != []
+      call add(a:order_list, order)
+    endif
+  endif
+endfunction
+"}}}
+" function! s:matchaddpos(group, pos) abort "{{{
+if s:has_patch_7_4_362
+  function! s:matchaddpos(group, pos) abort
+    return [matchaddpos(a:group, a:pos)]
+  endfunction
+else
+  function! s:matchaddpos(group, pos) abort
+    let id_list = []
+    for pos in a:pos
+      if len(pos) == 1
+        let id_list += [matchadd(a:group, printf('\%%%dl', pos[0]))]
+      else
+        let id_list += [matchadd(a:group, printf('\%%%dl\%%>%dc.*\%%<%dc', pos[0], pos[1]-1, pos[1]+pos[2]))]
+      endif
+    endfor
+    return id_list
+  endfunction
+endif
 "}}}
 
 " miscellaneous
@@ -2165,7 +2165,7 @@ function! s:compare_buf_length(i1, i2) abort  "{{{
   return a:i2[1] - a:i1[1]
 endfunction
 "}}}
-function! s:c2p(coord) abort"{{{
+function! s:c2p(coord) abort  "{{{
   return [0] + a:coord + [0]
 endfunction
 "}}}
