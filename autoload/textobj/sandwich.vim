@@ -103,9 +103,16 @@ let s:null_4coord = {
       \ }
 
 " types
-let s:type_num    = type(0)
-let s:type_str    = type('')
-let s:type_list   = type([])
+let s:type_num  = type(0)
+let s:type_str  = type('')
+let s:type_list = type([])
+
+" patchs
+if v:version > 704 || (v:version == 704 && has('patch237'))
+  let s:has_patch_7_4_358 = has('patch-7.4.358')
+else
+  let s:has_patch_7_4_358 = v:version == 704 && has('patch358')
+endif
 
 " features
 let s:has_reltime_and_float = has('reltime') && has('float')
@@ -959,7 +966,7 @@ function! s:select() dict abort  "{{{
           \   'inner_tail'
           \ )
     call map(self.candidates, map_rule)
-    call sort(self.candidates, 's:compare_buf_length')
+    call s:sort(self.candidates, 's:compare_buf_length', self.count)
     let elected = self.candidates[self.count - 1]
 
     " restore view
@@ -1302,6 +1309,35 @@ function! s:set_displaycoord(disp_coord) abort "{{{
     execute 'normal! ' . a:disp_coord[0] . 'G' . a:disp_coord[1] . '|'
   endif
 endfunction
+"}}}
+" function! s:sort(list, func, count) abort  "{{{
+if s:has_patch_7_4_358
+  function! s:sort(list, func, count) abort
+    return sort(a:list, a:func)
+  endfunction
+else
+  function! s:sort(list, func, count) abort
+    " NOTE: len(a:list) is always larger than count or same.
+    " FIXME: The number of item in a:list would not be large, but if there was
+    "        any efficient argorithm, I would rewrite here.
+    let len = len(a:list)
+    for i in range(a:count)
+      if len - 2 >= i
+        let min = len - 1
+        for j in range(len - 2, i, -1)
+          if a:list[min]['len'] >= a:list[j]['len']
+            let min = j
+          endif
+        endfor
+
+        if min > i
+          call insert(a:list, remove(a:list, min), i)
+        endif
+      endif
+    endfor
+    return a:list
+  endfunction
+endif
 "}}}
 
 " recipe  "{{{

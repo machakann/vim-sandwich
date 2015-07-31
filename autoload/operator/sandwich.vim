@@ -119,10 +119,12 @@ if v:version > 704 || (v:version == 704 && has('patch237'))
   let s:has_patch_7_4_771 = has('patch-7.4.771')
   let s:has_patch_7_4_310 = has('patch-7.4.310')
   let s:has_patch_7_4_362 = has('patch-7.4.362')
+  let s:has_patch_7_4_358 = has('patch-7.4.358')
 else
   let s:has_patch_7_4_771 = v:version == 704 && has('patch771')
   let s:has_patch_7_4_310 = v:version == 704 && has('patch310')
   let s:has_patch_7_4_362 = v:version == 704 && has('patch362')
+  let s:has_patch_7_4_358 = v:version == 704 && has('patch358')
 endif
 
 " features
@@ -780,9 +782,7 @@ function! s:search(recipes) dict abort "{{{
       endfor
       call filter(target_list, 's:is_valid_4pos(v:val)')
       if target_list != []
-        call map(target_list, '[v:val, s:get_buf_length(v:val.head1, v:val.tail2)]')
-        call sort(target_list, 's:compare_buf_length')
-        let target = target_list[0][0]
+        let target = s:shortest(target_list)
       endif
     endif
   endif
@@ -2161,10 +2161,6 @@ function! s:get_buf_length(start, end) abort  "{{{
   return len
 endfunction
 "}}}
-function! s:compare_buf_length(i1, i2) abort  "{{{
-  return a:i2[1] - a:i1[1]
-endfunction
-"}}}
 function! s:c2p(coord) abort  "{{{
   return [0] + a:coord + [0]
 endfunction
@@ -2223,6 +2219,33 @@ endfunction
 function! s:escape(string) abort  "{{{
   return escape(a:string, '~"\.^$[]*')
 endfunction
+"}}}
+" function! s:shortest(list) abort  "{{{
+if s:has_patch_7_4_358
+  function! s:shortest(list) abort
+    call map(a:list, '[v:val, s:get_buf_length(v:val.head1, v:val.tail2)]')
+    call sort(a:list, 's:compare_buf_length')
+    return a:list[0][0]
+  endfunction
+
+  function! s:compare_buf_length(i1, i2) abort
+    return a:i2[1] - a:i1[1]
+  endfunction
+else
+  function! s:shortest(list) abort
+    call map(a:list, '[v:val, s:get_buf_length(v:val.head1, v:val.tail2)]')
+    let len = len(a:list)
+    let min = len - 1
+    if len - 2 >= 0
+      for i in range(len - 2, 0, -1)
+        if a:list[min][1] >= a:list[i][1]
+          let min = i
+        endif
+      endfor
+    endif
+    return a:list[min][0]
+  endfunction
+endif
 "}}}
 
 " recipes "{{{
