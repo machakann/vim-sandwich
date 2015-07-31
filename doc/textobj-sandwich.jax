@@ -1,4 +1,4 @@
-*textobj-sandwich.jax*	日本語ヘルプ	Last change:25-Jul-2015.
+*textobj-sandwich.jax*	日本語ヘルプ	Last change:28-Jul-2015.
 
 “挟まれた”テキストを検索し選択するためのテキストオブジェクトです。
 
@@ -90,12 +90,12 @@ vib と入力します
 	         <->          : selected region
 	{baz[bar(foo)bar]baz}
 <
-さらに vib
+さらに ib
 >
 	     <--------->      : selected region
 	{baz[bar(foo)bar]baz}
 <
-さらに vib
+さらに ib
 >
 	 <----------------->  : selected region
 	{baz[bar(foo)bar]baz}
