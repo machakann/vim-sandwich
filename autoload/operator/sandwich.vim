@@ -6,7 +6,7 @@
 
 """ NOTE: Whole design (-: string or number, *: functions, []: list, {}: dictionary) "{{{
 " operator object
-"   - state                  : 0 or 1. If it is called by keymapping, it is 1. If it is called by dot command, it is 0.
+"   - state                  : 0 or 1 or -1. If it is called by keymapping, it is 1. If it is called by dot command, it is 0. -1 is used in order to deactivate the operaor object when the assigned region is not valid.
 "   - count                  : Positive integer. The assigned {count}
 "   - num                    : The number of processed regions in one count. It could be more than 1 only in block wise visual mode.
 "   - mode                   : 'n' or 'x'. Which mode the keymapping is called.
@@ -1076,7 +1076,9 @@ function! s:execute(kind, motionwise) dict abort  "{{{
   try
     call self.recipes.integrate(a:kind, a:motionwise, self.mode)
     call self.initialize(a:kind, a:motionwise)
-    call self[a:kind]()
+    if self.state >= 0
+      call self[a:kind]()
+    endif
   catch /^OperatorSandwichError:\%(Add\|Delete\|Replace\):ReadOnly/
     let errormsg = 'operator-sandwich: Cannot make changes to read-only buffer.'
   catch
@@ -1096,8 +1098,21 @@ function! s:execute(kind, motionwise) dict abort  "{{{
 endfunction
 "}}}
 function! s:initialize(kind, motionwise) dict abort "{{{
-  let region      = s:get_assigned_region(a:motionwise)
+  let region = s:get_assigned_region(a:kind, a:motionwise)
   let region_list = a:motionwise ==# 'block' ? self.split(region) : [region]
+
+  if region == s:null_2pos
+    " deactivate
+    let self.state = -1
+  else
+    " hide_cursor
+    if s:has_gui_running
+      let self.cursor_info = &guicursor
+      set guicursor+=o:block-NONE
+    else
+      let self.cursor_info = &t_ve
+    endif
+  endif
 
   let self.num = len(region_list)
   let self.opt.timeoutlen = s:get('timeoutlen', &timeoutlen)
@@ -1162,14 +1177,6 @@ function! s:initialize(kind, motionwise) dict abort "{{{
     let act = stuff.acts[j]
     let act.region = region_list[j]
   endfor
-
-  " hide_cursor
-  if s:has_gui_running
-    let self.cursor_info = &guicursor
-    set guicursor+=o:block-NONE
-  else
-    let self.cursor_info = &t_ve
-  endif
 endfunction
 "}}}
 function! s:split(region) dict abort  "{{{
@@ -1363,62 +1370,66 @@ function! s:replace() dict abort  "{{{
 endfunction
 "}}}
 function! s:finalize() dict abort  "{{{
-  " restore view
-  if self.view != {}
-    call winrestview(self.view)
-    let self.view = {}
-  endif
-
-  if self.basket != [] && filter(copy(self.basket), 'v:val.done') != []
-    " set modified marks
-    let modmark = self.modmark
-    if modmark.head != s:null_pos && modmark.tail != s:null_pos
-          \ && s:is_equal_or_ahead(modmark.tail, modmark.head)
-      call setpos("'[", modmark.head)
-      call setpos("']", modmark.tail)
+  if self.state >= 0
+    " restore view
+    if self.view != {}
+      call winrestview(self.view)
+      let self.view = {}
     endif
 
-    " set cursor position
-    let cursor_opt = 'inner_head'
-    for i in range(self.count - 1, 0, -1)
-      let stuff = self.basket[i]
-      if stuff.done
-        let cursor_opt = stuff.opt.integrated.cursor
-        let cursor_opt = cursor_opt =~# '^\%(keep\|\%(inner_\)\?\%(head\|tail\)\)$'
-                      \ ? cursor_opt : 'inner_head'
-        break
+    if self.basket != [] && filter(copy(self.basket), 'v:val.done') != []
+      " set modified marks
+      let modmark = self.modmark
+      if modmark.head != s:null_pos && modmark.tail != s:null_pos
+            \ && s:is_equal_or_ahead(modmark.tail, modmark.head)
+        call setpos("'[", modmark.head)
+        call setpos("']", modmark.tail)
       endif
-    endfor
 
-    if self.state || self.keepable
-      let cursor = cursor_opt =~# '^\%(keep\|inner_\%(head\|tail\)\)$' ? self.cursor[cursor_opt]
-              \ : cursor_opt ==# 'head' && modmark.head != s:null_pos ? modmark.head
-              \ : cursor_opt ==# 'tail' && modmark.tail != s:null_pos ? s:get_left_pos(modmark.tail)
-              \ : self.cursor['inner_head']
-      let self.keepable = 0
-    else
-      " In the case of dot repeat, it is impossible to keep original position
-      " unless self.keepable == 1.
-      let cursor = cursor_opt =~# '^inner_\%(head\|tail\)$' ? self.cursor[cursor_opt]
-              \ : cursor_opt ==# 'head' && modmark.head != s:null_pos ? modmark.head
-              \ : cursor_opt ==# 'tail' && modmark.tail != s:null_pos ? s:get_left_pos(modmark.tail)
-              \ : self.cursor['inner_head']
+      " set cursor position
+      let cursor_opt = 'inner_head'
+      for i in range(self.count - 1, 0, -1)
+        let stuff = self.basket[i]
+        if stuff.done
+          let cursor_opt = stuff.opt.integrated.cursor
+          let cursor_opt = cursor_opt =~# '^\%(keep\|\%(inner_\)\?\%(head\|tail\)\)$'
+                        \ ? cursor_opt : 'inner_head'
+          break
+        endif
+      endfor
+
+      if self.state || self.keepable
+        let cursor = cursor_opt =~# '^\%(keep\|inner_\%(head\|tail\)\)$' ? self.cursor[cursor_opt]
+                \ : cursor_opt ==# 'head' && modmark.head != s:null_pos ? modmark.head
+                \ : cursor_opt ==# 'tail' && modmark.tail != s:null_pos ? s:get_left_pos(modmark.tail)
+                \ : self.cursor['inner_head']
+        let self.keepable = 0
+      else
+        " In the case of dot repeat, it is impossible to keep original position
+        " unless self.keepable == 1.
+        let cursor = cursor_opt =~# '^inner_\%(head\|tail\)$' ? self.cursor[cursor_opt]
+                \ : cursor_opt ==# 'head' && modmark.head != s:null_pos ? modmark.head
+                \ : cursor_opt ==# 'tail' && modmark.tail != s:null_pos ? s:get_left_pos(modmark.tail)
+                \ : self.cursor['inner_head']
+      endif
+
+      if s:has_patch_7_4_310
+        " set curswant explicitly
+        call setpos('.', cursor + [cursor[2]])
+      else
+        call setpos('.', cursor)
+      endif
     endif
 
-    if s:has_patch_7_4_310
-      " set curswant explicitly
-      call setpos('.', cursor + [cursor[2]])
-    else
-      call setpos('.', cursor)
+    " restore cursor
+    if has_key(self, 'cursor_info')
+      if s:has_gui_running
+        set guicursor&
+        let &guicursor = self.cursor_info
+      else
+        let &t_ve = self.cursor_info
+      endif
     endif
-  endif
-
-  " restore cursor
-  if s:has_gui_running
-    set guicursor&
-    let &guicursor = self.cursor_info
-  else
-    let &t_ve = self.cursor_info
   endif
 
   " set state
@@ -1597,8 +1608,9 @@ endfunction
 "}}}
 
 " get and modify region
-function! s:get_assigned_region(motionwise) abort "{{{
+function! s:get_assigned_region(kind, motionwise) abort "{{{
   let region = {'head': getpos("'["), 'tail': getpos("']")}
+
   if a:motionwise ==# 'line'
     let region.head[2] = 1
     let region.tail[2] = col([region.tail[1], '$']) - 1
@@ -1609,10 +1621,19 @@ function! s:get_assigned_region(motionwise) abort "{{{
   endif
 
   " for multibyte characters
-  if region.tail[3] == 0
+  if region.tail != s:null_pos && region.tail[3] == 0
     call setpos('.', region.tail)
     call search('.', 'bc')
     let region.tail = getpos('.')
+  endif
+
+  " check validity
+  if a:kind ==# 'add'
+    let region = region.head == s:null_pos || region.tail == s:null_pos || !s:is_equal_or_ahead(region.tail, region.head)
+          \ ? deepcopy(s:null_2pos) : region
+  else
+    let region = region.head == s:null_pos || region.tail == s:null_pos || !s:is_ahead(region.tail, region.head)
+          \ ? deepcopy(s:null_2pos) : region
   endif
   return region
 endfunction
