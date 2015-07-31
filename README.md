@@ -48,7 +48,7 @@ A sandwiched text could be resolved into two parts, {surrounding} and {surrounde
 ```
              |<----ib,is---->|
 {surrounding}{surrounded text}{surrounding}
-|<------------------ab,as------------------>|
+|<-----------------ab,as----------------->|
 ```
 
 ### Configuration
