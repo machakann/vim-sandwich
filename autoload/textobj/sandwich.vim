@@ -1001,8 +1001,11 @@ function! s:select() dict abort  "{{{
     endif
 
     " For the cooperation with operator-sandwich
+    " NOTE: After visual selection by a user-defined textobject, v:operator is set as ':'
+    " NOTE: 'synchro' option is not valid for visual mode, because there is no guarantee that g:operator#sandwich#object exists.
     if elected.opt.integrated.synchro && exists('g:operator#sandwich#object')
-          \ && v:operator ==# 'g@' && &operatorfunc =~# '^operator#sandwich#\%(delete\|replace\)'
+          \ && ((elected.searchby == 'buns' && v:operator ==# 'g@') || (elected.searchby == 'external' && v:operator =~# '\%(:\|g@\)'))
+          \ && &operatorfunc =~# '^operator#sandwich#\%(delete\|replace\)'
       call self.synchronize(elected)
     endif
 
