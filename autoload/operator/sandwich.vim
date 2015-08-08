@@ -1562,10 +1562,8 @@ function! s:doautocmd(name) abort "{{{
   try
     execute 'silent doautocmd <nomodeline> User ' . a:name
   catch
-    let errormsg = printf('operator-sandwich: An error occurred in autocmd %s. [%s] %s', a:name, v:throwpoint, v:exception)
-    echohl ErrorMsg
-    echomsg errormsg
-    echohl NONE
+    let errormsg = printf('operator-sandwich: An error occurred in autocmd %s. [%s]', a:name, v:exception)
+    echoerr errormsg
   finally
     call s:restview(view, a:name)
   endtry
@@ -1585,9 +1583,7 @@ function! s:restview(view, name) abort  "{{{
     endif
   catch /^OperatorSandwichError:CouldNotRestoreTabpage/
     let errormsg = printf('operator-sandwich: Could not have restored tabpage after autocmd %s.', a:name)
-    echohl ErrorMsg
-    echomsg errormsg
-    echohl NONE
+    echoerr errormsg
   endtry
 
   " window
@@ -1595,9 +1591,7 @@ function! s:restview(view, name) abort  "{{{
     execute winnr . 'wincmd w'
   catch /^Vim\%((\a\+)\)\=:E16/
     let errormsg = printf('operator-sandwich: Could not have restored window after autocmd %s.', a:name)
-    echohl ErrorMsg
-    echomsg errormsg
-    echohl NONE
+    echoerr errormsg
   endtry
   " view
   call winrestview(view)
