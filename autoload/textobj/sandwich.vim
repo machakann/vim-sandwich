@@ -623,7 +623,7 @@ function! s:is_valid_candidate(textobj) dict abort "{{{
   " specific condition for the option 'matched_syntax'
   if opt.match_syntax == 2
     let opt_match_syntax_affair = s:is_included_syntax(coord.inner_head, self.syntax)
-                             \ || s:is_included_syntax(coord.inner_tail, self.syntax)
+                             \ && s:is_included_syntax(coord.inner_tail, self.syntax)
   elseif opt.match_syntax == 3
     " check inner syntax independently
     if opt.syntax == []
