@@ -328,9 +328,7 @@ function! s:search_with_nest(textobj) dict abort  "{{{
     if head == s:null_coord | break | endif
     let coord.head = head
 
-    let self.syntax = opt.match_syntax
-          \ ? [synIDattr(synIDtrans(synID(head[0], head[1], 1)), 'name')]
-          \ : []
+    let self.syntax = opt.match_syntax ? [s:get_displaysyntax(head)] : []
 
     " search tail
     let tail = searchpairpos(buns[0], '', buns[1], '', 'self.skip(0)', range.bottom, stimeoutlen)
@@ -383,8 +381,7 @@ function! s:search_without_nest(textobj) dict abort  "{{{
   endif
   let _tail = searchpos(buns[0], 'ce', range.bottom, stimeoutlen)
 
-  let self.syntax = opt.match_syntax
-        \ ? [synIDattr(synIDtrans(synID(head[0], head[1], 1)), 'name')] : []
+  let self.syntax = opt.match_syntax ? [s:get_displaysyntax(head)] : []
 
   " search nearest tail
   call cursor(self.cursor)
@@ -409,8 +406,7 @@ function! s:search_without_nest(textobj) dict abort  "{{{
       " pos is head
       let head = pos
 
-      let self.syntax = opt.match_syntax
-            \ ? [synIDattr(synIDtrans(synID(head[0], head[1], 1)), 'name')] : []
+      let self.syntax = opt.match_syntax ? [s:get_displaysyntax(head)] : []
 
       " search tail
       call search(buns[0], 'ce', range.bottom, stimeoutlen)
@@ -424,8 +420,7 @@ function! s:search_without_nest(textobj) dict abort  "{{{
       call cursor(pos)
       let tail = self.searchpos(buns[1], 'ce',  range.bottom, stimeoutlen, 1)
 
-      let self.syntax = opt.match_syntax
-            \ ? [synIDattr(synIDtrans(synID(tail[0], tail[1], 1)), 'name')] : []
+      let self.syntax = opt.match_syntax ? [s:get_displaysyntax(tail)] : []
 
       " search head
       call search(buns[1], 'bc', range.top, stimeoutlen)
@@ -558,12 +553,8 @@ function! s:skip(is_head, ...) dict abort  "{{{
   endif
 
   if a:is_head || !opt.match_syntax
-    if opt.syntax != []
-      let list = map(synstack(coord[0], coord[1]),
-            \ 'synIDattr(synIDtrans(v:val), "name")')
-      if !s:is_included_syntax(list, opt.syntax)
-        return 1
-      endif
+    if opt.syntax != [] && !s:is_included_syntax(coord, opt.syntax)
+      return 1
     endif
   else
     if !s:is_matched_syntax(coord, self.syntax)
@@ -633,12 +624,8 @@ function! s:is_valid_candidate(textobj) dict abort "{{{
   if opt.match_syntax != 2
     let opt_match_syntax_affair = 1
   else
-    let synstack_inner_head = map(synstack(coord.inner_head[0], coord.inner_head[1]),
-          \ 'synIDattr(synIDtrans(v:val), "name")')
-    let synstack_inner_tail = map(synstack(coord.inner_tail[0], coord.inner_tail[1]),
-          \ 'synIDattr(synIDtrans(v:val), "name")')
-    let opt_match_syntax_affair = s:is_included_syntax(synstack_inner_head, self.syntax)
-                             \ || s:is_included_syntax(synstack_inner_tail, self.syntax)
+    let opt_match_syntax_affair = s:is_included_syntax(coord.inner_head, self.syntax)
+                             \ || s:is_included_syntax(coord.inner_tail, self.syntax)
   endif
 
   return s:is_equal_or_ahead(tail, head)
@@ -1235,22 +1222,24 @@ function! s:is_matched_syntax(coord, syntaxID) abort  "{{{
   elseif a:syntaxID == []
     return 1
   else
-    return [synIDattr(synIDtrans(synID(a:coord[0], a:coord[1], 1)), 'name')]
-          \ == a:syntaxID
+    return [s:get_displaysyntax(a:coord)] == a:syntaxID
   endif
 endfunction
 "}}}
-function! s:is_included_syntax(synstack, syntaxID) abort  "{{{
+function! s:is_included_syntax(coord, syntaxID) abort  "{{{
+  let synstack = map(synstack(a:coord[0], a:coord[1]),
+        \ 'synIDattr(synIDtrans(v:val), "name")')
+
   if a:syntaxID == []
     return 1
-  elseif a:synstack == []
+  elseif synstack == []
     if a:syntaxID == ['']
       return 1
     else
       return 0
     endif
   else
-    return filter(copy(a:syntaxID), 'match(a:synstack, v:val) > -1') != []
+    return filter(copy(a:syntaxID), 'match(synstack, v:val) > -1') != []
   endif
 endfunction
 "}}}
@@ -1311,6 +1300,10 @@ function! s:set_displaycoord(disp_coord) abort "{{{
   if a:disp_coord != s:null_coord
     execute 'normal! ' . a:disp_coord[0] . 'G' . a:disp_coord[1] . '|'
   endif
+endfunction
+"}}}
+function! s:get_displaysyntax(coord) abort  "{{{
+  return synIDattr(synIDtrans(synID(a:coord[0], a:coord[1], 1)), 'name')
 endfunction
 "}}}
 " function! s:sort(list, func, count) abort  "{{{
