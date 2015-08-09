@@ -157,7 +157,11 @@ let g:sandwich#recipes += [
 function! TagInput(is_head) abort
   if a:is_head
     let s:TagLast = input('Tag: ')
-    let tag = printf('<%s>', s:TagLast)
+    if s:TagLast !=# ''
+      let tag = printf('<%s>', s:TagLast)
+    else
+      throw 'OperatorSandwichCancel'
+    endif
   else
     let tag = printf('</%s>', matchstr(s:TagLast, '^\a[^[:blank:]>/]*'))
   endif

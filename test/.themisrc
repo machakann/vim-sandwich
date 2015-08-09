@@ -14,3 +14,11 @@ function! TestIndent() abort
   " always the indent of the previous nonbland line + shiftwidth()
   return indent(prevnonblank(v:lnum)) + shiftwidth()
 endfunction
+
+function! SandwichExprCancel() abort
+  throw 'OperatorSandwichCancel'
+endfunction
+
+function! SandwichExprEmpty() abort
+  return ''
+endfunction

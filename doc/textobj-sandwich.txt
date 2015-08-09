@@ -1,4 +1,4 @@
-*textobj-sandwich.txt*			Last change:25-Jul-2015.
+*textobj-sandwich.txt*			Last change:08-Aug-2015.
 
 The textobject plugin to search and select sandwiched textobjects.
 
@@ -734,21 +734,25 @@ expr
 	      reccomended to use "kind" filter and "synchro" option. For
 	      example, the following recipe asks two characters to select a
 	      text between the two characters.
+	
+	NOTE: If "buns" include empty string resulting of the evaluation,
+	      |textobj-sandwich| cancel the selection.
 >
-	let g:textobj#sandwich#recipes += [
-	  \    {
-	  \      'buns': ['GetChar()', 'GetChar()'],
-	  \      'kind': ['query'],
-	  \      'expr': 1,
-	  \      'synchro': 1,
-	  \      'input': ['f']
-	  \    },
-	  \ ]
+	      let g:textobj#sandwich#recipes += [
+	        \    {
+	        \      'buns': ['GetChar()', 'GetChar()'],
+	        \      'kind': ['query'],
+	        \      'expr': 1,
+	        \      'synchro': 1,
+	        \      'input': ['f']
+	        \    },
+	        \ ]
 
-	function! GetChar() abort
-	  let c = getchar()
-	  return type(c) == type(0) ? nr2char(c) : c
-	endfunction
+	      function! GetChar() abort
+	        let c = getchar()
+	        let c = type(c) == type(0) ? nr2char(c) : c
+	        return c ==# "\<Esc>" || c ==# "\<C-c>" ? '' : c
+	      endfunction
 <
 	Default values
 	  * query: 0

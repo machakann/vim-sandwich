@@ -1081,6 +1081,9 @@ function! s:execute(kind, motionwise) dict abort  "{{{
     endif
   catch /^OperatorSandwichError:\%(Add\|Delete\|Replace\):ReadOnly/
     let errormsg = 'operator-sandwich: Cannot make changes to read-only buffer.'
+  catch /^OperatorSandwichCancel/
+    " I don't know why it can be released here, but anyway it can be done.
+    unlet! g:operator#sandwich#object
   catch
     let errormsg = printf('operator-sandwich: Unanticipated error. [%s] %s', v:throwpoint, v:exception)
     unlet! g:operator#sandwich#object
