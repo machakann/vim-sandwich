@@ -1,4 +1,4 @@
-*sandwich.txt*				Last change:08-Aug-2015.
+*sandwich.txt*				Last change:23-Jul-2015.
 
 The set of operator and textobject plugins to edit sandwiched textobjects.
 
@@ -211,9 +211,9 @@ g:sandwich#default_recipes		*g:sandwich#default_recipes*
 	let g:sandwich#default_recipes = [
 	\	{'buns': ['<', '>'], 'expand_range': 0, 'match_syntax': 1},
 	\	{'buns': ['"', '"'], 'quoteescape': 1, 'expand_range': 0,
-	\				'nesting': 0, 'match_syntax': 1},
+	\				'nesting': 0, 'match_syntax': 2},
 	\	{'buns': ["'", "'"], 'quoteescape': 1, 'expand_range': 0,
-	\				'nesting': 0, 'match_syntax': 1},
+	\				'nesting': 0, 'match_syntax': 2},
 	\	{'buns': ['{', '}'], 'nesting': 1, 'match_syntax': 1,
 	\				'skip_break': 1},
 	\	{'buns': ['[', ']'], 'nesting': 1, 'match_syntax': 1},
