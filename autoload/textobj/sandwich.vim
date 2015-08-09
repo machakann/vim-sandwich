@@ -621,11 +621,24 @@ function! s:is_valid_candidate(textobj) dict abort "{{{
   endif
 
   " specific condition for the option 'matched_syntax'
-  if opt.match_syntax != 2
-    let opt_match_syntax_affair = 1
-  else
+  if opt.match_syntax == 2
     let opt_match_syntax_affair = s:is_included_syntax(coord.inner_head, self.syntax)
                              \ || s:is_included_syntax(coord.inner_tail, self.syntax)
+  elseif opt.match_syntax == 3
+    " check inner syntax independently
+    if opt.syntax == []
+      let syntax = [s:get_displaysyntax(coord.inner_head)]
+      let opt_match_syntax_affair = s:is_included_syntax(coord.inner_tail, syntax)
+    else
+      if s:is_included_syntax(coord.inner_head, opt.syntax)
+        let syntax = [s:get_displaysyntax(coord.inner_head)]
+        let opt_match_syntax_affair = s:is_included_syntax(coord.inner_tail, syntax)
+      else
+        let opt_match_syntax_affair = 0
+      endif
+    endif
+  else
+    let opt_match_syntax_affair = 1
   endif
 
   return s:is_equal_or_ahead(tail, head)

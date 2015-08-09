@@ -1,4 +1,4 @@
-*textobj-sandwich.txt*			Last change:08-Aug-2015.
+*textobj-sandwich.txt*			Last change:09-Aug-2015.
 
 The textobject plugin to search and select sandwiched textobjects.
 
@@ -826,19 +826,33 @@ match_syntax
 	If this option is 1, the textobjects check the both surroundings
 	whether their syntaxes are matched or not. If not, the candidate is
 	skipped. In addition to that, if this option is 2, the textobjects
-	also check the both edge of the surrounded text. In many cases, both
-	sides of surroundings have same syntaxes. For example, "" is
-	frequently used for the string literal, "" itself would be applied
-	String syntax and the inside text also applied the same. If the
-	surrounding is not a character, then only the first character would
-	be checked.
+	also check the both edge of the surrounded text whether their
+	colorings are same as those of surroundings. If this option is 3,
+	almost same as that is 3 but textobjects check the inside text
+	independently. That is to say, both surroundings should be same
+	colorings and both edge of surrounded text should be same colorings,
+	but it is not required to be same the colorings of surroundings and
+	that of the surrounded text.
+>
+			AB CD
+			(foo)
+
+	match_syntax is 1: A == D is required.
+	match_syntax is 2: A == D == B == C is required.
+	match_syntax is 3: A == D and B == C is required.
+<
+	If a surrounding is not a character, textobjects check its head only.
+
+	In many cases, both sides of surroundings have same syntaxes. For
+	example, "" is frequently used for the string literal, "" itself would
+	be applied String syntax and the inside text also applied the same.
 >
 	let g:sandwich#recipes += [
 	  \   {
 	  \     'buns': ['"', '"'],
 	  \     'quoteescape' : 1,
-	  \     'syntax'      : ['String']}
-	  \     'match_syntax': 2
+	  \     'syntax'      : ['String'],
+	  \     'match_syntax': 2}
 	  \ ]
 <
 	NOTE: The applied (displayed) syntax can be checked by using the
