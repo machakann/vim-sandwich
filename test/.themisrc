@@ -1,6 +1,7 @@
 set runtimepath+=%:p:h:h
 runtime! %:p:h:h/plugin/*.vim
 set noswapfile
+
 let g:assert = themis#helper('assert')
 
 function! TextobjCoord(l1, c1, l2, c2) abort

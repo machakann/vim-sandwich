@@ -620,32 +620,37 @@ function! s:is_valid_candidate(textobj) dict abort "{{{
     endif
   endif
 
-  " specific condition for the option 'matched_syntax'
+  " specific condition for the option 'matched_syntax' and 'inner_syntax'
   if opt.match_syntax == 2
-    let opt_match_syntax_affair = s:is_included_syntax(coord.inner_head, self.syntax)
-                             \ && s:is_included_syntax(coord.inner_tail, self.syntax)
+    let opt_syntax_affair = s:is_included_syntax(coord.inner_head, self.syntax)
+                       \ && s:is_included_syntax(coord.inner_tail, self.syntax)
   elseif opt.match_syntax == 3
     " check inner syntax independently
-    if opt.syntax == []
+    if opt.inner_syntax == []
       let syntax = [s:get_displaysyntax(coord.inner_head)]
-      let opt_match_syntax_affair = s:is_included_syntax(coord.inner_tail, syntax)
+      let opt_syntax_affair = s:is_included_syntax(coord.inner_tail, syntax)
     else
-      if s:is_included_syntax(coord.inner_head, opt.syntax)
+      if s:is_included_syntax(coord.inner_head, opt.inner_syntax)
         let syntax = [s:get_displaysyntax(coord.inner_head)]
-        let opt_match_syntax_affair = s:is_included_syntax(coord.inner_tail, syntax)
+        let opt_syntax_affair = s:is_included_syntax(coord.inner_tail, syntax)
       else
-        let opt_match_syntax_affair = 0
+        let opt_syntax_affair = 0
       endif
     endif
   else
-    let opt_match_syntax_affair = 1
+    if opt.inner_syntax == []
+      let opt_syntax_affair = 1
+    else
+      let opt_syntax_affair = s:is_included_syntax(coord.inner_head, opt.inner_syntax)
+                         \ && s:is_included_syntax(coord.inner_tail, opt.inner_syntax)
+    endif
   endif
 
   return s:is_equal_or_ahead(tail, head)
         \ && s:is_in_between(self.cursor, coord.head, coord.tail)
         \ && filter(copy(a:textobj.candidates), filter) == []
         \ && visual_mode_affair
-        \ && opt_match_syntax_affair
+        \ && opt_syntax_affair
 endfunction
 "}}}
 function! s:get_buns() dict abort  "{{{
@@ -1377,6 +1382,7 @@ let s:default_opt.auto = {
       \   'synchro'      : 0,
       \   'noremap'      : 1,
       \   'syntax'       : [],
+      \   'inner_syntax' : [],
       \   'match_syntax' : 0,
       \   'skip_break'   : 0,
       \ }
@@ -1390,6 +1396,7 @@ let s:default_opt.query = {
       \   'synchro'      : 0,
       \   'noremap'      : 1,
       \   'syntax'       : [],
+      \   'inner_syntax' : [],
       \   'match_syntax' : 0,
       \   'skip_break'   : 0,
       \ }

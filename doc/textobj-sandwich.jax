@@ -1,4 +1,4 @@
-*textobj-sandwich.jax*	日本語ヘルプ	Last change:09-Aug-2015.
+*textobj-sandwich.jax*	日本語ヘルプ	Last change:10-Aug-2015.
 
 “挟まれた”テキストを検索し選択するためのテキストオブジェクトです。
 
@@ -807,6 +807,44 @@ syntax
 	let g:sandwich#recipes += [
 	  \   {'buns': ['"', '"'], 'quoteescape': 1, 'syntax': ['String']}
 	  \ ]
+
+	" check the position pointed by #
+	"           #   #
+	"           "foo"
+<
+	よく使われるハイライトグループは多くのカラースキーマで共有されていま
+	す。こちらをご覧ください。 |group-name|
+
+	NOTE: リストの要素がシンタックススタックの中に含まれていれば成功とみな
+	      されます。シンタックススタックは次のようなキーマッピングを対象文
+	      字列の上で使用することにより確認できます。
+>
+	nnoremap <Leader>s :echo map(synstack(line('.'), col('.')),
+	                        \ 'synIDattr(synIDtrans(v:val), "name")')<CR>
+<
+	デフォルト値
+	  * query: []
+	  * auto : []
+
+
+
+inner_syntax
+	囲まれたテキストの両端に適用されていることを期待するシンタックスグルー
+	プ名のリストです。このリストが空でなければ、テキストオブジェクトは選択
+	範囲の候補検索時にシンタックスを確認し、リスト要素にマッチするものがな
+	ければスキップします。
+>
+	let g:sandwich#recipes += [
+	  \   {
+	  \     'buns': ['"', '"'],
+	  \     'quoteescape': 1,
+	  \     'inner_syntax': ['String']
+	  \   }
+	  \ ]
+
+	" check the position pointed by #
+	"            # #
+	"           "foo"
 <
 	よく使われるハイライトグループは多くのカラースキーマで共有されていま
 	す。こちらをご覧ください。 |group-name|

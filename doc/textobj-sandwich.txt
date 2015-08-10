@@ -1,4 +1,4 @@
-*textobj-sandwich.txt*			Last change:09-Aug-2015.
+*textobj-sandwich.txt*			Last change:10-Aug-2015.
 
 The textobject plugin to search and select sandwiched textobjects.
 
@@ -805,6 +805,43 @@ syntax
 	let g:sandwich#recipes += [
 	  \   {'buns': ['"', '"'], 'quoteescape': 1, 'syntax': ['String']}
 	  \ ]
+
+	" check the position pointed by #
+	"           #   #
+	"           "foo"
+<
+	In many colorscheme, frequently used highlight group name is shared.
+	See |group-name|.
+
+	NOTE: If an item in the list exists in the syntax stack at the
+	      candidate, it is regarded as the matched. The syntax stack can
+	      be checked by using following keymapping on a text.
+>
+	nnoremap <Leader>s :echo map(synstack(line('.'), col('.')),
+	                        \ 'synIDattr(synIDtrans(v:val), "name")')<CR>
+<
+	Default values
+	  * query: []
+	  * auto : []
+
+
+
+inner_syntax
+	This is a list of syntax groups expected to be applied to the
+	both edges of a surrounded text. If this list is not empty, the
+	textobjects check the syntax to skip candidates.
+>
+	let g:sandwich#recipes += [
+	  \   {
+	  \     'buns': ['"', '"'],
+	  \     'quoteescape': 1,
+	  \     'inner_syntax': ['String']
+	  \   }
+	  \ ]
+
+	" check the position pointed by #
+	"            # #
+	"           "foo"
 <
 	In many colorscheme, frequently used highlight group name is shared.
 	See |group-name|.
