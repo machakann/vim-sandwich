@@ -1251,7 +1251,7 @@ function! s:is_matched_syntax(coord, syntaxID) abort  "{{{
   elseif a:syntaxID == []
     return 1
   else
-    return [s:get_displaysyntax(a:coord)] == a:syntaxID
+    return s:get_displaysyntax(a:coord) ==? a:syntaxID[0]
   endif
 endfunction
 "}}}
@@ -1268,7 +1268,7 @@ function! s:is_included_syntax(coord, syntaxID) abort  "{{{
       return 0
     endif
   else
-    return filter(copy(a:syntaxID), 'match(synstack, v:val) > -1') != []
+    return filter(map(copy(a:syntaxID), '''\c'' . v:val'), 'match(synstack, v:val) > -1') != []
   endif
 endfunction
 "}}}
