@@ -799,8 +799,11 @@ noremap
 syntax
 	This is a list of syntax groups expected to be applied to the
 	surroundings. If this list is not empty, the textobjects check the
-	syntax to skip candidates. For example, ' and " is expected to
-	be highlighted by String highlight group.
+	syntax to skip candidates. If syntax highlighting is not active, this
+	option is simply ignored.
+
+	For example, " is expected to be highlighted by String highlight
+	group.
 >
 	let g:sandwich#recipes += [
 	  \   {'buns': ['"', '"'], 'quoteescape': 1, 'syntax': ['String']}
@@ -829,7 +832,10 @@ syntax
 inner_syntax
 	This is a list of syntax groups expected to be applied to the
 	both edges of a surrounded text. If this list is not empty, the
-	textobjects check the syntax to skip candidates.
+	textobjects check the syntax to skip candidates. If syntax
+	highlighting is not active, this option is simply ignored.
+	In addition, also when "match_syntax" option is 2, this option is
+	ignored.
 >
 	let g:sandwich#recipes += [
 	  \   {

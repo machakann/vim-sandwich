@@ -114,6 +114,10 @@ else
   let s:has_patch_7_4_358 = v:version == 704 && has('patch358')
 endif
 
+" syntax
+" NOTE: this would be evaluated every in textobj.initialiize()
+let s:is_syntax_on = 0
+
 " features
 let s:has_reltime_and_float = has('reltime') && has('float')
 "}}}
@@ -328,7 +332,7 @@ function! s:search_with_nest(textobj) dict abort  "{{{
     if head == s:null_coord | break | endif
     let coord.head = head
 
-    let self.syntax = opt.match_syntax ? [s:get_displaysyntax(head)] : []
+    let self.syntax = s:is_syntax_on && opt.match_syntax ? [s:get_displaysyntax(head)] : []
 
     " search tail
     let tail = searchpairpos(buns[0], '', buns[1], '', 'self.skip(0)', range.bottom, stimeoutlen)
@@ -381,7 +385,7 @@ function! s:search_without_nest(textobj) dict abort  "{{{
   endif
   let _tail = searchpos(buns[0], 'ce', range.bottom, stimeoutlen)
 
-  let self.syntax = opt.match_syntax ? [s:get_displaysyntax(head)] : []
+  let self.syntax = s:is_syntax_on && opt.match_syntax ? [s:get_displaysyntax(head)] : []
 
   " search nearest tail
   call cursor(self.cursor)
@@ -406,7 +410,7 @@ function! s:search_without_nest(textobj) dict abort  "{{{
       " pos is head
       let head = pos
 
-      let self.syntax = opt.match_syntax ? [s:get_displaysyntax(head)] : []
+      let self.syntax = s:is_syntax_on && opt.match_syntax ? [s:get_displaysyntax(head)] : []
 
       " search tail
       call search(buns[0], 'ce', range.bottom, stimeoutlen)
@@ -420,7 +424,7 @@ function! s:search_without_nest(textobj) dict abort  "{{{
       call cursor(pos)
       let tail = self.searchpos(buns[1], 'ce',  range.bottom, stimeoutlen, 1)
 
-      let self.syntax = opt.match_syntax ? [s:get_displaysyntax(tail)] : []
+      let self.syntax = s:is_syntax_on && opt.match_syntax ? [s:get_displaysyntax(tail)] : []
 
       " search head
       call search(buns[1], 'bc', range.top, stimeoutlen)
@@ -552,13 +556,15 @@ function! s:skip(is_head, ...) dict abort  "{{{
     return 1
   endif
 
-  if a:is_head || !opt.match_syntax
-    if opt.syntax != [] && !s:is_included_syntax(coord, opt.syntax)
-      return 1
-    endif
-  else
-    if !s:is_matched_syntax(coord, self.syntax)
-      return 1
+  if s:is_syntax_on
+    if a:is_head || !opt.match_syntax
+      if opt.syntax != [] && !s:is_included_syntax(coord, opt.syntax)
+        return 1
+      endif
+    else
+      if !s:is_matched_syntax(coord, self.syntax)
+        return 1
+      endif
     endif
   endif
 
@@ -621,29 +627,33 @@ function! s:is_valid_candidate(textobj) dict abort "{{{
   endif
 
   " specific condition for the option 'matched_syntax' and 'inner_syntax'
-  if opt.match_syntax == 2
-    let opt_syntax_affair = s:is_included_syntax(coord.inner_head, self.syntax)
-                       \ && s:is_included_syntax(coord.inner_tail, self.syntax)
-  elseif opt.match_syntax == 3
-    " check inner syntax independently
-    if opt.inner_syntax == []
-      let syntax = [s:get_displaysyntax(coord.inner_head)]
-      let opt_syntax_affair = s:is_included_syntax(coord.inner_tail, syntax)
-    else
-      if s:is_included_syntax(coord.inner_head, opt.inner_syntax)
+  if s:is_syntax_on
+    if opt.match_syntax == 2
+      let opt_syntax_affair = s:is_included_syntax(coord.inner_head, self.syntax)
+                        \ && s:is_included_syntax(coord.inner_tail, self.syntax)
+    elseif opt.match_syntax == 3
+      " check inner syntax independently
+      if opt.inner_syntax == []
         let syntax = [s:get_displaysyntax(coord.inner_head)]
         let opt_syntax_affair = s:is_included_syntax(coord.inner_tail, syntax)
       else
-        let opt_syntax_affair = 0
+        if s:is_included_syntax(coord.inner_head, opt.inner_syntax)
+          let syntax = [s:get_displaysyntax(coord.inner_head)]
+          let opt_syntax_affair = s:is_included_syntax(coord.inner_tail, syntax)
+        else
+          let opt_syntax_affair = 0
+        endif
+      endif
+    else
+      if opt.inner_syntax == []
+        let opt_syntax_affair = 1
+      else
+        let opt_syntax_affair = s:is_included_syntax(coord.inner_head, opt.inner_syntax)
+                          \ && s:is_included_syntax(coord.inner_tail, opt.inner_syntax)
       endif
     endif
   else
-    if opt.inner_syntax == []
-      let opt_syntax_affair = 1
-    else
-      let opt_syntax_affair = s:is_included_syntax(coord.inner_head, opt.inner_syntax)
-                         \ && s:is_included_syntax(coord.inner_tail, opt.inner_syntax)
-    endif
+    let opt_syntax_affair = 1
   endif
 
   return s:is_equal_or_ahead(tail, head)
@@ -817,6 +827,7 @@ endfunction
 function! s:initialize() dict abort  "{{{
   let self.count = !self.state && self.count != v:count1 ? v:count1 : self.count
   let self.done  = 0
+  let s:is_syntax_on = exists('g:syntax_on') || exists('g:syntax_manual')
 
   if self.mode ==# 'x'
     let self.visualmark.head = getpos("'<")[1:2]
