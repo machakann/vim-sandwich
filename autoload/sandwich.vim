@@ -10,8 +10,8 @@ if exists('g:sandwich#default_recipes')
 endif
 let g:sandwich#default_recipes = [
       \   {'buns': ['<', '>'], 'expand_range': 0, 'match_syntax': 1},
-      \   {'buns': ['"', '"'], 'quoteescape': 1, 'expand_range': 0, 'nesting': 0, 'match_syntax': 1, 'syntax': ['String', 'Statement', 'Special'], 'inner_syntax': ['String', 'PreProc', 'Special']},
-      \   {'buns': ["'", "'"], 'quoteescape': 1, 'expand_range': 0, 'nesting': 0, 'match_syntax': 1, 'syntax': ['String', 'Statement', 'Special'], 'inner_syntax': ['String', 'PreProc', 'Special']},
+      \   {'buns': ['"', '"'], 'quoteescape': 1, 'expand_range': 0, 'nesting': 0, 'match_syntax': 1, 'syntax': ['Constant', 'Statement', 'Special', 'String', 'Comment'], 'inner_syntax': ['Constant', 'PreProc', 'Special', 'String', 'Comment']},
+      \   {'buns': ["'", "'"], 'quoteescape': 1, 'expand_range': 0, 'nesting': 0, 'match_syntax': 1, 'syntax': ['Constant', 'Statement', 'Special', 'String', 'Comment'], 'inner_syntax': ['Constant', 'PreProc', 'Special', 'String', 'Comment']},
       \   {'buns': ['{', '}'], 'nesting': 1, 'match_syntax': 1, 'skip_break': 1},
       \   {'buns': ['[', ']'], 'nesting': 1, 'match_syntax': 1},
       \   {'buns': ['(', ')'], 'nesting': 1, 'match_syntax': 1},
