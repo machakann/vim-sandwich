@@ -1,4 +1,4 @@
-*textobj-sandwich.txt*			Last change:10-Aug-2015.
+*textobj-sandwich.txt*			Last change:15-Aug-2015.
 
 The textobject plugin to search and select sandwiched textobjects.
 
@@ -31,11 +31,14 @@ CONFIGURATION			|textobj-sandwich-configuration|
     expand_range
     regex
     skip_regex
+    skip_regex_head
+    skip_regex_tail
     quoteescape
     expr
     synchro
     noremap
     syntax
+    inner_syntax
     match_syntax
     skip_breaking
   GLOBAL OPTIONS
@@ -578,11 +581,14 @@ g:textobj#sandwich#options		*g:textobj#sandwich#options*
 	    - expand_range
 	    - regex
 	    - skip_regex
+	    - skip_regex_head
+	    - skip_regex_tail
 	    - quoteescape
 	    - expr
 	    - synchro
 	    - noremap
 	    - syntax
+	    - inner_syntax
 	    - match_syntax
 	    - skip_break
 
@@ -661,10 +667,12 @@ regex
 
 
 skip_regex
-	This is a list of regular expressions to skip candidate positions in
+skip_regex_head
+skip_regex_tail
+	These are lists of regular expressions to skip candidate positions in
 	searching. When the textobjects searches a target text, even though a
 	text matched with "buns", if the text also matched with an item in
-	this list then it will be skipped. The regular expression have to
+	these lists then it will be skipped. The regular expression have to
 	matched with the head of a skipped text.
 >
 	let g:sandwich#recipes += [
@@ -673,27 +681,36 @@ skip_regex
 	" Press dib
 	" baaaaaaaar   --->   bar
 <
-	For instance, successive two quotes, '', inside a quote wrapped string
-	literal is regarded as a quote in vimscript.
+	Items in "skip_regex" are checked both in searching head and tail
+	buns. Usually this is enough helpful, but if head, tail and escape
+	character are all same, it might be a problem. For instance,
+	successive two quotes, '', inside a quote wrapped string literal is
+	regarded as a quote in Vim script.
 >
-	:echo 'foo''bar'		" -> foo'bar
+	:echo '''foo bar'''		" -> 'foo bar'
 <
-	To skip these quote, use this option.
+	To skip the successive quotes, searching head and tail are required to
+	be distinguished. Use "skip_regex_head", "skip_regex_tail".
 >
 	let g:sandwich#recipes += [
 	  \   {
 	  \     'buns': ["'", "'"],
 	  \     'filetype': ['vim'],
 	  \     'expand_range': 0,
-	  \     'skip_regex':
-	  \       [
-	  \         "[^']\\%(''\\)*\\%#\\zs''",
-	  \         "[^']\\%(''\\)*'\\%#\\zs'",
-	  \       ],
-	  \     'quoteescape': 1,
+	  \     'skip_regex_head':
+	  \       ['\%(\%#\zs''\|''\%#\zs\)''\%(''''\)*[^'']'],
+	  \     'skip_regex_tail':
+	  \       ['[^'']\%(''''\)*\%(\%#\zs''\|''\%#\zs\)'''],
+	  \     'nesting': 0
 	  \     'match_syntax': 2,
 	  \   }
 	  \ ]
+<
+	NOTE: This is still not perfect. If cursor is on ended successive
+	      single quotes, it does not work as expected.
+>
+			###          ###   : Cursor should not be on
+			'''foo '' bar'''   : the positions pointed by #.
 <
 	Cursor is moving in searching positions, thus user can use the pattern
 	|\%#|.
@@ -736,7 +753,7 @@ expr
 	      text between the two characters.
 	
 	NOTE: If "buns" include empty string resulting of the evaluation,
-	      |textobj-sandwich| cancel the selection.
+	      |textobj-sandwich| cancels the selection.
 >
 	      let g:textobj#sandwich#recipes += [
 	        \    {

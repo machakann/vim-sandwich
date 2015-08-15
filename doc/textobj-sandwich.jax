@@ -1,4 +1,4 @@
-*textobj-sandwich.jax*	日本語ヘルプ	Last change:10-Aug-2015.
+*textobj-sandwich.jax*	日本語ヘルプ	Last change:15-Aug-2015.
 
 “挟まれた”テキストを検索し選択するためのテキストオブジェクトです。
 
@@ -31,11 +31,14 @@ CONFIGURATION			|textobj-sandwich-configuration|
     expand_range
     regex
     skip_regex
+    skip_regex_head
+    skip_regex_tail
     quoteescape
     expr
     synchro
     noremap
     syntax
+    inner_syntax
     match_syntax
     skip_breaking
   GLOBAL OPTIONS
@@ -587,11 +590,14 @@ g:textobj#sandwich#options		*g:textobj#sandwich#options*
 	    - expand_range
 	    - regex
 	    - skip_regex
+	    - skip_regex_head
+	    - skip_regex_tail
 	    - quoteescape
 	    - expr
 	    - synchro
 	    - noremap
 	    - syntax
+	    - inner_syntax
 	    - match_syntax
 	    - skip_break
 
@@ -665,6 +671,8 @@ regex
 
 
 skip_regex
+skip_regex_head
+skip_regex_tail
 	選択範囲候補を検索の際に、候補をスキップするための正規表現を収めた
 	|list| です。"buns" にマッチしたとしても同時にこのリストのどれかにも同
 	時にマッチした場合、この候補はスキップされます。正規表現は "buns" に
@@ -676,28 +684,37 @@ skip_regex
 	" Press dib
 	" baaaaaaaar   --->   bar
 <
-	例えば vimscript では、シングルクオーテーションに囲まれた領域内の連続
-	した二つのシングルクオーテーションは一つのシングルクオーテーションとみ
-	なされます。
+	"skip_regex" の要素は前方と後方の、両方の囲みの検索で使われます。通常
+	はこれで十分に便利なのですが、両方の囲みとエスケープ文字がすべて同一の
+	場合などに問題になります。例えば Vim script では、シングルクオーテーシ
+	ョンに囲まれた領域内の連続した二つのシングルクオーテーションは一つのシ
+	ングルクオーテーションとみなされます。
 >
 	:echo 'foo''bar'		" -> foo'bar
 <
-	これをスキップするのにこのオプションが使えます。
+	これをスキップするためには前方の検索か、後方の検索かを区別しなければな
+	りません。なので、 "skip_regex_head" 及び "skip_regex_tail" を使いまし
+	ょう。
 >
 	let g:sandwich#recipes += [
 	  \   {
 	  \     'buns': ["'", "'"],
 	  \     'filetype': ['vim'],
 	  \     'expand_range': 0,
-	  \     'skip_regex':
-	  \       [
-	  \         "[^']\\%(''\\)*\\%#\\zs''",
-	  \         "[^']\\%(''\\)*'\\%#\\zs'",
-	  \       ],
-	  \     'quoteescape': 1,
+	  \     'skip_regex_head':
+	  \       ['\%(\%#\zs''\|''\%#\zs\)''\%(''''\)*[^'']'],
+	  \     'skip_regex_tail':
+	  \       ['[^'']\%(''''\)*\%(\%#\zs''\|''\%#\zs\)'''],
+	  \     'nesting': 0
 	  \     'match_syntax': 2,
 	  \   }
 	  \ ]
+<
+	NOTE: 残念ながら、カーソルが両端の連続するシングルクオーテーションの上
+	      にある場合はこの設定でもうまく働きません。
+>
+			###          ###   : Cursor should not be on
+			'''foo '' bar'''   : the positions pointed by #.
 <
 	検索の間、内部的にカーソルを動かしているので、カーソルを表す正規表現の
 	|\%#| が使えます。

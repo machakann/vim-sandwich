@@ -577,7 +577,8 @@ function! s:skip(is_head, ...) dict abort  "{{{
     endfor
   endif
 
-  let skip_patterns += copy(opt.skip_regex)
+  let skip_patterns += opt.skip_regex
+  let skip_patterns += a:is_head ? opt.skip_regex_head : opt.skip_regex_tail
   if skip_patterns != []
     call cursor(coord)
     for pattern in skip_patterns
@@ -1384,32 +1385,36 @@ lockvar! g:textobj#sandwich#default_recipes
 " options "{{{
 let s:default_opt = {}
 let s:default_opt.auto = {
-      \   'expr'         : 0,
-      \   'regex'        : 0,
-      \   'skip_regex'   : [],
-      \   'quoteescape'  : 0,
-      \   'expand_range' : -1,
-      \   'nesting'      : 0,
-      \   'synchro'      : 0,
-      \   'noremap'      : 1,
-      \   'syntax'       : [],
-      \   'inner_syntax' : [],
-      \   'match_syntax' : 0,
-      \   'skip_break'   : 0,
+      \   'expr'           : 0,
+      \   'regex'          : 0,
+      \   'skip_regex'     : [],
+      \   'skip_regex_head': [],
+      \   'skip_regex_tail': [],
+      \   'quoteescape'    : 0,
+      \   'expand_range'   : -1,
+      \   'nesting'        : 0,
+      \   'synchro'        : 0,
+      \   'noremap'        : 1,
+      \   'syntax'         : [],
+      \   'inner_syntax'   : [],
+      \   'match_syntax'   : 0,
+      \   'skip_break'     : 0,
       \ }
 let s:default_opt.query = {
-      \   'expr'         : 0,
-      \   'regex'        : 0,
-      \   'skip_regex'   : [],
-      \   'quoteescape'  : 0,
-      \   'expand_range' : -1,
-      \   'nesting'      : 0,
-      \   'synchro'      : 0,
-      \   'noremap'      : 1,
-      \   'syntax'       : [],
-      \   'inner_syntax' : [],
-      \   'match_syntax' : 0,
-      \   'skip_break'   : 0,
+      \   'expr'           : 0,
+      \   'regex'          : 0,
+      \   'skip_regex'     : [],
+      \   'skip_regex_head': [],
+      \   'skip_regex_tail': [],
+      \   'quoteescape'    : 0,
+      \   'expand_range'   : -1,
+      \   'nesting'        : 0,
+      \   'synchro'        : 0,
+      \   'noremap'        : 1,
+      \   'syntax'         : [],
+      \   'inner_syntax'   : [],
+      \   'match_syntax'   : 0,
+      \   'skip_break'     : 0,
       \ }
 function! s:initialize_options(...) abort  "{{{
   let manner = a:0 ? a:1 : 'keep'
