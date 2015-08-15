@@ -912,7 +912,7 @@ inner_syntax
 	  \   {
 	  \     'buns': ['"', '"'],
 	  \     'quoteescape': 1,
-	  \     'inner_syntax': ['String']
+	  \     'inner_syntax': ['Constant', 'String']
 	  \   }
 	  \ ]
 
@@ -961,17 +961,21 @@ match_syntax
 	If a surrounding is not a character, textobjects check its head only.
 
 	In many cases, both sides of surroundings have same syntaxes. For
-	example, "" is frequently used for the string literal, "" itself would
-	be applied String syntax and the inside text also applied the same.
+	example, '' is frequently used for the string literal, "" itself would
+	be applied Constant or String syntax and the inside text also applied
+	the same.
 >
 	let g:sandwich#recipes += [
 	  \   {
-	  \     'buns': ['"', '"'],
+	  \     'buns': ["'", "'"],
 	  \     'quoteescape' : 1,
-	  \     'syntax'      : ['String'],
-	  \     'match_syntax': 2}
+	  \     'syntax'      : ['Constant', 'String'],
+	  \     'match_syntax': 2
+	  \   }
 	  \ ]
 <
+	There are also other examples in the section of local option "syntax".
+
 	NOTE: The applied (displayed) syntax can be checked by using the
 	      following keymapping on a text.
 >

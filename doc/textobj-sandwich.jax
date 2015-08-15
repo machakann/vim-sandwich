@@ -911,7 +911,7 @@ inner_syntax
 	  \   {
 	  \     'buns': ['"', '"'],
 	  \     'quoteescape': 1,
-	  \     'inner_syntax': ['String']
+	  \     'inner_syntax': ['Constant', 'String']
 	  \   }
 	  \ ]
 
@@ -957,17 +957,20 @@ match_syntax
 <
 	囲み文字が一文字でない場合はそれぞれの先頭位置が確認されます。
 
-	例えば "" は一般的にそれ自体を含み、内部の文字列もStringシンタックスが
-	適用されているでしょう。
+	例えば '' は一般的にそれ自体を含み、内部の文字列もConstant か String
+	シンタックスが適用されているでしょう。
 >
 	let g:sandwich#recipes += [
 	  \   {
-	  \     'buns': ['"', '"'],
+	  \     'buns': ["'", "'"],
 	  \     'quoteescape' : 1,
-	  \     'syntax'      : ['String']}
-	  \     'match_syntax': 2
+	  \     'syntax'      : ['Constant', 'String'],
+	  \     'match_syntax': 2,
+	  \   }
 	  \ ]
 <
+	Local option "syntax" の項にも使用例がありますのでご覧ください。
+
 	NOTE: 適用されたシンタックスアイテムは次のようなキーマッピングを対象文
 	      字列の上で使用することで調べられます。
 >
