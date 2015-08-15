@@ -847,7 +847,7 @@ function! s:restore_indent() dict abort  "{{{
     elseif opt.autoindent == 1
       let [&l:autoindent, &l:smartindent, &l:cindent, &l:indentexpr] = indent.autoindent
     elseif opt.autoindent == 2
-      let [&l:smartindent, &l:cindent, &l:indentexpr] = indent.autoindent[1:]
+      let [&l:autoindent, &l:smartindent, &l:cindent, &l:indentexpr] = indent.autoindent
     elseif opt.autoindent == 3
       let [&l:cindent, &l:indentexpr] = indent.autoindent[2:]
     endif
