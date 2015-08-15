@@ -818,18 +818,72 @@ syntax
 	surroundings. If this list is not empty, the textobjects check the
 	syntax to skip candidates. If syntax highlighting is not active, this
 	option is simply ignored.
-
-	For example, " is expected to be highlighted by String highlight
-	group.
 >
-	let g:sandwich#recipes += [
-	  \   {'buns': ['"', '"'], 'quoteescape': 1, 'syntax': ['String']}
-	  \ ]
-
 	" check the position pointed by #
 	"           #   #
 	"           "foo"
 <
+	For example, " is expected to be highlighted by several limited
+	highlight groups.
+>
+	let g:sandwich#recipes += [
+	  \   {
+	  \     'buns': ['"', '"'],
+	  \     'quoteescape': 1,
+	  \     'expand_range': 0,
+	  \     'nesting': 0,
+	  \     'match_syntax': 1,
+	  \     'syntax':
+	  \       ['Constant', 'Statement', 'Special', 'String', 'Comment'],
+	  \     'inner_syntax':
+	  \       ['Constant', 'PreProc', 'Special', 'String', 'Comment'],
+	  \   }
+	  \ ]
+<
+	However the recipe is not useful for some filetype, for example
+	markdown, while it really goes well with some filetypes to recognize
+	strings surrounded by "" even in the following situation.
+>
+	key press vas" selects as following. # means cursor positions.
+
+	        <-#->
+	list = ["foo", "bar"]
+	       <-----#------>
+<
+	Therefore, if possible, it would be better to prepare recipes for each
+	filetypes.
+>
+	let g:sandwich#recipes += [
+	  \   {
+	  \     'buns': ['"', '"'],
+	  \     'filetype': ['ruby'],
+	  \     'quoteescape': 1,
+	  \     'expand_range': 0,
+	  \     'nesting': 0,
+	  \     'match_syntax': 1,
+	  \     'syntax':
+	  \       ['Constant', 'Special', 'String', 'Comment'],
+	  \     'inner_syntax':
+	  \       ['Constant', 'Special', 'String', 'Comment'],
+	  \   }
+	  \ ]
+
+	let g:sandwich#recipes += [
+	  \   {
+	  \     'buns': ['"', '"'],
+	  \     'filetype': ['sh'],
+	  \     'quoteescape': 1,
+	  \     'expand_range': 0,
+	  \     'nesting': 0,
+	  \     'match_syntax': 1,
+	  \     'syntax':
+	  \       ['Constant', 'Statement', 'String', 'Comment'],
+	  \     'inner_syntax':
+	  \       ['Constant', 'Special', 'PreProc', 'String', 'Comment'],
+	  \   }
+	  \ ]
+<
+
 	In many colorscheme, frequently used highlight group name is shared.
 	See |group-name|.
 
@@ -866,6 +920,9 @@ inner_syntax
 	"            # #
 	"           "foo"
 <
+	There are practical examples in the above, local option "syntax",
+	section. Please see also them.
+
 	In many colorscheme, frequently used highlight group name is shared.
 	See |group-name|.
 

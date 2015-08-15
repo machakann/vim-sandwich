@@ -819,17 +819,70 @@ syntax
 	ストです。このリストが空でなければ、テキストオブジェクトは選択範囲の候
 	補検索時にシンタックスを確認し、リスト要素にマッチするものがなければス
 	キップします。構文ハイライトがオフになっていれば単に無視されます。
-
-	例えば "" は一般的に String ハイライトグループが適用されているでしょ
-	う。
 >
-	let g:sandwich#recipes += [
-	  \   {'buns': ['"', '"'], 'quoteescape': 1, 'syntax': ['String']}
-	  \ ]
-
 	" check the position pointed by #
 	"           #   #
 	"           "foo"
+<
+	例えば "" は一般的にいくつかの限られたハイライトグループが適用されてい
+	ることが期待できます。
+>
+	let g:sandwich#recipes += [
+	  \   {
+	  \     'buns': ['"', '"'],
+	  \     'quoteescape': 1,
+	  \     'expand_range': 0,
+	  \     'nesting': 0,
+	  \     'match_syntax': 1,
+	  \     'syntax':
+	  \       ['Constant', 'Statement', 'Special', 'String', 'Comment'],
+	  \     'inner_syntax':
+	  \       ['Constant', 'PreProc', 'Special', 'String', 'Comment'],
+	  \   }
+	  \ ]
+<
+	このレシピは次のような場合も文字列としての "" に囲まれた領域をよく認識
+	します。
+>
+	key press vas" selects as following. # means cursor positions.
+
+	        <-#->
+	list = ["foo", "bar"]
+	       <------#----->
+<
+	しかし残念ながらこのレシピは汎用的とはいえずマークダウンのようなファイ
+	ルタイプでうまく働きません。なので可能ならば使用するファイルタイプごと
+	に設定するのが望ましいでしょう。
+>
+	let g:sandwich#recipes += [
+	  \   {
+	  \     'buns': ['"', '"'],
+	  \     'filetype': ['ruby'],
+	  \     'quoteescape': 1,
+	  \     'expand_range': 0,
+	  \     'nesting': 0,
+	  \     'match_syntax': 1,
+	  \     'syntax':
+	  \       ['Constant', 'Special', 'String', 'Comment'],
+	  \     'inner_syntax':
+	  \       ['Constant', 'Special', 'String', 'Comment'],
+	  \   }
+	  \ ]
+
+	let g:sandwich#recipes += [
+	  \   {
+	  \     'buns': ['"', '"'],
+	  \     'filetype': ['sh'],
+	  \     'quoteescape': 1,
+	  \     'expand_range': 0,
+	  \     'nesting': 0,
+	  \     'match_syntax': 1,
+	  \     'syntax':
+	  \       ['Constant', 'Statement', 'String', 'Comment'],
+	  \     'inner_syntax':
+	  \       ['Constant', 'Special', 'PreProc', 'String', 'Comment'],
+	  \   }
+	  \ ]
 <
 	よく使われるハイライトグループは多くのカラースキーマで共有されていま
 	す。こちらをご覧ください。 |group-name|
@@ -866,6 +919,9 @@ inner_syntax
 	"            # #
 	"           "foo"
 <
+	一つ上の local option "syntax" の項に実用的な使用例があります。こちら
+	もご覧ください。
+
 	よく使われるハイライトグループは多くのカラースキーマで共有されていま
 	す。こちらをご覧ください。 |group-name|
 
