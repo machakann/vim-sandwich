@@ -809,7 +809,8 @@ function! s:set_indent() dict abort "{{{
     let [&l:autoindent, &l:smartindent, &l:cindent, &l:indentexpr] = [1, 0, 0, '']
     let indent.restore_indent = 1
   elseif opt.autoindent == 2
-    let [&l:smartindent, &l:cindent, &l:indentexpr] = [1, 0, '']
+    " NOTE: 'Smartindent' requires 'autoindent'. :help 'smartindent'
+    let [&l:autoindent, &l:smartindent, &l:cindent, &l:indentexpr] = [1, 1, 0, '']
     let indent.restore_indent = 1
   elseif opt.autoindent == 3
     let [&l:cindent, &l:indentexpr] = [1, '']
