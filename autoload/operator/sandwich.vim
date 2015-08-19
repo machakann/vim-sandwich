@@ -424,71 +424,65 @@ function! s:add_once(buns, undojoin, done, next_act) dict abort "{{{
   endif
 
   if s:is_valid_4pos(target)
-    if opt.skip_space
-      call s:skip_space(target.head1, 'c',  target.head2[1])
-      call s:skip_space(target.head2, 'bc', target.tail1[1])
-    endif
+        \ && s:is_equal_or_ahead(target.head2, target.head1)
+    let target.head2[0:3] = s:get_right_pos(target.head2)
+    call self.set_indent()
 
-    if s:is_valid_4pos(target)
-          \ && s:is_equal_or_ahead(target.head2, target.head1)
-      let target.head2[0:3] = s:get_right_pos(target.head2)
-      call self.set_indent()
-
-      try
-        call setpos('.', target.head2)
-        if opt.linewise
-          execute undojoin_cmd . startinsert_o . a:buns[1]
-          let is_linewise[1] = 1
-        else
-          execute undojoin_cmd . startinsert_i . a:buns[1]
-        endif
-        let indent[1] = indent(line("']"))
-        let tail = getpos("']")
-
-        call setpos('.', target.head1)
-        if opt.linewise
-          execute startinsert_O . a:buns[0]
-          let is_linewise[0] = 1
-        else
-          execute startinsert_i . a:buns[0]
-        endif
-        let indent[0] = indent(line("']"))
-        let head = getpos("'[")
-      catch /^Vim\%((\a\+)\)\=:E21/
-        throw 'OperatorSandwichError:Add:ReadOnly'
-      finally
-        call self.restore_indent()
-      endtry
-
-      " get tail
-      call s:push1(tail, target, a:buns, indent, is_linewise)
-
-      " update modmark
-      if modmark.head == s:null_pos || s:is_ahead(modmark.head, head)
-        let modmark.head = head
-      endif
-      if modmark.tail == s:null_pos
-        let modmark.tail = tail
+    try
+      call setpos('.', target.head2)
+      if opt.linewise
+        execute undojoin_cmd . startinsert_o . a:buns[1]
+        let is_linewise[1] = 1
       else
-        call s:shift_for_add(modmark.tail, target, a:buns, indent, is_linewise)
-        if s:is_ahead(tail, modmark.tail)
-          let modmark.tail = tail
-        endif
+        execute undojoin_cmd . startinsert_i . a:buns[1]
       endif
+      let indent[1] = indent(line("']"))
+      let tail = getpos("']")
 
-      " update cursor position
-      call s:shift_for_add(self.cursor.inner_head, target, a:buns, indent, is_linewise)
-      call s:shift_for_add(self.cursor.keep,       target, a:buns, indent, is_linewise)
-      call s:shift_for_add(self.cursor.inner_tail, target, a:buns, indent, is_linewise)
+      call setpos('.', target.head1)
+      if opt.linewise
+        execute startinsert_O . a:buns[0]
+        let is_linewise[0] = 1
+      else
+        execute startinsert_i . a:buns[0]
+      endif
+      let indent[0] = indent(line("']"))
+      let head = getpos("'[")
+    catch /^Vim\%((\a\+)\)\=:E21/
+      throw 'OperatorSandwichError:Add:ReadOnly'
+    finally
+      call self.restore_indent()
+    endtry
 
-      " update next_act
-      let a:next_act.region.head = copy(head)
-      let a:next_act.region.tail = s:get_left_pos(tail)
+    " get tail
+    call s:push1(tail, target, a:buns, indent, is_linewise)
 
-      let undojoin = 0
-      let done     = 1
+    " update modmark
+    if modmark.head == s:null_pos || s:is_ahead(modmark.head, head)
+      let modmark.head = head
     endif
+    if modmark.tail == s:null_pos
+      let modmark.tail = tail
+    else
+      call s:shift_for_add(modmark.tail, target, a:buns, indent, is_linewise)
+      if s:is_ahead(tail, modmark.tail)
+        let modmark.tail = tail
+      endif
+    endif
+
+    " update cursor position
+    call s:shift_for_add(self.cursor.inner_head, target, a:buns, indent, is_linewise)
+    call s:shift_for_add(self.cursor.keep,       target, a:buns, indent, is_linewise)
+    call s:shift_for_add(self.cursor.inner_tail, target, a:buns, indent, is_linewise)
+
+    " update next_act
+    let a:next_act.region.head = copy(head)
+    let a:next_act.region.tail = s:get_left_pos(tail)
+
+    let undojoin = 0
+    let done     = 1
   endif
+
   return [undojoin, done]
 endfunction
 "}}}
@@ -1253,6 +1247,11 @@ function! s:add() dict abort "{{{
       let act.target.tail1 = act.target.head1
       let act.target.head2 = copy(act.region.tail)
       let act.target.tail2 = act.target.head2
+
+      if opt.skip_space
+        call s:skip_space(act.target.head1, 'c',  act.target.head2[1])
+        call s:skip_space(act.target.head2, 'bc', act.target.tail1[1])
+      endif
     endfor
 
     if self.state
@@ -2082,8 +2081,10 @@ function! s:highlight_add(acts) abort  "{{{
   let order_list = []
   for act in a:acts
     let target = act.target
-    call s:highlight_order(order_list, target.head1, target.tail1)
-    call s:highlight_order(order_list, target.head2, target.tail2)
+    if s:is_valid_4pos(target)
+      call s:highlight_order(order_list, target.head1, target.tail1)
+      call s:highlight_order(order_list, target.head2, target.tail2)
+    endif
   endfor
 
   let id_list    = []
