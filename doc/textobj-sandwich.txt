@@ -1,4 +1,4 @@
-*textobj-sandwich.txt*			Last change:15-Aug-2015.
+*textobj-sandwich.txt*			Last change:22-Aug-2015.
 
 The textobject plugin to search and select sandwiched textobjects.
 
@@ -41,6 +41,7 @@ CONFIGURATION			|textobj-sandwich-configuration|
     inner_syntax
     match_syntax
     skip_breaking
+    skip_expr
   GLOBAL OPTIONS
     timeoutlen			|g:textobj#sandwich#timeoutlen|
     stimeoutlen			|g:textobj#sandwich#stimeoutlen|
@@ -591,6 +592,7 @@ g:textobj#sandwich#options		*g:textobj#sandwich#options*
 	    - inner_syntax
 	    - match_syntax
 	    - skip_break
+	    - skip_expr
 
 
 
@@ -1025,6 +1027,58 @@ skip_break
 	Default values
 	  * query: 0
 	  * auto : 0
+
+
+
+skip_expr
+	The value is a list of |expression|s. Searching the selection area,
+	every time when a text matched with buns is found the expressions are
+	evalueated. If the expression returns true (not 0), then the candidate
+	is skipped and textobject searches next.
+>
+	" skip 'a's other than head and tail of a line.
+	let g:sandwich#recipes += [
+	  \   {
+	  \     'buns': ['a', 'a'],
+	  \     'skip_expr': [
+	  \       'getpos(".")[2] != 1 && getpos(".")[2] != col([getpos(".")[1], "$"])-1'
+	  \     ]
+	  \   }
+	  \ ]
+	" Press dib
+	" aaaaa   --->   aa
+<
+	Note that if the item is |Funcref|, it should be possible to accept
+	two arguments.
+>
+	:function {func}(is_head, pos)
+<
+	If a:is_head is 1, the textobject is searching a head surrounding
+	matched with buns. Otherwise the textobject is searching a tail
+	surrounding matched with buns. a:pos is a list pointing the head of
+	matched position. It has four items which is same format with the
+	argument of |getpos()|. Not necessarily to use them, use if needed.
+	In future, the arguments are possible to append. Thus it might be
+	better to assign variable-length argument.
+>
+	" skip 'a's other than head and tail of a line.
+	function! SkipIntermediates(is_head, pos, ...)
+	  if a:is_head
+	    return a:pos[2] != 1
+	  else
+	    return a:pos[2] != col([a:pos[1], '$'])-1
+	  endif
+	endfunction
+
+	let g:sandwich#recipes += [
+	  \   {
+	  \     'buns': ['a', 'a'],
+	  \     'skip_expr': [function('SkipIntermediates')]
+	  \   }
+	  \ ]
+	" Press dib
+	" aaaaa   --->   aa
+<
 
 
 

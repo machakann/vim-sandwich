@@ -1,4 +1,4 @@
-*textobj-sandwich.jax*	日本語ヘルプ	Last change:15-Aug-2015.
+*textobj-sandwich.jax*	日本語ヘルプ	Last change:22-Aug-2015.
 
 “挟まれた”テキストを検索し選択するためのテキストオブジェクトです。
 
@@ -40,7 +40,8 @@ CONFIGURATION			|textobj-sandwich-configuration|
     syntax
     inner_syntax
     match_syntax
-    skip_breaking
+    skip_break
+    skip_expr
   GLOBAL OPTIONS
     timeoutlen			|g:textobj#sandwich#timeoutlen|
     stimeoutlen			|g:textobj#sandwich#stimeoutlen|
@@ -600,6 +601,7 @@ g:textobj#sandwich#options		*g:textobj#sandwich#options*
 	    - inner_syntax
 	    - match_syntax
 	    - skip_break
+	    - skip_expr
 
 
 
@@ -1022,6 +1024,55 @@ skip_break
 	デフォルト値
 	  * query: 0
 	  * auto : 0
+
+
+
+skip_expr
+	式 |expression| のリストを値にとります。選択範囲を検索する際、 buns に
+	マッチする箇所を見つけるたびに式が評価され、もし返り値が真 (非ゼロ値)
+	ならそのマッチ箇所をスキップします。
+>
+	" skip 'a's other than head and tail of a line.
+	let g:sandwich#recipes += [
+	  \   {
+	  \     'buns': ['a', 'a'],
+	  \     'skip_expr': [
+	  \       'getpos(".")[2] != 1 && getpos(".")[2] != col([getpos(".")[1], "$"])-1'
+	  \     ]
+	  \   }
+	  \ ]
+	" Press dib
+	" aaaaa   --->   aa
+<
+	もし、リストの要素が |Funcref| の場合は注意が必要です。その関数は二つ
+	の引数をとれるようにする必要があります。
+>
+	:function {func}(is_head, pos)
+<
+	もし、 a:is_head が1なら前方の囲みを検索中です。もし、 a:is_head が0な
+	ら後方の囲みを検索中になります。 a:pos は buns にマッチした先頭位置を
+	表す四要素のリストです。これは |getpos()| 関数とおなじフォーマットを持
+	ちます。必ずしもこれらの引数を使う必要はありません。将来、引数が追加さ
+	れることがありうるので、可変長引数を指定しておくことをお勧めします。
+>
+	" skip 'a's other than head and tail of a line.
+	function! SkipIntermediates(is_head, pos, ...)
+	  if a:is_head
+	    return a:pos[2] != 1
+	  else
+	    return a:pos[2] != col([a:pos[1], '$'])-1
+	  endif
+	endfunction
+
+	let g:sandwich#recipes += [
+	  \   {
+	  \     'buns': ['a', 'a'],
+	  \     'skip_expr': [function('SkipIntermediates')]
+	  \   }
+	  \ ]
+	" Press dib
+	" aaaaa   --->   aa
+<
 
 
 

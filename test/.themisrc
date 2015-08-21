@@ -23,3 +23,11 @@ endfunction
 function! SandwichExprEmpty() abort
   return ''
 endfunction
+
+function! SandwichSkipIntermediate(is_head, pos, ...) abort
+  if a:is_head
+    return !(a:pos[2] == 1)
+  else
+    return !(a:pos[2] == col([a:pos[1], '$'])-1)
+  endif
+endfunction

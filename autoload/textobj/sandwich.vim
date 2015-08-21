@@ -3,20 +3,19 @@
 "       region is employed for 'external' user-defined textobjects, it makes
 "       impossible to repeat by dot command. Thus, 'external' is checked by
 "       using visual selection (xmap) in any case.
-" TODO: add a 'skip_expr' option, like {skip} argument for searchpair()
 
 """ NOTE: Whole design (-: string or number, *: functions, []: list, {}: dictionary) "{{{
 " textobj object
 "   - state                 : 0 or 1. If it is called by keymapping, it is 1. If it is called by dot command, it is 0.
 "   - kind                  : 'auto' or 'query'.
 "   - a_or_i                : 'a' or 'i'. It means 'a sandwich' or 'inner sandwich'. See :help text-objects.
-"   - mode                  : 'o' or 'x'. Which mode the keymapping is called.
+"   - mode                  : 'n', 'o' or 'x'. Which mode the keymapping is called.
 "   - count                 : Positive integer. The assigned {count}
 "   []cursor                : [Linked from stuff.cursor] The original position of the cursor
 "   {}view                  : The dictionary to restore the view when it starts.
 "   - done                  : If the textobject could find the target and select, then 1. Otherwise 0.
 "   - visualmode            : If the textobject is called in blockwise visual mode, then '<C-v>'. Otherwise 'v'.
-"   []recipes
+"   {}recipes
 "     []arg                 : The recipes which is used mandatory if it is not empty. It could be given through the 4th argument.
 "     []integrated          : The recipes which are the integrated result of all recipes. This is the one used practically.
 "     * integrate           : The function to set operator.recipes.integrated.
@@ -106,6 +105,7 @@ let s:null_4coord = {
 let s:type_num  = type(0)
 let s:type_str  = type('')
 let s:type_list = type([])
+let s:type_fref = type(function('tr'))
 
 " patchs
 if v:version > 704 || (v:version == 704 && has('patch237'))
@@ -556,6 +556,30 @@ function! s:skip(is_head, ...) dict abort  "{{{
     return 1
   endif
 
+  " quoteescape option
+  let skip_patterns = []
+  if opt.quoteescape && &quoteescape !=# ''
+    for c in split(&quoteescape, '\zs')
+      let c = s:escape(c)
+      let pattern = printf('[^%s]%s\%%(%s%s\)*\zs\%%#', c, c, c, c)
+      let skip_patterns += [pattern]
+    endfor
+  endif
+
+  " skip_regex option
+  let skip_patterns += opt.skip_regex
+  let skip_patterns += a:is_head ? opt.skip_regex_head : opt.skip_regex_tail
+  if skip_patterns != []
+    call cursor(coord)
+    for pattern in skip_patterns
+      let skip = searchpos(pattern, 'cn', cursor[0], stimeoutlen) == coord
+      if skip
+        return 1
+      endif
+    endfor
+  endif
+
+  " syntax, match_syntax option
   if s:is_syntax_on
     if a:is_head || !opt.match_syntax
       if opt.syntax != [] && !s:is_included_syntax(coord, opt.syntax)
@@ -568,22 +592,10 @@ function! s:skip(is_head, ...) dict abort  "{{{
     endif
   endif
 
-  let skip_patterns = []
-  if opt.quoteescape && &quoteescape !=# ''
-    for c in split(&quoteescape, '\zs')
-      let c = s:escape(c)
-      let pattern = printf('[^%s]%s\%%(%s%s\)*\zs\%%#', c, c, c, c)
-      let skip_patterns += [pattern]
-    endfor
-  endif
-
-  let skip_patterns += opt.skip_regex
-  let skip_patterns += a:is_head ? opt.skip_regex_head : opt.skip_regex_tail
-  if skip_patterns != []
-    call cursor(coord)
-    for pattern in skip_patterns
-      let skip = searchpos(pattern, 'cn', cursor[0], stimeoutlen) == coord
-      if skip
+  " skip_expr option
+  if opt.skip_expr != []
+    for Expr in opt.skip_expr
+      if s:eval(Expr, a:is_head, s:c2p(coord))
         return 1
       endif
     endfor
@@ -1336,6 +1348,10 @@ function! s:get_displaysyntax(coord) abort  "{{{
   return synIDattr(synIDtrans(synID(a:coord[0], a:coord[1], 1)), 'name')
 endfunction
 "}}}
+function! s:c2p(coord) abort  "{{{
+  return [0] + a:coord + [0]
+endfunction
+"}}}
 " function! s:sort(list, func, count) abort  "{{{
 if s:has_patch_7_4_358
   function! s:sort(list, func, count) abort
@@ -1364,6 +1380,14 @@ else
     return a:list
   endfunction
 endif
+"}}}
+function! s:eval(expr, ...) abort "{{{
+  if type(a:expr) == s:type_fref
+    return call(a:expr, a:000)
+  else
+    return eval(a:expr)
+  endif
+endfunction
 "}}}
 
 " recipe  "{{{
@@ -1399,6 +1423,7 @@ let s:default_opt.auto = {
       \   'inner_syntax'   : [],
       \   'match_syntax'   : 0,
       \   'skip_break'     : 0,
+      \   'skip_expr'      : [],
       \ }
 let s:default_opt.query = {
       \   'expr'           : 0,
@@ -1415,6 +1440,7 @@ let s:default_opt.query = {
       \   'inner_syntax'   : [],
       \   'match_syntax'   : 0,
       \   'skip_break'     : 0,
+      \   'skip_expr'      : [],
       \ }
 function! s:initialize_options(...) abort  "{{{
   let manner = a:0 ? a:1 : 'keep'
