@@ -1,4 +1,4 @@
-*operator-sandwich.txt*			Last change:08-Aug-2015.
+*operator-sandwich.txt*			Last change:22-Aug-2015.
 
 The operator plugin to edit sandwiched textobjects.
 
@@ -1125,6 +1125,16 @@ expr
 	        return tag
 	      endfunction
 <
+	If the item is |Funcref|, it should be possible to accept an argument.
+>
+	:function {func}(is_head, ...)
+<
+	If a:is_head is 1, the function is required to return head
+	surrounding. If a:is_head is 0, the function is required to return
+	tail surrounding. Not necessarily to use the argument, use if needed.
+	In future, the arguments are possible to append. Thus it might be
+	better to assign variable-length argument.
+
 	Default values
 	  * add
 	    - char : 0

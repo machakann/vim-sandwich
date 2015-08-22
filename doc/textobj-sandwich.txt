@@ -612,7 +612,7 @@ textobj#sandwich#set_default()		*textobj#sandwich#set_default()*
 
 
 nesting
-	This option switchs the searching algorithm. If a set of "buns" makes
+	This option switches the searching algorithm. If a set of "buns" makes
 	nested structure, this option should be 1. Otherwise it should be 0.
 	For example, ( and ) makes nest but " is not generally. Assume that
 	the cursor is on foo of the text, expected results are different
@@ -639,8 +639,8 @@ expand_range
 	buffer is taken as the searched range.
 	NOTE: Intrinsically, it is not searched a wide range at a time.
 	      The searching lines are expanded step-by-step with monitoring
-	      the erapsed time and a certain time
-	      |g:textobj#sandwich#stimeoutlen| is erapsed without finding
+	      the elapsed time and a certain time
+	      |g:textobj#sandwich#stimeoutlen| is elapsed without finding
 	      [count] number of candidate, the searching process would time
 	      out.
 
@@ -750,7 +750,7 @@ expr
 	      |operator-sandwich| delete operator and |textobj-sandwich|
 	      textobjects, |<Plug>(textobj-sandwich-auto-i)| and
 	      |<Plug>(textobj-sandwich-auto-a)|. To avoid this problem, it is
-	      reccomended to use "kind" filter and "synchro" option. For
+	      recommended to use "kind" filter and "synchro" option. For
 	      example, the following recipe asks two characters to select a
 	      text between the two characters.
 	
@@ -773,6 +773,16 @@ expr
 	        return c ==# "\<Esc>" || c ==# "\<C-c>" ? '' : c
 	      endfunction
 <
+	If the item is |Funcref|, it should be possible to accept an argument.
+>
+	:function {func}(is_head, ...)
+<
+	If a:is_head is 1, the function is required to return head
+	surrounding. If a:is_head is 0, the function is required to return
+	tail surrounding. Not necessarily to use the argument, use if needed.
+	In future, the arguments are possible to append. Thus it might be
+	better to assign variable-length argument.
+
 	Default values
 	  * query: 0
 	  * auto : 0

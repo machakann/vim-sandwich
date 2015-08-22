@@ -24,6 +24,14 @@ function! SandwichExprEmpty() abort
   return ''
 endfunction
 
+function! SandwichExprBuns(is_head) abort
+  if a:is_head
+    return 'head'
+  else
+    return 'tail'
+  endif
+endfunction
+
 function! SandwichSkipIntermediate(is_head, pos, ...) abort
   if a:is_head
     return !(a:pos[2] == 1)

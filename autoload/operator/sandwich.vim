@@ -111,8 +111,10 @@ let s:null_4pos  = {
 
 " types
 let s:type_num  = type(0)
+let s:type_str  = type('')
 let s:type_list = type([])
 let s:type_dict = type({})
+let s:type_fref = type(function('tr'))
 
 " patchs
 if v:version > 704 || (v:version == 704 && has('patch237'))
@@ -1035,7 +1037,8 @@ function! s:get_buns() dict abort  "{{{
   if (opt.expr && !self.evaluated) || opt.expr == 2
     echo ''
     let buns = opt.expr == 2 ? deepcopy(buns) : buns
-    call map(buns, 'eval(v:val)')
+    let buns[0] = s:eval(buns[0], 1)
+    let buns[1] = s:eval(buns[1], 0)
     let self.evaluated = 1
     redraw
     echo ''
@@ -1654,6 +1657,8 @@ endfunction
 function! s:check_edges(head, tail, candidate, opt) abort  "{{{
   let patterns = s:get_patterns(a:candidate, a:opt)
 
+  if patterns[0] ==# '' || patterns[1] ==# '' | return s:null_4pos | endif
+
   call setpos('.', a:head)
   let head1 = searchpos(patterns[0], 'c', a:tail[1])
 
@@ -1683,6 +1688,8 @@ endfunction
 "}}}
 function! s:search_edges(head, tail, candidate, opt) abort "{{{
   let patterns = s:get_patterns(a:candidate, a:opt)
+
+  if patterns[0] ==# '' || patterns[1] ==# '' | return s:null_4pos | endif
 
   call setpos('.', a:head)
   let head1 = searchpos(patterns[0], 'c', a:tail[1])
@@ -1714,6 +1721,10 @@ function! s:search_edges(head, tail, candidate, opt) abort "{{{
 endfunction
 "}}}
 function! s:get_patterns(candidate, opt) abort "{{{
+  if has_key(a:opt, 'expr') && a:opt.expr
+    return ['', '']
+  endif
+
   let patterns = deepcopy(a:candidate.buns)
   if !a:opt.regex
     let patterns = map(patterns, 's:escape(v:val)')
@@ -2238,6 +2249,14 @@ endfunction
 "}}}
 function! s:escape(string) abort  "{{{
   return escape(a:string, '~"\.^$[]*')
+endfunction
+"}}}
+function! s:eval(expr, ...) abort "{{{
+  if type(a:expr) == s:type_fref
+    return call(a:expr, a:000)
+  else
+    return eval(a:expr)
+  endif
 endfunction
 "}}}
 " function! s:shortest(list) abort  "{{{

@@ -29,12 +29,12 @@
 "   {}clock                 : The object to measure the time.
 "     - started             : If the stopwatch has started, then 1. Otherwise 0.
 "     - paused              : If the stopwatch has paused, then 1. Otherwise 0.
-"     - losstime            : The erapsed time in paused periods.
+"     - losstime            : The elapsed time in paused periods.
 "     []zerotime            : The time to start the measurement.
 "     []pause_at            : The time to start temporal pause.
 "     * start               : The function to start the stopwatch.
 "     * pause               : The function to pause the stopwatch.
-"     * erapsed             : The function to check the erapsed time from zerotime substituting losstime.
+"     * elapsed             : The function to check the elapsed time from zerotime substituting losstime.
 "     * stop                : The function to stop the measurement.
 "   []basket                : The list holding information and histories for the action.
 "     {}stuff
@@ -234,7 +234,7 @@ function! s:clock_pause() dict abort "{{{
   let self.paused   = 1
 endfunction
 "}}}
-function! s:clock_erapsed() dict abort "{{{
+function! s:clock_elapsed() dict abort "{{{
   if self.started
     let total = str2float(reltimestr(reltime(self.zerotime)))
     return floor((total - self.losstime)*1000)
@@ -258,7 +258,7 @@ let s:clock = {
       \   'pause_at': reltime(),
       \   'start'   : function('s:clock_start'),
       \   'pause'   : function('s:clock_pause'),
-      \   'erapsed' : function('s:clock_erapsed'),
+      \   'elapsed' : function('s:clock_elapsed'),
       \   'stop'    : function('s:clock_stop'),
       \ }
 "}}}
@@ -685,9 +685,9 @@ function! s:get_buns() dict abort  "{{{
     call clock.pause()
     echo ''
     let buns = opt.expr == 2 ? deepcopy(buns) : buns
-    let buns[0] = eval(buns[0])
+    let buns[0] = s:eval(buns[0], 1)
     if buns[0] !=# ''
-      let buns[1] = eval(buns[1])
+      let buns[1] = s:eval(buns[1], 0)
     endif
     let self.evaluated = 1
     redraw
@@ -769,7 +769,7 @@ function! s:query() dict abort  "{{{
   while recipes != []
     let c = getchar(0)
     if c == 0
-      if clock.started && timeoutlen > 0 && clock.erapsed() > timeoutlen
+      if clock.started && timeoutlen > 0 && clock.elapsed() > timeoutlen
         let [input, recipes] = last_compl_match
         break
       else
@@ -976,8 +976,8 @@ function! s:select() dict abort  "{{{
 
     " time out
     if clock.started && stimeoutlen > 0
-      let erapsed = clock.erapsed()
-      if erapsed > stimeoutlen
+      let elapsed = clock.elapsed()
+      if elapsed > stimeoutlen
         echo 'textobj-sandwich: Timed out.'
         break
       endif
@@ -1050,12 +1050,13 @@ function! s:synchronize(elected) abort "{{{
   let recipe = {}
   if a:elected.searchby ==# 'buns'
     call extend(recipe, {'buns': a:elected.buns})
+    call extend(recipe, {'expr': 0})
   elseif a:elected.searchby ==# 'external'
     call extend(recipe, {'external': a:elected.external})
     call extend(recipe, {'excursus': [a:elected.range.count, [0] + a:elected.cursor + [0]]})
   endif
   let filter = 'v:key !=# "clear" && v:key !=# "update"'
-  call extend(recipe, filter(a:elected.opt.recipe, filter))
+  call extend(recipe, filter(a:elected.opt.recipe, filter), 'keep')
 
   " If the recipe has 'kind' key and has no 'delete', 'replace' keys, then add these items.
   if has_key(recipe, 'kind') && filter(copy(recipe.kind), 'v:val ==# "delete" || v:val ==# "replace"') == []

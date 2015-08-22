@@ -1,4 +1,4 @@
-*operator-sandwich.jax*	日本語ヘルプ	Last change:08-Aug-2015.
+*operator-sandwich.jax*	日本語ヘルプ	Last change:22-Aug-2015.
 
 “挟まれた”テキストを編集するためのオペレータです。
 
@@ -1111,6 +1111,15 @@ expr
 	        return tag
 	      endfunction
 <
+	評価される buns が |Funcref| の場合、その関数は最低一つの引数を取れな
+	ければなりません。
+>
+	:function {func}(is_head, ...)
+<
+	a:is_head は前方の囲みを評価中に1、後方の囲みを評価中に0になります。将
+	来、引数が追加されることがありうるので、可変長引数を指定しておくことを
+	お勧めします。
+
 	デフォルト値
 	  * add
 	    - char : 0
