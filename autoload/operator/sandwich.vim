@@ -958,7 +958,7 @@ function! s:query(recipes) dict abort  "{{{
         let recipe = {}
       else
         let c = split(input, '\zs')[0]
-        let recipe = {'buns': [c, c]}
+        let recipe = {'buns': [c, c], 'expr': 0}
       endif
     endif
 
