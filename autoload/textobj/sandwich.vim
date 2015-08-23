@@ -475,7 +475,7 @@ function! s:get_region(textobj) dict abort "{{{
       let [prev_inner_head, prev_inner_tail] = [coord.inner_head, coord.inner_tail]
       " get outer positions
       call cursor(self.cursor)
-      execute printf("%s %s%d%s", cmd, v, range.count, self.external[1])
+      execute printf('%s %s%d%s', cmd, v, range.count, self.external[1])
       execute "normal! \<Esc>"
       let motionwise_a = visualmode()
       let [head, tail] = [getpos("'<")[1:2], getpos("'>")[1:2]]
@@ -489,7 +489,7 @@ function! s:get_region(textobj) dict abort "{{{
 
       " get inner positions
       call cursor(self.cursor)
-      execute printf("%s %s%d%s", cmd, v, range.count, self.external[0])
+      execute printf('%s %s%d%s', cmd, v, range.count, self.external[0])
       execute "normal! \<Esc>"
       let motionwise_i = visualmode()
       let [inner_head, inner_tail] = [getpos("'<")[1:2], getpos("'>")[1:2]]

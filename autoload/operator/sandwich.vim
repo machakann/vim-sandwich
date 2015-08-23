@@ -41,12 +41,12 @@
 "       {}clock              : The object to measure the time.
 "         - started          : If the stopwatch has started, then 1. Otherwise 0.
 "         - paused           : If the stopwatch has paused, then 1. Otherwise 0.
-"         - losstime         : The erapsed time in paused periods.
+"         - losstime         : The elapsed time in paused periods.
 "         []zerotime         : The time to start the measurement.
 "         []pause_at         : The time to start temporal pause.
 "         * start            : The function to start the stopwatch.
 "         * pause            : The function to pause the stopwatch.
-"         * erapsed          : The function to check the erapsed time from zerotime substituting losstime.
+"         * elapsed          : The function to check the elapsed time from zerotime substituting losstime.
 "         * stop             : The function to stop the measurement.
 "       {}opt                : [Linked from act.opt]
 "         - filter           : A strings for integrate() function to filter out redundant options.
@@ -375,7 +375,7 @@ function! s:clock_pause() dict abort "{{{
   let self.paused   = 1
 endfunction
 "}}}
-function! s:clock_erapsed() dict abort "{{{
+function! s:clock_elapsed() dict abort "{{{
   if self.started
     let total = str2float(reltimestr(reltime(self.zerotime)))
     return floor((total - self.losstime)*1000)
@@ -400,7 +400,7 @@ let s:clock = {
       \ }
 let s:clock.start   = function('s:clock_start')
 let s:clock.pause   = function('s:clock_pause')
-let s:clock.erapsed = function('s:clock_erapsed')
+let s:clock.elapsed = function('s:clock_elapsed')
 let s:clock.stop    = function('s:clock_stop')
 "}}}
 
@@ -914,7 +914,7 @@ function! s:query(recipes) dict abort  "{{{
     while 1
       let c = getchar(0)
       if c == 0
-        if clock.started && timeoutlen > 0 && clock.erapsed() > timeoutlen
+        if clock.started && timeoutlen > 0 && clock.elapsed() > timeoutlen
           let [input, recipes] = last_compl_match
           break
         else
@@ -990,7 +990,7 @@ function! s:show() dict abort "{{{
     call clock.start()
     while c == 0
       let c = getchar(0)
-      if clock.started && clock.erapsed() > self.opt.duration
+      if clock.started && clock.elapsed() > self.opt.duration
         break
       endif
       sleep 20m
@@ -1784,7 +1784,7 @@ function! s:get_external_diff_region(head, tail, candidate, opt) abort  "{{{
   for [l:count, cursor] in order_list
     " get outer positions
     call setpos('.', cursor)
-    execute printf("%s %s%d%s", cmd, v, l:count, textobj_a)
+    execute printf('%s %s%d%s', cmd, v, l:count, textobj_a)
     execute "normal! \<Esc>"
     let motionwise_a = visualmode()
     let [target.head1, target.tail2] = [getpos("'<"), getpos("'>")]
@@ -1796,7 +1796,7 @@ function! s:get_external_diff_region(head, tail, candidate, opt) abort  "{{{
 
     " get inner positions
     call setpos('.', cursor)
-    execute printf("%s %s%d%s", cmd, v, l:count, textobj_i)
+    execute printf('%s %s%d%s', cmd, v, l:count, textobj_i)
     execute "normal! \<Esc>"
     let motionwise_i = visualmode()
     " FIXME: How should I treat a line breaking?
