@@ -122,16 +122,22 @@ if v:version > 704 || (v:version == 704 && has('patch237'))
   let s:has_patch_7_4_310 = has('patch-7.4.310')
   let s:has_patch_7_4_362 = has('patch-7.4.362')
   let s:has_patch_7_4_358 = has('patch-7.4.358')
+  let s:has_patch_7_4_392 = has('patch-7.4.392')
 else
   let s:has_patch_7_4_771 = v:version == 704 && has('patch771')
   let s:has_patch_7_4_310 = v:version == 704 && has('patch310')
   let s:has_patch_7_4_362 = v:version == 704 && has('patch362')
   let s:has_patch_7_4_358 = v:version == 704 && has('patch358')
+  let s:has_patch_7_4_392 = v:version == 704 && has('patch392')
 endif
 
 " features
 let s:has_reltime_and_float = has('reltime') && has('float')
 let s:has_gui_running = has('gui_running')
+
+" Others
+" NOTE: This would be updated in each operator functions (operator#sandwich#{add/delete/replce})
+let s:is_in_cmdline_window = 0
 "}}}
 
 """ Public funcs
@@ -193,6 +199,7 @@ endfunction
 " Operator funcs
 function! operator#sandwich#add(motionwise, ...) abort  "{{{
   if exists('g:operator#sandwich#object')
+    call s:update_is_in_cmdline_window()
     call s:doautocmd('OperatorSandwichAddPre')
     call g:operator#sandwich#object.execute('add', a:motionwise)
     call s:doautocmd('OperatorSandwichAddPost')
@@ -201,6 +208,7 @@ endfunction
 "}}}
 function! operator#sandwich#delete(motionwise, ...) abort  "{{{
   if exists('g:operator#sandwich#object')
+    call s:update_is_in_cmdline_window()
     call s:doautocmd('OperatorSandwichDeletePre')
     call g:operator#sandwich#object.execute('delete', a:motionwise)
     call s:doautocmd('OperatorSandwichDeletePost')
@@ -209,6 +217,7 @@ endfunction
 "}}}
 function! operator#sandwich#replace(motionwise, ...) abort  "{{{
   if exists('g:operator#sandwich#object')
+    call s:update_is_in_cmdline_window()
     call s:doautocmd('OperatorSandwichReplacePre')
     call g:operator#sandwich#object.execute('replace', a:motionwise)
     call s:doautocmd('OperatorSandwichReplacePost')
@@ -432,7 +441,10 @@ function! s:add_once(buns, undojoin, done, next_act) dict abort "{{{
 
     try
       call setpos('.', target.head2)
-      if opt.linewise
+      if s:is_in_cmdline_window
+        " workaround for a bug in cmdline-window
+        call s:paste(0, a:buns, undojoin_cmd)
+      elseif opt.linewise
         execute undojoin_cmd . startinsert_o . a:buns[1]
         let is_linewise[1] = 1
       else
@@ -442,7 +454,10 @@ function! s:add_once(buns, undojoin, done, next_act) dict abort "{{{
       let tail = getpos("']")
 
       call setpos('.', target.head1)
-      if opt.linewise
+      if s:is_in_cmdline_window
+        " workaround for a bug in cmdline-window
+        call s:paste(1, a:buns)
+      elseif opt.linewise
         execute startinsert_O . a:buns[0]
         let is_linewise[0] = 1
       else
@@ -611,7 +626,10 @@ function! s:replace_once(buns, undojoin, done, next_act) dict abort "{{{
       let @@ = ''
       execute undojoin_cmd . printf(cmd, 'target.tail2')
       let deletion[1] = @@
-      if opt.linewise == 2 ||
+      if s:is_in_cmdline_window
+        " workaround for a bug in cmdline-window
+        call s:paste(0, a:buns)
+      elseif opt.linewise == 2 ||
             \ (opt.linewise && match(getline('.'), '^\s*$') > -1)
         if getpos('.')[1] != target.head1[1]
           .delete
@@ -629,7 +647,10 @@ function! s:replace_once(buns, undojoin, done, next_act) dict abort "{{{
       let @@ = ''
       execute printf(cmd, 'target.tail1')
       let deletion[0] = @@
-      if opt.linewise == 2 ||
+      if s:is_in_cmdline_window
+        " workaround for a bug in cmdline-window
+        call s:paste(1, a:buns)
+      elseif opt.linewise == 2 ||
             \ (opt.linewise && match(getline('.'), '^\s*$') > -1)
         .delete
         execute startinsert_O . a:buns[0]
@@ -1585,6 +1606,12 @@ endfunction
 "}}}
 function! s:restview(view, name) abort  "{{{
   let [tabpagenr, winnr, view, modhead, modtail] = a:view
+
+  if s:is_in_cmdline_window
+    " in cmdline-window
+    return
+  endif
+
   " tabpage
   try
     execute 'tabnext ' . tabpagenr
@@ -2247,6 +2274,23 @@ function! s:is_in_between(pos, head, tail) abort  "{{{
     \  && ((a:pos[1] < a:tail[1]) || ((a:pos[1] == a:tail[1]) && (a:pos[2] <= a:tail[2])))
 endfunction
 "}}}
+" function! s:update_is_in_cmdline_window() abort  "{{{
+if s:has_patch_7_4_392
+  function! s:update_is_in_cmdline_window() abort
+    let s:is_in_cmdline_window = getcmdwintype() !=# ''
+  endfunction
+else
+  function! s:update_is_in_cmdline_window() abort
+    let s:is_in_cmdline_window = 0
+    try
+      execute 'tabnext ' . tabpagenr()
+    catch /^Vim\%((\a\+)\)\=:E11/
+      let s:is_in_cmdline_window = 1
+    catch
+    endtry
+  endfunction
+endif
+"}}}
 function! s:get(name, default) abort  "{{{
   return get(g:, 'operator#sandwich#' . a:name, a:default)
 endfunction
@@ -2289,6 +2333,21 @@ else
     return a:list[min][0]
   endfunction
 endif
+"}}}
+function! s:paste(is_head, buns, ...) abort "{{{
+  let undojoin_cmd = a:0 > 0 ? a:1 : ''
+  let reg = ['"', getreg('"'), getregtype('"')]
+  let @@ = a:is_head ? a:buns[0] : a:buns[1]
+  if s:has_gui_running
+    execute undojoin_cmd . 'normal! ""P'
+  else
+    let paste  = &paste
+    let &paste = 1
+    execute undojoin_cmd . 'normal! ""P'
+    let &paste = paste
+  endif
+  call call('setreg', reg)
+endfunction
 "}}}
 
 " recipes "{{{
