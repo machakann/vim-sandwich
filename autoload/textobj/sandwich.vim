@@ -125,9 +125,6 @@ let s:has_reltime_and_float = has('reltime') && has('float')
 """ Public funcs
 function! textobj#sandwich#auto(mode, a_or_i, ...) abort  "{{{
   " make new textobj object
-  if !exists('g:textobj#sandwich#object')
-    let g:textobj#sandwich#object = {}
-  endif
   let g:textobj#sandwich#object = deepcopy(s:textobj)
   let textobj = g:textobj#sandwich#object
 
@@ -140,16 +137,22 @@ function! textobj#sandwich#auto(mode, a_or_i, ...) abort  "{{{
   let textobj.cursor = getpos('.')[1:2]
   let textobj.view   = winsaveview()
   let textobj.recipes.arg = get(a:000, 1, [])
+  let textobj.opt.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:default_opt[textobj.kind]), '\|'))
   call textobj.opt.arg.update(get(a:000, 0, {}))
+  call textobj.opt.default.update(deepcopy(g:textobj#sandwich#options[textobj.kind]))
+  call textobj.opt.integrate()
+  call textobj.recipes.integrate(textobj.kind, textobj.mode, textobj.opt.integrated)
 
-  return ":\<C-u>call textobj#sandwich#select()\<CR>"
+  if textobj.recipes.integrated != []
+    let cmd = ":\<C-u>call textobj#sandwich#select()\<CR>"
+  else
+    let cmd = a:mode ==# 'o' ? "\<Esc>" : "\<Plug>(sandwich-nop)"
+  endif
+  return cmd
 endfunction
 "}}}
 function! textobj#sandwich#query(mode, a_or_i, ...) abort  "{{{
   " make new textobj object
-  if !exists('g:textobj#sandwich#object')
-    let g:textobj#sandwich#object = {}
-  endif
   let g:textobj#sandwich#object = deepcopy(s:textobj)
   let textobj = g:textobj#sandwich#object
 
@@ -164,19 +167,18 @@ function! textobj#sandwich#query(mode, a_or_i, ...) abort  "{{{
   let textobj.recipes.arg = get(a:000, 1, [])
   let textobj.opt.timeoutlen = s:get('timeoutlen', &timeoutlen)
   let textobj.opt.timeoutlen = textobj.opt.timeoutlen < 0 ? 0 : textobj.opt.timeoutlen
+  let textobj.opt.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:default_opt[textobj.kind]), '\|'))
   call textobj.opt.arg.update(get(a:000, 0, {}))
+  call textobj.opt.default.update(deepcopy(g:textobj#sandwich#options[textobj.kind]))
+  call textobj.opt.integrate()
+  call textobj.recipes.integrate(textobj.kind, textobj.mode, textobj.opt.integrated)
 
-  " query
   call textobj.query()
 
   if textobj.recipes.integrated != []
     let cmd = ":\<C-u>call textobj#sandwich#select()\<CR>"
   else
-    if a:mode ==# 'o'
-      let cmd = "\<Esc>"
-    else
-      let cmd = "\<Plug>(sandwich-nop)"
-    endif
+    let cmd = a:mode ==# 'o' ? "\<Esc>" : "\<Plug>(sandwich-nop)"
   endif
   return cmd
 endfunction
@@ -192,11 +194,11 @@ endfunction
 function! s:opt_integrate() dict abort  "{{{
   call self.integrated.clear()
   let default = filter(copy(self.default), self.filter)
-  let recipe  = filter(copy(self.recipe),  self.filter)
   let arg     = filter(copy(self.arg),     self.filter)
-  call extend(self.integrated, self.default, 'force')
-  call extend(self.integrated, self.recipe,  'force')
-  call extend(self.integrated, self.arg,     'force')
+  let recipe  = filter(copy(self.recipe),  self.filter)
+  call extend(self.integrated, default, 'force')
+  call extend(self.integrated, arg,     'force')
+  call extend(self.integrated, recipe,  'force')
 endfunction
 "}}}
 function! s:opt_clear() dict abort "{{{
@@ -757,7 +759,6 @@ let s:stuff = {
 "}}}
 
 function! s:query() dict abort  "{{{
-  call self.recipes.integrate(self.kind, self.mode, self.opt.default)
   let recipes = deepcopy(self.recipes.integrated)
   let clock   = self.clock
   let timeoutlen = self.opt.timeoutlen
@@ -782,10 +783,10 @@ function! s:query() dict abort  "{{{
     let input .= c
 
     " check forward match
-    let n_fwd = len(filter(recipes, 's:is_input_matched(v:val, input, 0)'))
+    let n_fwd = len(filter(recipes, 's:is_input_matched(v:val, input, self.opt, 0)'))
 
     " check complete match
-    let n_comp = len(filter(copy(recipes), 's:is_input_matched(v:val, input, 1)'))
+    let n_comp = len(filter(copy(recipes), 's:is_input_matched(v:val, input, self.opt, 1)'))
     if n_comp
       if len(recipes) == n_comp
         break
@@ -806,7 +807,7 @@ function! s:query() dict abort  "{{{
   call clock.stop()
 
   " pick up and register a recipe
-  if filter(recipes, 's:is_input_matched(v:val, input, 1)') != []
+  if filter(recipes, 's:is_input_matched(v:val, input, self.opt, 1)') != []
     let recipe = recipes[0]
   else
     if input ==# "\<Esc>" || input ==# "\<C-c>" || input ==# ''
@@ -852,15 +853,9 @@ function! s:initialize() dict abort  "{{{
     let self.opt.stimeoutlen = self.opt.stimeoutlen < 0 ? 0 : self.opt.stimeoutlen
     let self.opt.latestjump  = s:get('latest_jump', 1)
     let self.visualmode = self.mode ==# 'x' && visualmode() ==# "\<C-v>" ? "\<C-v>" : 'v'
-    call self.opt.default.update(deepcopy(g:textobj#sandwich#options[self.kind]))
-
-    if self.recipes.integrated == []
-      call self.recipes.integrate(self.kind, self.mode, self.opt.default)
-    endif
-    let recipes = self.recipes.integrated
 
     " prepare basket
-    for recipe in recipes
+    for recipe in self.recipes.integrated
       let has_buns     = has_key(recipe, 'buns')
       let has_external = has_key(recipe, 'external')
       if has_buns || has_external
@@ -886,11 +881,8 @@ function! s:initialize() dict abort  "{{{
 
         let stuff.opt      = copy(self.opt)
         let opt            = stuff.opt
-        let opt.filter     = printf('v:key =~# ''\%%(%s\)''',
-                \ join(keys(s:default_opt[self.kind]), '\|'))
         let opt.recipe     = deepcopy(s:opt)
         let opt.integrated = deepcopy(s:opt)
-        let opt.integrate  = function('s:opt_integrate')
         call opt.recipe.update(recipe)
         call opt.integrate()
 
@@ -1141,6 +1133,10 @@ let s:textobj = {
       \     'stimeoutlen': 0,
       \     'arg'    : copy(s:opt),
       \     'default': copy(s:opt),
+      \     'recipe' : copy(s:opt),
+      \     'integrated': copy(s:opt),
+      \     'integrate' : function('s:opt_integrate'),
+      \     'filter' : '',
       \   },
       \   'done'      : 0,
       \   'clock'     : copy(s:clock),
@@ -1202,10 +1198,10 @@ function! s:is_duplicated_buns(recipe, item, opt) abort  "{{{
   if has_key(a:item, 'buns')
         \ && a:recipe['buns'][0] ==# a:item['buns'][0]
         \ && a:recipe['buns'][1] ==# a:item['buns'][1]
-    let regex_r   = get(a:recipe, 'regex',   a:opt.regex)
-    let regex_i   = get(a:item,   'regex',   a:opt.regex)
-    let expr_r    = get(a:recipe, 'expr',    a:opt.expr)
-    let expr_i    = get(a:item,   'expr',    a:opt.expr)
+    let regex_r = get(a:recipe, 'regex', a:opt.regex)
+    let regex_i = get(a:item,   'regex', a:opt.regex)
+    let expr_r  = get(a:recipe, 'expr',  a:opt.expr)
+    let expr_i  = get(a:item,   'expr',  a:opt.expr)
 
     let expr_r = expr_r ? 1 : 0
     let expr_i = expr_i ? 1 : 0
@@ -1304,7 +1300,7 @@ function! s:is_equal_or_ahead(coord1, coord2) abort  "{{{
   return a:coord1[0] > a:coord2[0] || (a:coord1[0] == a:coord2[0] && a:coord1[1] >= a:coord2[1])
 endfunction
 "}}}
-function! s:is_input_matched(candidate, input, flag) abort "{{{
+function! s:is_input_matched(candidate, input, opt, flag) abort "{{{
   let has_buns = has_key(a:candidate, 'buns')
   let has_ext  = has_key(a:candidate, 'external') && has_key(a:candidate, 'input')
   if !(has_buns || has_ext)
@@ -1313,13 +1309,28 @@ function! s:is_input_matched(candidate, input, flag) abort "{{{
     return 1
   endif
 
-  " If a:flag == 0, check forward match. Otherwise, check complete match.
   let candidate = deepcopy(a:candidate)
+
   if has_buns
+    call a:opt.recipe.update(candidate)
+    call a:opt.integrate()
+
+    " 'input' is necessary for 'expr' or 'regex' buns
+    if (a:opt.integrated.expr || a:opt.integrated.regex) && !has_key(candidate, 'input')
+      return 0
+    endif
+
     let inputs = get(candidate, 'input', candidate['buns'])
   elseif has_ext
+    " 'input' is necessary for 'external' textobjects assignment
+    if !has_key(candidate, 'input')
+      return 0
+    endif
+
     let inputs = a:candidate['input']
   endif
+
+  " If a:flag == 0, check forward match. Otherwise, check complete match.
   if a:flag
     return filter(inputs, 'v:val ==# a:input') != []
   else

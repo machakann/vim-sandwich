@@ -1,4 +1,4 @@
-*operator-sandwich.txt*			Last change:24-Aug-2015.
+*operator-sandwich.txt*			Last change:26-Aug-2015.
 
 The operator plugin to edit sandwiched textobjects.
 
@@ -1089,6 +1089,9 @@ expr
 	  \   {'buns': ['@@', '@@'], 'expr': 1, 'synchro': 1, 'input': ['@']}
 	  \ ]
 <
+	NOTE: If this option is true, the recipe requires "input" to call by
+	      key inputs. "buns" never be regarded as key inputs to trigger.
+
 	NOTE: If the expressions query user something by |getchar()| or
 	      |input()|, the recipe may cause problems on the
 	      |operator-sandwich| delete operator and |textobj-sandwich|

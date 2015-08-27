@@ -948,10 +948,10 @@ function! s:query(recipes) dict abort  "{{{
       let input .= c
 
       " check forward match
-      let n_fwd = len(filter(recipes, 's:is_input_matched(v:val, input, 0)'))
+      let n_fwd = len(filter(recipes, 's:is_input_matched(v:val, input, self.opt, 0)'))
 
       " check complete match
-      let n_comp = len(filter(copy(recipes), 's:is_input_matched(v:val, input, 1)'))
+      let n_comp = len(filter(copy(recipes), 's:is_input_matched(v:val, input, self.opt, 1)'))
       if n_comp
         if len(recipes) == n_comp
           break
@@ -972,7 +972,7 @@ function! s:query(recipes) dict abort  "{{{
     call clock.stop()
 
     " pick up and register a recipe
-    if filter(recipes, 's:is_input_matched(v:val, input, 1)') != []
+    if filter(recipes, 's:is_input_matched(v:val, input, self.opt, 1)') != []
       let recipe = recipes[0]
     else
       if input ==# "\<Esc>" || input ==# "\<C-c>" || input ==# ''
@@ -1141,6 +1141,8 @@ function! s:initialize(kind, motionwise) dict abort "{{{
   let self.opt.timeoutlen = self.opt.timeoutlen < 0 ? 0 : self.opt.timeoutlen
   let self.opt.duration = s:get('highlight_duration', 200)
   let self.opt.duration = self.opt.duration < 0 ? 0 : self.opt.duration
+  let self.opt.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:default_opt[a:kind][a:motionwise]), '\|'))
+  let self.opt.integrate  = function('s:opt_integrate')
   let self.cursor.inner_head = region.head
   let self.cursor.inner_tail = region.tail
   call self.opt.default.update(deepcopy(g:operator#sandwich#options[a:kind][a:motionwise]))
@@ -1158,11 +1160,8 @@ function! s:initialize(kind, motionwise) dict abort "{{{
       let stuff.cursor         = self.cursor
       let stuff.modmark        = self.modmark
       let stuff.opt            = copy(self.opt)
-      let stuff.opt.filter     = printf('v:key =~# ''\%%(%s\)''',
-            \ join(keys(s:default_opt[a:kind][a:motionwise]), '\|'))
       let stuff.opt.recipe     = deepcopy(s:opt)
       let stuff.opt.integrated = deepcopy(s:opt)
-      let stuff.opt.integrate  = function('s:opt_integrate')
       call stuff.opt.integrate()
       for act in stuff.acts
         let act.cursor  = stuff.cursor
@@ -2227,16 +2226,24 @@ function! s:c2p(coord) abort  "{{{
   return [0] + a:coord + [0]
 endfunction
 "}}}
-function! s:is_input_matched(candidate, input, flag) abort "{{{
+function! s:is_input_matched(candidate, input, opt, flag) abort "{{{
   if !has_key(a:candidate, 'buns')
     return 0
   elseif !a:flag && a:input ==# ''
     return 1
   endif
 
-  " If a:flag == 0, check forward match. Otherwise, check complete match.
   let candidate = deepcopy(a:candidate)
-  let inputs    = get(candidate, 'input', candidate['buns'])
+  call a:opt.recipe.update(candidate)
+  call a:opt.integrate()
+
+  " 'input' is necessary for 'expr' buns
+  if a:opt.integrated.expr && !has_key(candidate, 'input')
+    return 0
+  endif
+
+  " If a:flag == 0, check forward match. Otherwise, check complete match.
+  let inputs = get(candidate, 'input', candidate['buns'])
   if a:flag
     return filter(inputs, 'v:val ==# a:input') != []
   else

@@ -1,4 +1,4 @@
-*textobj-sandwich.jax*	日本語ヘルプ	Last change:22-Aug-2015.
+*textobj-sandwich.jax*	日本語ヘルプ	Last change:26-Aug-2015.
 
 “挟まれた”テキストを検索し選択するためのテキストオブジェクトです。
 
@@ -748,6 +748,9 @@ expr
 	  \   {'buns': ['@@', '@@'], 'expr': 1, 'input': ['@']}
 	  \ ]
 <
+	NOTE: このオプションが真の時、 "buns" はレシピを呼ぶためのキー入力とは
+	      みなされませんので "input" の指定が必要になります。
+
 	NOTE: もし式が |getchar()| や |input()| でユーザーに入力を求める場合、
 	      |operator-sandwich| の囲みを外すオペレータや |textobj-sandwich|
 	      の |<Plug>(textobj-sandwich-auto-i)| や
