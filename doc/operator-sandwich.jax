@@ -1,4 +1,4 @@
-*operator-sandwich.jax*	日本語ヘルプ	Last change:26-Aug-2015.
+*operator-sandwich.jax*	日本語ヘルプ	Last change:28-Aug-2015.
 
 “挟まれた”テキストを編集するためのオペレータです。
 
@@ -862,8 +862,7 @@ highlight
 
 
 skip_space
-	値が 1 なら、指定された文字列の両端がスペースであった場合にこれらをス
-	キップします。
+	値が 1 なら、指定された文字列の両端のスペースをスキップします。
 >
 	let g:sandwich#recipes += [
 	  \   {'buns': ['(', ')'], 'skip_space': 0}
