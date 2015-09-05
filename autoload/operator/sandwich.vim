@@ -20,9 +20,11 @@
 "     []integrated           : The recipes which are the integrated result of all recipes. This is the one used practically.
 "     * integrate            : The function to set operator.recipes.integrated.
 "   {}cursor                 : [Linked from stuff.cursor] The infomation to set the final position of the cursor
+"     []head                 : The head of the inserted head-surrounding.
 "     []inner_head           : The left upper edge of the assigned region. It is used in default
 "     []keep                 : The original position of the cursor. This is not valid when it started by dot command.
 "     []inner_tail           : The right bottom edge of the assigned region.
+"     []tail                 : The tail of the inserted tail-surrounding.
 "   {}modmark                : [Linked from stuff.modmark] The positions of both edges of the modified region.
 "   {}opt
 "     {}arg                  : [Linked from stuff.opt.arg] The options given through the 3rd argument of operator#sandwich#prerequisite(). This has higher priority than default.
@@ -1303,11 +1305,14 @@ function! s:add() dict abort "{{{
       let [undojoin, stuff.done]
             \ = act.add_once(buns, undojoin, stuff.done, next_act)
     endfor
+    let self.cursor.head = copy(self.modmark.head)
+    let self.cursor.tail = s:get_left_pos(self.modmark.tail)
     let undojoin = self.state ? 1 : 0
 
     if stuff.done && opt.command != []
       call stuff.command()
     endif
+
   endfor
 endfunction
 "}}}
@@ -1336,6 +1341,8 @@ function! s:delete() dict abort  "{{{
       let next_act = next_stuff.acts[j]
       let stuff.done = act.delete_once(stuff.done, next_act)
     endfor
+    let self.cursor.head = copy(self.modmark.head)
+    let self.cursor.tail = s:get_left_pos(self.modmark.tail)
 
     if stuff.done && stuff.opt.integrated.command != []
       call stuff.command()
@@ -1387,6 +1394,8 @@ function! s:replace() dict abort  "{{{
       let [undojoin, stuff.done]
             \ = act.replace_once(buns, undojoin, stuff.done, next_act)
     endfor
+    let self.cursor.head = copy(self.modmark.head)
+    let self.cursor.tail = s:get_left_pos(self.modmark.tail)
     let undojoin = self.state ? 1 : 0
 
     if stuff.done && opt.command != []
@@ -1425,18 +1434,14 @@ function! s:finalize() dict abort  "{{{
       endfor
 
       if self.state || self.keepable
-        let cursor = cursor_opt =~# '^\%(keep\|inner_\%(head\|tail\)\)$' ? self.cursor[cursor_opt]
-                \ : cursor_opt ==# 'head' && modmark.head != s:null_pos ? modmark.head
-                \ : cursor_opt ==# 'tail' && modmark.tail != s:null_pos ? s:get_left_pos(modmark.tail)
-                \ : self.cursor['inner_head']
+        let cursor = cursor_opt =~# '^\%(keep\|\%(inner_\)\?\%(head\|tail\)\)$' && self.cursor[cursor_opt] != s:null_pos
+                   \ ? self.cursor[cursor_opt] : self.cursor['inner_head']
         let self.keepable = 0
       else
         " In the case of dot repeat, it is impossible to keep original position
         " unless self.keepable == 1.
-        let cursor = cursor_opt =~# '^inner_\%(head\|tail\)$' ? self.cursor[cursor_opt]
-                \ : cursor_opt ==# 'head' && modmark.head != s:null_pos ? modmark.head
-                \ : cursor_opt ==# 'tail' && modmark.tail != s:null_pos ? s:get_left_pos(modmark.tail)
-                \ : self.cursor['inner_head']
+        let cursor = cursor_opt =~# '^\%(inner_\)\?\%(head\|tail\)$' && self.cursor[cursor_opt] != s:null_pos
+                   \ ? self.cursor[cursor_opt] : self.cursor['inner_head']
       endif
 
       if s:has_patch_7_4_310
