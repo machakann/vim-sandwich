@@ -257,8 +257,7 @@ function! operator#sandwich#query1st(kind, mode, ...) abort "{{{
     let stuff.modmark        = operator.modmark
     " NOTE: stuff.opt.filter is actually does not depend on the motionwise.
     let stuff.opt            = copy(operator.opt)
-    let stuff.opt.filter     = printf('v:key =~# ''\%%(%s\)''',
-          \ join(keys(s:default_opt[a:kind]['char']), '\|'))
+    let stuff.opt.filter     = s:default_opt[a:kind]['filter']
     let stuff.opt.recipe     = deepcopy(s:opt)
     let stuff.opt.integrated = deepcopy(s:opt)
     let stuff.opt.integrate  = function('s:opt_integrate')
@@ -1143,7 +1142,7 @@ function! s:initialize(kind, motionwise) dict abort "{{{
   let self.opt.timeoutlen = self.opt.timeoutlen < 0 ? 0 : self.opt.timeoutlen
   let self.opt.duration = s:get('highlight_duration', 200)
   let self.opt.duration = self.opt.duration < 0 ? 0 : self.opt.duration
-  let self.opt.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:default_opt[a:kind][a:motionwise]), '\|'))
+  let self.opt.filter = s:default_opt[a:kind]['filter']
   let self.opt.integrate  = function('s:opt_integrate')
   let self.cursor.inner_head = region.head
   let self.cursor.inner_tail = region.tail
@@ -2380,6 +2379,7 @@ lockvar! g:operator#sandwich#default_recipes
 
 " options "{{{
 let s:default_opt = {}
+
 let s:default_opt.add = {}
 let s:default_opt.add.char = {
       \   'cursor'     : 'inner_head',
@@ -2423,6 +2423,8 @@ let s:default_opt.add.block = {
       \   'indentkeys+': '',
       \   'indentkeys-': '',
       \ }
+let s:default_opt.add.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:default_opt['add']['char']), '\|'))
+
 let s:default_opt.delete = {}
 let s:default_opt.delete.char = {
       \   'cursor'    : 'inner_head',
@@ -2454,6 +2456,8 @@ let s:default_opt.delete.block = {
       \   'command'   : [],
       \   'linewise'  : 0,
       \ }
+let s:default_opt.delete.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:default_opt['delete']['char']), '\|'))
+
 let s:default_opt.replace = {}
 let s:default_opt.replace.char = {
       \   'cursor'    : 'inner_head',
@@ -2503,6 +2507,8 @@ let s:default_opt.replace.block = {
       \   'indentkeys+': '',
       \   'indentkeys-': '',
       \ }
+let s:default_opt.replace.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:default_opt['replace']['char']), '\|'))
+
 function! s:initialize_options(...) abort  "{{{
   let manner = a:0 ? a:1 : 'keep'
   let g:operator#sandwich#options = s:get('options', {})

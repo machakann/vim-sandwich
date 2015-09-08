@@ -137,7 +137,7 @@ function! textobj#sandwich#auto(mode, a_or_i, ...) abort  "{{{
   let textobj.cursor = getpos('.')[1:2]
   let textobj.view   = winsaveview()
   let textobj.recipes.arg = get(a:000, 1, [])
-  let textobj.opt.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:default_opt[textobj.kind]), '\|'))
+  let textobj.opt.filter = s:default_opt.filter
   call textobj.opt.arg.update(get(a:000, 0, {}))
   call textobj.opt.default.update(deepcopy(g:textobj#sandwich#options[textobj.kind]))
   call textobj.opt.integrate()
@@ -167,7 +167,7 @@ function! textobj#sandwich#query(mode, a_or_i, ...) abort  "{{{
   let textobj.recipes.arg = get(a:000, 1, [])
   let textobj.opt.timeoutlen = s:get('timeoutlen', &timeoutlen)
   let textobj.opt.timeoutlen = textobj.opt.timeoutlen < 0 ? 0 : textobj.opt.timeoutlen
-  let textobj.opt.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:default_opt[textobj.kind]), '\|'))
+  let textobj.opt.filter = s:default_opt.filter
   call textobj.opt.arg.update(get(a:000, 0, {}))
   call textobj.opt.default.update(deepcopy(g:textobj#sandwich#options[textobj.kind]))
   call textobj.opt.integrate()
@@ -1458,6 +1458,7 @@ let s:default_opt.query = {
       \   'skip_break'     : 0,
       \   'skip_expr'      : [],
       \ }
+let s:default_opt.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:default_opt['auto']), '\|'))
 function! s:initialize_options(...) abort  "{{{
   let manner = a:0 ? a:1 : 'keep'
   let g:textobj#sandwich#options = s:get('options', {})
