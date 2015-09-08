@@ -10545,5 +10545,19 @@ function! s:suite.undo() abort  "{{{
 endfunction
 "}}}
 
+" When a assigned region is invalid
+function! s:suite.invalid_region() abort  "{{{
+  nmap sr' <Plug>(operator-sandwich-replace)i'
+
+  " #810
+  call setline('.', 'foo')
+  normal 0lsr'"
+  call g:assert.equals(getline('.'), 'foo',        'failed at #810')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #810')
+
+  nunmap sr'
+endfunction
+"}}}
+
 " vim:set foldmethod=marker:
 " vim:set commentstring="%s:

@@ -1645,6 +1645,11 @@ endfunction
 function! s:get_assigned_region(kind, motionwise) abort "{{{
   let region = {'head': getpos("'["), 'tail': getpos("']")}
 
+  " early-quit conditions
+  if !s:is_valid_region(a:kind, region, a:motionwise)
+    return deepcopy(s:null_2pos)
+  endif
+
   if a:motionwise ==# 'line'
     let region.head[2] = 1
     let region.tail[2] = col([region.tail[1], '$']) - 1
@@ -1656,20 +1661,28 @@ function! s:get_assigned_region(kind, motionwise) abort "{{{
 
   " for multibyte characters
   if region.tail != s:null_pos && region.tail[3] == 0
+    let cursor = getpos('.')
     call setpos('.', region.tail)
     call search('.', 'bc')
     let region.tail = getpos('.')
+    call setpos('.', cursor)
   endif
 
   " check validity
-  if a:kind ==# 'add'
-    let region = region.head == s:null_pos || region.tail == s:null_pos || !s:is_equal_or_ahead(region.tail, region.head)
-          \ ? deepcopy(s:null_2pos) : region
-  else
-    let region = region.head == s:null_pos || region.tail == s:null_pos || !s:is_ahead(region.tail, region.head)
-          \ ? deepcopy(s:null_2pos) : region
-  endif
+  let region = s:is_valid_region(a:kind, region) ? region : deepcopy(s:null_2pos)
+
   return region
+endfunction
+"}}}
+function! s:is_valid_region(kind, region, ...) abort "{{{
+  " If the third argument is given and it is 'line', ignore the geometric
+  " condition of head and tail.
+  return s:is_valid_2pos(a:region)
+    \ && (
+    \       (a:kind ==# 'add' && s:is_equal_or_ahead(a:region.tail, a:region.head))
+    \    || ((a:kind ==# 'delete' || a:kind ==# 'replace') && s:is_ahead(a:region.tail, a:region.head))
+    \    || (a:0 > 0 && a:1 ==# 'line')
+    \    )
 endfunction
 "}}}
 function! s:get_wider_region(head_edge, tail_edge) abort "{{{
