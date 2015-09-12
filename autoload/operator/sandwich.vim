@@ -437,9 +437,11 @@ function! s:add_once(buns, undojoin, done, next_act) dict abort "{{{
 
   if s:is_valid_4pos(target)
         \ && s:is_equal_or_ahead(target.head2, target.head1)
-    let target.head2[0:3] = s:get_right_pos(target.head2)
-    call self.set_indent()
+    if target.head2[2] != col([target.head2[1], '$'])
+      let target.head2[0:3] = s:get_right_pos(target.head2)
+    endif
 
+    call self.set_indent()
     try
       call setpos('.', target.head2)
       if s:is_in_cmdline_window
@@ -1658,9 +1660,12 @@ function! s:get_assigned_region(kind, motionwise) abort "{{{
       let region.tail[2] -= 1
     endif
   endif
+  if region.tail[2] < 1
+    let region.tail[2] = 1
+  endif
 
   " for multibyte characters
-  if region.tail != s:null_pos && region.tail[3] == 0
+  if region.tail[2] != col([region.tail[1], '$']) && region.tail[3] == 0
     let cursor = getpos('.')
     call setpos('.', region.tail)
     call search('.', 'bc')
@@ -1668,8 +1673,10 @@ function! s:get_assigned_region(kind, motionwise) abort "{{{
     call setpos('.', cursor)
   endif
 
-  " check validity
-  let region = s:is_valid_region(a:kind, region) ? region : deepcopy(s:null_2pos)
+  " check validity again
+  if !s:is_valid_region(a:kind, region)
+    return deepcopy(s:null_2pos)
+  endif
 
   return region
 endfunction
@@ -1784,7 +1791,12 @@ endfunction
 "}}}
 function! s:skip_space(pos, flag, stopline) abort  "{{{
   call setpos('.', a:pos)
-  let dest = s:c2p(searchpos('\S', a:flag, a:stopline))
+  if a:pos[2] == col([a:pos[1], '$'])
+    " if the cursor is on a line breaking, it should not be skipped.
+    let dest = a:pos
+  else
+    let dest = s:c2p(searchpos('\_S', a:flag, a:stopline))
+  endif
   let validity = 0
   if dest != s:null_pos
     if stridx(a:flag, 'b') > -1
