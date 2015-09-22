@@ -166,7 +166,6 @@ function! operator#sandwich#prerequisite(kind, mode, ...) abort "{{{
     normal! gv
     let is_extended = winsaveview().curswant == 1/0
     silent normal! ""y
-    execute "normal! \<Esc>"
     let regtype = getregtype('"')
     call setreg('"', reg[0], reg[1])
 
