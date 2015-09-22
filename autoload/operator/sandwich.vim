@@ -151,7 +151,7 @@ function! operator#sandwich#prerequisite(kind, mode, ...) abort "{{{
   " prerequisite
   let operator       = g:operator#sandwich#object
   let operator.state = 1
-  let operator.count = v:prevcount == 0 ? 1 : v:prevcount
+  let operator.count = a:mode == 'x' ? (v:prevcount == 0 ? 1 : v:prevcount) : v:count1
   let operator.mode  = a:mode
   let operator.view  = winsaveview()
   let operator.cursor.keep[0:3] = getpos('.')[0:3]

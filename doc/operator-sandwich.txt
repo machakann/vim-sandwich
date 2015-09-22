@@ -1,4 +1,4 @@
-*operator-sandwich.txt*			Last change:26-Aug-2015.
+*operator-sandwich.txt*			Last change:22-Sep-2015.
 
 The operator plugin to edit sandwiched textobjects.
 
@@ -355,7 +355,7 @@ User can make new mappings by using function interfaces natively.
 operator#sandwich#keymap(kind, mode[, options[, recipes]])
 	This function is used to make a operator key-mapping as following.
 >
-	nnoremap <silent> sa <Esc>:call operator#sandwich#keymap('add', 'n')<CR>
+	nnoremap <silent> sa :<C-u>call operator#sandwich#keymap('add', 'n')<CR>
 	xnoremap <silent> sa <Esc>:call operator#sandwich#keymap('add', 'x')<CR>
 <
 	If a not-empty dictionary is given to the optional third argument of

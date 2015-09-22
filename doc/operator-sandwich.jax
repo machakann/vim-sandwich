@@ -1,4 +1,4 @@
-*operator-sandwich.jax*	日本語ヘルプ	Last change:17-Sep-2015.
+*operator-sandwich.jax*	日本語ヘルプ	Last change:22-Sep-2015.
 
 “挟まれた”テキストを編集するためのオペレータです。
 
@@ -343,7 +343,7 @@ option の "cursor" に関係しており、このオプションの選択肢 "k
 operator#sandwich#keymap(kind, mode[, options[, recipes]])
 	この関数はオペレータのキーマッピングを定義するのにつかわれます。
 >
-	nnoremap <silent> sa <Esc>:call operator#sandwich#keymap('add', 'n')<CR>
+	nnoremap <silent> sa :<C-u>call operator#sandwich#keymap('add', 'n')<CR>
 	xnoremap <silent> sa <Esc>:call operator#sandwich#keymap('add', 'x')<CR>
 <
 	もし空でない辞書変数が省略可能な第三引数に与えられた場合、辞書に含まれ

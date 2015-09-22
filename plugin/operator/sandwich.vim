@@ -1,5 +1,5 @@
 " The vim operator plugin to do well with 'sandwich' like structure
-" Last Change: 12-Jul-2015.
+" Last Change: 22-Sep-2015.
 " Maintainer : Masaaki Nakamura <mckn@outlook.jp>
 
 " License    : NYSL
@@ -12,16 +12,16 @@ endif
 let g:loaded_operator_sandwich = 1
 
 " keymappings
-nnoremap <silent> <Plug>(operator-sandwich-add)     <Esc>:call operator#sandwich#prerequisite('add', 'n')<CR>g@
+nnoremap <silent> <Plug>(operator-sandwich-add)     :<C-u>call operator#sandwich#prerequisite('add', 'n')<CR>g@
 xnoremap <silent> <Plug>(operator-sandwich-add)     <Esc>:call operator#sandwich#prerequisite('add', 'x')<CR>gvg@
-nnoremap <silent> <Plug>(operator-sandwich-delete)  <Esc>:call operator#sandwich#prerequisite('delete', 'n')<CR>g@
+nnoremap <silent> <Plug>(operator-sandwich-delete)  :<C-u>call operator#sandwich#prerequisite('delete', 'n')<CR>g@
 xnoremap <silent> <Plug>(operator-sandwich-delete)  <Esc>:call operator#sandwich#prerequisite('delete', 'x')<CR>gvg@
-nnoremap <silent> <Plug>(operator-sandwich-replace) <Esc>:call operator#sandwich#prerequisite('replace', 'n')<CR>g@
+nnoremap <silent> <Plug>(operator-sandwich-replace) :<C-u>call operator#sandwich#prerequisite('replace', 'n')<CR>g@
 xnoremap <silent> <Plug>(operator-sandwich-replace) <Esc>:call operator#sandwich#prerequisite('replace', 'x')<CR>gvg@
 
-nnoremap <silent> <Plug>(operator-sandwich-add-query1st)     <Esc>:call operator#sandwich#query1st('add', 'n')<CR>
+nnoremap <silent> <Plug>(operator-sandwich-add-query1st)     :<C-u>call operator#sandwich#query1st('add', 'n')<CR>
 xnoremap <silent> <Plug>(operator-sandwich-add-query1st)     <Esc>:call operator#sandwich#query1st('add', 'x')<CR>
-nnoremap <silent> <Plug>(operator-sandwich-replace-query1st) <Esc>:call operator#sandwich#query1st('replace', 'n')<CR>
+nnoremap <silent> <Plug>(operator-sandwich-replace-query1st) :<C-u>call operator#sandwich#query1st('replace', 'n')<CR>
 xnoremap <silent> <Plug>(operator-sandwich-replace-query1st) <Esc>:call operator#sandwich#query1st('replace', 'x')<CR>
 
 " supplementary keymappings
