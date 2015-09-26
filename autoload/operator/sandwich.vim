@@ -1132,7 +1132,7 @@ function! s:initialize(kind, motionwise) dict abort "{{{
     " hide_cursor
     if s:has_gui_running
       let self.cursor_info = &guicursor
-      set guicursor+=o:block-NONE
+      set guicursor+=n-o:block-NONE
     else
       let self.cursor_info = &t_ve
       set t_ve=
