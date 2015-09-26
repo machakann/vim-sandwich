@@ -1135,6 +1135,7 @@ function! s:initialize(kind, motionwise) dict abort "{{{
       set guicursor+=o:block-NONE
     else
       let self.cursor_info = &t_ve
+      set t_ve=
     endif
   endif
 
