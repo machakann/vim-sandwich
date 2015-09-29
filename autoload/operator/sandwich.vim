@@ -25,6 +25,9 @@
 "     []keep                 : The original position of the cursor. This is not valid when it started by dot command.
 "     []inner_tail           : The right bottom edge of the assigned region.
 "     []tail                 : The tail of the inserted tail-surrounding.
+"   {}appearance             : For some tweaks of appearance.
+"     - cursor               : The information of the shape of cursor. This is used to hide cursor in action temporary, after an action it should be restored.
+"     - cursorline           : In case of the add and replace operators are called in visual mode, hide cursorline highlight temporaly, after an action it should be restored.
 "   {}modmark                : [Linked from stuff.modmark] The positions of both edges of the modified region.
 "   {}opt
 "     {}arg                  : [Linked from stuff.opt.arg] The options given through the 3rd argument of operator#sandwich#prerequisite(). This has higher priority than default.
@@ -1129,13 +1132,26 @@ function! s:initialize(kind, motionwise) dict abort "{{{
     " deactivate
     let self.state = -1
   else
+    """ tweak appearance
     " hide_cursor
     if s:has_gui_running
-      let self.cursor_info = &guicursor
+      let self.appearance.cursor = &guicursor
       set guicursor+=n-o:block-NONE
     else
-      let self.cursor_info = &t_ve
+      let self.appearance.cursor = &t_ve
       set t_ve=
+    endif
+
+    " hide cursorline highlight if in visualmode.
+    " FIXME: The cursorline would be shown at the top line of assigned region
+    "        in a moment currently. This is not good. This could be avoidable
+    "        if the tweak was done in operator#sandwich#prerequisite().
+    "        However, since operatorfunc is possible not to be called (when
+    "        motion or textobj is canceled), it cannot be restored safely...
+    "        Another way to avoid is to set lazyredraw on constantly.
+    if (a:kind ==# 'add' || a:kind ==# 'replace') && self.mode ==# 'x'
+      let self.appearance.cursorline = &l:cursorline
+      setlocal nocursorline
     endif
   endif
 
@@ -1453,14 +1469,16 @@ function! s:finalize() dict abort  "{{{
       endif
     endif
 
-    " restore cursor
-    if has_key(self, 'cursor_info')
-      if s:has_gui_running
-        set guicursor&
-        let &guicursor = self.cursor_info
-      else
-        let &t_ve = self.cursor_info
-      endif
+    " restore appearance
+    if s:has_gui_running
+      set guicursor&
+      let &guicursor = self.appearance.cursor
+    else
+      let &t_ve = self.appearance.cursor
+    endif
+
+    if self.mode ==# 'x'
+      let &l:cursorline = self.appearance.cursorline
     endif
   endif
 
@@ -1507,6 +1525,10 @@ let s:operator = {
       \     'keep'      : copy(s:null_pos),
       \     'inner_tail': copy(s:null_pos),
       \     'tail'      : copy(s:null_pos),
+      \   },
+      \   'appearance': {
+      \     'cursor': '',
+      \     'cursorline': &cursorline,
       \   },
       \   'modmark': copy(s:null_2pos),
       \   'opt': {
