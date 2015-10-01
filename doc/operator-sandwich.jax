@@ -1,4 +1,4 @@
-*operator-sandwich.jax*	日本語ヘルプ	Last change:22-Sep-2015.
+*operator-sandwich.jax*	日本語ヘルプ	Last change:01-Oct-2015.
 
 “挟まれた”テキストを編集するためのオペレータです。
 
@@ -55,6 +55,7 @@ MISCELLANEOUS			|operator-sandwich-miscellaneous|
   文字列を囲むオペレータの文字指向の場合だけ空白をスキップしないのはなぜ？
   なぜ囲みを外す/置換するオペレータのキーマッピングはデフォルトで提供されない?
   ドットコマンドでもカーソル位置を保存・復元したい
+  Query1st 系列のキーマッピングは何のためにある？
 
 ==============================================================================
 TL;DR
@@ -260,12 +261,36 @@ query-1st 系列キーマッピング~
 	れた場合、その数だけ囲みを追加します。|<Plug>(operator-sandwich-add)|
 	とは違い、 {motion/textobject} の入力の前に挿入する文字の決定を行いま
 	す。
+>
+	nmap sa <Plug>(operator-sandwich-add-query1st)
+
+	" Press sa(iw
+	" foo -> (foo)
+<
+	NOTE: ノーマルモードへのマップでのみ意味を持ちます。|:xmap| でビジュア
+	      ルモードにもマップできますが、ビジュアルモードでは入力順序が通常
+	      の |<Plug>(operator-sandwich-add)| と同じです。また、別の理由か
+	      ら使用が推奨されません。 |operator-sandwich-miscellaneous| を
+	      ご覧ください。
 
 <Plug>(operator-sandwich-replace-query1st)
 	テキストの囲みを置き換えるためのオペレータコマンドです。 [count] が与
 	えられた場合、その数だけ連続する囲みを置換します。
 	|<Plug>(operator-sandwich-replace)|とは違い、 {motion/textobject} の入
 	力の前に挿入する文字の決定を行います。
+>
+	nmap sa <Plug>(operator-sandwich-replace-query1st)
+
+	" Press sr(a[
+	" [foo] -> (foo)
+<
+	NOTE: ノーマルモードへのマップでのみ意味を持ちます。|:xmap| でビジュア
+	      ルモードにもマップできますが、ビジュアルモードでは入力順序が通常
+	      の |<Plug>(operator-sandwich-replace)| と同じです。また、別の
+	      理由から使用が推奨されません。 |operator-sandwich-miscellaneous|
+	      をご覧ください。
+
+
 
 
 
@@ -1479,6 +1504,61 @@ matchit.vim のハイライトがかぶって邪魔~
 	|<Plug>(operator-sandwich-predot)| 及び
 	|<Plug>(operator-sandwich-dot)| それぞれの詳しい説明もご覧ください。
 
+
+
+Query1st 系列のキーマッピングは何のためにある？~
+	Query1st 系列のキーマッピングは二つあります。
+	|<Plug>(operator-sandwich-add-query1st)| 及び
+	|<Plug>(operator-sandwich-replace-query1st)| です。これらは通常の
+	|<Plug>(operator-sandwich-add)| 及び
+	|<Plug>(operator-sandwich-replace)| とはノーマルモードでの使用時のキー
+	入力の順序が違います。通常のキーマッピングは
+>
+	{operator}{motion/textobject}{addition}
+<
+	のように {addition} の指定を最後に入力します。つまり、単語を () で囲み
+	たい場合 `saiw(` のように入力します。この場合、 `sa` が {operator},
+	`iw` が {textobject}, `(` が {addition}の指定になります。
+
+	これに対し、query1st 系列のキーマッピングは{addition} の指定が
+	{textobj} の前にきます。
+>
+	{operator}{addition}{motion/textobj}
+<
+	つまり、先の例と同等の入力は `sa(iw` になります。これは例えばより
+	限定的なマッピングを作るのに便利です。
+>
+	nmap s( <Plug>(operator-sandwich-add-query1st)(
+	nmap s[ <Plug>(operator-sandwich-add-query1st)[
+	nmap s{ <Plug>(operator-sandwich-add-query1st){
+
+	" Press s(iw
+	" foo -> (foo)
+<
+	Query1st 系列のキーマッピングは、範囲を指定する {motion} あるいは
+	{textobject} よりも前に {addition} を決定するため、いくつか制限があり
+	ます。
+
+	1. motionwise フィルタは実際の範囲指定にかかわらず、すべての種類
+	   (char, line, block) について有効なレシピのみを残します。
+	2. highlight オプションは無視され、ハイライトは行われません。
+	3. 主に上記のような使用を想定しているため query_once オプションは 1 に
+	   設定されます。これは |operator#sandwich#query1st()| 関数を使って
+	   キーマッピングを設定しなおすことで上書きできます。
+>
+	nmap <silent> <Plug>(operator-sandwich-add-query1st)
+	  \ operator#sandwich#query1st('add', 'n', {'query_once': 0})<CR>
+
+	nmap ssa <Plug>(operator-sandwich-add-query1st)
+<
+	ビジュアルモードでは入力順序が変わらないので query1st 系列のキーマッピ
+	ングを使う必要はありません。上記の制限もあるため通常のキーマッピングを
+	使うことが望ましいでしょう。
+>
+	xmap s( <Plug>(operator-sandwich-add)(
+	xmap s[ <Plug>(operator-sandwich-add)[
+	xmap s{ <Plug>(operator-sandwich-add){
+<
 
 
 ==============================================================================

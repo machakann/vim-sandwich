@@ -1,4 +1,4 @@
-*operator-sandwich.txt*			Last change:22-Sep-2015.
+*operator-sandwich.txt*			Last change:01-Oct-2015.
 
 The operator plugin to edit sandwiched textobjects.
 
@@ -55,6 +55,7 @@ MISCELLANEOUS			|operator-sandwich-miscellaneous|
   Why does not the add operator skip white spaces in character-wise motion?
   Why the default mappings for the delete/replace operators were not defined?
   I want to keep cursor position even after dot repeating.
+  What is special about the query1st series mappings?
 
 ==============================================================================
 TL;DR
@@ -270,6 +271,16 @@ query-1st series~
 	assigned region. If [count] is given, add surroundings [count] times.
 	Different from |<Plug>(operator-sandwich-add)|, this keymapping asks
 	the addition before {motion/textobject}.
+>
+	nmap sa <Plug>(operator-sandwich-add-query1st)
+
+	" Press sa(iw
+	" foo -> (foo)
+<
+	NOTE: Use it only in normal mode although user can define it in
+	      visual mode by |:xmap|. The order of key sequence is same as the
+	      usual keymapping, |<Plug>(operator-sandwich-add)| in visual
+	      mode. See also |operator-sandwich-miscellaneous|.
 
 				*<Plug>(operator-sandwich-replace-query1st)*
 <Plug>(operator-sandwich-replace-query1st)
@@ -278,6 +289,16 @@ query-1st series~
 	surroundings [count] times.  Different from
 	|<Plug>(operator-sandwich-replace)|, this keymapping asks the addition
 	before {motion/textobject}.
+>
+	nmap sa <Plug>(operator-sandwich-replace-query1st)
+
+	" Press sr(a[
+	" [foo] -> (foo)
+<
+	NOTE: Use it only in normal mode although user can define it in
+	      visual mode by |:xmap|. The order of key sequence is same as the
+	      usual keymapping, |<Plug>(operator-sandwich-replace)| in visual
+	      mode. See also |operator-sandwich-miscellaneous|.
 
 
 
@@ -1499,6 +1520,63 @@ I want to keep cursor position even after dot repeating.~
 	See each detailed description of |<Plug>(operator-sandwich-predot)|
 	and |<Plug>(operator-sandwich-dot)|.
 
+
+
+What is special about the query1st series mappings?~
+	There are two query1st series keymappings,
+	|<Plug>(operator-sandwich-add-query1st)| and
+	|<Plug>(operator-sandwich-replace-query1st)|. These are different from
+	usual |<Plug>(operator-sandwich-add)| and
+	|<Plug>(operator-sandwich-replace)| on the order of key sequences in
+	normal mode. As for the usual keymappings, the assignment of
+	{addition} is input at last.
+>
+	{operator}{motion/textobject}{addition}
+<
+	For instance, if user wants to surround a word by (), press `saiw(`.
+	In this case, `sa` is {operator}, `iw` is {textobject}, `(` is the
+	assignment of {addition}.
+
+	As for the query1st series mappings, on the other hand, {addition}
+	comes ahead of {textobject}.
+>
+	{operator}{addition}{motion/textobj}
+<
+	That is, the equivalent key sequence of the above instance is `sa(iw`.
+	These keymappings would be useful to define solid shortened mappings.
+>
+	nmap s( <Plug>(operator-sandwich-add-query1st)(
+	nmap s[ <Plug>(operator-sandwich-add-query1st)[
+	nmap s{ <Plug>(operator-sandwich-add-query1st){
+
+	" Press s(iw
+	" foo -> (foo)
+<
+	Query1st series keymappings have a few limitation since determining
+	{addition} before {motion} or {textobject} which assigns the processed
+	region.
+
+	1. "motionwise" filter dropped recipes other than the recipes which is
+	   valid for all kinds of region (char, line, block) regardless of the
+	   actual assigned region.
+	2. "highlight" local option is ignored. Never be highlighted.
+	3. "query_once" local option is set to 1 because the above use case is
+	   mainly assumed. However this could be overwritten by using
+	   |operator#sandwich#query1st()| function to re-define keymapping.
+>
+	nmap <silent> <Plug>(operator-sandwich-add-query1st)
+	  \ operator#sandwich#query1st('add', 'n', {'query_once': 0})<CR>
+
+	nmap ssa <Plug>(operator-sandwich-add-query1st)
+<
+	In visual mode, there is nothing different on the order of key
+	sequences. Rather there are a few limitations listed, thus it is
+	recommended to use usual key mappings.
+>
+	xmap s( <Plug>(operator-sandwich-add)(
+	xmap s[ <Plug>(operator-sandwich-add)[
+	xmap s{ <Plug>(operator-sandwich-add){
+<
 
 
 ==============================================================================

@@ -6,7 +6,7 @@
 
 """ NOTE: Whole design (-: string or number, *: functions, []: list, {}: dictionary) "{{{
 " operator object
-"   - state                  : 0 or 1 or -1. If it is called by keymapping, it is 1. If it is called by dot command, it is 0. -1 is used in order to deactivate the operaor object when the assigned region is not valid.
+"   - state                  : 0 or 1 or -1. If it is called by keymapping, it is 1. If it is called by dot command, it is 0. -1 is used in order to deactivate the operator object when the assigned region is not valid.
 "   - count                  : Positive integer. The assigned {count}
 "   - num                    : The number of processed regions in one count. It could be more than 1 only in block wise visual mode.
 "   - mode                   : 'n' or 'x'. Which mode the keymapping is called.
@@ -236,7 +236,6 @@ function! operator#sandwich#query1st(kind, mode, ...) abort "{{{
   endif
 
   " prerequisite
-  " NOTE: force to set highlight=0
   let arg_opt = get(a:000, 0, {})
   let arg_recipes = get(a:000, 1, [])
   call operator#sandwich#prerequisite(a:kind, a:mode, arg_opt, arg_recipes)
@@ -244,7 +243,10 @@ function! operator#sandwich#query1st(kind, mode, ...) abort "{{{
   let operator.num = 1
   let operator.opt.timeoutlen = s:get('timeoutlen', &timeoutlen)
   let operator.opt.timeoutlen = operator.opt.timeoutlen < 0 ? 0 : operator.opt.timeoutlen
-  call operator.opt.default.update({'highlight': 0, 'query_once': 1})
+  let operator.opt.filter     = s:default_opt[a:kind]['filter']
+  let operator.opt.integrate  = function('s:opt_integrate')
+  " NOTE: force to set highlight=0 and query_once=1
+  call operator.opt.default.update({'highlight': 0, 'query_once': 1, 'expr': 0})
 
   " build stuff
   let stuff = deepcopy(s:stuff)
@@ -257,12 +259,9 @@ function! operator#sandwich#query1st(kind, mode, ...) abort "{{{
   for stuff in operator.basket
     let stuff.cursor         = operator.cursor
     let stuff.modmark        = operator.modmark
-    " NOTE: stuff.opt.filter is actually does not depend on the motionwise.
     let stuff.opt            = copy(operator.opt)
-    let stuff.opt.filter     = s:default_opt[a:kind]['filter']
     let stuff.opt.recipe     = deepcopy(s:opt)
     let stuff.opt.integrated = deepcopy(s:opt)
-    let stuff.opt.integrate  = function('s:opt_integrate')
     call stuff.opt.integrate()
     for act in stuff.acts
       let act.cursor  = stuff.cursor
@@ -287,7 +286,7 @@ function! operator#sandwich#query1st(kind, mode, ...) abort "{{{
         let _stuff = operator.basket[_i]
         call extend(_stuff.buns, stuff.buns, 'force')
         call _stuff.opt.recipe.update(stuff.opt.recipe)
-        call _stuff.opt.integrated()
+        call _stuff.opt.integrate()
       endfor
       break
     endif
@@ -295,12 +294,10 @@ function! operator#sandwich#query1st(kind, mode, ...) abort "{{{
 
   if filter(copy(operator.basket), 'has_key(v:val, "buns")') != []
     let operator.state = 0
-    let &l:operatorfunc = 'operator#sandwich#' . a:kind
-    let cmd = 'g@'
-    if a:mode ==# 'x'
-      let cmd = 'gv' . cmd
-    endif
+    let cmd = a:mode ==# 'x' ? 'gvg@' : 'g@'
     call feedkeys(cmd, 'n')
+  else
+    unlet g:operator#sandwich#object
   endif
   return
 endfunction
