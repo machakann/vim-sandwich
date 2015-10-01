@@ -1,6 +1,5 @@
-*operator-sandwich.txt*			Last change:01-Oct-2015.
-
-The operator plugin to edit sandwiched textobjects.
+*operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
+						Last change:01-Oct-2015.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license

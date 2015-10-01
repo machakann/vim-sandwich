@@ -1,6 +1,5 @@
-*textobj-sandwich.jax*	日本語ヘルプ	Last change:26-Aug-2015.
-
-“挟まれた”テキストを検索し選択するためのテキストオブジェクトです。
+*textobj-sandwich.jax*	『挟まれた』テキストを選択する。
+						Last change:01-Oct-2015.
 
 書いた人   : machakann <mckn@outlook.jp>
 ライセンス : NYSL license

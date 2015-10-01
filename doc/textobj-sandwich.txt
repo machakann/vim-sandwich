@@ -1,6 +1,5 @@
-*textobj-sandwich.txt*			Last change:26-Aug-2015.
-
-The textobject plugin to search and select sandwiched textobjects.
+*textobj-sandwich.txt*	The textobject plugin to select sandwiched textobjects.
+						Last change:01-Oct-2015.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license
