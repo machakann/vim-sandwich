@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:08-Oct-2015.
+						Last change:09-Oct-2015.
 
 書いた人   : machakann <mckn@outlook.jp>
 ライセンス : NYSL license
@@ -292,11 +292,9 @@ query-1st 系列キーマッピング~
 
 
 
-
-
 補助キーマッピング~
 
-カウントの取り扱いに関して、補助的な働きをするキーマッピングが二つ用意されてい
+カウントの取り扱いに関して、補助的な働きをするキーマッピングが三つ用意されてい
 ます。短縮キーマッピングなどを独自に定義する際に役に立つでしょう。オペレータの
 独特なカウントの扱いについては |operator-sandwich-introduction| をご覧ください
 。実用例は |sandwich-keymappings| をご覧ください。
@@ -323,6 +321,18 @@ query-1st 系列キーマッピング~
  \ <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)a(
 <
 	このキーマッピングでは 2sd( は <Plug>(operator-sandwich-delete)2a( に
+	等しくなります。
+
+
+
+				*<Plug>(operator-sandwich-squash-count)*
+<Plug>(operator-sandwich-squash-count)
+	与えられたカウントをすべて無視するためのキーマッピングです。
+>
+ nmap sd(
+ \ <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-squash-count)a(
+<
+	このキーマッピングでは 2sd( は <Plug>(operator-sandwich-delete)a( に
 	等しくなります。
 
 

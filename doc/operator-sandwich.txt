@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:08-Oct-2015.
+						Last change:09-Oct-2015.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license
@@ -304,7 +304,7 @@ query-1st series~
 
 Supplementary keymappings~
 
-There are two supplementary keymappings related to the count treatment. They
+There are three supplementary keymappings related to the count treatment. They
 may be useful when you define your short-hand keymapping. About the unique
 count interpretation of the operators, See |operator-sandwich-introduction|.
 Practical examples are in |sandwich-keymappings|.
@@ -332,6 +332,18 @@ Practical examples are in |sandwich-keymappings|.
 <
 	A key sequence `2sd(` is identical to
 	`<Plug>(operator-sandwich-delete)2a(` in this case.
+
+
+
+				*<Plug>(operator-sandwich-squash-count)*
+<Plug>(operator-sandwich-squash-count)
+	The keymapping that ignores a given count completely.
+>
+ nmap sd(
+ \ <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-squash-count)a(
+<
+	A key sequence `2sd(` is identical to
+	`<Plug>(operator-sandwich-delete)a(` in this case.
 
 
 

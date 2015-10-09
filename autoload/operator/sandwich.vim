@@ -322,6 +322,13 @@ function! operator#sandwich#release_count() abort  "{{{
   endif
 endfunction
 "}}}
+function! operator#sandwich#squash_count() abort  "{{{
+  if exists('g:operator#sandwich#object')
+    let g:operator#sandwich#object.count = 1
+  endif
+  return ''
+endfunction
+"}}}
 function! operator#sandwich#predot() abort  "{{{
   if exists('g:operator#sandwich#object')
     let operator = g:operator#sandwich#object
