@@ -14,3 +14,4 @@ before_script:
 
 script:
   - ./vim-themis/bin/themis
+  - ./test/dot-repeat/test_dot.sh
