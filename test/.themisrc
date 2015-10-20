@@ -1,6 +1,6 @@
 set encoding=utf-8
-set runtimepath+=%:p:h:h
-runtime! %:p:h:h/plugin/*.vim
+execute 'set runtimepath+=' . expand('<sfile>:p:h:h')
+runtime! <sfile>:p:h:h/plugin/*.vim
 set noswapfile
 
 let g:assert = themis#helper('assert')
