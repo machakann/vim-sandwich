@@ -11,6 +11,7 @@ install:
 
 before_script:
   - vim --version
+  - chmod +x ./test/dot-repeat/test_dot.sh
 
 script:
   - ./vim-themis/bin/themis

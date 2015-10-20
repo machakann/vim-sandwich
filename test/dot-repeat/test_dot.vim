@@ -361,17 +361,15 @@ call s:assert(getline('.'), '', 'textobj-query:normal use #2')
 %delete
 
 " count
-call setline('.', '((foo))')
-normal 0ffd2is(
-call setline('.', '((foo))')
-normal 0ff.
-call s:assert(getline('.'), '()', 'textobj-query:count #1')
+call setline('.', '((foo))((bar))')
+normal 0ffdis(
+normal 0fb2.
+call s:assert(getline('.'), '(())()', 'textobj-query:count #1')
 
-call setline('.', '((foo))')
-normal 0ffd2as(
-call setline('.', '((foo))')
-normal 0ff.
-call s:assert(getline('.'), '', 'textobj-query:count #2')
+call setline('.', '((foo))((bar))')
+normal 0ffdas(
+normal 0fb2.
+call s:assert(getline('.'), '()', 'textobj-query:count #2')
 
 %delete
 
@@ -464,17 +462,15 @@ call s:assert(getline('.'), '', 'textobj-auto:normal use #2')
 %delete
 
 " count
-call setline('.', '((foo))')
-normal 0ffd2ib
-call setline('.', '((foo))')
-normal 0ff.
-call s:assert(getline('.'), '()', 'textobj-auto:count #1')
+call setline('.', '((foo))((bar))')
+normal 0ffdib
+normal 0fb2.
+call s:assert(getline('.'), '(())()', 'textobj-auto:count #1')
 
-call setline('.', '((foo))')
-normal 0ffd2ab
-call setline('.', '((foo))')
-normal 0ff.
-call s:assert(getline('.'), '', 'textobj-auto:count #2')
+call setline('.', '((foo))((bar))')
+normal 0ffdab
+normal 0fb2.
+call s:assert(getline('.'), '()', 'textobj-auto:count #2')
 
 %delete
 
