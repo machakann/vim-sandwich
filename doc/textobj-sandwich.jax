@@ -1,5 +1,5 @@
 *textobj-sandwich.jax*	『挟まれた』テキストを選択する。
-						Last change:01-Oct-2015.
+						Last change:24-Oct-2015.
 
 書いた人   : machakann <mckn@outlook.jp>
 ライセンス : NYSL license
@@ -1030,7 +1030,12 @@ skip_break
 	}
 <
 	このオプションが真のときテキストオブジェクトは両端の改行文字をスキップ
-	して後者を与えます。
+	して後者を与えます。さらにインデントを保存するために改行に続くホワイト
+	スペースも一緒にスキップします。つまり "\n\\s*" というパターンにマッチ
+	する文字列がスキップされます。
+
+	このオプションは |<Plug>(textobj-sandwich-query-i)| 及び
+	|<Plug>(textobj-sandwich-auto-i)| に対してのみ有効です。
 
 	デフォルト値
 	  * query: 0

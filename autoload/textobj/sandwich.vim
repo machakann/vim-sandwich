@@ -273,15 +273,23 @@ function! s:coord_get_inner(buns, cursor, opt) dict abort "{{{
 
   call cursor(self.head)
   call search(a:buns[0], 'ce', self.tail[0])
-  normal! l
+  if a:opt.skip_break
+    let self.inner_head[0:1] = searchpos('\_S', '', self.inner_head[0])
+  else
+    normal! l
+  endif
   let self.inner_head = getpos('.')[1:2]
 
   call cursor(self.tail)
   call search(a:buns[1], 'bc', self.head[0])
-  if !a:opt.skip_break && getpos('.')[2] == 1
-    normal! hl
+  if a:opt.skip_break
+    let self.inner_tail[0:1] = searchpos('\_S', 'be', self.inner_tail[0])
   else
-    normal! h
+    if getpos('.')[2] == 1
+      normal! hl
+    else
+      normal! h
+    endif
   endif
   let self.inner_tail = getpos('.')[1:2]
 
@@ -671,7 +679,8 @@ function! s:is_valid_candidate(textobj) dict abort "{{{
     let opt_syntax_affair = 1
   endif
 
-  return s:is_equal_or_ahead(tail, head)
+  return head != s:null_coord && tail != s:null_coord
+        \ && s:is_equal_or_ahead(tail, head)
         \ && s:is_in_between(self.cursor, coord.head, coord.tail)
         \ && filter(copy(a:textobj.candidates), filter) == []
         \ && visual_mode_affair

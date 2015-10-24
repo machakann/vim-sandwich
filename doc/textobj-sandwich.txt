@@ -1,5 +1,5 @@
 *textobj-sandwich.txt*	The textobject plugin to select sandwiched textobjects.
-						Last change:01-Oct-2015.
+						Last change:24-Oct-2015.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license
@@ -1039,7 +1039,12 @@ skip_break
 	}
 <
 	If this option is true, the textobjects skip the breakings at the both
-	ends to make the latter situation.
+	ends to make the latter situation. In addition, skip following spaces
+	together to keep indentation. That is to say, skipped string would be
+	a string matched with the pattern "\n\\s*".
+
+	This option is valid only for |<Plug>(textobj-sandwich-query-i)| and
+	|<Plug>(textobj-sandwich-auto-i)|.
 
 	Default values
 	  * query: 0
