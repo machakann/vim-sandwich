@@ -984,13 +984,7 @@ function! s:select() dict abort  "{{{
 
   if len(self.candidates) >= self.count
     " election
-    let map_rule = printf(
-          \   'extend(v:val,
-          \     {"len": s:get_buf_length(v:val.coord.%s, v:val.coord.%s)}
-          \   )',
-          \   'inner_head',
-          \   'inner_tail'
-          \ )
+    let map_rule = 'extend(v:val, {"len": s:get_buf_length(v:val.coord.inner_head, v:val.coord.inner_tail)})'
     call map(self.candidates, map_rule)
     call s:sort(self.candidates, 's:compare_buf_length', self.count)
     let elected = self.candidates[self.count - 1]
