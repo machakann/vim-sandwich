@@ -266,35 +266,26 @@ let s:clock = {
 "}}}
 
 function! s:coord_get_inner(buns, cursor, opt) dict abort "{{{
-  if a:opt.skip_break
-    let virtualedit = &virtualedit
-    let &virtualedit = ''
-  endif
-
   call cursor(self.head)
   call search(a:buns[0], 'ce', self.tail[0])
-  if a:opt.skip_break
-    let self.inner_head[0:1] = searchpos('\_S', '', self.inner_head[0])
+  normal! l
+  if a:opt.skip_break && col('.') == col([line('.'), '$'])
+    let self.inner_head = searchpos('\_S', '', self.tail[0])
   else
-    normal! l
+    let self.inner_head = getpos('.')[1:2]
   endif
-  let self.inner_head = getpos('.')[1:2]
 
   call cursor(self.tail)
   call search(a:buns[1], 'bc', self.head[0])
-  if a:opt.skip_break
-    let self.inner_tail[0:1] = searchpos('\_S', 'be', self.inner_tail[0])
+  if a:opt.skip_break && (col('.') < 2 || getline(line('.'))[: col('.')-2] =~# '^\s*$')
+    let self.inner_tail = searchpos('\_S', 'be', self.head[0])
   else
     if getpos('.')[2] == 1
       normal! hl
     else
       normal! h
     endif
-  endif
-  let self.inner_tail = getpos('.')[1:2]
-
-  if a:opt.skip_break
-    let &virtualedit = virtualedit
+    let self.inner_tail = getpos('.')[1:2]
   endif
 endfunction
 "}}}
