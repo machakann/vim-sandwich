@@ -633,8 +633,13 @@ function! s:is_valid_candidate(textobj) dict abort "{{{
   else
     " self.visualmode ==# 'V' never comes.
     if self.visualmode ==# 'v'
-      let visual_mode_affair = s:is_ahead(visualmark.head, head)
-                          \ || s:is_ahead(tail, visualmark.tail)
+      if self.a_or_i ==# 'i'
+        let visual_mode_affair = s:is_ahead(visualmark.head, head)
+                            \ || s:is_ahead(tail, visualmark.tail)
+      else
+        let visual_mode_affair = (s:is_ahead(visualmark.head, head) && s:is_equal_or_ahead(tail, visualmark.tail))
+                            \ || (s:is_equal_or_ahead(visualmark.head, head) && s:is_ahead(tail, visualmark.tail))
+      endif
     else
       let orig_pos = getpos('.')
       let visual_head = s:get_displaycoord(visualmark.head)
