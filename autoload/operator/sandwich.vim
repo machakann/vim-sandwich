@@ -1233,7 +1233,6 @@ function! s:split(region) dict abort  "{{{
       " The case for blockwise motions in operator-pending mode
       execute "normal! `[\<C-v>`]"
       silent normal! ""y
-      execute "normal! \<Esc>"
       let regtype = getregtype('"')
       let self.blockwidth = str2nr(regtype[1:])
     endif
