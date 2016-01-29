@@ -770,7 +770,6 @@ function! s:query() dict abort  "{{{
 
   " query phase
   let input   = ''
-  let cmdline = []
   let last_compl_match = ['', []]
   while recipes != []
     let c = getchar(0)

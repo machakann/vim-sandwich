@@ -939,7 +939,6 @@ function! s:query(recipes) dict abort  "{{{
   try
     " query phase
     let input   = ''
-    let cmdline = []
     let last_compl_match = ['', []]
     while 1
       let c = getchar(0)
