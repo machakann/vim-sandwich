@@ -52,7 +52,11 @@ A sandwiched text could be resolved into two parts, {surrounding} and {surrounde
 ```
 
 ### Configuration
-The point is that it would be nice to be shared the definitions of {surrounding}s pairs in all kinds of operations. User can freely add new settings to extend the functionality. Each setting, it is called `recipe`, is a set of a definition of {surrounding}s pair and options. The key named `buns` is used for the definition of {surrounding}.
+The point is that it would be nice to be shared the definitions of {surrounding}s pairs in all kinds of operations. User can freely add new settings to extend the functionality. If `g:sandwich#recipes` was defined, this plugin works with the settings inside. As a first step, it would be better to copy the default settings in `g:sandwich#default_recipes`.
+```vim
+let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
+```
+Each setting, it is called `recipe`, is a set of a definition of {surrounding}s pair and options. The key named `buns` is used for the definition of {surrounding}.
 ```
 let g:sandwich#recipes += [{'buns': [{surrounding}, {surrounding}], 'option-name1': {value1}, 'option-name2': {value2} ...}]
 
