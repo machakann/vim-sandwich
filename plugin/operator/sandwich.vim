@@ -1,5 +1,5 @@
 " The vim operator plugin to do well with 'sandwich' like structure
-" Last Change: 09-Oct-2015.
+" Last Change: 09-Feb-2016.
 " Maintainer : Masaaki Nakamura <mckn@outlook.jp>
 
 " License    : NYSL
@@ -32,7 +32,7 @@ nnoremap <expr><silent> <Plug>(operator-sandwich-predot) operator#sandwich#predo
 nnoremap <expr><silent> <Plug>(operator-sandwich-dot)    operator#sandwich#dot()
 
 " highlight group
-highlight link OperatorSandwichBuns IncSearch
+highlight default link OperatorSandwichBuns IncSearch
 
 """ default keymappings
 " If g:operator_sandwich_no_default_key_mappings has been defined, then quit immediately.
