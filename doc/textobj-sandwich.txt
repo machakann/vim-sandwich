@@ -1,5 +1,5 @@
-*textobj-sandwich.txt*	The textobject plugin to select sandwiched textobjects.
-						Last change:24-Oct-2015.
+*textobj-sandwich.txt*	The textobject plugin to select sandwiched texts.
+						Last change:21-Feb-2016.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license
@@ -231,8 +231,8 @@ textobj#sandwich#auto(mode, a_or_i[, options[, recipes]])
 
 	If a not-empty list of recipes is given to the optional fourth
 	argument of this function, the key mapping use the list instead of
-	|sandwich#recipes| (or |sandwich#default_recipes|) and
-	|textobj#sandwich#recipes| (or |textobj#sandwich#default_recipes|).
+	|g:sandwich#recipes| (|g:sandwich#default_recipes|) and
+	|g:textobj#sandwich#recipes| (|g:textobj#sandwich#default_recipes|).
 >
 	" example 1
 	onoremap <silent><expr> ib
@@ -507,8 +507,8 @@ mode
 
 
 expr_filter
-	A user can define filters by oneself. The items of the list is
-	evaluated as |expressions|, and if the value is true (1) then the
+	A user can define filters by oneself. The items of the list are
+	evaluated as |expression|, and if the value is true (1) then the
 	recipe is valid, if the value is false (0) then the recipe is invalid.
 >
 	" A filter should be defined in somewhere, for example in your vimrc.
@@ -718,7 +718,7 @@ skip_regex_tail
 			'''foo '' bar'''   : the positions pointed by #.
 <
 	Cursor is moving in searching positions, thus user can use the pattern
-	|\%#|.
+	\%# |/\%#|.
 
 
 
@@ -742,7 +742,7 @@ expr
 	If this option is 1, "buns" are evaluated once and repeat it by |.|
 	command. If this option is 2, "buns" are evaluated every times in |.|
 	repeating. For example, the following recipe searches the text in the
-	unnamed register. (ref. |let-@|, |quotequote|)
+	unnamed register. (ref. |:let-@|, |quotequote|)
 >
 	let g:sandwich#recipes += [
 	  \   {'buns': ['@@', '@@'], 'expr': 1, 'input': ['@']}

@@ -1,12 +1,12 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:09-Oct-2015.
+						Last change:17-Feb-2016.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license
           Japanese <http://www.kmonos.net/nysl/>
           English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>
 
-Requirement:	Vim 7.4 or higher
+ Requirement:	Vim 7.4 or higher
 		|+reltime| feature (optional)
 		|+float| feature (optional)
 
@@ -416,8 +416,9 @@ operator#sandwich#keymap(kind, mode[, options[, recipes]])
 
 	If a not-empty list of recipes is given to the optional fourth
 	argument of this function, the key mapping use the list instead of
-	|sandwich#recipes| (or |sandwich#default_recipes|) and
-	|operator#sandwich#recipes| (or |operator#sandwich#default_recipes|).
+	|g:sandwich#recipes| (or |g:sandwich#default_recipes|) and
+	|g:operator#sandwich#recipes|
+	(or |g:operator#sandwich#default_recipes|).
 >
 	" example 1
 	nnoremap <silent> sa
@@ -727,8 +728,8 @@ action
 
 
 expr_filter
-	A user can define filters by oneself. The items of the list is
-	evaluated as |expressions|, and if the value is true (1) then the
+	A user can define filters by oneself. The items of the list are
+	evaluated as |expression|, and if the value is true (1) then the
 	recipe is valid, if the value is false (0) then the recipe is invalid.
 >
 	" A filter should be defined in somewhere, for example in your vimrc.
@@ -1116,7 +1117,7 @@ expr
 	repeating. If you want to match deleted/replaced surroundings by
 	expressions, use "synchro" option of |textobj-sandwich| together. For
 	example, the following recipe adds the text in the unnamed register.
-	(ref. |let-@|, |quotequote|)
+	(ref. |:let-@|, |quotequote|)
 >
 	let g:sandwich#recipes += [
 	  \   {'buns': ['@@', '@@'], 'expr': 1, 'synchro': 1, 'input': ['@']}
@@ -1197,7 +1198,7 @@ autoindent
 	integer.
 
 	  * -n : Current settings (if it is not empty, then 'indentexpr')
-	  *  0 : 'noautoindent', 'nosmartindent', 'nocindent', 'noindentexpr'
+	  *  0 : 'noautoindent', 'nosmartindent', 'nocindent', 'indentexpr'=''
 	  *  1 : 'autoindent'
 	  *  2 : 'smartindent'
 	  *  3 : 'cindent'
@@ -1419,7 +1420,7 @@ OperatorSandwichBuns			*hl-OperatorSandwichBuns*
 
 
 ==============================================================================
-AUTOCOMMAND				*operator-sandwich-autocommand*
+AUTOCOMMAND				*operator-sandwich-autocommands*
 
 Users can hook some processes for the start and the end of the operator action
 by |:autocmd| command. Each operator defines its own |User| autocommand

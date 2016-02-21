@@ -1,5 +1,5 @@
 *textobj-sandwich.jax*	『挟まれた』テキストを選択する。
-						Last change:24-Oct-2015.
+						Last change:21-Feb-2016.
 
 書いた人   : machakann <mckn@outlook.jp>
 ライセンス : NYSL license
@@ -228,9 +228,9 @@ textobj#sandwich#auto(mode, a_or_i[, options[, recipes]])
 	\ textobj#sandwich#auto('o', 'i', g:sandwich_alt_options)
 <
 
-	空でないレシピのリストが省略可能な第四引数に与えられた場合、そのキーマ
-	ッピングは |sandwich#recipes| (|sandwich#default_recipes|) や
-	|textobj#sandwich#recipes| (|textobj#sandwich#default_recipes|) の
+	空でないレシピのリストが省略可能な第四引数に与えられた場合、そのキー
+	マッピングは |g:sandwich#recipes| (|g:sandwich#default_recipes|) や
+	|g:textobj#sandwich#recipes| (|g:textobj#sandwich#default_recipes|) の
 	かわりに引数に与えられたリストを参照します。
 >
 	" example 1
@@ -718,7 +718,7 @@ skip_regex_tail
 			'''foo '' bar'''   : the positions pointed by #.
 <
 	検索の間、内部的にカーソルを動かしているので、カーソルを表す正規表現の
-	|\%#| が使えます。
+	\%# |/\%#| が使えます。
 
 
 
@@ -741,7 +741,7 @@ expr
 	れます。値が 1 の場合は一度だけ評価され、|.| コマンドでは同じものが使
 	用されます。値が 2 の場合は |.| コマンドで繰り返される毎に評価されます
 	。例えば以下のレシピはその時々の無名レジスタ |quotequote| の内容に挟ま
-	れた範囲を検索します。 (参考: |let-@|)
+	れた範囲を検索します。 (参考: |:let-@|)
 >
 	let g:sandwich#recipes += [
 	  \   {'buns': ['@@', '@@'], 'expr': 1, 'input': ['@']}
@@ -1053,7 +1053,7 @@ skip_expr
 	  \   {
 	  \     'buns': ['a', 'a'],
 	  \     'skip_expr': [
-	  \       'getpos(".")[2] != 1 && getpos(".")[2] != col([getpos(".")[1], "$"])-1'
+	  \       'col(".")[2] != 1 && col(".")[2] != col([line("."), "$"])-1'
 	  \     ]
 	  \   }
 	  \ ]

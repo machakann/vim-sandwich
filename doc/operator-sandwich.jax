@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:09-Oct-2015.
+						Last change:21-Feb-2016.
 
 書いた人   : machakann <mckn@outlook.jp>
 ライセンス : NYSL license
@@ -256,7 +256,7 @@ NOTE: 誤操作を防ぐため以下の設定を vimrc に追加することを�
 
 
 query-1st 系列キーマッピング~
-<Plug>(operator-sandwich-add-query1st)
+*<Plug>(operator-sandwich-add-query1st)*
 	テキストを括弧などで囲むためのオペレータコマンドです。[count] が与えら
 	れた場合、その数だけ囲みを追加します。|<Plug>(operator-sandwich-add)|
 	とは違い、 {motion/textobject} の入力の前に挿入する文字の決定を行いま
@@ -273,7 +273,7 @@ query-1st 系列キーマッピング~
 	      ら使用が推奨されません。 |operator-sandwich-miscellaneous| を
 	      ご覧ください。
 
-<Plug>(operator-sandwich-replace-query1st)
+*<Plug>(operator-sandwich-replace-query1st)*
 	テキストの囲みを置き換えるためのオペレータコマンドです。 [count] が与
 	えられた場合、その数だけ連続する囲みを置換します。
 	|<Plug>(operator-sandwich-replace)|とは違い、 {motion/textobject} の入
@@ -405,9 +405,9 @@ operator#sandwich#keymap(kind, mode[, options[, recipes]])
 <
 
 	空でないレシピのリストが省略可能な第四引数に与えられた場合、そのキーマ
-	ッピングは |sandwich#recipes| (|sandwich#default_recipes|) や
-	|operator#sandwich#recipes| (|operator#sandwich#default_recipes|) のか
-	わりに引数に与えられたリストを参照します。
+	ッピングは |g:sandwich#recipes| (|g:sandwich#default_recipes|) や
+	|g:operator#sandwich#recipes| (|g:operator#sandwich#default_recipes|)
+	のかわりに引数に与えられたリストを参照します。
 >
 	" example 1
 	nnoremap <silent> sa
@@ -462,7 +462,7 @@ CONFIGURATION				*operator-sandwich-configuration*
 |g:sandwich#default_recipes| をご覧ください。
 
 |g:operator#sandwich#default_recipes| はまた別のリストで、こちらは
-|operetor-sandwich| のみからしか参照されません。ユーザーが
+|operator-sandwich| のみからしか参照されません。ユーザーが
 |g:operator#sandwich#recipes| を定義した際にはそちらがかわりに使用されます。
 |g:operator#sandwich#default_recipes| は |g:sandwich#default_recipes| と同様に
 ロックされています。
@@ -1104,7 +1104,7 @@ expr
 	。もし、囲みを外す/置換するオペレータにおいて、削除される/置換される囲
 	みを式として表したい場合は |textobj-sandwich| のローカルオプション
 	"synchro" も同時に設定する必要があります。例えば以下のレシピはその時々
-	の無名レジスタ |quotequote| の内容を挿入します。 (参考: |let-@|)
+	の無名レジスタ |quotequote| の内容を挿入します。 (参考: |:let-@|)
 >
 	let g:sandwich#recipes += [
 	  \   {'buns': ['@@', '@@'], 'expr': 1, 'synchro': 1, 'input': ['@']}
@@ -1181,7 +1181,7 @@ autoindent
 	オプションを使用したい場合には負数を指定するとよいでしょう。
 
 	  * -n : 設定を変更しない ('indentexpr' が空でなければそれが使われる)
-	  *  0 : 'noautoindent', 'nosmartindent', 'nocindent', 'noindentexpr'
+	  *  0 : 'noautoindent', 'nosmartindent', 'nocindent', 'indentexpr'=''
 	  *  1 : 'autoindent'
 	  *  2 : 'smartindent'
 	  *  3 : 'cindent'
@@ -1400,7 +1400,7 @@ OperatorSandwichBuns			*hl-OperatorSandwichBuns*
 
 
 ==============================================================================
-AUTOCOMMAND				*operator-sandwich-autocommand*
+AUTOCOMMAND				*operator-sandwich-autocommands*
 
 ユーザーは |:autocmd| によってオペレータの動作前と後に処理をフックできます。そ
 れぞれのオペレータは独自の |User| オートコマンドイベントを持っているのでこれを
