@@ -727,7 +727,7 @@ function! s:search(recipes) dict abort "{{{
   let filter  = 's:has_action(v:val, "delete")'
   call filter(recipes, filter)
   let region  = self.region
-  let opt     = deepcopy(self.opt)
+  let opt     = self.opt
   let target  = copy(s:null_4pos)
 
   if s:is_valid_2pos(region) && s:is_ahead(region.tail, region.head)
