@@ -1064,13 +1064,10 @@ function! s:get_buns() dict abort  "{{{
   let buns = self.buns
 
   if (opt.expr && !self.evaluated) || opt.expr == 2
-    echo ''
     let buns = opt.expr == 2 ? deepcopy(buns) : buns
     let buns[0] = s:eval(buns[0], 1)
     let buns[1] = s:eval(buns[1], 0)
     let self.evaluated = 1
-    redraw
-    echo ''
   endif
 
   return buns
