@@ -13,6 +13,11 @@ function! s:suite.before_each() abort "{{{
   set filetype=
   set whichwrap&
   set autoindent&
+  set smartindent&
+  set cindent&
+  set cinkeys&
+  set indentexpr=
+  set indentkeys&
   set virtualedit&
   silent! mapc!
   silent! ounmap ii
