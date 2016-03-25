@@ -508,6 +508,23 @@ function! s:act_replace_pair(buns, undojoin, done, next_act) dict abort "{{{
   return [undojoin, done]
 endfunction
 "}}}
+function! s:act_set_target() dict abort  "{{{
+  let head = copy(self.region.head)
+  let tail = copy(self.region.tail)
+  let self.target.head1 = head
+  let self.target.tail1 = head
+  let self.target.head2 = tail
+  let self.target.tail2 = tail
+endfunction
+"}}}
+function! s:act_skip_space() dict abort  "{{{
+  let opt = self.opt.integrated
+  if opt.skip_space
+    call s:skip_space(self.region.head, 'c',  self.region.tail[1])
+    call s:skip_space(self.region.tail, 'bc', self.region.head[1])
+  endif
+endfunction
+"}}}
 function! s:act_search(recipes) dict abort "{{{
   let recipes = deepcopy(a:recipes)
   let filter  = 's:has_action(v:val, "delete")'
@@ -881,6 +898,7 @@ let s:act = {
       \   'target' : copy(s:null_4pos),
       \   'cursor' : {},
       \   'modmark': {},
+      \   'opt'    : {},
       \   'hi_status': 0,
       \   'hi_idlist': [],
       \   'initialize'  : function('s:act_initialize'),
@@ -888,6 +906,8 @@ let s:act = {
       \   'delete_pair' : function('s:act_delete_pair'),
       \   'replace_pair': function('s:act_replace_pair'),
       \   'search'      : function('s:act_search'),
+      \   'set_target'  : function('s:act_set_target'),
+      \   'skip_space'  : function('s:act_skip_space'),
       \   'show'        : function('s:act_show'),
       \   'quench'      : function('s:act_quench'),
       \ }
@@ -926,20 +946,29 @@ function! s:stuff_set_region(region_list) dict abort "{{{
   endfor
 endfunction
 "}}}
-function! s:stuff_adjust() dict abort  "{{{
-  let opt = self.opt.integrated
+function! s:stuff_set_target() dict abort  "{{{
   for i in range(self.n)
     let act = self.acts[i]
-    let act.target.head1 = copy(act.region.head)
-    let act.target.tail1 = act.target.head1
-    let act.target.head2 = copy(act.region.tail)
-    let act.target.tail2 = act.target.head2
-
-    if opt.skip_space
-      call s:skip_space(act.target.head1, 'c',  act.target.head2[1])
-      call s:skip_space(act.target.head2, 'bc', act.target.tail1[1])
-    endif
+    call act.set_target()
   endfor
+endfunction
+"}}}
+function! s:stuff_skip_space(n) dict abort  "{{{
+  " skip space only in the first count.
+  if a:n == 0
+    for i in range(self.n)
+      let act = self.acts[i]
+      call act.skip_space()
+      call act.set_target()
+    endfor
+
+    " for cursor positions
+    let opt = self.opt.integrated
+    if !opt.linewise
+      let self.cursor.inner_head = deepcopy(self.acts[-1].region.head)
+      let self.cursor.inner_tail = deepcopy(self.acts[ 0].region.tail)
+    endif
+  endif
 endfunction
 "}}}
 function! s:stuff_mimic(original) dict abort "{{{
@@ -1118,8 +1147,7 @@ function! s:stuff_add_once(next_stuff, undojoin) dict abort  "{{{
   for i in range(self.n)
     let act      = self.acts[i]
     let next_act = a:next_stuff.acts[i]
-    let [undojoin, self.done]
-          \ = act.add_pair(buns, undojoin, self.done, next_act)
+    let [undojoin, self.done] = act.add_pair(buns, undojoin, self.done, next_act)
   endfor
 endfunction
 "}}}
@@ -1137,8 +1165,7 @@ function! s:stuff_replace_once(next_stuff, undojoin) dict abort  "{{{
   for i in range(self.n)
     let act      = self.acts[i]
     let next_act = a:next_stuff.acts[i]
-    let [undojoin, self.done]
-          \ = act.replace_pair(buns, undojoin, self.done, next_act)
+    let [undojoin, self.done] = act.replace_pair(buns, undojoin, self.done, next_act)
   endfor
 endfunction
 "}}}
@@ -1154,7 +1181,8 @@ let s:stuff = {
       \   'initialize'  : function('s:stuff_initialize'),
       \   'fill'        : function('s:stuff_fill'),
       \   'set_region'  : function('s:stuff_set_region'),
-      \   'adjust'      : function('s:stuff_adjust'),
+      \   'set_target'  : function('s:stuff_set_target'),
+      \   'skip_space'  : function('s:stuff_skip_space'),
       \   'mimic'       : function('s:stuff_mimic'),
       \   'search'      : function('s:stuff_search'),
       \   'query'       : function('s:stuff_query'),
@@ -1213,8 +1241,8 @@ function! s:operator_initialize(kind, motionwise) dict abort "{{{
   let n = len(region_list)  " Number of lines in the target region
   let self.opt.filter = s:default_opt[a:kind]['filter']
   let self.opt.integrate  = function('s:opt_integrate')
-  let self.cursor.inner_head = region.head
-  let self.cursor.inner_tail = region.tail
+  let self.cursor.inner_head = deepcopy(region.head)
+  let self.cursor.inner_tail = deepcopy(region.tail)
   call self.opt.default.update(deepcopy(g:operator#sandwich#options[a:kind][a:motionwise]))
 
   if self.state
@@ -1315,8 +1343,7 @@ function! s:operator_add() dict abort "{{{
     let next_stuff = get(self.basket, i + 1, deepcopy(stuff))
     let opt = stuff.opt.integrated
 
-    call stuff.adjust()
-
+    call stuff.set_target()
     if self.state
       " query preferable buns
       call winrestview(self.view)
@@ -1330,6 +1357,7 @@ function! s:operator_add() dict abort "{{{
     if stuff.buns == [] || len(stuff.buns) < 2
       break
     endif
+    call stuff.skip_space(i)
 
     if opt.query_once && self.count > 1 && i == 0 && self.state
       for j in range(1, len(self.basket) - 1)
