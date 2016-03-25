@@ -336,16 +336,15 @@ function! s:act_add_pair(buns, undojoin, done, next_act) dict abort "{{{
 
     let indentopt = s:set_indent(opt)
     try
-      let [is_linewise[1], indent[1], tail] = s:add_tail(a:buns, target, opt, undojoin)
-      let [is_linewise[0], indent[0], head] = s:add_head(a:buns, target, opt)
+      let pos = target.head1
+      let [is_linewise[0], indent[0], head] = s:add_former(a:buns, pos, opt, undojoin)
+      let pos = s:push1(copy(target.head2), target, a:buns, indent, is_linewise)
+      let [is_linewise[1], indent[1], tail] = s:add_latter(a:buns, pos, opt)
     catch /^Vim\%((\a\+)\)\=:E21/
       throw 'OperatorSandwichError:Add:ReadOnly'
     finally
       call s:restore_indent(indentopt)
     endtry
-
-    " get tail
-    call s:push1(tail, target, a:buns, indent, is_linewise)
 
     " update modmark
     if modmark.head == s:null_pos || s:is_ahead(modmark.head, head)
@@ -381,30 +380,25 @@ function! s:act_delete_pair(done, next_act) dict abort  "{{{
   let modmark  = self.modmark
   let opt      = self.opt.integrated
   let done     = a:done
-  let is_linewise = [0, 0]
-  let no_shift = 0
 
-  if s:is_valid_4pos(target)
-        \ && s:is_ahead(target.head2, target.tail1)
-    if target.tail1 == s:get_left_pos(target.head2)
-      " a trick for the case nothing inside, like '()'
-      let no_shift = 1
-    endif
-
-    let deletion = ['', '']
+  if s:is_valid_4pos(target) && s:is_ahead(target.head2, target.tail1)
     let reg = [getreg('"'), getregtype('"')]
-    let cmd = "silent normal! \"\"dv:call setpos('\.', %s)\<CR>"
+    let deletion = ['', '']
+    let is_linewise = [0, 0]
     try
-      let [deletion[1], is_linewise[1], no_shift] = s:delete_tail(target, opt, no_shift)
-      let [deletion[0], is_linewise[0], head]     = s:delete_head(target, opt)
+      let former_head = target.head1
+      let former_tail = target.tail1
+      let latter_head = target.head2
+      let [deletion[0], is_linewise[0], head] = s:delete_former(former_head, former_tail, latter_head, opt)
+
+      let latter_head = s:pull1(copy(target.head2), target, deletion, is_linewise)
+      let latter_tail = s:pull1(copy(target.tail2), target, deletion, is_linewise)
+      let [deletion[1], is_linewise[1], tail] = s:delete_latter(latter_head, latter_tail, former_head, opt)
     catch /^Vim\%((\a\+)\)\=:E21/
       throw 'OperatorSandwichError:Delete:ReadOnly'
     finally
       call setreg('"', reg[0], reg[1])
     endtry
-
-    " get tail
-    let tail = s:shift_for_delete(copy(target.tail2), target, deletion, is_linewise)
 
     " update modmark
     if modmark.head == s:null_pos || s:is_ahead(modmark.head, head)
@@ -412,14 +406,12 @@ function! s:act_delete_pair(done, next_act) dict abort  "{{{
     endif
     " NOTE: Probably, there is no possibility to delete breakings along multiple acts.
     if !done
-      let _tail = no_shift || tail[2] == col([tail[1], '$'])
-            \ ? tail : s:get_right_pos(tail)
       if modmark.tail == s:null_pos
-        let modmark.tail = _tail
+        let modmark.tail = tail
       else
         call s:shift_for_delete(modmark.tail, target, deletion, is_linewise)
-        if _tail[1] >= modmark.tail[1]
-          let modmark.tail = _tail
+        if tail[1] >= modmark.tail[1]
+          let modmark.tail = tail
         endif
       endif
     endif
@@ -431,7 +423,7 @@ function! s:act_delete_pair(done, next_act) dict abort  "{{{
 
     " update next_act
     let a:next_act.region.head = copy(head)
-    let a:next_act.region.tail = copy(tail)
+    let a:next_act.region.tail = s:get_left_pos(tail)
 
     let done = 1
   endif
@@ -457,18 +449,23 @@ function! s:act_replace_pair(buns, undojoin, done, next_act) dict abort "{{{
     let is_linewise = [0, 0]
     let indentopt   = s:set_indent(opt)
     try
-      let [deletion[1], is_linewise[1], indent[1], tail] = s:replace_tail(a:buns, target, opt, undojoin)
-      let [deletion[0], is_linewise[0], indent[0], head] = s:replace_head(a:buns, target, opt)
+      let former_head = target.head1
+      let former_tail = target.tail1
+      let latter_head = copy(target.head2)
+      let latter_tail = copy(target.tail2)
+      let [deletion[0], is_linewise[0], indent[0], head] = s:replace_former(a:buns[0], former_head, former_tail, latter_tail, opt, undojoin)
+
+      call s:pull1(latter_head, target, deletion, is_linewise)
+      call s:push1(latter_head, target, a:buns, indent, is_linewise)
+      call s:pull1(latter_tail, target, deletion, is_linewise)
+      call s:push1(latter_tail, target, a:buns, indent, is_linewise)
+      let [deletion[1], is_linewise[1], indent[1], tail] = s:replace_latter(a:buns[1], latter_head, latter_tail, opt)
     catch /^Vim\%((\a\+)\)\=:E21/
       throw 'OperatorSandwichError:Replace:ReadOnly'
     finally
       call setreg('"', reg[0], reg[1])
       call s:restore_indent(indentopt)
     endtry
-
-    " update tail
-    call s:pull1(tail, target, deletion, is_linewise)
-    call s:push1(tail, target, a:buns, indent, is_linewise)
 
     " update modmark
     if modmark.head == s:null_pos || s:is_ahead(modmark.head, head)
@@ -489,8 +486,7 @@ function! s:act_replace_pair(buns, undojoin, done, next_act) dict abort "{{{
     call s:shift_for_replace(self.cursor.keep, target, a:buns, deletion, indent, is_linewise)
     call s:shift_for_replace(next_head, target, a:buns, deletion, indent, is_linewise)
     call s:shift_for_replace(next_tail, target, a:buns, deletion, indent, is_linewise)
-    if self.cursor.inner_head == s:null_pos
-          \ || target.head1[1] <= self.cursor.inner_head[1]
+    if self.cursor.inner_head == s:null_pos || target.head1[1] <= self.cursor.inner_head[1]
       let self.cursor.inner_head = copy(next_head)
     endif
     if self.cursor.inner_tail == s:null_pos
@@ -692,25 +688,25 @@ function! s:restore_indent(indentopt) abort  "{{{
   endif
 endfunction
 "}}}
-function! s:add_head(buns, target, opt) abort  "{{{
-  let undojoin_cmd = ''
+function! s:add_former(buns, pos, opt, ...) abort  "{{{
+  let undojoin_cmd = get(a:000, 0, 0) ? 'undojoin | ' : ''
   if a:opt.linewise
     let startinsert = a:opt.noremap ? 'normal! O' : "normal \<Plug>(sandwich-O)"
   else
     let startinsert = a:opt.noremap ? 'normal! i' : "normal \<Plug>(sandwich-i)"
   endif
-  call s:add_portion(a:buns[0], a:target.head1, undojoin_cmd, startinsert)
+  call s:add_portion(a:buns[0], a:pos, undojoin_cmd, startinsert)
   return [a:opt.linewise, indent(line("']")), getpos("'[")]
 endfunction
 "}}}
-function! s:add_tail(buns, target, opt, ...) abort  "{{{
-  let undojoin_cmd = get(a:000, 0, 0) ? 'undojoin | ' : ''
+function! s:add_latter(buns, pos, opt) abort  "{{{
+  let undojoin_cmd = ''
   if a:opt.linewise
     let startinsert = a:opt.noremap ? 'normal! o' : "normal \<Plug>(sandwich-o)"
   else
     let startinsert = a:opt.noremap ? 'normal! i' : "normal \<Plug>(sandwich-i)"
   endif
-  call s:add_portion(a:buns[1], a:target.head2, undojoin_cmd, startinsert)
+  call s:add_portion(a:buns[1], a:pos, undojoin_cmd, startinsert)
   return [a:opt.linewise, indent(line("']")), getpos("']")]
 endfunction
 "}}}
@@ -724,36 +720,38 @@ function! s:add_portion(bun, pos, undojoin_cmd, startinsert) abort "{{{
   endif
 endfunction
 "}}}
-function! s:delete_head(target, opt) abort  "{{{
+function! s:delete_former(head, tail, latter_head, opt, ...) abort  "{{{
   let is_linewise = 0
-  let undojoin_cmd = ''
-  let deletion = s:delete_portion(a:target.head1, a:target.tail1, undojoin_cmd)
-  if a:opt.linewise == 2 ||
-        \ (a:opt.linewise && match(getline('.'), '^\s*$') > -1)
-    .delete
+  let undojoin_cmd = get(a:000, 0, 0) ? 'undojoin | ' : ''
+  let deletion = s:delete_portion(a:head, a:tail, undojoin_cmd)
+  if a:opt.linewise == 2 || (a:opt.linewise && match(getline('.'), '^\s*$') > -1)
+    if line('.') != a:latter_head[1]
+      .delete
+      let is_linewise = 1
+    endif
     let head = getpos("']")
-    let is_linewise = 1
   else
     let head = getpos('.')
   endif
   return [deletion, is_linewise, head]
 endfunction
 "}}}
-function! s:delete_tail(target, opt, no_shift, ...) abort  "{{{
+function! s:delete_latter(head, tail, former_head, opt) abort  "{{{
   let is_linewise = 0
-  let no_shift = a:no_shift
-  let undojoin_cmd = get(a:000, 0, 0) ? 'undojoin | ' : ''
-  let deletion = s:delete_portion(a:target.head2, a:target.tail2, undojoin_cmd)
-  if a:opt.linewise == 2
-        \ || (a:opt.linewise && match(getline('.'), '^\s*$') > -1)
-    if line('.') != a:target.head1[1]
-      .delete
-      let is_linewise = 1
-    else
-      let no_shift = 1
+  let undojoin_cmd = ''
+  let deletion = s:delete_portion(a:head, a:tail, undojoin_cmd)
+  if a:opt.linewise == 2 || (a:opt.linewise && match(getline('.'), '^\s*$') > -1)
+    .delete
+    let is_linewise = 1
+    let tail = getpos("']")
+    if tail[1] != 1 && tail[1] != a:former_head[1]
+      let prevline = line("']") - 1
+      let tail = [0, prevline, col([prevline, '$']), 0]
     endif
+  else
+    let tail = getpos("']")
   endif
-  return [deletion, is_linewise, no_shift]
+  return [deletion, is_linewise, tail]
 endfunction
 "}}}
 function! s:delete_portion(head, tail, undojoin_cmd) abort  "{{{
@@ -764,57 +762,51 @@ function! s:delete_portion(head, tail, undojoin_cmd) abort  "{{{
   return @@
 endfunction
 "}}}
-function! s:replace_head(buns, target, opt) abort "{{{
-  let indent = 0
-  let is_linewise = 0
-  let undojoin_cmd = ''
-  let deletion = s:delete_portion(a:target.head1, a:target.tail1, undojoin_cmd)
-
-  let bun = a:buns[0]
-  if s:is_in_cmdline_window
-    " workaround for a bug in cmdline-window
-    call s:paste(bun)
-  elseif a:opt.linewise == 2 || (a:opt.linewise && match(getline('.'), '^\s*$') > -1)
-    .delete
-    let startinsert = a:opt.noremap ? 'normal! O' : "normal \<Plug>(sandwich-O)"
-    execute 'silent ' . startinsert . bun
-    let indent = indent(line("']"))
-    let is_linewise = 1
-  else
-    let startinsert = a:opt.noremap ? 'normal! i' : "normal \<Plug>(sandwich-i)"
-    execute 'silent ' . startinsert . bun
-  endif
-  return [deletion, is_linewise, indent, getpos("'[")]
-endfunction
-"}}}
-function! s:replace_tail(buns, target, opt, ...) abort "{{{
-  let indent = 0
+function! s:replace_former(bun, head, tail, latter_head, opt, ...) abort "{{{
   let is_linewise = 0
   let undojoin_cmd = get(a:000, 0, 0) ? 'undojoin | ' : ''
-  let deletion = s:delete_portion(a:target.head2, a:target.tail2, undojoin_cmd)
+  let deletion = s:delete_portion(a:head, a:tail, undojoin_cmd)
 
-  let bun = a:buns[1]
   if s:is_in_cmdline_window
     " workaround for a bug in cmdline-window
-    call s:paste(bun)
+    call s:paste(a:bun)
   elseif a:opt.linewise == 2 || (a:opt.linewise && match(getline('.'), '^\s*$') > -1)
-    let cursorline = line('.')
-    let fileend    = line('$')
-    if cursorline != a:target.head1[1]
+    if line('.') != a:latter_head[1]
       .delete
-      if cursorline != fileend
-        normal! k
-      endif
-      let startinsert = a:opt.noremap ? 'normal! o' : "normal \<Plug>(sandwich-o)"
-      execute 'silent ' . startinsert . bun
-      let indent = indent(line("']"))
+      let startinsert = a:opt.noremap ? 'normal! O' : "normal \<Plug>(sandwich-O)"
+      execute 'silent ' . startinsert . a:bun
       let is_linewise = 1
     endif
   else
     let startinsert = a:opt.noremap ? 'normal! i' : "normal \<Plug>(sandwich-i)"
-    execute 'silent ' . startinsert . bun
+    execute 'silent ' . startinsert . a:bun
   endif
-  return [deletion, is_linewise, indent, getpos("']")]
+  return [deletion, is_linewise, indent(line("']")), getpos("'[")]
+endfunction
+"}}}
+function! s:replace_latter(bun, head, tail, opt) abort "{{{
+  let is_linewise = 0
+  let undojoin_cmd = ''
+  let deletion = s:delete_portion(a:head, a:tail, undojoin_cmd)
+
+  if s:is_in_cmdline_window
+    " workaround for a bug in cmdline-window
+    call s:paste(a:bun)
+  elseif a:opt.linewise == 2 || (a:opt.linewise && match(getline('.'), '^\s*$') > -1)
+    let current = line('.')
+    let fileend = line('$')
+    .delete
+    if current != fileend
+      normal! k
+    endif
+    let startinsert = a:opt.noremap ? 'normal! o' : "normal \<Plug>(sandwich-o)"
+    execute 'silent ' . startinsert . a:bun
+    let is_linewise = 1
+  else
+    let startinsert = a:opt.noremap ? 'normal! i' : "normal \<Plug>(sandwich-i)"
+    execute 'silent ' . startinsert . a:bun
+  endif
+  return [deletion, is_linewise, indent(line("']")), getpos("']")]
 endfunction
 "}}}
 function! s:paste(bun, ...) abort "{{{
@@ -2056,7 +2048,10 @@ function! s:push1(shifted_pos, target, addition, indent, is_linewise) abort  "{{
       " lnum
       let shift[1] += 1
     endif
-    call s:push(shift, a:shifted_pos, head, a:addition[0], a:indent[0], a:is_linewise[0])
+
+    if s:is_equal_or_ahead(a:shifted_pos, head) || (a:is_linewise[0] && a:shifted_pos[1] == head[1])
+      call s:push(shift, a:shifted_pos, head, a:addition[0], a:indent[0], a:is_linewise[0])
+    endif
     let a:shifted_pos[1:2] += shift[1:2]
   endif
   return a:shifted_pos
@@ -2071,26 +2066,26 @@ function! s:push2(shifted_pos, target, addition, indent, is_linewise) abort  "{{
       " lnum
       let shift[1] += 1
     endif
-    call s:push(shift, a:shifted_pos, head, a:addition[1], a:indent[1], a:is_linewise[1])
+
+    if s:is_equal_or_ahead(a:shifted_pos, head)
+      call s:push(shift, a:shifted_pos, head, a:addition[1], a:indent[1], a:is_linewise[1])
+    endif
     let a:shifted_pos[1:2] += shift[1:2]
   endif
   return a:shifted_pos
 endfunction
 "}}}
 function! s:push(shift, shifted_pos, head, addition, indent, is_linewise) abort  "{{{
-  if s:is_equal_or_ahead(a:shifted_pos, a:head)
-    let addition = split(a:addition, '\n', 1)
+  let addition = split(a:addition, '\n', 1)
 
-    " lnum
-    let a:shift[1] += len(addition) - 1
-    " column
-    if !a:is_linewise
-          \ && a:head[1] == a:shifted_pos[1]
-      let a:shift[2] += strlen(addition[-1])
-      if len(addition) > 1
-        let a:shift[2] -= a:head[2] - 1
-        let a:shift[2] += a:indent - strlen(matchstr(addition[-1], '^\s*'))
-      endif
+  " lnum
+  let a:shift[1] += len(addition) - 1
+  " column
+  if !a:is_linewise && a:head[1] == a:shifted_pos[1]
+    let a:shift[2] += strlen(addition[-1])
+    if len(addition) > 1
+      let a:shift[2] -= a:head[2] - 1
+      let a:shift[2] += a:indent - strlen(matchstr(addition[-1], '^\s*'))
     endif
   endif
 endfunction
@@ -2391,7 +2386,7 @@ let s:default_opt.add.char = {
       \   'highlight'  : 1,
       \   'command'    : [],
       \   'linewise'   : 0,
-      \   'autoindent' : 1,
+      \   'autoindent' : -1,
       \   'indentkeys' : '',
       \   'indentkeys+': '',
       \   'indentkeys-': '',
@@ -2405,7 +2400,7 @@ let s:default_opt.add.line = {
       \   'highlight' : 1,
       \   'command'   : [],
       \   'linewise'  : 1,
-      \   'autoindent' : 1,
+      \   'autoindent' : -1,
       \   'indentkeys' : '',
       \   'indentkeys+': '',
       \   'indentkeys-': '',
@@ -2419,7 +2414,7 @@ let s:default_opt.add.block = {
       \   'highlight' : 1,
       \   'command'   : [],
       \   'linewise'  : 0,
-      \   'autoindent' : 1,
+      \   'autoindent' : -1,
       \   'indentkeys' : '',
       \   'indentkeys+': '',
       \   'indentkeys-': '',
@@ -2471,7 +2466,7 @@ let s:default_opt.replace.char = {
       \   'highlight' : 1,
       \   'command'   : [],
       \   'linewise'  : 0,
-      \   'autoindent' : 1,
+      \   'autoindent' : -1,
       \   'indentkeys' : '',
       \   'indentkeys+': '',
       \   'indentkeys-': '',
@@ -2487,7 +2482,7 @@ let s:default_opt.replace.line = {
       \   'highlight' : 1,
       \   'command'   : [],
       \   'linewise'  : 0,
-      \   'autoindent' : 1,
+      \   'autoindent' : -1,
       \   'indentkeys' : '',
       \   'indentkeys+': '',
       \   'indentkeys-': '',
@@ -2503,7 +2498,7 @@ let s:default_opt.replace.block = {
       \   'highlight' : 1,
       \   'command'   : [],
       \   'linewise'  : 0,
-      \   'autoindent' : 1,
+      \   'autoindent' : -1,
       \   'indentkeys' : '',
       \   'indentkeys+': '',
       \   'indentkeys-': '',

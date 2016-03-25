@@ -1202,12 +1202,6 @@ autoindent
 	  *  1 : 'autoindent'
 	  *  2 : 'smartindent'
 	  *  3 : 'cindent'
-
-	If "buns" include line breaks, it would be better to think about this
-	option. Practically the value 1 ('autoindent') would be helpful in
-	many cases, at least it is easier to expect its result. The other
-	positive integers sometime cause unexpected results, use them with
-	care.
 >
 	let g:sandwich#recipes += [
 	  \   {'buns': ['{', '}'], 'motionwise': ['line'], 'autoindent': 3},
@@ -1215,13 +1209,13 @@ autoindent
 <
 	Default values
 	  * add
-	    - char : 1
-	    - line : 1
-	    - block: 1
+	    - char : -1
+	    - line : -1
+	    - block: -1
 	  * replace
-	    - char : 1
-	    - line : 1
-	    - block: 1
+	    - char : -1
+	    - line : -1
+	    - block: -1
 
 
 

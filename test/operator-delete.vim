@@ -1347,7 +1347,7 @@ function! s:suite.charwise_n_option_linewise() abort  "{{{
   call g:assert.equals(getline(1),   'aa',         'failed at #9')
   call g:assert.equals(getline(2),   'bb',         'failed at #9')
   call g:assert.equals(getline(3),   '',           'failed at #9')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #9')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #9')
   call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #9')
   call g:assert.equals(getpos("']"), [0, 2, 1, 0], 'failed at #9')
 
@@ -2054,7 +2054,7 @@ function! s:suite.charwise_x_option_linewise() abort  "{{{
   call g:assert.equals(getline(1),   'aa',         'failed at #9')
   call g:assert.equals(getline(2),   'bb',         'failed at #9')
   call g:assert.equals(getline(3),   '',           'failed at #9')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #9')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #9')
   call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #9')
   call g:assert.equals(getpos("']"), [0, 2, 1, 0], 'failed at #9')
 
@@ -2913,7 +2913,7 @@ function! s:suite.linewise_n_option_linewise() abort  "{{{
   call g:assert.equals(getline(1),   'aa',         'failed at #9')
   call g:assert.equals(getline(2),   'bb',         'failed at #9')
   call g:assert.equals(getline(3),   '',           'failed at #9')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #9')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #9')
   call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #9')
   call g:assert.equals(getpos("']"), [0, 2, 1, 0], 'failed at #9')
 endfunction
@@ -3769,7 +3769,7 @@ function! s:suite.linewise_x_option_linewise() abort  "{{{
   call g:assert.equals(getline(1),   'aa',         'failed at #9')
   call g:assert.equals(getline(2),   'bb',         'failed at #9')
   call g:assert.equals(getline(3),   '',           'failed at #9')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #9')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #9')
   call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #9')
   call g:assert.equals(getpos("']"), [0, 2, 1, 0], 'failed at #9')
 endfunction

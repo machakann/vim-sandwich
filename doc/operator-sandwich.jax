@@ -1180,16 +1180,11 @@ autoindent
 	設定を変更せず、現行の設定をそのまま使います。もし vim の 'indentexpr'
 	オプションを使用したい場合には負数を指定するとよいでしょう。
 
-	  * -n : 設定を変更しない ('indentexpr' が空でなければそれが使われる)
+	  * -n : 設定を変更しない ( 'indentexpr' が空でなければそれが使われる)
 	  *  0 : 'noautoindent', 'nosmartindent', 'nocindent', 'indentexpr'=''
 	  *  1 : 'autoindent'
 	  *  2 : 'smartindent'
 	  *  3 : 'cindent'
-
-	"buns" が改行を含む場合にはこのオプションについて考える必要があるかも
-	しれません。実用的にはほとんどの場合 1 ('autoindent') を指定するのがよ
-	い選択でしょう。少なくとも予期せぬ結果を招くことは少ないと思われます。
-	その他の選択については注意深くご使用ください。
 >
 	let g:sandwich#recipes += [
 	  \   {'buns': ['{', '}'], 'motionwise': ['line'], 'autoindent': 3},
@@ -1197,13 +1192,13 @@ autoindent
 <
 	Default values
 	  * add
-	    - char : 1
-	    - line : 1
-	    - block: 1
+	    - char : -1
+	    - line : -1
+	    - block: -1
 	  * replace
-	    - char : 1
-	    - line : 1
-	    - block: 1
+	    - char : -1
+	    - line : -1
+	    - block: -1
 
 
 
