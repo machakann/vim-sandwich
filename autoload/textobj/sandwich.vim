@@ -215,13 +215,59 @@ let s:coord = deepcopy(s:null_4coord)
 let s:coord.get_inner = function('s:coord_get_inner')
 let s:coord.next = function('s:coord_next')
 "}}}
+" range object"{{{
+function! s:range_initialize(lnum, expand_range) dict abort "{{{
+  let filehead    = 1
+  let fileend     = line('$')
+  let self.valid  = 1
+  let self.top    = a:lnum
+  let self.bottom = a:lnum
+  if a:expand_range >= 0
+    let self.toplim = max([filehead, a:lnum - a:expand_range])
+    let self.botlim = min([a:lnum + a:expand_range, fileend])
+  else
+    let self.toplim = filehead
+    let self.botlim = fileend
+  endif
+  let self.count = 1
+endfunction
+"}}}
+function! s:range_next() dict abort  "{{{
+  if (self.top == 1/0 && self.bottom < 1)
+        \ || (self.top <= self.toplim && self.bottom >= self.botlim)
+    let self.top    = 1/0
+    let self.bottom = 0
+    let self.valid  = 0
+  else
+    if self.top > self.toplim
+      let self.top = self.top - self.stride
+      let self.top = self.top < self.toplim ? self.toplim : self.top
+    endif
+    if self.bottom < self.botlim
+      let self.bottom = self.bottom + self.stride
+      let self.bottom = self.bottom > self.botlim ? self.botlim : self.bottom
+    endif
+  endif
+endfunction
+"}}}
+let s:range = {
+      \   'valid'     : 0,
+      \   'top'       : 0,
+      \   'bottom'    : 0,
+      \   'toplim'    : 0,
+      \   'botlim'    : 0,
+      \   'stride'    : &lines,
+      \   'count'     : 1,
+      \   'initialize': function('s:range_initialize'),
+      \   'next'      : function('s:range_next'),
+      \ }
+"}}}
 " stuff object "{{{
-function! s:stuff_search_with_nest(textobj) dict abort  "{{{
+function! s:stuff_search_with_nest(candidates) dict abort  "{{{
   let buns  = self.get_buns()
   let range = self.range
   let coord = self.coord
   let opt   = self.opt.integrated
-  let visualmark  = self.visualmark
   let stimeoutlen = max([0, s:get('stimeoutlen', 500)])
 
   if buns[0] ==# '' || buns[1] ==# ''
@@ -260,11 +306,11 @@ function! s:stuff_search_with_nest(textobj) dict abort  "{{{
     call coord.get_inner(buns, self.cursor, opt)
 
     " add to candidates
-    if self.is_valid_candidate(a:textobj)
+    if self.is_valid_candidate(a:candidates)
       let candidate = deepcopy(self)
       " this is required for the case of 'expr' option is 2.
       let candidate.buns[0:1] = buns
-      let a:textobj.candidates += [candidate]
+      call add(a:candidates, candidate)
     endif
 
     if coord.head == [1, 1]
@@ -278,12 +324,11 @@ function! s:stuff_search_with_nest(textobj) dict abort  "{{{
   call range.next()
 endfunction
 "}}}
-function! s:stuff_search_without_nest(textobj) dict abort  "{{{
+function! s:stuff_search_without_nest(candidates) dict abort  "{{{
   let buns  = self.get_buns()
   let range = self.range
   let coord = self.coord
   let opt   = self.opt.integrated
-  let visualmark  = self.visualmark
   let stimeoutlen = max([0, s:get('stimeoutlen', 500)])
 
   if buns[0] ==# '' || buns[1] ==# ''
@@ -356,17 +401,17 @@ function! s:stuff_search_without_nest(textobj) dict abort  "{{{
   let coord.tail = tail
   call coord.get_inner(buns, self.cursor, opt)
 
-  if self.is_valid_candidate(a:textobj)
+  if self.is_valid_candidate(a:candidates)
     let candidate = deepcopy(self)
     " this is required for the case of 'expr' option is 2.
     let candidate.buns[0:1] = buns
-    let a:textobj.candidates += [candidate]
+    call add(a:candidates, candidate)
   endif
 
   let range.valid = 0
 endfunction
 "}}}
-function! s:stuff_get_region(textobj) dict abort "{{{
+function! s:stuff_get_region(candidates) dict abort "{{{
   let range = self.range
   let coord = self.coord
   let opt   = self.opt.integrated
@@ -375,45 +420,25 @@ function! s:stuff_get_region(textobj) dict abort "{{{
 
   if opt.noremap
     let cmd = 'normal!'
-    let v = a:textobj.visualmode
+    let v = self.visualmode
   else
     let cmd = 'normal'
-    let v = a:textobj.visualmode ==# 'v' ? "\<Plug>(sandwich-v)" :
-          \ a:textobj.visualmode ==# 'V' ? "\<Plug>(sandwich-V)" :
+    let v = self.visualmode ==# 'v' ? "\<Plug>(sandwich-v)" :
+          \ self.visualmode ==# 'V' ? "\<Plug>(sandwich-V)" :
           \ "\<Plug>(sandwich-CTRL-v)"
   endif
 
-  let visualmode = a:textobj.visualmode
+  let visualmode = self.visualmode
   let [visual_head, visual_tail] = [getpos("'<"), getpos("'>")]
   try
     while 1
       let [prev_head, prev_tail] = [coord.head, coord.tail]
       let [prev_inner_head, prev_inner_tail] = [coord.inner_head, coord.inner_tail]
       " get outer positions
-      call cursor(self.cursor)
-      execute printf('%s %s%d%s', cmd, v, range.count, self.external[1])
-      execute "normal! \<Esc>"
-      let motionwise_a = visualmode()
-      let [head, tail] = [getpos("'<")[1:2], getpos("'>")[1:2]]
-      " NOTE: V never comes for v. Thus if head == taik == self.cursor, then
-      "       it is failed.
-      if head == self.cursor && tail == self.cursor
-        let [head, tail] = [copy(s:null_coord), copy(s:null_coord)]
-      elseif motionwise_a ==# 'V'
-        let tail[2] = col([tail[1], '$'])
-      endif
+      let [head, tail, visualmode_a] = s:get_textobj_region(self.cursor, cmd, v, range.count, self.external[1])
 
       " get inner positions
-      call cursor(self.cursor)
-      execute printf('%s %s%d%s', cmd, v, range.count, self.external[0])
-      execute "normal! \<Esc>"
-      let motionwise_i = visualmode()
-      let [inner_head, inner_tail] = [getpos("'<")[1:2], getpos("'>")[1:2]]
-      if inner_head == self.cursor && inner_tail == self.cursor
-        let [inner_head, inner_tail] = [copy(s:null_coord), copy(s:null_coord)]
-      elseif motionwise_i ==# 'V'
-        let inner_tail[2] = col([inner_tail[1], '$'])
-      endif
+      let [inner_head, inner_tail, visualmode_i] = s:get_textobj_region(self.cursor, cmd, v, range.count, self.external[0])
 
       if (self.a_or_i ==# 'i' && s:is_valid_region(inner_head, inner_tail, prev_inner_head, prev_inner_tail, range.count))
        \ || (self.a_or_i ==# 'a' && s:is_valid_region(head, tail, prev_head, prev_tail, range.count))
@@ -423,9 +448,9 @@ function! s:stuff_get_region(textobj) dict abort "{{{
           let coord.inner_head = inner_head
           let coord.inner_tail = inner_tail
 
-          if self.is_valid_candidate(a:textobj)
-            let self.visualmode = self.a_or_i ==# 'a' ? motionwise_a : motionwise_i
-            let a:textobj.candidates += [deepcopy(self)]
+          if self.is_valid_candidate(a:candidates)
+            let self.visualmode = self.a_or_i ==# 'a' ? visualmode_a : visualmode_i
+            call add(a:candidates, deepcopy(self))
           endif
         else
           call range.next()
@@ -440,7 +465,8 @@ function! s:stuff_get_region(textobj) dict abort "{{{
     endwhile
   finally
     " restore visualmode
-    execute 'normal! ' . visualmode . "\<Esc>"
+    execute 'normal! ' . visualmode
+    execute 'normal! ' . "\<Esc>"
     call cursor(self.cursor)
     " restore marks
     call setpos("'<", visual_head)
@@ -520,7 +546,7 @@ function! s:stuff_skip(is_head, ...) dict abort  "{{{
   return 0
 endfunction
 "}}}
-function! s:stuff_is_valid_candidate(textobj) dict abort "{{{
+function! s:stuff_is_valid_candidate(candidates) dict abort "{{{
   let coord      = self.coord
   let opt        = self.opt.integrated
   let visualmark = self.visualmark
@@ -539,6 +565,7 @@ function! s:stuff_is_valid_candidate(textobj) dict abort "{{{
   else
     " self.visualmode ==# 'V' never comes.
     if self.visualmode ==# 'v'
+      " character-wise
       if self.a_or_i ==# 'i'
         let visual_mode_affair = s:is_ahead(visualmark.head, head)
                             \ || s:is_ahead(tail, visualmark.tail)
@@ -547,6 +574,7 @@ function! s:stuff_is_valid_candidate(textobj) dict abort "{{{
                             \ || (s:is_equal_or_ahead(visualmark.head, head) && s:is_ahead(tail, visualmark.tail))
       endif
     else
+      " block-wise
       let orig_pos = getpos('.')
       let visual_head = s:get_displaycoord(visualmark.head)
       let visual_tail = s:get_displaycoord(visualmark.tail)
@@ -593,7 +621,7 @@ function! s:stuff_is_valid_candidate(textobj) dict abort "{{{
   return head != s:null_coord && tail != s:null_coord
         \ && s:is_equal_or_ahead(tail, head)
         \ && s:is_in_between(self.cursor, coord.head, coord.tail)
-        \ && filter(copy(a:textobj.candidates), filter) == []
+        \ && filter(copy(a:candidates), filter) == []
         \ && visual_mode_affair
         \ && opt_syntax_affair
 endfunction
@@ -625,37 +653,35 @@ function! s:stuff_get_buns() dict abort  "{{{
   return buns
 endfunction
 "}}}
-function! s:stuff_range_initialize(lnum, expand_range) dict abort "{{{
-  let filehead    = 1
-  let fileend     = line('$')
-  let self.valid  = 1
-  let self.top    = a:lnum
-  let self.bottom = a:lnum
-  if a:expand_range >= 0
-    let self.toplim = max([filehead, a:lnum - a:expand_range])
-    let self.botlim = min([a:lnum + a:expand_range, fileend])
-  else
-    let self.toplim = filehead
-    let self.botlim = fileend
-  endif
-  let self.count = 1
-endfunction
-"}}}
-function! s:stuff_range_next() dict abort  "{{{
-  if (self.top == 1/0 && self.bottom < 1)
-        \ || (self.top <= self.toplim && self.bottom >= self.botlim)
-    let self.top    = 1/0
-    let self.bottom = 0
-    let self.valid  = 0
-  else
-    if self.top > self.toplim
-      let self.top = self.top - self.stride
-      let self.top = self.top < self.toplim ? self.toplim : self.top
+function! s:stuff_synchronize() dict abort  "{{{
+  " For the cooperation with operator-sandwich
+  " NOTE: After visual selection by a user-defined textobject, v:operator is set as ':'
+  " NOTE: 'synchro' option is not valid for visual mode, because there is no guarantee that g:operator#sandwich#object exists.
+  if self.opt.integrated.synchro && exists('g:operator#sandwich#object')
+        \ && ((self.searchby ==# 'buns' && v:operator ==# 'g@') || (self.searchby ==# 'external' && v:operator =~# '\%(:\|g@\)'))
+        \ && &operatorfunc =~# '^operator#sandwich#\%(delete\|replace\)'
+    let recipe = {}
+    if self.searchby ==# 'buns'
+      call extend(recipe, {'buns': self.buns})
+      call extend(recipe, {'expr': 0})
+    elseif self.searchby ==# 'external'
+      call extend(recipe, {'external': self.external})
+      call extend(recipe, {'excursus': [self.range.count, [0] + self.cursor + [0]]})
     endif
-    if self.bottom < self.botlim
-      let self.bottom = self.bottom + self.stride
-      let self.bottom = self.bottom > self.botlim ? self.botlim : self.bottom
+    let filter = 'v:key !=# "clear" && v:key !=# "update"'
+    call extend(recipe, filter(self.opt.recipe, filter), 'keep')
+
+    " If the recipe has 'kind' key and has no 'delete', 'replace' keys, then add these items.
+    if has_key(recipe, 'kind') && filter(copy(recipe.kind), 'v:val ==# "delete" || v:val ==# "replace"') == []
+      let recipe.kind += ['delete', 'replace']
     endif
+
+    " Add 'delete' item to 'action' filter, if the recipe is not valid in 'delete' action.
+    if has_key(recipe, 'action') && filter(copy(recipe.action), 'v:val ==# "delete"') == []
+      let recipe.action += ['delete']
+    endif
+
+    let g:operator#sandwich#object.recipes.synchro = [recipe]
   endif
 endfunction
 "}}}
@@ -663,37 +689,44 @@ function! s:is_valid_region(head, tail, prev_head, prev_tail, count) abort  "{{{
   return a:head != s:null_coord && a:tail != s:null_coord && (a:count == 1 || s:is_ahead(a:prev_head, a:head) || s:is_ahead(a:tail, a:prev_tail))
 endfunction
 "}}}
+function! s:get_textobj_region(cursor, cmd, visualmode, count, key_seq) abort "{{{
+  call cursor(a:cursor)
+  execute printf('%s %s%d%s', a:cmd, a:visualmode, a:count, a:key_seq)
+  execute "normal! \<Esc>"
+  let visualmode = visualmode()
+  let [head, tail] = [getpos("'<")[1:2], getpos("'>")[1:2]]
+  " NOTE: V never comes for v. Thus if head == tail == self.cursor, then
+  "       it is failed.
+  if head == a:cursor && tail == a:cursor
+    let [head, tail] = [copy(s:null_coord), copy(s:null_coord)]
+  elseif visualmode ==# 'V'
+    let tail[2] = col([tail[1], '$'])
+  endif
+  return [head, tail, visualmode]
+endfunction
+"}}}
 let s:stuff = {
-      \   'buns'    : [],
-      \   'external': [],
-      \   'searchby': '',
-      \   'state'   : 0,
-      \   'a_or_i'  : '',
-      \   'mode'    : '',
-      \   'cursor'  : copy(s:null_coord),
-      \   'coord'   : copy(s:coord),
-      \   'syntax'  : [],
-      \   'opt'     : {},
-      \   'range'   : {
-      \     'valid' : 0,
-      \     'top'   : 0,
-      \     'bottom': 0,
-      \     'toplim': 0,
-      \     'botlim': 0,
-      \     'stride': &lines,
-      \     'count' : 1,
-      \     'init'  : function('s:stuff_range_initialize'),
-      \     'next'  : function('s:stuff_range_next'),
-      \   },
+      \   'buns'     : [],
+      \   'external' : [],
+      \   'searchby' : '',
+      \   'state'    : 0,
+      \   'a_or_i'   : '',
+      \   'mode'     : '',
+      \   'cursor'   : deepcopy(s:null_coord),
+      \   'coord'    : deepcopy(s:coord),
+      \   'range'    : deepcopy(s:range),
+      \   'syntax'   : [],
+      \   'opt'      : {},
       \   'escaped'  : 0,
       \   'evaluated': 0,
-      \   'search_with_nest': function('s:stuff_search_with_nest'),
-      \   'search_without_nest': function('s:stuff_search_without_nest'),
-      \   'get_region': function('s:stuff_get_region'),
       \   'searchpos': function('s:stuff_searchpos'),
-      \   'skip': function('s:stuff_skip'),
-      \   'is_valid_candidate': function('s:stuff_is_valid_candidate'),
-      \   'get_buns': function('s:stuff_get_buns'),
+      \   'skip'     : function('s:stuff_skip'),
+      \   'get_buns' : function('s:stuff_get_buns'),
+      \   'synchronize'         : function('s:stuff_synchronize'),
+      \   'is_valid_candidate'  : function('s:stuff_is_valid_candidate'),
+      \   '_search_with_nest'   : function('s:stuff_search_with_nest'),
+      \   '_search_without_nest': function('s:stuff_search_without_nest'),
+      \   '_get_region'         : function('s:stuff_get_region'),
       \ }
 "}}}
 " textobj object  "{{{
@@ -769,7 +802,9 @@ function! s:textobj_start() dict abort "{{{
   let [virtualedit, whichwrap]   = [&virtualedit, &whichwrap]
   let [&virtualedit, &whichwrap] = ['onemore', 'h,l']
   try
-    call self.select()
+    let candidates = self.list()
+    let elected = self.elect(candidates)
+    call self.select(elected)
   finally
     call self.finalize()
     let [&virtualedit, &whichwrap] = [virtualedit, whichwrap]
@@ -791,37 +826,8 @@ function! s:textobj_initialize() dict abort  "{{{
 
     " prepare basket
     for recipe in self.recipes.integrated
-      let has_buns     = has_key(recipe, 'buns')
-      let has_external = has_key(recipe, 'external')
-      if has_buns || has_external
-        let stuff = deepcopy(s:stuff)
-
-        if has_buns
-          let stuff.buns     = remove(recipe, 'buns')
-          let stuff.searchby = 'buns'
-        else
-          let stuff.external = remove(recipe, 'external')
-          let stuff.searchby = 'external'
-        endif
-
-        let stuff.state  = self.state
-        let stuff.a_or_i = self.a_or_i
-        let stuff.mode   = self.mode
-        let stuff.cursor = self.cursor
-        let stuff.evaluated  = 0
-        let stuff.visualmode = self.visualmode
-        let stuff.coord.head = copy(self.cursor)
-        let stuff.visualmark = self.visualmark
-
-        let stuff.opt      = copy(self.opt)
-        let opt            = stuff.opt
-        let opt.recipe     = deepcopy(s:opt)
-        let opt.integrated = deepcopy(s:opt)
-        call opt.recipe.update(recipe)
-        call opt.integrate()
-
-        call stuff.range.init(self.cursor[0], opt.integrated.expand_range)
-
+      let stuff = self.new_stuff(recipe)
+      if stuff != {}
         let self.basket += [stuff]
       endif
     endfor
@@ -839,37 +845,67 @@ function! s:textobj_initialize() dict abort  "{{{
       let stuff.coord.inner_tail = copy(s:null_coord)
 
       let opt = stuff.opt
-      call stuff.range.init(self.cursor[0], opt.integrated.expand_range)
+      call stuff.range.initialize(self.cursor[0], opt.integrated.expand_range)
     endfor
   endif
-
-  let self.candidates = []
 endfunction
 "}}}
-function! s:textobj_select() dict abort  "{{{
+function! s:textobj_new_stuff(recipe) dict abort "{{{
+  let has_buns     = has_key(a:recipe, 'buns')
+  let has_external = has_key(a:recipe, 'external')
+  if !has_buns && !has_external
+    return {}
+  endif
+
+  let stuff = deepcopy(s:stuff)
+  let stuff.state  = self.state
+  let stuff.a_or_i = self.a_or_i
+  let stuff.mode   = self.mode
+  let stuff.cursor = self.cursor
+  let stuff.evaluated  = 0
+  let stuff.visualmode = self.visualmode
+  let stuff.coord.head = copy(self.cursor)
+  let stuff.visualmark = self.visualmark
+  let stuff.opt       = copy(self.opt)
+
+  let opt            = stuff.opt
+  let opt.recipe     = deepcopy(s:opt)
+  let opt.integrated = deepcopy(s:opt)
+  call opt.recipe.update(a:recipe)
+  call opt.integrate()
+
+  call stuff.range.initialize(self.cursor[0], opt.integrated.expand_range)
+
+  if has_buns
+    let stuff.buns = remove(a:recipe, 'buns')
+    let stuff.searchby = 'buns'
+    if opt.integrated.nesting
+      let stuff.search = stuff._search_with_nest
+    else
+      let stuff.search = stuff._search_without_nest
+    endif
+  elseif has_external
+    let stuff.external = remove(a:recipe, 'external')
+    let stuff.searchby = 'external'
+    let stuff.search = stuff._get_region
+  endif
+
+  return stuff
+endfunction
+"}}}
+function! s:textobj_list() dict abort  "{{{
   let clock = deepcopy(s:clock)
   let stimeoutlen = max([0, s:get('stimeoutlen', 500)])
 
-  " start stopwatch
+  " gather candidates
+  let candidates = []
   call clock.start()
-
-  " gather candidate
   while filter(copy(self.basket), 'v:val.range.valid') != []
     for stuff in self.basket
-      if stuff.searchby ==# 'buns'
-        if stuff.opt.integrated.nesting
-          call stuff.search_with_nest(self)
-        else
-          call stuff.search_without_nest(self)
-        endif
-      elseif stuff.searchby ==# 'external'
-        call stuff.get_region(self)
-      else
-        let stuff.range.valid = 0
-      endif
+      call stuff.search(candidates)
     endfor
 
-    if len(self.candidates) >= self.count
+    if len(candidates) >= self.count
       break
     endif
 
@@ -884,19 +920,33 @@ function! s:textobj_select() dict abort  "{{{
   endwhile
   call clock.stop()
 
-  if len(self.candidates) >= self.count
+  return candidates
+endfunction
+"}}}
+function! s:textobj_elect(candidates) dict abort "{{{
+  let elected = {}
+  if len(a:candidates) >= self.count
     " election
     let map_rule = 'extend(v:val, {"len": s:get_buf_length(v:val.coord.inner_head, v:val.coord.inner_tail)})'
-    call map(self.candidates, map_rule)
-    call s:sort(self.candidates, 's:compare_buf_length', self.count)
-    let elected = self.candidates[self.count - 1]
-
+    call map(a:candidates, map_rule)
+    call s:sort(a:candidates, 's:compare_buf_length', self.count)
+    let elected = a:candidates[self.count - 1]
+  else
+    if self.mode ==# 'x'
+      normal! gv
+    endif
+  endif
+  return elected
+endfunction
+"}}}
+function! s:textobj_select(target) dict abort  "{{{
+  if a:target != {}
     " restore view
     call winrestview(self.view)
 
     " select
-    let head = self.a_or_i ==# 'i' ? elected.coord.inner_head : elected.coord.head
-    let tail = self.a_or_i ==# 'i' ? elected.coord.inner_tail : elected.coord.tail
+    let head = self.a_or_i ==# 'i' ? a:target.coord.inner_head : a:target.coord.head
+    let tail = self.a_or_i ==# 'i' ? a:target.coord.inner_tail : a:target.coord.tail
     if self.mode ==# 'x' && self.visualmode ==# "\<C-v>"
       " trick for the blockwise visual mode
       if self.cursor[0] == self.visualmark.tail[0]
@@ -912,7 +962,7 @@ function! s:textobj_select() dict abort  "{{{
       endif
     endif
 
-    execute 'normal! ' . elected.visualmode
+    execute 'normal! ' . a:target.visualmode
     call cursor(head)
     normal! o
     call cursor(tail)
@@ -922,46 +972,13 @@ function! s:textobj_select() dict abort  "{{{
       normal! l
     endif
 
-    " For the cooperation with operator-sandwich
-    " NOTE: After visual selection by a user-defined textobject, v:operator is set as ':'
-    " NOTE: 'synchro' option is not valid for visual mode, because there is no guarantee that g:operator#sandwich#object exists.
-    if elected.opt.integrated.synchro && exists('g:operator#sandwich#object')
-          \ && ((elected.searchby ==# 'buns' && v:operator ==# 'g@') || (elected.searchby ==# 'external' && v:operator =~# '\%(:\|g@\)'))
-          \ && &operatorfunc =~# '^operator#sandwich#\%(delete\|replace\)'
-      call self.synchronize(elected)
-    endif
-
+    call a:target.synchronize()
     let self.done = 1
   else
     if self.mode ==# 'x'
       normal! gv
     endif
   endif
-endfunction
-"}}}
-function! s:textobj_synchronize(elected) abort "{{{
-  let recipe = {}
-  if a:elected.searchby ==# 'buns'
-    call extend(recipe, {'buns': a:elected.buns})
-    call extend(recipe, {'expr': 0})
-  elseif a:elected.searchby ==# 'external'
-    call extend(recipe, {'external': a:elected.external})
-    call extend(recipe, {'excursus': [a:elected.range.count, [0] + a:elected.cursor + [0]]})
-  endif
-  let filter = 'v:key !=# "clear" && v:key !=# "update"'
-  call extend(recipe, filter(a:elected.opt.recipe, filter), 'keep')
-
-  " If the recipe has 'kind' key and has no 'delete', 'replace' keys, then add these items.
-  if has_key(recipe, 'kind') && filter(copy(recipe.kind), 'v:val ==# "delete" || v:val ==# "replace"') == []
-    let recipe.kind += ['delete', 'replace']
-  endif
-
-  " Add 'delete' item to 'action' filter, if the recipe is not valid in 'delete' action.
-  if has_key(recipe, 'action') && filter(copy(recipe.action), 'v:val ==# "delete"') == []
-    let recipe.action += ['delete']
-  endif
-
-  let g:operator#sandwich#object.recipes.synchro = [recipe]
 endfunction
 "}}}
 function! s:textobj_finalize() dict abort "{{{
@@ -1026,7 +1043,6 @@ let s:textobj = {
       \     'integrate' : function('s:textobj_recipes_integrate'),
       \   },
       \   'basket'    : [],
-      \   'candidates': [],
       \   'visualmode': 'v',
       \   'visualmark': copy(s:null_2coord),
       \   'opt'       : {
@@ -1041,8 +1057,10 @@ let s:textobj = {
       \   'query'     : function('s:textobj_query'),
       \   'start'     : function('s:textobj_start'),
       \   'initialize': function('s:textobj_initialize'),
+      \   'new_stuff' : function('s:textobj_new_stuff'),
+      \   'list'      : function('s:textobj_list'),
+      \   'elect'     : function('s:textobj_elect'),
       \   'select'    : function('s:textobj_select'),
-      \   'synchronize': function('s:textobj_synchronize'),
       \   'finalize'  : function('s:textobj_finalize'),
       \ }
 "}}}
