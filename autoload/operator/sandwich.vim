@@ -1,10 +1,4 @@
 " operator-sandwich: wrap by buns!
-" TODO Fix a bug on indent handlings
-" TODO Change highlighting for linewise action
-" TODO Add 'headend', 'tailstart' to 'cursor' option.
-" TODO Add a new feature highlight == 2 (including query1st series)
-" TODO Give API for highlighting and echoing
-" TODO Specification change: expr buns of function ref
 " TODO Give API to get information from operator object.
 "      It would be helpful for users in use of 'expr_filter' and 'command' option.
 " TODO Add 'at' option
@@ -75,14 +69,14 @@ function! operator#sandwich#prerequisite(kind, mode, ...) abort "{{{
   if a:mode ==# 'x' && visualmode() ==# "\<C-v>"
     " The case for blockwise selections in visual mode
     " NOTE: 'is_extended' could be recorded safely only at here. Do not move.
-    let reg = [getreg('"'), getregtype('"')]
+    let reg = ['"', getreg('"'), getregtype('"')]
     try
       normal! gv
       let is_extended = winsaveview().curswant == 1/0
       silent normal! ""y
       let regtype = getregtype('"')
     finally
-      call setreg('"', reg[0], reg[1])
+      call call('setreg', reg)
     endtry
 
     let operator.extended   = is_extended
@@ -165,7 +159,7 @@ function! operator#sandwich#query1st(kind, mode, ...) abort "{{{
 
   " connect links
   for stuff in operator.basket
-    call stuff.initialize(1, operator.cursor, operator.modmark, operator.opt)
+    call stuff.initialize(operator.cursor, operator.modmark, operator.opt)
   endfor
 
   " pick 'recipe' up and query prefered buns
@@ -320,6 +314,141 @@ function! s:act_initialize(cursor, modmark, opt) dict abort  "{{{
   let self.opt     = a:opt
 endfunction
 "}}}
+function! s:act_set_target() dict abort  "{{{
+  let head = copy(self.region.head)
+  let tail = copy(self.region.tail)
+  let self.target.head1 = head
+  let self.target.tail1 = head
+  let self.target.head2 = tail
+  let self.target.tail2 = tail
+endfunction
+"}}}
+function! s:act_skip_space() dict abort  "{{{
+  let opt = self.opt.integrated
+  if opt.skip_space
+    call s:skip_space(self.region.head, self.region.tail)
+  endif
+endfunction
+"}}}
+function! s:act_match(recipes) dict abort "{{{
+  let region = self.region
+  let opt    = self.opt.integrated
+  let region_saved = deepcopy(region)
+
+  if s:is_valid_2pos(region) && s:is_ahead(region.tail, region.head)
+    let edge_chars = ['', '']
+    if self._match_recipes(a:recipes) || self._match_edges(edge_chars)
+      " found!
+      return
+    else
+      let [head_c, tail_c] = edge_chars
+      if opt.skip_space && (head_c =~# '\s' || tail_c =~# '\s')
+        call self.skip_space()
+        if s:is_ahead(region.head, region.tail)
+          " invalid region after skip spaces
+          return
+        else
+          if self._match_recipes(a:recipes) || self._match_edges(edge_chars)
+            " found
+            return
+          endif
+        endif
+      endif
+    endif
+
+
+    " skip characters
+    let target_list = []
+    for candidate in a:recipes
+      call self.opt.recipe.update(candidate)
+      call self.opt.integrate()
+      if self.opt.integrated.skip_char && has_key(candidate, 'buns')
+        let head = region_saved.head
+        let tail = region_saved.tail
+        let target_list += [s:search_edges(head, tail, candidate, opt)]
+      endif
+    endfor
+    if filter(target_list, 's:is_valid_4pos(v:val)') != []
+      let self.target = s:shortest(target_list)
+      return
+    endif
+
+    call self.opt.recipe.clear()
+    call self.opt.integrate()
+  endif
+endfunction
+"}}}
+function! s:act__match_recipes(recipes) dict abort "{{{
+  let opt = self.opt
+
+  let found = 0
+  for candidate in a:recipes
+    call opt.recipe.update(candidate)
+    call opt.integrate()
+
+    if has_key(candidate, 'buns')
+      " search buns
+      let target = s:check_edges(self.region.head, self.region.tail, candidate, opt.integrated)
+    elseif has_key(candidate, 'external')
+      " get difference of external motion/textobject
+      let target = s:check_textobj_diff(self.region.head, self.region.tail, candidate, opt.integrated)
+    else
+      let target = deepcopy(s:null_4pos)
+    endif
+
+    if s:is_valid_4pos(target)
+      let found = 1
+      let self.target = target
+      break
+    endif
+  endfor
+  return found
+endfunction
+"}}}
+function! s:act__match_edges(edge_chars) dict abort "{{{
+  let opt = self.opt
+  call opt.recipe.clear()
+  call opt.integrate()
+
+  let found = 0
+  let head = self.region.head
+  let tail = self.region.tail
+  let head_c = s:get_cursorchar(head)
+  let tail_c = s:get_cursorchar(tail)
+  if head_c ==# tail_c && !(opt.integrated.skip_space == 2 && head_c =~# '\s')
+    let found = 1
+    let self.target = {
+          \   'head1': head, 'tail1': head,
+          \   'head2': tail, 'tail2': tail,
+          \ }
+  endif
+
+  let a:edge_chars[0] = head_c
+  let a:edge_chars[1] = tail_c
+  return found
+endfunction
+"}}}
+function! s:act_show(hi_group) dict abort "{{{
+  if !self.hi_status
+    if s:is_valid_4pos(self.target)
+      let order_list = s:highlight_order(self.target)
+      for order in order_list
+        let self.hi_idlist += s:matchaddpos(a:hi_group, order)
+      endfor
+      let self.hi_status = 1
+    endif
+    call filter(self.hi_idlist, 'v:val > 0')
+  endif
+endfunction
+"}}}
+function! s:act_quench() dict abort "{{{
+  if self.hi_status
+    call map(self.hi_idlist, 'matchdelete(v:val)')
+    call filter(self.hi_idlist, 'v:val > 0')
+    let self.hi_status = 0
+  endif
+endfunction
+"}}}
 function! s:act_add_pair(buns, undojoin, done, next_act) dict abort "{{{
   let target   = self.target
   let modmark  = self.modmark
@@ -382,7 +511,7 @@ function! s:act_delete_pair(done, next_act) dict abort  "{{{
   let done     = a:done
 
   if s:is_valid_4pos(target) && s:is_ahead(target.head2, target.tail1)
-    let reg = [getreg('"'), getregtype('"')]
+    let reg = ['"', getreg('"'), getregtype('"')]
     let deletion = ['', '']
     let is_linewise = [0, 0]
     try
@@ -397,7 +526,7 @@ function! s:act_delete_pair(done, next_act) dict abort  "{{{
     catch /^Vim\%((\a\+)\)\=:E21/
       throw 'OperatorSandwichError:Delete:ReadOnly'
     finally
-      call setreg('"', reg[0], reg[1])
+      call call('setreg', reg)
     endtry
 
     " update modmark
@@ -443,7 +572,7 @@ function! s:act_replace_pair(buns, undojoin, done, next_act) dict abort "{{{
     let next_tail = s:get_left_pos(target.head2)
     set virtualedit=onemore
 
-    let reg         = [getreg('"'), getregtype('"')]
+    let reg         = ['"', getreg('"'), getregtype('"')]
     let deletion    = ['', '']
     let indent      = [0, 0]
     let is_linewise = [0, 0]
@@ -463,7 +592,7 @@ function! s:act_replace_pair(buns, undojoin, done, next_act) dict abort "{{{
     catch /^Vim\%((\a\+)\)\=:E21/
       throw 'OperatorSandwichError:Replace:ReadOnly'
     finally
-      call setreg('"', reg[0], reg[1])
+      call call('setreg', reg)
       call s:restore_indent(indentopt)
     endtry
 
@@ -506,138 +635,6 @@ function! s:act_replace_pair(buns, undojoin, done, next_act) dict abort "{{{
     let done     = 1
   endif
   return [undojoin, done]
-endfunction
-"}}}
-function! s:act_set_target() dict abort  "{{{
-  let head = copy(self.region.head)
-  let tail = copy(self.region.tail)
-  let self.target.head1 = head
-  let self.target.tail1 = head
-  let self.target.head2 = tail
-  let self.target.tail2 = tail
-endfunction
-"}}}
-function! s:act_skip_space() dict abort  "{{{
-  let opt = self.opt.integrated
-  if opt.skip_space
-    call s:skip_space(self.region.head, 'c',  self.region.tail[1])
-    call s:skip_space(self.region.tail, 'bc', self.region.head[1])
-  endif
-endfunction
-"}}}
-function! s:act_search(recipes) dict abort "{{{
-  let recipes = deepcopy(a:recipes)
-  let filter  = 's:has_action(v:val, "delete")'
-  call filter(recipes, filter)
-  let region  = self.region
-  let opt     = self.opt
-  let target  = copy(s:null_4pos)
-
-  if s:is_valid_2pos(region) && s:is_ahead(region.tail, region.head)
-    let head = deepcopy(region.head)
-    let tail = deepcopy(region.tail)
-
-    for i in [1, 2]
-      " check the recipe
-      let found = 0
-      for candidate in recipes
-        call opt.recipe.update(candidate)
-        call opt.integrate()
-        if i == 1 || opt.integrated.skip_space
-          if has_key(candidate, 'buns')
-            " search buns
-            let target = s:check_edges(head, tail, candidate, opt.integrated)
-          elseif has_key(candidate, 'external')
-            " get difference of external motion/textobject
-            let target = s:get_external_diff_region(head, tail, candidate, opt.integrated)
-          else
-            let target = deepcopy(s:null_4pos)
-          endif
-          if s:is_valid_4pos(target)
-            let found = 1
-            break
-          endif
-        endif
-      endfor
-      if found | break | endif
-
-      " check the case that same characters are at both ends
-      call opt.recipe.clear()
-      call opt.integrate()
-      if i == 1 || opt.integrated.skip_space
-        let head_c = s:get_cursorchar(head)
-        let tail_c = s:get_cursorchar(tail)
-        if head_c ==# tail_c && !(opt.integrated.skip_space == 2 && head_c =~# '\s')
-          let target = {
-                \   'head1': head, 'tail1': head,
-                \   'head2': tail, 'tail2': tail,
-                \ }
-          break
-        endif
-      endif
-
-      if i == 1
-        " skip space
-        if head_c =~# '\s' || tail_c =~# '\s'
-          if head_c =~# '\s'
-            call s:skip_space(head, '', tail[1])
-            if head == s:null_pos || s:is_equal_or_ahead(head, tail)
-              break
-            endif
-          endif
-          if tail_c =~# '\s'
-            call s:skip_space(tail, 'b', head[1])
-            if tail == s:null_pos || s:is_equal_or_ahead(head, tail)
-              break
-            endif
-          endif
-        else
-          break
-        endif
-      endif
-    endfor
-
-    " skip characters
-    if target == s:null_4pos
-      let target_list = []
-      for candidate in recipes
-        call opt.recipe.update(candidate)
-        call opt.integrate()
-        if opt.integrated.skip_char && has_key(candidate, 'buns')
-          let head = region.head
-          let tail = region.tail
-          let target_list += [s:search_edges(head, tail, candidate, opt.integrated)]
-        endif
-      endfor
-      call filter(target_list, 's:is_valid_4pos(v:val)')
-      if target_list != []
-        let target = s:shortest(target_list)
-      endif
-    endif
-  endif
-
-  let self.target = target
-endfunction
-"}}}
-function! s:act_show(hi_group) dict abort "{{{
-  if !self.hi_status
-    if s:is_valid_4pos(self.target)
-      let order_list = s:highlight_order(self.target)
-      for order in order_list
-        let self.hi_idlist += s:matchaddpos(a:hi_group, order)
-      endfor
-      let self.hi_status = 1
-    endif
-    call filter(self.hi_idlist, 'v:val > 0')
-  endif
-endfunction
-"}}}
-function! s:act_quench() dict abort "{{{
-  if self.hi_status
-    call map(self.hi_idlist, 'matchdelete(v:val)')
-    call filter(self.hi_idlist, 'v:val > 0')
-    let self.hi_status = 0
-  endif
 endfunction
 "}}}
 function! s:set_indent(opt) abort "{{{
@@ -901,15 +898,17 @@ let s:act = {
       \   'opt'    : {},
       \   'hi_status': 0,
       \   'hi_idlist': [],
-      \   'initialize'  : function('s:act_initialize'),
-      \   'add_pair'    : function('s:act_add_pair'),
-      \   'delete_pair' : function('s:act_delete_pair'),
-      \   'replace_pair': function('s:act_replace_pair'),
-      \   'search'      : function('s:act_search'),
-      \   'set_target'  : function('s:act_set_target'),
-      \   'skip_space'  : function('s:act_skip_space'),
-      \   'show'        : function('s:act_show'),
-      \   'quench'      : function('s:act_quench'),
+      \   'initialize'    : function('s:act_initialize'),
+      \   'add_pair'      : function('s:act_add_pair'),
+      \   'delete_pair'   : function('s:act_delete_pair'),
+      \   'replace_pair'  : function('s:act_replace_pair'),
+      \   'match'         : function('s:act_match'),
+      \   '_match_recipes': function('s:act__match_recipes'),
+      \   '_match_edges'  : function('s:act__match_edges'),
+      \   'set_target'    : function('s:act_set_target'),
+      \   'skip_space'    : function('s:act_skip_space'),
+      \   'show'          : function('s:act_show'),
+      \   'quench'        : function('s:act_quench'),
       \ }
 "}}}
 " stuff object - controlling a count of editing {{{
@@ -929,9 +928,10 @@ function! s:stuff_initialize(cursor, modmark, opt) dict abort  "{{{
   endfor
 endfunction
 "}}}
-function! s:stuff_fill(lack) dict abort  "{{{
-  if a:lack > 0
-    let fillings = map(range(a:lack), 'deepcopy(s:act)')
+function! s:stuff_fill() dict abort  "{{{
+  let lack = self.n - len(self.acts)
+  if lack > 0
+    let fillings = map(range(lack), 'deepcopy(s:act)')
     for act in fillings
       call act.initialize(self.cursor, self.modmark, self.opt)
     endfor
@@ -953,34 +953,14 @@ function! s:stuff_set_target() dict abort  "{{{
   endfor
 endfunction
 "}}}
-function! s:stuff_skip_space(n) dict abort  "{{{
-  " skip space only in the first count.
-  if a:n == 0
-    for i in range(self.n)
-      let act = self.acts[i]
-      call act.skip_space()
-      call act.set_target()
-    endfor
+function! s:stuff_match(recipes) dict abort  "{{{
+  let recipes = deepcopy(a:recipes)
+  let filter  = 's:has_action(v:val, "delete")'
+  call filter(recipes, filter)
 
-    " for cursor positions
-    let opt = self.opt.integrated
-    if !opt.linewise
-      let self.cursor.inner_head = deepcopy(self.acts[-1].region.head)
-      let self.cursor.inner_tail = deepcopy(self.acts[ 0].region.tail)
-    endif
-  endif
-endfunction
-"}}}
-function! s:stuff_mimic(original) dict abort "{{{
-  let self.buns = a:original.buns
-  call self.opt.recipe.update(a:original.opt.recipe)
-  call self.opt.integrate()
-endfunction
-"}}}
-function! s:stuff_search(recipes) dict abort  "{{{
   for i in range(self.n)
     let act = self.acts[i]
-    call act.search(a:recipes)
+    call act.match(recipes)
   endfor
 endfunction
 "}}}
@@ -991,7 +971,6 @@ function! s:stuff_query(recipes) dict abort  "{{{
   let recipes = filter(deepcopy(a:recipes), filter)
   let opt   = self.opt.integrated
   let clock = deepcopy(s:clock)
-  let acts  = self.acts
   let timeoutlen = s:get('timeoutlen', &timeoutlen)
 
   " query phase
@@ -1056,10 +1035,17 @@ function! s:stuff_query(recipes) dict abort  "{{{
   call clock.stop()
 endfunction
 "}}}
+function! s:stuff_mimic(original) dict abort "{{{
+  let self.buns = a:original.buns
+  call self.opt.recipe.update(a:original.opt.recipe)
+  call self.opt.integrate()
+endfunction
+"}}}
 function! s:stuff_show(hi_group) dict abort "{{{
   let opt = self.opt.integrated
   if opt.highlight
-    for act in self.acts
+    for i in range(self.n)
+      let act = self.acts[i]
       call act.show(a:hi_group)
     endfor
     redraw
@@ -1069,7 +1055,8 @@ endfunction
 function! s:stuff_quench() dict abort "{{{
   let opt = self.opt.integrated
   if opt.highlight
-    for act in self.acts
+    for i in range(self.n)
+      let act = self.acts[i]
       call act.quench()
     endfor
   endif
@@ -1106,6 +1093,26 @@ function! s:stuff_blink(hi_group, duration, ...) dict abort "{{{
       call clock.stop()
       return hi_exited
     endtry
+  endif
+endfunction
+"}}}
+function! s:stuff_skip_space(n) dict abort  "{{{
+  " skip space only in the first count.
+  if a:n == 0
+    for i in range(self.n)
+      let act = self.acts[i]
+      call act.skip_space()
+      call act.set_target()
+    endfor
+
+    " for cursor positions
+    let opt = self.opt.integrated
+    if !opt.linewise
+      let top_act = self.acts[self.n-1]
+      let bot_act = self.acts[0]
+      let self.cursor.inner_head = deepcopy(top_act.region.head)
+      let self.cursor.inner_tail = deepcopy(bot_act.region.tail)
+    endif
   endif
 endfunction
 "}}}
@@ -1182,13 +1189,13 @@ let s:stuff = {
       \   'fill'        : function('s:stuff_fill'),
       \   'set_region'  : function('s:stuff_set_region'),
       \   'set_target'  : function('s:stuff_set_target'),
-      \   'skip_space'  : function('s:stuff_skip_space'),
-      \   'mimic'       : function('s:stuff_mimic'),
-      \   'search'      : function('s:stuff_search'),
+      \   'match'       : function('s:stuff_match'),
       \   'query'       : function('s:stuff_query'),
+      \   'mimic'       : function('s:stuff_mimic'),
       \   'show'        : function('s:stuff_show'),
       \   'quench'      : function('s:stuff_quench'),
       \   'blink'       : function('s:stuff_blink'),
+      \   'skip_space'  : function('s:stuff_skip_space'),
       \   'command'     : function('s:stuff_command'),
       \   'get_buns'    : function('s:stuff_get_buns'),
       \   'add_once'    : function('s:stuff_add_once'),
@@ -1255,6 +1262,7 @@ function! s:operator_initialize(kind, motionwise) dict abort "{{{
 
     " connect links
     for stuff in self.basket
+      let stuff.n = n
       call stuff.initialize(self.cursor, self.modmark, self.opt)
     endfor
   else
@@ -1263,17 +1271,12 @@ function! s:operator_initialize(kind, motionwise) dict abort "{{{
     let self.modmark.tail = copy(s:null_pos)
 
     for stuff in self.basket
+      let stuff.n = n
       let stuff.done = 0
       call stuff.opt.integrate()
-
-      let lack = n - len(stuff.acts)
-      call stuff.fill(lack)
+      call stuff.fill()
     endfor
   endif
-
-  for stuff in self.basket
-    let stuff.n = n
-  endfor
 
   " set initial values
   let stuff = self.basket[0]
@@ -1281,7 +1284,7 @@ function! s:operator_initialize(kind, motionwise) dict abort "{{{
 endfunction
 "}}}
 function! s:operator_split(region) dict abort  "{{{
-  let reg  = [getreg('"'), getregtype('"')]
+  let reg  = ['"', getreg('"'), getregtype('"')]
   let view = winsaveview()
   let virtualedit = &virtualedit
   let &virtualedit = 'all'
@@ -1306,8 +1309,6 @@ function! s:operator_split(region) dict abort  "{{{
         let tail = [0, lnum, col([lnum, '$']) - 1, 0]
         if head[3] == 0 && s:is_equal_or_ahead(tail, head)
           let region_list += [{'head': head, 'tail': tail}]
-        else
-          let region_list += [deepcopy(s:null_2pos)]
         endif
       endfor
     else
@@ -1323,13 +1324,11 @@ function! s:operator_split(region) dict abort  "{{{
             let tail[3] = 0
           endif
           let region_list += [{'head': head, 'tail': tail}]
-        else
-          let region_list += [deepcopy(s:null_2pos)]
         endif
       endfor
     endif
   finally
-    call setreg('"', reg[0], reg[1])
+    call call('setreg', reg)
     call winrestview(view)
     let &virtualedit = virtualedit
   endtry
@@ -1385,7 +1384,7 @@ function! s:operator_delete() dict abort  "{{{
     let stuff = self.basket[i]
     let next_stuff = get(self.basket, i + 1, deepcopy(stuff))
 
-    call stuff.search(self.recipes.integrated)
+    call stuff.match(self.recipes.integrated)
     if filter(copy(stuff.acts), 's:is_valid_4pos(v:val.target)') == []
       break
     endif
@@ -1415,7 +1414,7 @@ function! s:operator_replace() dict abort  "{{{
     let next_stuff = get(self.basket, i + 1, deepcopy(stuff))
     let opt = stuff.opt.integrated
 
-    call stuff.search(self.recipes.integrated)
+    call stuff.match(self.recipes.integrated)
     if filter(copy(stuff.acts), 's:is_valid_4pos(v:val.target)') == []
       break
     endif
@@ -1874,39 +1873,30 @@ function! s:get_patterns(candidate, opt) abort "{{{
   return patterns
 endfunction
 "}}}
-function! s:skip_space(pos, flag, stopline) abort  "{{{
-  call setpos('.', a:pos)
-  if a:pos[2] == col([a:pos[1], '$'])
+function! s:skip_space(head, tail) abort  "{{{
+  " NOTE: This function is destructive, directly update a:head and a:tail.
+  call setpos('.', a:head)
+  if a:head[2] == col([a:head[1], '$'])
     " if the cursor is on a line breaking, it should not be skipped.
-    let dest = a:pos
+    let head = a:head
   else
-    let dest = s:c2p(searchpos('\_S', a:flag, a:stopline))
-  endif
-  let validity = 0
-  if dest != s:null_pos
-    if stridx(a:flag, 'b') > -1
-      if stridx(a:flag, 'c') > -1
-        let validity = s:is_equal_or_ahead(a:pos, dest)
-      else
-        let validity = s:is_ahead(a:pos, dest)
-      endif
-    else
-      if stridx(a:flag, 'c') > -1
-        let validity = s:is_equal_or_ahead(dest, a:pos)
-      else
-        let validity = s:is_ahead(dest, a:pos)
-      endif
-    endif
+    let head = s:c2p(searchpos('\_S', 'c', a:tail[1]))
   endif
 
-  if validity
-    let a:pos[0:3] = dest[0:3]
+  call setpos('.', a:tail)
+  if a:tail[2] == 1
+    let tail = a:tail
   else
-    let a:pos[0:3] = copy(s:null_pos)[0:3]
+    let tail = s:c2p(searchpos('\_S', 'bc', a:head[1]))
+  endif
+
+  if head != s:null_pos && tail != s:null_pos && s:is_equal_or_ahead(tail, head)
+    let a:head[0:3] = head[0:3]
+    let a:tail[0:3] = tail[0:3]
   endif
 endfunction
 "}}}
-function! s:get_external_diff_region(head, tail, candidate, opt) abort  "{{{
+function! s:check_textobj_diff(head, tail, candidate, opt) abort  "{{{
   let target = deepcopy(s:null_4pos)
   let [textobj_i, textobj_a] = a:candidate.external
   let cmd = a:opt.noremap ? 'normal!' : 'normal'
@@ -2235,14 +2225,31 @@ endfunction
 "}}}
 
 " miscellaneous
+" function! s:update_is_in_cmdline_window() abort  "{{{
+if s:has_patch_7_4_392
+  function! s:update_is_in_cmdline_window() abort
+    let s:is_in_cmdline_window = getcmdwintype() !=# ''
+  endfunction
+else
+  function! s:update_is_in_cmdline_window() abort
+    let s:is_in_cmdline_window = 0
+    try
+      execute 'tabnext ' . tabpagenr()
+    catch /^Vim\%((\a\+)\)\=:E11/
+      let s:is_in_cmdline_window = 1
+    catch
+    endtry
+  endfunction
+endif
+"}}}
 function! s:get_cursorchar(pos) abort "{{{
-  let reg = [getreg('"'), getregtype('"')]
+  let reg = ['"', getreg('"'), getregtype('"')]
   try
     call setpos('.', a:pos)
     normal! yl
     let c = @@
   finally
-    call setreg('"', reg[0], reg[1])
+    call call('setreg', reg)
   endtry
   return c
 endfunction
@@ -2323,23 +2330,6 @@ function! s:is_in_between(pos, head, tail) abort  "{{{
     \  && ((a:pos[1] > a:head[1]) || ((a:pos[1] == a:head[1]) && (a:pos[2] >= a:head[2])))
     \  && ((a:pos[1] < a:tail[1]) || ((a:pos[1] == a:tail[1]) && (a:pos[2] <= a:tail[2])))
 endfunction
-"}}}
-" function! s:update_is_in_cmdline_window() abort  "{{{
-if s:has_patch_7_4_392
-  function! s:update_is_in_cmdline_window() abort
-    let s:is_in_cmdline_window = getcmdwintype() !=# ''
-  endfunction
-else
-  function! s:update_is_in_cmdline_window() abort
-    let s:is_in_cmdline_window = 0
-    try
-      execute 'tabnext ' . tabpagenr()
-    catch /^Vim\%((\a\+)\)\=:E11/
-      let s:is_in_cmdline_window = 1
-    catch
-    endtry
-  endfunction
-endif
 "}}}
 function! s:get(name, default) abort  "{{{
   return get(g:, 'operator#sandwich#' . a:name, a:default)
