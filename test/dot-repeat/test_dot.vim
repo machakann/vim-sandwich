@@ -33,30 +33,36 @@ call setline('.', 'foo')
 normal saiw(
 normal .
 call s:assert(getline('.'), '((foo))', 'operator-add:normal use #1')
+call s:assert(getpos('.'), [0, 1, 3, 0], 'operator-add:normal use #2')
 
 normal saiw[
 normal .
-call s:assert(getline('.'), '(([[foo]]))', 'operator-add:normal use #2')
+call s:assert(getline('.'), '(([[foo]]))', 'operator-add:normal use #3')
+call s:assert(getpos('.'), [0, 1, 5, 0], 'operator-add:normal use #4')
 
 %delete
 
 " blockwise-visual
 call append(0, ['foo', 'bar', 'baz'])
+$delete
 execute "normal gg\<C-v>2j2lsa("
 normal .
 call s:assert(getline(1), '((foo))', 'operator-add:blockwise-visual #1')
 call s:assert(getline(2), '((bar))', 'operator-add:blockwise-visual #2')
 call s:assert(getline(3), '((baz))', 'operator-add:blockwise-visual #3')
+call s:assert(getpos('.'), [0, 1, 3, 0], 'operator-add:blockwise-visual #4')
 
 normal j.
-call s:assert(getline(1), '((foo))', 'operator-add:blockwise-visual #4')
-call s:assert(getline(2), '(((bar)))', 'operator-add:blockwise-visual #5')
-call s:assert(getline(3), '(((baz)))', 'operator-add:blockwise-visual #6')
+call s:assert(getline(1), '((foo))', 'operator-add:blockwise-visual #5')
+call s:assert(getline(2), '(((bar)))', 'operator-add:blockwise-visual #6')
+call s:assert(getline(3), '(((baz)))', 'operator-add:blockwise-visual #7')
+call s:assert(getpos('.'), [0, 2, 4, 0], 'operator-add:blockwise-visual #8')
 
 normal j.
-call s:assert(getline(1), '((foo))', 'operator-add:blockwise-visual #7')
-call s:assert(getline(2), '(((bar)))', 'operator-add:blockwise-visual #8')
-call s:assert(getline(3), '((((baz))))', 'operator-add:blockwise-visual #9')
+call s:assert(getline(1), '((foo))', 'operator-add:blockwise-visual #9')
+call s:assert(getline(2), '(((bar)))', 'operator-add:blockwise-visual #10')
+call s:assert(getline(3), '((((baz))))', 'operator-add:blockwise-visual #11')
+call s:assert(getpos('.'), [0, 3, 5, 0], 'operator-add:blockwise-visual #12')
 
 %delete
 
@@ -65,12 +71,14 @@ call setline('.', 'foo')
 normal 2saiw((
 normal .
 call s:assert(getline('.'), '((((foo))))', 'operator-add:count #1')
+call s:assert(getpos('.'), [0, 1, 5, 0], 'operator-add:count #2')
 
 call setline('.', 'foo')
 normal saiw(
 call setline('.', 'foo bar')
 normal 3.
-call s:assert(getline('.'), '(foo bar)', 'operator-add:count #2')
+call s:assert(getline('.'), '(foo bar)', 'operator-add:count #3')
+call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-add:count #4')
 
 %delete
 
@@ -81,13 +89,15 @@ let s:count = 0
 normal saiwc
 normal .
 call s:assert(getline('.'), '11foo22', 'operator-add:expr #1')
+call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-add:expr #2')
 
 let g:operator#sandwich#recipes = [{'buns': ['Count()', 'Count()'], 'expr': 2, 'input': ['c']}]
 call setline('.', 'foo')
 let s:count = 0
 normal saiwc
 normal .
-call s:assert(getline('.'), '31foo24', 'operator-add:expr #2')
+call s:assert(getline('.'), '31foo24', 'operator-add:expr #3')
+call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-add:expr #4')
 
 unlet g:operator#sandwich#recipes
 %delete
@@ -136,31 +146,37 @@ call setline('.', '((foo))')
 normal sda(
 normal .
 call s:assert(getline('.'), 'foo', 'operator-delete:normal use #1')
+call s:assert(getpos('.'), [0, 1, 1, 0], 'operator-delete:normal use #2')
 
 call setline('.', '[[foo]]')
 normal sda[
 normal .
-call s:assert(getline('.'), 'foo', 'operator-delete:normal use #2')
+call s:assert(getline('.'), 'foo', 'operator-delete:normal use #3')
+call s:assert(getpos('.'), [0, 1, 1, 0], 'operator-delete:normal use #4')
 
 %delete
 
 " blockwise-visual
 call append(0, ['(((((foo)))))', '(((((bar)))))', '(((((baz)))))'])
+$delete
 execute "normal ggffh\<C-v>2j4lsd"
 normal h.
 call s:assert(getline(1), '(((foo)))', 'operator-delete:blockwise-visual #1')
 call s:assert(getline(2), '(((bar)))', 'operator-delete:blockwise-visual #2')
 call s:assert(getline(3), '(((baz)))', 'operator-delete:blockwise-visual #3')
+call s:assert(getpos('.'), [0, 1, 4, 0], 'operator-delete:blockwise-visual #4')
 
 normal jh.
-call s:assert(getline(1), '(((foo)))', 'operator-delete:blockwise-visual #4')
-call s:assert(getline(2), '((bar))', 'operator-delete:blockwise-visual #5')
-call s:assert(getline(3), '((baz))', 'operator-delete:blockwise-visual #6')
+call s:assert(getline(1), '(((foo)))', 'operator-delete:blockwise-visual #5')
+call s:assert(getline(2), '((bar))', 'operator-delete:blockwise-visual #6')
+call s:assert(getline(3), '((baz))', 'operator-delete:blockwise-visual #7')
+call s:assert(getpos('.'), [0, 2, 3, 0], 'operator-delete:blockwise-visual #8')
 
 normal jh.
-call s:assert(getline(1), '(((foo)))', 'operator-delete:blockwise-visual #7')
-call s:assert(getline(2), '((bar))', 'operator-delete:blockwise-visual #8')
-call s:assert(getline(3), '(baz)', 'operator-delete:blockwise-visual #9')
+call s:assert(getline(1), '(((foo)))', 'operator-delete:blockwise-visual #9')
+call s:assert(getline(2), '((bar))', 'operator-delete:blockwise-visual #10')
+call s:assert(getline(3), '(baz)', 'operator-delete:blockwise-visual #11')
+call s:assert(getpos('.'), [0, 3, 2, 0], 'operator-delete:blockwise-visual #12')
 
 %delete
 
@@ -169,11 +185,13 @@ call setline('.', '((((foo))))')
 normal 02sda(
 normal .
 call s:assert(getline('.'), 'foo', 'operator-delete:count #1')
+call s:assert(getpos('.'), [0, 1, 1, 0], 'operator-delete:count #2')
 
 call setline('.', '[([[foo]])]')
 normal ffsda[
 normal 2.
-call s:assert(getline('.'), '([foo])', 'operator-delete:count #2')
+call s:assert(getline('.'), '([foo])', 'operator-delete:count #3')
+call s:assert(getpos('.'), [0, 1, 1, 0], 'operator-delete:count #4')
 
 %delete
 
@@ -184,6 +202,7 @@ normal ggsdat
 normal j.
 call s:assert(getline(1), 'fooo', 'operator-delete:external textobject #1')
 call s:assert(getline(2), 'bar', 'operator-delete:external textobject #2')
+call s:assert(getpos('.'), [0, 2, 1, 0], 'operator-delete:external textobject #3')
 
 %delete
 
@@ -228,18 +247,21 @@ nmap sr <Plug>(operator-sandwich-replace)
 xmap sr <Plug>(operator-sandwich-replace)
 " normal use
 call setline('.', '((foo))')
-normal sra([
+normal 0ffsra([
 normal .
 call s:assert(getline('.'), '[[foo]]', 'operator-replace:normal use #1')
+call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-replace:normal use #2')
 
-normal sra[(
+normal 0ffsra[(
 normal .
-call s:assert(getline('.'), '((foo))', 'operator-replace:normal use #2')
+call s:assert(getline('.'), '((foo))', 'operator-replace:normal use #3')
+call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-replace:normal use #4')
 
 %delete
 
 " blockwise-visual
 call append(0, ['(foo)', '(bar)', '(baz)'])
+$delete
 execute "normal gg\<C-v>2j4lsr["
 call setline(1, '(foo)')
 call setline(2, '(bar)')
@@ -248,35 +270,40 @@ normal h.
 call s:assert(getline(1), '[foo]', 'operator-replace:blockwise-visual #1')
 call s:assert(getline(2), '[bar]', 'operator-replace:blockwise-visual #2')
 call s:assert(getline(3), '[baz]', 'operator-replace:blockwise-visual #3')
+call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-replace:blockwise-visual #4')
 
 call setline(1, '(foo)')
 call setline(2, '(bar)')
 call setline(3, '(baz)')
 normal jh.
-call s:assert(getline(1), '(foo)', 'operator-replace:blockwise-visual #4')
-call s:assert(getline(2), '[bar]', 'operator-replace:blockwise-visual #5')
-call s:assert(getline(3), '[baz]', 'operator-replace:blockwise-visual #6')
+call s:assert(getline(1), '(foo)', 'operator-replace:blockwise-visual #5')
+call s:assert(getline(2), '[bar]', 'operator-replace:blockwise-visual #6')
+call s:assert(getline(3), '[baz]', 'operator-replace:blockwise-visual #7')
+call s:assert(getpos('.'), [0, 2, 2, 0], 'operator-replace:blockwise-visual #8')
 
 call setline(1, '(foo)')
 call setline(2, '(bar)')
 call setline(3, '(baz)')
 normal jh.
-call s:assert(getline(1), '(foo)', 'operator-replace:blockwise-visual #7')
-call s:assert(getline(2), '(bar)', 'operator-replace:blockwise-visual #8')
-call s:assert(getline(3), '[baz]', 'operator-replace:blockwise-visual #9')
+call s:assert(getline(1), '(foo)', 'operator-replace:blockwise-visual #9')
+call s:assert(getline(2), '(bar)', 'operator-replace:blockwise-visual #10')
+call s:assert(getline(3), '[baz]', 'operator-replace:blockwise-visual #11')
+call s:assert(getpos('.'), [0, 3, 2, 0], 'operator-replace:blockwise-visual #12')
 
 %delete
 
 " count
 call setline('.', '((((foo))))')
-normal 2sra([[
+normal 0ff2sr2a([[
 normal .
 call s:assert(getline('.'), '[[[[foo]]]]', 'operator-replace:count #1')
+call s:assert(getpos('.'), [0, 1, 3, 0], 'operator-replace:count #2')
 
 call setline('.', '[([[foo]])]')
 normal 0ffsra[(
 normal 2.
-call s:assert(getline('.'), '(([(foo)]))', 'operator-replace:count #2')
+call s:assert(getline('.'), '(([(foo)]))', 'operator-replace:count #3')
+call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-replace:count #2')
 
 %delete
 
@@ -287,13 +314,15 @@ let s:count = 0
 normal ffsra(c
 normal .
 call s:assert(getline('.'), '11foo22', 'operator-replace:expr #1')
+call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-replace:expr #2')
 
 " let g:operator#sandwich#recipes = [{'buns': ['Count()', 'Count()'], 'expr': 2, 'input': ['c']}]
 " call setline('.', '((foo))')
 " let s:count = 0
 " normal ffsra(c
 " normal .
-" call s:assert(getline('.'), '31foo24', 'operator-replace:expr #2')
+" call s:assert(getline('.'), '31foo24', 'operator-replace:expr #3')
+" call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-replace:expr #4')
 
 unlet g:operator#sandwich#recipes
 %delete
@@ -305,6 +334,7 @@ normal ggsrat(
 normal j.
 call s:assert(getline(1), '(fooo)', 'operator-replace:external textobject #1')
 call s:assert(getline(2), '(bar)', 'operator-replace:external textobject #2')
+call s:assert(getpos('.'), [0, 2, 2, 0], 'operator-replace:external textobject #3')
 
 %delete
 
@@ -410,6 +440,7 @@ unlet g:textobj#sandwich#recipes
 " external textobjct
 let g:textobj#sandwich#recipes = [{'external': ['it', 'at'], 'noremap': 1, 'input': ['t']}]
 call append(0, ['<title>fooo</title>', '<body>bar</body>'])
+$delete
 normal ggdist
 normal j.
 call s:assert(getline(1), '<title></title>', 'textobj-query:external textobject #1')
@@ -418,6 +449,7 @@ call s:assert(getline(2), '<body></body>', 'textobj-query:external textobject #2
 %delete
 
 call append(0, ['<title>fooo</title>', '<body>bar</body>'])
+$delete
 normal ggdast
 normal j.
 call s:assert(getline(1), '', 'textobj-query:external textobject #3')
@@ -428,6 +460,7 @@ call s:assert(getline(2), '', 'textobj-query:external textobject #4')
 " synchro option
 let g:textobj#sandwich#recipes = [{'buns': ['foo', 'baz'], 'synchro': 1, 'input': ['f']}]
 call append(0, ['foo bar baz', ' foo baaaaar baz'])
+$delete
 normal ggdisf
 normal jl.
 call s:assert(getline(1), 'foobaz', 'textobj-query: synchro option #1')
@@ -436,6 +469,7 @@ call s:assert(getline(2), ' foobaz', 'textobj-query: synchro option #2')
 %delete
 
 call append(0, ['foo bar baz', ' foo baaaaar baz'])
+$delete
 normal ggdasf
 normal jl.
 call s:assert(getline(1), '', 'textobj-query: synchro option #3')
@@ -511,6 +545,7 @@ unlet g:textobj#sandwich#recipes
 " external textobjct
 let g:textobj#sandwich#recipes = [{'external': ['it', 'at'], 'noremap': 1, 'input': ['t']}]
 call append(0, ['<title>fooo</title>', '<body>bar</body>'])
+$delete
 normal ggdib
 normal j.
 call s:assert(getline(1), '<title></title>', 'textobj-auto:external textobject #1')
@@ -519,6 +554,7 @@ call s:assert(getline(2), '<body></body>', 'textobj-auto:external textobject #2'
 %delete
 
 call append(0, ['<title>fooo</title>', '<body>bar</body>'])
+$delete
 normal ggdab
 normal j.
 call s:assert(getline(1), '', 'textobj-auto:external textobject #3')
@@ -529,6 +565,7 @@ call s:assert(getline(2), '', 'textobj-auto:external textobject #4')
 " synchro option
 let g:textobj#sandwich#recipes = [{'buns': ['foo', 'baz'], 'synchro': 1, 'input': ['f']}]
 call append(0, ['foo bar baz', ' foo baaaaar baz'])
+$delete
 normal ggdib
 normal jl.
 call s:assert(getline(1), 'foobaz', 'textobj-auto: synchro option #1')
@@ -537,6 +574,7 @@ call s:assert(getline(2), ' foobaz', 'textobj-auto: synchro option #2')
 %delete
 
 call append(0, ['foo bar baz', ' foo baaaaar baz'])
+$delete
 normal ggdab
 normal jl.
 call s:assert(getline(1), '', 'textobj-auto: synchro option #3')
