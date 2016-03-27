@@ -2394,12 +2394,13 @@ function! s:suite.charwise_n_option_linewise() abort  "{{{
   call append(0, ['aa', '(foo)', 'bb'])
   normal ggjsr5l[
   call g:assert.equals(getline(1),   'aa',         'failed at #9')
-  call g:assert.equals(getline(2),   ']',          'failed at #9')
-  call g:assert.equals(getline(3),   'bb',         'failed at #9')
-  call g:assert.equals(getline(4),   '',           'failed at #9')
-  " call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #9')
-  " call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #9')
-  " call g:assert.equals(getpos("']"), [0, 3, 1, 0], 'failed at #9')
+  call g:assert.equals(getline(2),   '[',          'failed at #9')
+  call g:assert.equals(getline(3),   ']',          'failed at #9')
+  call g:assert.equals(getline(4),   'bb',         'failed at #9')
+  call g:assert.equals(getline(5),   '',           'failed at #9')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #9')
+  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #9')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #9')
 
   set whichwrap&
 endfunction
@@ -4122,12 +4123,13 @@ function! s:suite.charwise_x_option_linewise() abort  "{{{
   call append(0, ['aa', '(foo)', 'bb'])
   normal ggjv4lsr[
   call g:assert.equals(getline(1),   'aa',         'failed at #9')
-  call g:assert.equals(getline(2),   ']',          'failed at #9')
-  call g:assert.equals(getline(3),   'bb',         'failed at #9')
-  call g:assert.equals(getline(4),   '',           'failed at #9')
-  " call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #9')
-  " call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #9')
-  " call g:assert.equals(getpos("']"), [0, 3, 1, 0], 'failed at #9')
+  call g:assert.equals(getline(2),   '[',          'failed at #9')
+  call g:assert.equals(getline(3),   ']',          'failed at #9')
+  call g:assert.equals(getline(4),   'bb',         'failed at #9')
+  call g:assert.equals(getline(5),   '',           'failed at #9')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #9')
+  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #9')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #9')
 
   set whichwrap&
 endfunction
@@ -5951,12 +5953,13 @@ function! s:suite.linewise_n_option_linewise() abort  "{{{
   call append(0, ['aa', '(foo)', 'bb'])
   normal ggjsrVl[
   call g:assert.equals(getline(1),   'aa',         'failed at #9')
-  call g:assert.equals(getline(2),   ']',          'failed at #9')
-  call g:assert.equals(getline(3),   'bb',         'failed at #9')
-  call g:assert.equals(getline(4),   '',           'failed at #9')
-  " call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #9')
-  " call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #9')
-  " call g:assert.equals(getpos("']"), [0, 3, 1, 0], 'failed at #9')
+  call g:assert.equals(getline(2),   '[',          'failed at #9')
+  call g:assert.equals(getline(3),   ']',          'failed at #9')
+  call g:assert.equals(getline(4),   'bb',         'failed at #9')
+  call g:assert.equals(getline(5),   '',           'failed at #9')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #9')
+  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #9')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #9')
 endfunction
 "}}}
 function! s:suite.linewise_n_option_query_once() abort  "{{{
@@ -7841,12 +7844,13 @@ function! s:suite.linewise_x_option_linewise() abort  "{{{
   call append(0, ['aa', '(foo)', 'bb'])
   normal ggjVsr[
   call g:assert.equals(getline(1),   'aa',         'failed at #9')
-  call g:assert.equals(getline(2),   ']',          'failed at #9')
-  call g:assert.equals(getline(3),   'bb',         'failed at #9')
-  call g:assert.equals(getline(4),   '',           'failed at #9')
-  " call g:assert.equals(getpos('.'),  [0, 3, 1, 0], 'failed at #9')
-  " call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #9')
-  " call g:assert.equals(getpos("']"), [0, 3, 1, 0], 'failed at #9')
+  call g:assert.equals(getline(2),   '[',          'failed at #9')
+  call g:assert.equals(getline(3),   ']',          'failed at #9')
+  call g:assert.equals(getline(4),   'bb',         'failed at #9')
+  call g:assert.equals(getline(5),   '',           'failed at #9')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #9')
+  call g:assert.equals(getpos("'["), [0, 2, 1, 0], 'failed at #9')
+  call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #9')
 endfunction
 "}}}
 function! s:suite.linewise_x_option_query_once() abort  "{{{

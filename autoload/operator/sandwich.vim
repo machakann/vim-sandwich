@@ -651,17 +651,18 @@ function! s:act_replace_pair(buns, undojoin, done, next_act) dict abort "{{{
     let is_linewise = [0, 0]
     let indentopt   = s:set_indent(opt)
     try
+      let within_a_line = target.tail1[1] == target.head2[1]
       let former_head = target.head1
       let former_tail = target.tail1
       let latter_head = copy(target.head2)
       let latter_tail = copy(target.tail2)
-      let [deletion[0], is_linewise[0], indent[0], head] = s:replace_former(a:buns[0], former_head, former_tail, latter_tail, opt, undojoin)
+      let [deletion[0], is_linewise[0], indent[0], head] = s:replace_former(a:buns[0], former_head, former_tail, within_a_line, opt, undojoin)
 
       call s:pull1(latter_head, target, deletion, is_linewise)
       call s:push1(latter_head, target, a:buns, indent, is_linewise)
       call s:pull1(latter_tail, target, deletion, is_linewise)
       call s:push1(latter_tail, target, a:buns, indent, is_linewise)
-      let [deletion[1], is_linewise[1], indent[1], tail] = s:replace_latter(a:buns[1], latter_head, latter_tail, opt)
+      let [deletion[1], is_linewise[1], indent[1], tail] = s:replace_latter(a:buns[1], latter_head, latter_tail, within_a_line, opt)
     catch /^Vim\%((\a\+)\)\=:E21/
       throw 'OperatorSandwichError:Replace:ReadOnly'
     finally
@@ -814,7 +815,7 @@ function! s:delete_former(head, tail, latter_head, opt, ...) abort  "{{{
   let opt_linewise = a:opt.of('linewise')
   let undojoin_cmd = get(a:000, 0, 0) ? 'undojoin | ' : ''
   let deletion = s:delete_portion(a:head, a:tail, undojoin_cmd)
-  if opt_linewise == 2 || (opt_linewise && match(getline('.'), '^\s*$') > -1)
+  if opt_linewise == 2 || (opt_linewise == 1 && match(getline('.'), '^\s*$') > -1)
     if line('.') != a:latter_head[1]
       .delete
       let is_linewise = 1
@@ -831,7 +832,7 @@ function! s:delete_latter(head, tail, former_head, opt) abort  "{{{
   let opt_linewise = a:opt.of('linewise')
   let undojoin_cmd = ''
   let deletion = s:delete_portion(a:head, a:tail, undojoin_cmd)
-  if opt_linewise == 2 || (opt_linewise && match(getline('.'), '^\s*$') > -1)
+  if opt_linewise == 2 || (opt_linewise == 1 && match(getline('.'), '^\s*$') > -1)
     .delete
     let is_linewise = 1
     let tail = getpos("']")
@@ -853,7 +854,7 @@ function! s:delete_portion(head, tail, undojoin_cmd) abort  "{{{
   return @@
 endfunction
 "}}}
-function! s:replace_former(bun, head, tail, latter_head, opt, ...) abort "{{{
+function! s:replace_former(bun, head, tail, within_a_line, opt, ...) abort "{{{
   let is_linewise  = 0
   let opt_linewise = a:opt.of('linewise')
   let undojoin_cmd = get(a:000, 0, 0) ? 'undojoin | ' : ''
@@ -862,21 +863,28 @@ function! s:replace_former(bun, head, tail, latter_head, opt, ...) abort "{{{
   if s:is_in_cmdline_window
     " workaround for a bug in cmdline-window
     call s:paste(a:bun)
-  elseif opt_linewise == 2 || (opt_linewise && match(getline('.'), '^\s*$') > -1)
-    if line('.') != a:latter_head[1]
+  else
+    if opt_linewise == 1 && getline('.') =~# '^\s*$'
       .delete
       let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! O' : "normal \<Plug>(sandwich-O)"
       execute 'silent ' . startinsert . a:bun
       let is_linewise = 1
+    elseif opt_linewise == 2
+      if !a:within_a_line
+        .delete
+      endif
+      let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! O' : "normal \<Plug>(sandwich-O)"
+      execute 'silent ' . startinsert . a:bun
+      let is_linewise = 1
+    else
+      let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! i' : "normal \<Plug>(sandwich-i)"
+      execute 'silent ' . startinsert . a:bun
     endif
-  else
-    let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! i' : "normal \<Plug>(sandwich-i)"
-    execute 'silent ' . startinsert . a:bun
   endif
   return [deletion, is_linewise, indent(line("']")), getpos("'[")]
 endfunction
 "}}}
-function! s:replace_latter(bun, head, tail, opt) abort "{{{
+function! s:replace_latter(bun, head, tail, within_a_line, opt) abort "{{{
   let is_linewise  = 0
   let opt_linewise = a:opt.of('linewise')
   let undojoin_cmd = ''
@@ -885,21 +893,47 @@ function! s:replace_latter(bun, head, tail, opt) abort "{{{
   if s:is_in_cmdline_window
     " workaround for a bug in cmdline-window
     call s:paste(a:bun)
-  elseif opt_linewise == 2 || (opt_linewise && match(getline('.'), '^\s*$') > -1)
-    let current = line('.')
-    let fileend = line('$')
-    .delete
-    if current != fileend
-      normal! k
-    endif
-    let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! o' : "normal \<Plug>(sandwich-o)"
-    execute 'silent ' . startinsert . a:bun
-    let is_linewise = 1
+    let tail = getpos("']")
   else
-    let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! i' : "normal \<Plug>(sandwich-i)"
-    execute 'silent ' . startinsert . a:bun
+    if opt_linewise == 1 && getline('.') =~# '^\s*$'
+      let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! o' : "normal \<Plug>(sandwich-o)"
+      let current = line('.')
+      let fileend = line('$')
+      .delete
+      if current != fileend
+        normal! k
+      endif
+      execute 'silent ' . startinsert . a:bun
+      let tail = getpos("']")
+      let is_linewise = 1
+    elseif opt_linewise == 2
+      let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! o' : "normal \<Plug>(sandwich-o)"
+      if a:within_a_line
+        " exceptional behavior
+        let lnum = line('.')
+        execute 'silent ' . startinsert . a:bun
+        let tail = getpos("']")
+        execute lnum . 'delete'
+        let tail = [0, tail[1]-1, tail[2], 0]
+      else
+        " usual way (same as opt_linewise == 1)
+        let current = line('.')
+        let fileend = line('$')
+        .delete
+        if current != fileend
+          normal! k
+        endif
+        execute 'silent ' . startinsert . a:bun
+        let tail = getpos("']")
+      endif
+      let is_linewise = 1
+    else
+      let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! i' : "normal \<Plug>(sandwich-i)"
+      execute 'silent ' . startinsert . a:bun
+      let tail = getpos("']")
+    endif
   endif
-  return [deletion, is_linewise, indent(line("']")), getpos("']")]
+  return [deletion, is_linewise, indent(line("']")), tail]
 endfunction
 "}}}
 function! s:paste(bun, ...) abort "{{{
