@@ -437,7 +437,9 @@ function! s:act_match(recipes) dict abort "{{{
       if opt.of('skip_char') && has_key(candidate, 'buns')
         let head = region_saved.head
         let tail = region_saved.tail
-        let target_list += [s:search_edges(head, tail, candidate, opt)]
+        let opt_expr = opt.has('expr') && opt.of('expr', 'recipe_delete')
+        let patterns = s:get_patterns(candidate, opt_expr, opt.of('regex'))
+        let target_list += [s:search_edges(head, tail, patterns)]
       endif
     endfor
     if filter(target_list, 's:is_valid_4pos(v:val)') != []
@@ -458,10 +460,12 @@ function! s:act__match_recipes(recipes) dict abort "{{{
 
     if has_key(candidate, 'buns')
       " search buns
-      let target = s:check_edges(self.region.head, self.region.tail, candidate, opt)
+      let opt_expr = opt.has('expr') && opt.of('expr', 'recipe_delete')
+      let patterns = s:get_patterns(candidate, opt_expr, opt.of('regex'))
+      let target = s:check_edges(self.region.head, self.region.tail, patterns)
     elseif has_key(candidate, 'external')
       " get difference of external motion/textobject
-      let target = s:check_textobj_diff(self.region.head, self.region.tail, candidate, opt)
+      let target = s:check_textobj_diff(self.region.head, self.region.tail, candidate, opt.of('noremap', 'recipe_delete'))
     else
       let target = deepcopy(s:null_4pos)
     endif
@@ -1242,6 +1246,31 @@ function! s:stuff_replace_once(next_stuff, undojoin) dict abort  "{{{
   endfor
 endfunction
 "}}}
+function! s:is_input_matched(candidate, input, opt, flag) abort "{{{
+  if !has_key(a:candidate, 'buns')
+    return 0
+  elseif !a:flag && a:input ==# ''
+    return 1
+  endif
+
+  let candidate = deepcopy(a:candidate)
+  call a:opt.update('recipe_add', candidate)
+
+  " 'input' is necessary for 'expr' buns
+  if a:opt.of('expr') && !has_key(candidate, 'input')
+    return 0
+  endif
+
+  " If a:flag == 0, check forward match. Otherwise, check complete match.
+  let inputs = get(candidate, 'input', candidate['buns'])
+  if a:flag
+    return filter(inputs, 'v:val ==# a:input') != []
+  else
+    let idx = strlen(a:input) - 1
+    return filter(inputs, 'v:val[: idx] ==# a:input') != []
+  endif
+endfunction
+"}}}
 let s:stuff = {
       \   'buns'   : [],
       \   'done'   : 0,
@@ -1853,24 +1882,22 @@ function! s:get_right_pos(pos) abort  "{{{
   return getpos('.')
 endfunction
 "}}}
-function! s:check_edges(head, tail, candidate, opt) abort  "{{{
-  let patterns = s:get_patterns(a:candidate, a:opt)
-
-  if patterns[0] ==# '' || patterns[1] ==# '' | return s:null_4pos | endif
+function! s:check_edges(head, tail, patterns) abort  "{{{
+  if a:patterns[0] ==# '' || a:patterns[1] ==# '' | return s:null_4pos | endif
 
   call setpos('.', a:head)
-  let head1 = searchpos(patterns[0], 'c', a:tail[1])
+  let head1 = searchpos(a:patterns[0], 'c', a:tail[1])
 
   if head1 != a:head[1:2] | return s:null_4pos | endif
 
   call setpos('.', a:tail)
-  let tail2 = s:searchpos_bce(a:tail, patterns[1], a:head[1])
+  let tail2 = s:searchpos_bce(a:tail, a:patterns[1], a:head[1])
 
   if tail2 != a:tail[1:2] | return s:null_4pos | endif
 
-  let head2 = searchpos(patterns[1], 'bc', a:head[1])
+  let head2 = searchpos(a:patterns[1], 'bc', a:head[1])
   call setpos('.', a:head)
-  let tail1 = searchpos(patterns[0], 'ce', a:tail[1])
+  let tail1 = searchpos(a:patterns[0], 'ce', a:tail[1])
 
   if head1 == s:null_coord || tail1 == s:null_coord
         \ || head2 == s:null_coord || tail2 == s:null_coord
@@ -1885,25 +1912,23 @@ function! s:check_edges(head, tail, candidate, opt) abort  "{{{
   return map(target, 's:c2p(v:val)')
 endfunction
 "}}}
-function! s:search_edges(head, tail, candidate, opt) abort "{{{
-  let patterns = s:get_patterns(a:candidate, a:opt)
-
-  if patterns[0] ==# '' || patterns[1] ==# '' | return s:null_4pos | endif
+function! s:search_edges(head, tail, patterns) abort "{{{
+  if a:patterns[0] ==# '' || a:patterns[1] ==# '' | return s:null_4pos | endif
 
   call setpos('.', a:head)
-  let head1 = searchpos(patterns[0], 'c', a:tail[1])
+  let head1 = searchpos(a:patterns[0], 'c', a:tail[1])
 
   call setpos('.', a:tail)
-  let tail2 = s:searchpos_bce(a:tail, patterns[1], a:head[1])
+  let tail2 = s:searchpos_bce(a:tail, a:patterns[1], a:head[1])
 
   if head1 == s:null_coord || tail2 == s:null_coord
         \ || s:is_equal_or_ahead(s:c2p(head1), s:c2p(tail2))
     return s:null_4pos
   endif
 
-  let head2 = searchpos(patterns[1], 'bc', head1[0])
+  let head2 = searchpos(a:patterns[1], 'bc', head1[0])
   call setpos('.', s:c2p(head1))
-  let tail1 = searchpos(patterns[0], 'ce', head2[0])
+  let tail1 = searchpos(a:patterns[0], 'ce', head2[0])
 
   if tail1 == s:null_coord || head2 == s:null_coord
         \ || s:is_ahead(s:c2p(head1), s:c2p(tail1))
@@ -1919,13 +1944,13 @@ function! s:search_edges(head, tail, candidate, opt) abort "{{{
   return map(target, 's:c2p(v:val)')
 endfunction
 "}}}
-function! s:get_patterns(candidate, opt) abort "{{{
-  if a:opt.has('expr') && a:opt.of('expr', 'recipe_delete')
+function! s:get_patterns(candidate, opt_expr, opt_regex) abort "{{{
+  if a:opt_expr
     return ['', '']
   endif
 
   let patterns = deepcopy(a:candidate.buns)
-  if !a:opt.of('regex')
+  if !a:opt_regex
     let patterns = map(patterns, 's:escape(v:val)')
   endif
 
@@ -1957,13 +1982,19 @@ function! s:skip_space(head, tail) abort  "{{{
   endif
 endfunction
 "}}}
-function! s:check_textobj_diff(head, tail, candidate, opt) abort  "{{{
+function! s:check_textobj_diff(head, tail, candidate, opt_noremap) abort  "{{{
   let target = deepcopy(s:null_4pos)
   let [textobj_i, textobj_a] = a:candidate.external
-  let cmd = a:opt.of('noremap', 'recipe_delete') ? 'normal!' : 'normal'
-  let v   = a:opt.of('noremap', 'recipe_delete') ? 'v' : "\<Plug>(sandwich-v)"
   let [visual_head, visual_tail] = [getpos("'<"), getpos("'>")]
   let visualmode = visualmode()
+
+  if a:opt_noremap
+    let cmd = 'normal!'
+    let v   = 'v'
+  else
+    let cmd = 'normal'
+    let v   = "\<Plug>(sandwich-v)"
+  endif
 
   let order_list = [[1, a:head], [1, a:tail]]
   if has_key(a:candidate, 'excursus')
@@ -2335,31 +2366,6 @@ endfunction
 "}}}
 function! s:c2p(coord) abort  "{{{
   return [0] + a:coord + [0]
-endfunction
-"}}}
-function! s:is_input_matched(candidate, input, opt, flag) abort "{{{
-  if !has_key(a:candidate, 'buns')
-    return 0
-  elseif !a:flag && a:input ==# ''
-    return 1
-  endif
-
-  let candidate = deepcopy(a:candidate)
-  call a:opt.update('recipe_add', candidate)
-
-  " 'input' is necessary for 'expr' buns
-  if a:opt.of('expr') && !has_key(candidate, 'input')
-    return 0
-  endif
-
-  " If a:flag == 0, check forward match. Otherwise, check complete match.
-  let inputs = get(candidate, 'input', candidate['buns'])
-  if a:flag
-    return filter(inputs, 'v:val ==# a:input') != []
-  else
-    let idx = strlen(a:input) - 1
-    return filter(inputs, 'v:val[: idx] ==# a:input') != []
-  endif
 endfunction
 "}}}
 function! s:is_valid_2pos(pos) abort  "{{{
