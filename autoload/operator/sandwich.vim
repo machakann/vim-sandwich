@@ -1215,11 +1215,13 @@ endfunction
 function! s:stuff_add_once(next_stuff, undojoin) dict abort  "{{{
   let buns = self.get_buns()
   let undojoin = a:undojoin
-  for i in range(self.n)
-    let act      = self.acts[i]
-    let next_act = a:next_stuff.acts[i]
-    let [undojoin, self.done] = act.add_pair(buns, undojoin, self.done, next_act)
-  endfor
+  if buns[0] !=# '' || buns[1] !=# ''
+    for i in range(self.n)
+      let act      = self.acts[i]
+      let next_act = a:next_stuff.acts[i]
+      let [undojoin, self.done] = act.add_pair(buns, undojoin, self.done, next_act)
+    endfor
+  endif
 endfunction
 "}}}
 function! s:stuff_delete_once(next_stuff) dict abort  "{{{
