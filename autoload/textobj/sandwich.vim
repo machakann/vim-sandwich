@@ -279,12 +279,11 @@ let s:range = {
       \ }
 "}}}
 " stuff object "{{{
-function! s:stuff_search_with_nest(candidates) dict abort  "{{{
+function! s:stuff_search_with_nest(candidates, stimeoutlen) dict abort  "{{{
   let buns  = self.get_buns()
   let range = self.range
   let coord = self.coord
   let opt   = self.opt
-  let stimeoutlen = max([0, s:get('stimeoutlen', 500)])
 
   if buns[0] ==# '' || buns[1] ==# ''
     let range.valid = 0
@@ -294,8 +293,8 @@ function! s:stuff_search_with_nest(candidates) dict abort  "{{{
 
   " check whether the cursor is on the buns[1] or not
   call cursor(coord.head)
-  let _head = searchpos(buns[1], 'bc', range.top, stimeoutlen)
-  let _tail = searchpos(buns[1], 'cen', range.bottom, stimeoutlen)
+  let _head = searchpos(buns[1], 'bc', range.top, a:stimeoutlen)
+  let _tail = searchpos(buns[1], 'cen', range.bottom, a:stimeoutlen)
   if _head != s:null_coord && _tail != s:null_coord && s:is_in_between(coord.head, _head, _tail)
     call cursor(_head)
   else
@@ -304,18 +303,18 @@ function! s:stuff_search_with_nest(candidates) dict abort  "{{{
 
   while 1
     " search head
-    let flag = searchpos(buns[1], 'cn', range.bottom, stimeoutlen) == getpos('.')[1:2]
+    let flag = searchpos(buns[1], 'cn', range.bottom, a:stimeoutlen) == getpos('.')[1:2]
           \ ? 'b' : 'bc'
-    let head = searchpairpos(buns[0], '', buns[1], flag, 'self.skip(1)', range.top, stimeoutlen)
+    let head = searchpairpos(buns[0], '', buns[1], flag, 'self.skip(1)', range.top, a:stimeoutlen)
     if head == s:null_coord | break | endif
     let coord.head = head
 
     let self.syntax = s:is_syntax_on && opt.of('match_syntax') ? [s:get_displaysyntax(head)] : []
 
     " search tail
-    let tail = searchpairpos(buns[0], '', buns[1], '', 'self.skip(0)', range.bottom, stimeoutlen)
+    let tail = searchpairpos(buns[0], '', buns[1], '', 'self.skip(0)', range.bottom, a:stimeoutlen)
     if tail == s:null_coord | break | endif
-    let tail = searchpos(buns[1], 'ce', range.bottom, stimeoutlen)
+    let tail = searchpos(buns[1], 'ce', range.bottom, a:stimeoutlen)
     if tail == s:null_coord | break | endif
     let coord.tail = tail
 
@@ -340,12 +339,11 @@ function! s:stuff_search_with_nest(candidates) dict abort  "{{{
   call range.next()
 endfunction
 "}}}
-function! s:stuff_search_without_nest(candidates) dict abort  "{{{
+function! s:stuff_search_without_nest(candidates, stimeoutlen) dict abort  "{{{
   let buns  = self.get_buns()
   let range = self.range
   let coord = self.coord
   let opt   = self.opt
-  let stimeoutlen = max([0, s:get('stimeoutlen', 500)])
 
   if buns[0] ==# '' || buns[1] ==# ''
     let range.valid = 0
@@ -355,18 +353,18 @@ function! s:stuff_search_without_nest(candidates) dict abort  "{{{
 
   " search nearest head
   call cursor(self.cursor)
-  let head = self.searchpos(buns[0], 'bc', range.top, stimeoutlen, 1)
+  let head = self.searchpos(buns[0], 'bc', range.top, a:stimeoutlen, 1)
   if head == s:null_coord
     call range.next()
     return
   endif
-  let _tail = searchpos(buns[0], 'ce', range.bottom, stimeoutlen)
+  let _tail = searchpos(buns[0], 'ce', range.bottom, a:stimeoutlen)
 
   let self.syntax = s:is_syntax_on && opt.of('match_syntax') ? [s:get_displaysyntax(head)] : []
 
   " search nearest tail
   call cursor(self.cursor)
-  let tail = self.searchpos(buns[1], 'ce',  range.bottom, stimeoutlen, 0)
+  let tail = self.searchpos(buns[1], 'ce',  range.bottom, a:stimeoutlen, 0)
   if tail == s:null_coord
     call range.next()
     return
@@ -376,10 +374,10 @@ function! s:stuff_search_without_nest(candidates) dict abort  "{{{
     " check whether it is head or tail
     let odd = 1
     call cursor([range.top, 1])
-    let pos = searchpos(buns[0], 'c', range.top, stimeoutlen)
+    let pos = searchpos(buns[0], 'c', range.top, a:stimeoutlen)
     while pos != head && pos != s:null_coord
       let odd = !odd
-      let pos = searchpos(buns[0], '', range.top, stimeoutlen)
+      let pos = searchpos(buns[0], '', range.top, a:stimeoutlen)
     endwhile
     if pos == s:null_coord | return | endif
 
@@ -390,8 +388,8 @@ function! s:stuff_search_without_nest(candidates) dict abort  "{{{
       let self.syntax = s:is_syntax_on && opt.of('match_syntax') ? [s:get_displaysyntax(head)] : []
 
       " search tail
-      call search(buns[0], 'ce', range.bottom, stimeoutlen)
-      let tail = self.searchpos(buns[1], 'e',  range.bottom, stimeoutlen, 0)
+      call search(buns[0], 'ce', range.bottom, a:stimeoutlen)
+      let tail = self.searchpos(buns[1], 'e',  range.bottom, a:stimeoutlen, 0)
       if tail == s:null_coord
         call range.next()
         return
@@ -399,13 +397,13 @@ function! s:stuff_search_without_nest(candidates) dict abort  "{{{
     else
       " pos is tail
       call cursor(pos)
-      let tail = self.searchpos(buns[1], 'ce',  range.bottom, stimeoutlen, 1)
+      let tail = self.searchpos(buns[1], 'ce',  range.bottom, a:stimeoutlen, 1)
 
       let self.syntax = s:is_syntax_on && opt.of('match_syntax') ? [s:get_displaysyntax(tail)] : []
 
       " search head
-      call search(buns[1], 'bc', range.top, stimeoutlen)
-      let head = self.searchpos(buns[0], 'b',  range.top, stimeoutlen, 0)
+      call search(buns[1], 'bc', range.top, a:stimeoutlen)
+      let head = self.searchpos(buns[0], 'b',  range.top, a:stimeoutlen, 0)
       if head == s:null_coord
         call range.next()
         return
@@ -427,7 +425,7 @@ function! s:stuff_search_without_nest(candidates) dict abort  "{{{
   let range.valid = 0
 endfunction
 "}}}
-function! s:stuff_get_region(candidates) dict abort "{{{
+function! s:stuff_get_region(candidates, stimeoutlen) dict abort "{{{
   let range = self.range
   let coord = self.coord
   let opt   = self.opt
@@ -508,7 +506,6 @@ function! s:stuff_skip(is_head, ...) dict abort  "{{{
   let cursor = getpos('.')[1:2]
   let coord = a:0 > 0 ? a:1 : cursor
   let opt = self.opt
-  let stimeoutlen = max([0, s:get('stimeoutlen', 500)])
 
   if coord == s:null_coord
     return 1
@@ -530,7 +527,7 @@ function! s:stuff_skip(is_head, ...) dict abort  "{{{
   if skip_patterns != []
     call cursor(coord)
     for pattern in skip_patterns
-      let skip = searchpos(pattern, 'cn', cursor[0], stimeoutlen) == coord
+      let skip = searchpos(pattern, 'cn', cursor[0]) == coord
       if skip
         return 1
       endif
@@ -748,7 +745,7 @@ let s:stuff = {
 function! s:textobj_query() dict abort  "{{{
   let recipes = deepcopy(self.recipes.integrated)
   let clock   = deepcopy(s:clock)
-  let timeoutlen = s:get('timeoutlen', &timeoutlen)
+  let timeoutlen = max([0, s:get('timeoutlen', &timeoutlen)])
 
   " query phase
   let input   = ''
@@ -814,10 +811,11 @@ endfunction
 function! s:textobj_start() dict abort "{{{
   call self.initialize()
 
+  let stimeoutlen = max([0, s:get('stimeoutlen', 500)])
   let [virtualedit, whichwrap]   = [&virtualedit, &whichwrap]
   let [&virtualedit, &whichwrap] = ['onemore', 'h,l']
   try
-    let candidates = self.list()
+    let candidates = self.list(stimeoutlen)
     let elected = self.elect(candidates)
     call self.select(elected)
   finally
@@ -904,16 +902,15 @@ function! s:textobj_new_stuff(recipe) dict abort "{{{
   return stuff
 endfunction
 "}}}
-function! s:textobj_list() dict abort  "{{{
+function! s:textobj_list(stimeoutlen) dict abort  "{{{
   let clock = deepcopy(s:clock)
-  let stimeoutlen = max([0, s:get('stimeoutlen', 500)])
 
   " gather candidates
   let candidates = []
   call clock.start()
   while filter(copy(self.basket), 'v:val.range.valid') != []
     for stuff in self.basket
-      call stuff.search(candidates)
+      call stuff.search(candidates, a:stimeoutlen)
     endfor
 
     if len(candidates) >= self.count
@@ -921,9 +918,9 @@ function! s:textobj_list() dict abort  "{{{
     endif
 
     " time out
-    if clock.started && stimeoutlen > 0
+    if clock.started && a:stimeoutlen > 0
       let elapsed = clock.elapsed()
-      if elapsed > stimeoutlen
+      if elapsed > a:stimeoutlen
         echo 'textobj-sandwich: Timed out.'
         break
       endif

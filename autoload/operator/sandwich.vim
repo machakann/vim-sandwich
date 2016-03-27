@@ -1043,7 +1043,7 @@ function! s:stuff_query(recipes) dict abort  "{{{
   let recipes = filter(deepcopy(a:recipes), filter)
   let opt = self.opt
   let clock = deepcopy(s:clock)
-  let timeoutlen = s:get('timeoutlen', &timeoutlen)
+  let timeoutlen = max([0, s:get('timeoutlen', &timeoutlen)])
 
   " query phase
   let input   = ''
