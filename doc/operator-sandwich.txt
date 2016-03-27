@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:17-Feb-2016.
+						Last change:27-Mar-2016.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license
@@ -56,6 +56,7 @@ MISCELLANEOUS			|operator-sandwich-miscellaneous|
   I want to keep cursor position even after dot repeating.
   What is special about the query1st series mappings?
   There is conflict with auto-complete plugins.
+  About the handlings of recipe-local options in the replace operator.
 
 ==============================================================================
 TL;DR
@@ -1617,6 +1618,57 @@ There is conflict with auto-complete plugins.~
  autocmd User OperatorSandwichAddPre,OperatorSandwichReplacePre NeoCompleteLock
  autocmd User OperatorSandwichAddPost,OperatorSandwichReplacePost NeoCompleteUnLock
 <
+
+
+About the handlings of recipe-local options in the replace operator.~
+	Two recipes are participated in an action of replace operator, a
+	recipe for delete action and a recipe for add action. If any option is
+	assigned in the recipes, it is determined which recipe is used
+	depending on the kind of option.
+
+	`cursor`
+	Both recipes are valid, but the recipe for add action is prior.
+
+	`query_once`
+	The recipe for add action is used.
+
+	`regex`
+	The recipe for delete action is used.
+
+	`expr`
+	The recipe for add action is used.
+
+	`noremap`
+	The recipe for delete action is used for target region matching, and
+	the recipe for add action is used for adding surroundings.
+
+	`skip_space`
+	The bigger value in the two is used.
+
+	`skip_char`
+	The recipe for delete action is used.
+
+	`highlight`
+	The bigger value in the two is used.
+
+	`command`
+	Both recipes are valid, the recipe for add action is executed later.
+
+	`linewise`
+	The bigger value in the two is used.
+
+	`autoindent`
+	The recipe for add action is used.
+
+	`indentkeys`
+	The recipe for add action is used.
+
+	`indentkeys+`
+	The recipe for add action is used.
+
+	`indentkeys-`
+	The recipe for add action is used.
+
 
 
 ==============================================================================

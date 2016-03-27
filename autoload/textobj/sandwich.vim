@@ -55,10 +55,9 @@ function! textobj#sandwich#auto(mode, a_or_i, ...) abort  "{{{
   let textobj.view   = winsaveview()
   let textobj.recipes.arg = get(a:000, 1, [])
   let textobj.opt.filter = s:default_opt.filter
-  call textobj.opt.arg.update(get(a:000, 0, {}))
-  call textobj.opt.default.update(deepcopy(g:textobj#sandwich#options[textobj.kind]))
-  call textobj.opt.integrate()
-  call textobj.recipes.integrate(textobj.kind, textobj.mode, textobj.opt.integrated)
+  call textobj.opt.update('arg', get(a:000, 0, {}))
+  call textobj.opt.update('default', g:textobj#sandwich#options[textobj.kind])
+  call textobj.recipes.integrate(textobj.kind, textobj.mode, textobj.opt)
 
   if textobj.recipes.integrated != []
     let cmd = ":\<C-u>call textobj#sandwich#select()\<CR>"
@@ -82,13 +81,10 @@ function! textobj#sandwich#query(mode, a_or_i, ...) abort  "{{{
   let textobj.cursor = getpos('.')[1:2]
   let textobj.view   = winsaveview()
   let textobj.recipes.arg = get(a:000, 1, [])
-  let textobj.opt.timeoutlen = s:get('timeoutlen', &timeoutlen)
-  let textobj.opt.timeoutlen = textobj.opt.timeoutlen < 0 ? 0 : textobj.opt.timeoutlen
   let textobj.opt.filter = s:default_opt.filter
-  call textobj.opt.arg.update(get(a:000, 0, {}))
-  call textobj.opt.default.update(deepcopy(g:textobj#sandwich#options[textobj.kind]))
-  call textobj.opt.integrate()
-  call textobj.recipes.integrate(textobj.kind, textobj.mode, textobj.opt.integrated)
+  call textobj.opt.update('arg', get(a:000, 0, {}))
+  call textobj.opt.update('default', g:textobj#sandwich#options[textobj.kind])
+  call textobj.recipes.integrate(textobj.kind, textobj.mode, textobj.opt)
 
   call textobj.query()
 
@@ -119,18 +115,38 @@ function! s:opt_integrate() dict abort  "{{{
   call extend(self.integrated, recipe,  'force')
 endfunction
 "}}}
-function! s:opt_clear() dict abort "{{{
-  call filter(self, 'v:key ==# "clear" || v:key ==# "update" || v:key ==# "integrate"')
+function! s:opt_clear(target) dict abort "{{{
+  call filter(self[a:target], 0)
 endfunction
 "}}}
-function! s:opt_update(dict) dict abort "{{{
-  call self.clear()
-  call extend(self, a:dict, 'keep')
+function! s:opt_update(target, dict) dict abort "{{{
+  call self.clear(a:target)
+  call extend(self[a:target], filter(deepcopy(a:dict), self.filter), 'force')
+endfunction
+"}}}
+function! s:opt_has(opt_name) dict abort  "{{{
+  return has_key(self.default, a:opt_name)
+endfunction
+"}}}
+function! s:opt_of(opt_name, ...) dict abort  "{{{
+  if has_key(self['recipe'], a:opt_name)
+    return self['recipe'][a:opt_name]
+  elseif has_key(self['arg'], a:opt_name)
+    return self['arg'][a:opt_name]
+  else
+    return self['default'][a:opt_name]
+  endif
 endfunction
 "}}}
 let s:opt = {
-      \   'clear' : function('s:opt_clear'),
-      \   'update': function('s:opt_update'),
+      \   'recipe' : {},
+      \   'default': {},
+      \   'arg'    : {},
+      \   'filter' : '',
+      \   'clear'  : function('s:opt_clear'),
+      \   'update' : function('s:opt_update'),
+      \   'has'    : function('s:opt_has'),
+      \   'of'     : function('s:opt_of'),
       \ }
 "}}}
 " clock object  "{{{
@@ -181,11 +197,11 @@ let s:clock = {
       \ }
 "}}}
 " coord object"{{{
-function! s:coord_get_inner(buns, cursor, opt) dict abort "{{{
+function! s:coord_get_inner(buns, cursor, skip_break) dict abort "{{{
   call cursor(self.head)
   call search(a:buns[0], 'ce', self.tail[0])
   normal! l
-  if a:opt.skip_break && col('.') == col([line('.'), '$'])
+  if a:skip_break && col('.') == col([line('.'), '$'])
     let self.inner_head = searchpos('\_S', '', self.tail[0])
   else
     let self.inner_head = getpos('.')[1:2]
@@ -193,7 +209,7 @@ function! s:coord_get_inner(buns, cursor, opt) dict abort "{{{
 
   call cursor(self.tail)
   call search(a:buns[1], 'bc', self.head[0])
-  if a:opt.skip_break && (col('.') < 2 || getline(line('.'))[: col('.')-2] =~# '^\s*$')
+  if a:skip_break && (col('.') < 2 || getline(line('.'))[: col('.')-2] =~# '^\s*$')
     let self.inner_tail = searchpos('\_S', 'be', self.head[0])
   else
     if getpos('.')[2] == 1
@@ -267,7 +283,7 @@ function! s:stuff_search_with_nest(candidates) dict abort  "{{{
   let buns  = self.get_buns()
   let range = self.range
   let coord = self.coord
-  let opt   = self.opt.integrated
+  let opt   = self.opt
   let stimeoutlen = max([0, s:get('stimeoutlen', 500)])
 
   if buns[0] ==# '' || buns[1] ==# ''
@@ -294,7 +310,7 @@ function! s:stuff_search_with_nest(candidates) dict abort  "{{{
     if head == s:null_coord | break | endif
     let coord.head = head
 
-    let self.syntax = s:is_syntax_on && opt.match_syntax ? [s:get_displaysyntax(head)] : []
+    let self.syntax = s:is_syntax_on && opt.of('match_syntax') ? [s:get_displaysyntax(head)] : []
 
     " search tail
     let tail = searchpairpos(buns[0], '', buns[1], '', 'self.skip(0)', range.bottom, stimeoutlen)
@@ -303,7 +319,7 @@ function! s:stuff_search_with_nest(candidates) dict abort  "{{{
     if tail == s:null_coord | break | endif
     let coord.tail = tail
 
-    call coord.get_inner(buns, self.cursor, opt)
+    call coord.get_inner(buns, self.cursor, opt.of('skip_break'))
 
     " add to candidates
     if self.is_valid_candidate(a:candidates)
@@ -328,7 +344,7 @@ function! s:stuff_search_without_nest(candidates) dict abort  "{{{
   let buns  = self.get_buns()
   let range = self.range
   let coord = self.coord
-  let opt   = self.opt.integrated
+  let opt   = self.opt
   let stimeoutlen = max([0, s:get('stimeoutlen', 500)])
 
   if buns[0] ==# '' || buns[1] ==# ''
@@ -346,7 +362,7 @@ function! s:stuff_search_without_nest(candidates) dict abort  "{{{
   endif
   let _tail = searchpos(buns[0], 'ce', range.bottom, stimeoutlen)
 
-  let self.syntax = s:is_syntax_on && opt.match_syntax ? [s:get_displaysyntax(head)] : []
+  let self.syntax = s:is_syntax_on && opt.of('match_syntax') ? [s:get_displaysyntax(head)] : []
 
   " search nearest tail
   call cursor(self.cursor)
@@ -371,7 +387,7 @@ function! s:stuff_search_without_nest(candidates) dict abort  "{{{
       " pos is head
       let head = pos
 
-      let self.syntax = s:is_syntax_on && opt.match_syntax ? [s:get_displaysyntax(head)] : []
+      let self.syntax = s:is_syntax_on && opt.of('match_syntax') ? [s:get_displaysyntax(head)] : []
 
       " search tail
       call search(buns[0], 'ce', range.bottom, stimeoutlen)
@@ -385,7 +401,7 @@ function! s:stuff_search_without_nest(candidates) dict abort  "{{{
       call cursor(pos)
       let tail = self.searchpos(buns[1], 'ce',  range.bottom, stimeoutlen, 1)
 
-      let self.syntax = s:is_syntax_on && opt.match_syntax ? [s:get_displaysyntax(tail)] : []
+      let self.syntax = s:is_syntax_on && opt.of('match_syntax') ? [s:get_displaysyntax(tail)] : []
 
       " search head
       call search(buns[1], 'bc', range.top, stimeoutlen)
@@ -399,7 +415,7 @@ function! s:stuff_search_without_nest(candidates) dict abort  "{{{
 
   let coord.head = head
   let coord.tail = tail
-  call coord.get_inner(buns, self.cursor, opt)
+  call coord.get_inner(buns, self.cursor, self.opt.of('skip_break'))
 
   if self.is_valid_candidate(a:candidates)
     let candidate = deepcopy(self)
@@ -414,11 +430,11 @@ endfunction
 function! s:stuff_get_region(candidates) dict abort "{{{
   let range = self.range
   let coord = self.coord
-  let opt   = self.opt.integrated
+  let opt   = self.opt
 
   if !range.valid | return | endif
 
-  if opt.noremap
+  if opt.of('noremap')
     let cmd = 'normal!'
     let v = self.visualmode
   else
@@ -491,7 +507,7 @@ endfunction
 function! s:stuff_skip(is_head, ...) dict abort  "{{{
   let cursor = getpos('.')[1:2]
   let coord = a:0 > 0 ? a:1 : cursor
-  let opt = self.opt.integrated
+  let opt = self.opt
   let stimeoutlen = max([0, s:get('stimeoutlen', 500)])
 
   if coord == s:null_coord
@@ -500,7 +516,7 @@ function! s:stuff_skip(is_head, ...) dict abort  "{{{
 
   " quoteescape option
   let skip_patterns = []
-  if opt.quoteescape && &quoteescape !=# ''
+  if opt.of('quoteescape') && &quoteescape !=# ''
     for c in split(&quoteescape, '\zs')
       let c = s:escape(c)
       let pattern = printf('[^%s]%s\%%(%s%s\)*\zs\%%#', c, c, c, c)
@@ -509,8 +525,8 @@ function! s:stuff_skip(is_head, ...) dict abort  "{{{
   endif
 
   " skip_regex option
-  let skip_patterns += opt.skip_regex
-  let skip_patterns += a:is_head ? opt.skip_regex_head : opt.skip_regex_tail
+  let skip_patterns += opt.of('skip_regex')
+  let skip_patterns += a:is_head ? opt.of('skip_regex_head') : opt.of('skip_regex_tail')
   if skip_patterns != []
     call cursor(coord)
     for pattern in skip_patterns
@@ -523,8 +539,9 @@ function! s:stuff_skip(is_head, ...) dict abort  "{{{
 
   " syntax, match_syntax option
   if s:is_syntax_on
-    if a:is_head || !opt.match_syntax
-      if opt.syntax != [] && !s:is_included_syntax(coord, opt.syntax)
+    if a:is_head || !opt.of('match_syntax')
+      let opt_syntax = opt.of('syntax')
+      if opt_syntax != [] && !s:is_included_syntax(coord, opt_syntax)
         return 1
       endif
     else
@@ -535,20 +552,18 @@ function! s:stuff_skip(is_head, ...) dict abort  "{{{
   endif
 
   " skip_expr option
-  if opt.skip_expr != []
-    for Expr in opt.skip_expr
-      if s:eval(Expr, a:is_head, s:c2p(coord))
-        return 1
-      endif
-    endfor
-  endif
+  for Expr in opt.of('skip_expr')
+    if s:eval(Expr, a:is_head, s:c2p(coord))
+      return 1
+    endif
+  endfor
 
   return 0
 endfunction
 "}}}
 function! s:stuff_is_valid_candidate(candidates) dict abort "{{{
   let coord      = self.coord
-  let opt        = self.opt.integrated
+  let opt        = self.opt
   let visualmark = self.visualmark
 
   if self.a_or_i ==# 'i'
@@ -590,16 +605,16 @@ function! s:stuff_is_valid_candidate(candidates) dict abort "{{{
 
   " specific condition for the option 'matched_syntax' and 'inner_syntax'
   if s:is_syntax_on
-    if opt.match_syntax == 2
+    if opt.of('match_syntax') == 2
       let opt_syntax_affair = s:is_included_syntax(coord.inner_head, self.syntax)
                         \ && s:is_included_syntax(coord.inner_tail, self.syntax)
-    elseif opt.match_syntax == 3
+    elseif opt.of('match_syntax') == 3
       " check inner syntax independently
-      if opt.inner_syntax == []
+      if opt.of('inner_syntax') == []
         let syntax = [s:get_displaysyntax(coord.inner_head)]
         let opt_syntax_affair = s:is_included_syntax(coord.inner_tail, syntax)
       else
-        if s:is_included_syntax(coord.inner_head, opt.inner_syntax)
+        if s:is_included_syntax(coord.inner_head, opt.of('inner_syntax'))
           let syntax = [s:get_displaysyntax(coord.inner_head)]
           let opt_syntax_affair = s:is_included_syntax(coord.inner_tail, syntax)
         else
@@ -607,11 +622,11 @@ function! s:stuff_is_valid_candidate(candidates) dict abort "{{{
         endif
       endif
     else
-      if opt.inner_syntax == []
+      if opt.of('inner_syntax') == []
         let opt_syntax_affair = 1
       else
-        let opt_syntax_affair = s:is_included_syntax(coord.inner_head, opt.inner_syntax)
-                          \ && s:is_included_syntax(coord.inner_tail, opt.inner_syntax)
+        let opt_syntax_affair = s:is_included_syntax(coord.inner_head, opt.of('inner_syntax'))
+                          \ && s:is_included_syntax(coord.inner_tail, opt.of('inner_syntax'))
       endif
     endif
   else
@@ -627,14 +642,15 @@ function! s:stuff_is_valid_candidate(candidates) dict abort "{{{
 endfunction
 "}}}
 function! s:stuff_get_buns() dict abort  "{{{
-  let opt   = self.opt.integrated
   let buns  = self.buns
   let clock = deepcopy(s:clock)
+  let opt_expr  = self.opt.of('expr')
+  let opt_regex = self.opt.of('regex')
 
-  if (opt.expr && !self.evaluated) || opt.expr == 2
+  if (opt_expr && !self.evaluated) || opt_expr == 2
     call clock.pause()
     echo ''
-    let buns = opt.expr == 2 ? deepcopy(buns) : buns
+    let buns = opt_expr == 2 ? deepcopy(buns) : buns
     let buns[0] = s:eval(buns[0], 1)
     if buns[0] !=# ''
       let buns[1] = s:eval(buns[1], 0)
@@ -645,7 +661,7 @@ function! s:stuff_get_buns() dict abort  "{{{
     call clock.start()
   endif
 
-  if self.state && !opt.regex && !self.escaped
+  if self.state && !opt_regex && !self.escaped
     call map(buns, 's:escape(v:val)')
     let self.escaped = 1
   endif
@@ -657,7 +673,7 @@ function! s:stuff_synchronize() dict abort  "{{{
   " For the cooperation with operator-sandwich
   " NOTE: After visual selection by a user-defined textobject, v:operator is set as ':'
   " NOTE: 'synchro' option is not valid for visual mode, because there is no guarantee that g:operator#sandwich#object exists.
-  if self.opt.integrated.synchro && exists('g:operator#sandwich#object')
+  if self.opt.of('synchro') && exists('g:operator#sandwich#object')
         \ && ((self.searchby ==# 'buns' && v:operator ==# 'g@') || (self.searchby ==# 'external' && v:operator =~# '\%(:\|g@\)'))
         \ && &operatorfunc =~# '^operator#sandwich#\%(delete\|replace\)'
     let recipe = {}
@@ -668,8 +684,7 @@ function! s:stuff_synchronize() dict abort  "{{{
       call extend(recipe, {'external': self.external})
       call extend(recipe, {'excursus': [self.range.count, [0] + self.cursor + [0]]})
     endif
-    let filter = 'v:key !=# "clear" && v:key !=# "update"'
-    call extend(recipe, filter(self.opt.recipe, filter), 'keep')
+    call extend(recipe, self.opt.recipe, 'keep')
 
     " If the recipe has 'kind' key and has no 'delete', 'replace' keys, then add these items.
     if has_key(recipe, 'kind') && filter(copy(recipe.kind), 'v:val ==# "delete" || v:val ==# "replace"') == []
@@ -733,7 +748,7 @@ let s:stuff = {
 function! s:textobj_query() dict abort  "{{{
   let recipes = deepcopy(self.recipes.integrated)
   let clock   = deepcopy(s:clock)
-  let timeoutlen = self.opt.timeoutlen
+  let timeoutlen = s:get('timeoutlen', &timeoutlen)
 
   " query phase
   let input   = ''
@@ -845,7 +860,7 @@ function! s:textobj_initialize() dict abort  "{{{
       let stuff.coord.inner_tail = copy(s:null_coord)
 
       let opt = stuff.opt
-      call stuff.range.initialize(self.cursor[0], opt.integrated.expand_range)
+      call stuff.range.initialize(self.cursor[0], opt.of('expand_range'))
     endfor
   endif
 endfunction
@@ -866,20 +881,16 @@ function! s:textobj_new_stuff(recipe) dict abort "{{{
   let stuff.visualmode = self.visualmode
   let stuff.coord.head = copy(self.cursor)
   let stuff.visualmark = self.visualmark
-  let stuff.opt       = copy(self.opt)
+  let stuff.opt        = copy(self.opt)
+  let stuff.opt.recipe = {}
+  call stuff.opt.update('recipe', a:recipe)
 
-  let opt            = stuff.opt
-  let opt.recipe     = deepcopy(s:opt)
-  let opt.integrated = deepcopy(s:opt)
-  call opt.recipe.update(a:recipe)
-  call opt.integrate()
-
-  call stuff.range.initialize(self.cursor[0], opt.integrated.expand_range)
+  call stuff.range.initialize(self.cursor[0], stuff.opt.of('expand_range'))
 
   if has_buns
     let stuff.buns = remove(a:recipe, 'buns')
     let stuff.searchby = 'buns'
-    if opt.integrated.nesting
+    if stuff.opt.of('nesting')
       let stuff.search = stuff._search_with_nest
     else
       let stuff.search = stuff._search_without_nest
@@ -1014,6 +1025,9 @@ function! s:textobj_recipes_integrate(kind, mode, opt) dict abort  "{{{
   call reverse(self.integrated)
 
   " uniq by buns
+  let opt_regex   = a:opt.of('regex')
+  let opt_expr    = a:opt.of('expr')
+  let opt_noremap = a:opt.of('noremap')
   if a:kind ==# 'auto'
     let recipes = copy(self.integrated)
     let self.integrated = []
@@ -1021,9 +1035,9 @@ function! s:textobj_recipes_integrate(kind, mode, opt) dict abort  "{{{
       let recipe = remove(recipes, 0)
       let self.integrated += [recipe]
       if has_key(recipe, 'buns')
-        call filter(recipes, '!s:is_duplicated_buns(recipe, v:val, a:opt)')
+        call filter(recipes, '!s:is_duplicated_buns(recipe, v:val, opt_regex, opt_expr)')
       elseif has_key(recipe, 'external')
-        call filter(recipes, '!s:is_duplicated_external(recipe, v:val, a:opt)')
+        call filter(recipes, '!s:is_duplicated_external(recipe, v:val, opt_noremap)')
       endif
     endwhile
   endif
@@ -1045,14 +1059,7 @@ let s:textobj = {
       \   'basket'    : [],
       \   'visualmode': 'v',
       \   'visualmark': copy(s:null_2coord),
-      \   'opt'       : {
-      \     'arg'    : copy(s:opt),
-      \     'default': copy(s:opt),
-      \     'recipe' : copy(s:opt),
-      \     'integrated': copy(s:opt),
-      \     'integrate' : function('s:opt_integrate'),
-      \     'filter' : '',
-      \   },
+      \   'opt'       : deepcopy(s:opt),
       \   'done'      : 0,
       \   'query'     : function('s:textobj_query'),
       \   'start'     : function('s:textobj_start'),
@@ -1112,14 +1119,14 @@ function! s:expr_filter(candidate) abort  "{{{
   endif
 endfunction
 "}}}
-function! s:is_duplicated_buns(recipe, item, opt) abort  "{{{
+function! s:is_duplicated_buns(recipe, item, opt_regex, opt_expr) abort  "{{{
   if has_key(a:item, 'buns')
         \ && a:recipe['buns'][0] ==# a:item['buns'][0]
         \ && a:recipe['buns'][1] ==# a:item['buns'][1]
-    let regex_r = get(a:recipe, 'regex', a:opt.regex)
-    let regex_i = get(a:item,   'regex', a:opt.regex)
-    let expr_r  = get(a:recipe, 'expr',  a:opt.expr)
-    let expr_i  = get(a:item,   'expr',  a:opt.expr)
+    let regex_r = get(a:recipe, 'regex', a:opt_regex)
+    let regex_i = get(a:item,   'regex', a:opt_regex)
+    let expr_r  = get(a:recipe, 'expr',  a:opt_expr)
+    let expr_i  = get(a:item,   'expr',  a:opt_expr)
 
     let expr_r = expr_r ? 1 : 0
     let expr_i = expr_i ? 1 : 0
@@ -1128,16 +1135,15 @@ function! s:is_duplicated_buns(recipe, item, opt) abort  "{{{
       return 1
     endif
   endif
-
   return 0
 endfunction
 "}}}
-function! s:is_duplicated_external(recipe, item, opt) abort "{{{
+function! s:is_duplicated_external(recipe, item, opt_noremap) abort "{{{
   if has_key(a:item, 'external')
         \ && a:recipe['external'][0] ==# a:item['external'][0]
         \ && a:recipe['external'][1] ==# a:item['external'][1]
-    let noremap_r = get(a:recipe, 'noremap', a:opt.noremap)
-    let noremap_i = get(a:item,   'noremap', a:opt.noremap)
+    let noremap_r = get(a:recipe, 'noremap', a:opt_noremap)
+    let noremap_i = get(a:item,   'noremap', a:opt_noremap)
 
     if noremap_r == noremap_i
       return 1
@@ -1230,11 +1236,10 @@ function! s:is_input_matched(candidate, input, opt, flag) abort "{{{
   let candidate = deepcopy(a:candidate)
 
   if has_buns
-    call a:opt.recipe.update(candidate)
-    call a:opt.integrate()
+    call a:opt.update('recipe', candidate)
 
     " 'input' is necessary for 'expr' or 'regex' buns
-    if (a:opt.integrated.expr || a:opt.integrated.regex) && !has_key(candidate, 'input')
+    if (a:opt.of('expr') || a:opt.of('regex')) && !has_key(candidate, 'input')
       return 0
     endif
 

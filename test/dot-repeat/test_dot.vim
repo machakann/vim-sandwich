@@ -316,13 +316,13 @@ normal .
 call s:assert(getline('.'), '11foo22', 'operator-replace:expr #1')
 call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-replace:expr #2')
 
-" let g:operator#sandwich#recipes = [{'buns': ['Count()', 'Count()'], 'expr': 2, 'input': ['c']}]
-" call setline('.', '((foo))')
-" let s:count = 0
-" normal ffsra(c
-" normal .
-" call s:assert(getline('.'), '31foo24', 'operator-replace:expr #3')
-" call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-replace:expr #4')
+let g:operator#sandwich#recipes = [{'buns': ['Count()', 'Count()'], 'expr': 2, 'input': ['c']}]
+call setline('.', '((foo))')
+let s:count = 0
+normal ffsra(c
+normal .
+call s:assert(getline('.'), '31foo24', 'operator-replace:expr #3')
+call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-replace:expr #4')
 
 unlet g:operator#sandwich#recipes
 %delete
