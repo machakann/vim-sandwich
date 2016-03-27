@@ -1516,9 +1516,16 @@ I want to keep cursor position even after dot repeating.~
 	|<Plug>(operator-sandwich-predot)| or |<Plug>(operator-sandwich-dot)|,
 	it can enable the feature. If you are using other plugins which make
 	keymappings to |.| key, use |<Plug>(operator-sandwich-predot)|. For
-	example, if you are using repeat.vim (vimscript #2136), add the
-	following line into your vimrc.
+	example, if you are using a plugin which defines a mapping
+	`<Plug>(ExampleDot)`:
 >
+	nmap . <Plug>(operator-sandwich-predot)<Plug>(ExampleDot)
+<
+	In case of using repeat.vim (vimscript #2136), the mapping
+	`<Plug>(RepeatDot)` is defined retadatively. Thus, in order to ensure
+	the mapping exists, add the lines:
+>
+	runtime autoload/repeat.vim
 	nmap . <Plug>(operator-sandwich-predot)<Plug>(RepeatDot)
 <
 	Otherwise use |<Plug>(operator-sandwich-dot)|.

@@ -1497,13 +1497,21 @@ matchit.vim のハイライトがかぶって邪魔~
 	|<Plug>(operator-sandwich-predot)| か |<Plug>(operator-sandwich-dot)|
 	を |.| キーにマッピングすることでこの機能を有効にすることができます。
 	もし他に |.| コマンドにマップするようなプラグインをご使用の場合は
-	|<Plug>(operator-sandwich-predot)| を使います。例えば repeat.vim
-	(vimscript #2136) をご使用の場合は次の行を vimrc へ追加します。
+	|<Plug>(operator-sandwich-predot)| を使います。例えば
+	`<Plug>(ExampleDot)` というマッピングを |.| キーに定義するプラグインを
+	ご使用の場合は次のように使います。
 >
+	nmap . <Plug>(operator-sandwich-predot)<Plug>(ExampleDot)
+<
+	repeat.vim (vimscript #2136) をご使用の場合は `<Plug>(RepeatDot)` の
+	定義が遅延されているので、そのキーマッピングの存在を保証するために次の
+	行を vimrc へ追加します。
+>
+	runtime autoload/repeat.vim
 	nmap . <Plug>(operator-sandwich-predot)<Plug>(RepeatDot)
 <
-	そのようなプラグインを使ってない場合は |<Plug>(operator-sandwich-dot)|
-	を使います。
+	上記のようなプラグインを使ってない場合は
+	|<Plug>(operator-sandwich-dot)| を使います。
 >
 	nmap . <Plug>(operator-sandwich-dot)
 <
