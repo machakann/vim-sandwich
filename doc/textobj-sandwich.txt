@@ -1,5 +1,5 @@
 *textobj-sandwich.txt*	The textobject plugin to select sandwiched texts.
-						Last change:21-Feb-2016.
+						Last change:28-Mar-2016.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license
@@ -229,8 +229,8 @@ textobj#sandwich#auto(mode, a_or_i[, options[, recipes]])
 	\ textobj#sandwich#auto('o', 'i', g:sandwich_alt_options)
 <
 
-	If a not-empty list of recipes is given to the optional fourth
-	argument of this function, the key mapping use the list instead of
+	If a list of recipes is given to the optional fourth argument of this
+	function, the key mapping use the list instead of
 	|g:sandwich#recipes| (|g:sandwich#default_recipes|) and
 	|g:textobj#sandwich#recipes| (|g:textobj#sandwich#default_recipes|).
 >

@@ -54,6 +54,7 @@ function! textobj#sandwich#auto(mode, a_or_i, ...) abort  "{{{
   let textobj.cursor = getpos('.')[1:2]
   let textobj.view   = winsaveview()
   let textobj.recipes.arg = get(a:000, 1, [])
+  let textobj.recipes.arg_given = a:0 > 1
   let textobj.opt.filter = s:default_opt.filter
   call textobj.opt.update('arg', get(a:000, 0, {}))
   call textobj.opt.update('default', g:textobj#sandwich#options[textobj.kind])
@@ -81,6 +82,7 @@ function! textobj#sandwich#query(mode, a_or_i, ...) abort  "{{{
   let textobj.cursor = getpos('.')[1:2]
   let textobj.view   = winsaveview()
   let textobj.recipes.arg = get(a:000, 1, [])
+  let textobj.recipes.arg_given = a:0 > 1
   let textobj.opt.filter = s:default_opt.filter
   call textobj.opt.update('arg', get(a:000, 0, {}))
   call textobj.opt.update('default', g:textobj#sandwich#options[textobj.kind])
@@ -750,7 +752,7 @@ function! s:textobj_query() dict abort  "{{{
   " query phase
   let input   = ''
   let last_compl_match = ['', []]
-  while recipes != []
+  while 1
     let c = getchar(0)
     if empty(c)
       if clock.started && timeoutlen > 0 && clock.elapsed() > timeoutlen
@@ -786,6 +788,8 @@ function! s:textobj_query() dict abort  "{{{
         break
       endif
     endif
+
+    if recipes == [] | break | endif
   endwhile
   call clock.stop()
 
@@ -1008,7 +1012,7 @@ endfunction
 "}}}
 function! s:textobj_recipes_integrate(kind, mode, opt) dict abort  "{{{
   let self.integrated  = []
-  if self.arg != []
+  if self.arg_given
     let self.integrated += self.arg
   else
     let self.integrated += sandwich#get_recipes()

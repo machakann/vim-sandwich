@@ -66,6 +66,7 @@ function! operator#sandwich#prerequisite(kind, mode, ...) abort "{{{
   let operator.opt.of = operator.opt._of_for[a:kind]
   call operator.opt.update('arg', get(a:000, 0, {}))
   let operator.recipes.arg = get(a:000, 1, [])
+  let operator.recipes.arg_given = a:0 > 1
 
   if a:mode ==# 'x' && visualmode() ==# "\<C-v>"
     " The case for blockwise selections in visual mode
@@ -148,6 +149,7 @@ function! operator#sandwich#query1st(kind, mode, ...) abort "{{{
   let operator = g:operator#sandwich#object
   " NOTE: force to set highlight=0 and query_once=1
   call operator.opt.update('default', {'highlight': 0, 'query_once': 1, 'expr': 0})
+  let operator.recipe.arg_given = a:0 > 1
 
   " build stuff
   let stuff = deepcopy(s:stuff)
@@ -1633,7 +1635,7 @@ endfunction
 "}}}
 function! s:operator_recipe_integrate(kind, motionwise, mode) dict abort  "{{{
   let self.integrated = []
-  if self.arg != []
+  if self.arg_given
     let self.integrated += self.arg
   else
     let self.integrated += sandwich#get_recipes()

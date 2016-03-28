@@ -1,5 +1,5 @@
 *textobj-sandwich.jax*	『挟まれた』テキストを選択する。
-						Last change:21-Feb-2016.
+						Last change:28-Mar-2016.
 
 書いた人   : machakann <mckn@outlook.jp>
 ライセンス : NYSL license
@@ -214,8 +214,8 @@ textobj#sandwich#auto(mode, a_or_i[, options[, recipes]])
 	onoremap <silent><expr> ab textobj#sandwich#auto('o', 'a')
 	xnoremap <silent><expr> ab textobj#sandwich#auto('x', 'a')
 <
-	もし空でない辞書変数が省略可能な第三引数に与えられた場合、辞書に含まれ
-	る local option はそのキーマッピングで使われるオプションのデフォルト値
+	省略可能な第三引数に空でない辞書変数が与えられた場合、辞書に含まれる
+	local option はそのキーマッピングで使われるオプションのデフォルト値
 	を上書きします。
 >
 	" example 1
@@ -228,8 +228,8 @@ textobj#sandwich#auto(mode, a_or_i[, options[, recipes]])
 	\ textobj#sandwich#auto('o', 'i', g:sandwich_alt_options)
 <
 
-	空でないレシピのリストが省略可能な第四引数に与えられた場合、そのキー
-	マッピングは |g:sandwich#recipes| (|g:sandwich#default_recipes|) や
+	省略可能な第四引数にリストが与えられた場合、そのキーマッピングは
+	|g:sandwich#recipes| (|g:sandwich#default_recipes|) や
 	|g:textobj#sandwich#recipes| (|g:textobj#sandwich#default_recipes|) の
 	かわりに引数に与えられたリストを参照します。
 >

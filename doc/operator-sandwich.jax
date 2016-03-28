@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:27-Mar-2016.
+						Last change:28-Mar-2016.
 
 書いた人   : machakann <mckn@outlook.jp>
 ライセンス : NYSL license
@@ -382,8 +382,8 @@ operator#sandwich#keymap(kind, mode[, options[, recipes]])
 	nnoremap <silent> sa :<C-u>call operator#sandwich#keymap('add', 'n')<CR>
 	xnoremap <silent> sa <Esc>:call operator#sandwich#keymap('add', 'x')<CR>
 <
-	もし空でない辞書変数が省略可能な第三引数に与えられた場合、辞書に含まれ
-	る local option はそのキーマッピングで使われるオプションのデフォルト値
+	省略可能な第三引数に空でない辞書変数が与えられた場合、辞書に含まれる
+	local option はそのキーマッピングで使われるオプションのデフォルト値
 	を上書きします。ただし、 motionwise に依って設定することはここではでき
 	ません。
 >
@@ -405,8 +405,8 @@ operator#sandwich#keymap(kind, mode[, options[, recipes]])
 	\ )<CR>
 <
 
-	空でないレシピのリストが省略可能な第四引数に与えられた場合、そのキーマ
-	ッピングは |g:sandwich#recipes| (|g:sandwich#default_recipes|) や
+	省略可能な第四引数にリストが与えられた場合、そのキーマッピングは
+	|g:sandwich#recipes| (|g:sandwich#default_recipes|) や
 	|g:operator#sandwich#recipes| (|g:operator#sandwich#default_recipes|)
 	のかわりに引数に与えられたリストを参照します。
 >

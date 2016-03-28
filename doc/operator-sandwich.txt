@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:27-Mar-2016.
+						Last change:28-Mar-2016.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license
@@ -415,8 +415,8 @@ operator#sandwich#keymap(kind, mode[, options[, recipes]])
 	\ )<CR>
 <
 
-	If a not-empty list of recipes is given to the optional fourth
-	argument of this function, the key mapping use the list instead of
+	If a list of recipes is given to the optional fourth argument of this
+	function, the key mapping uses the list instead of
 	|g:sandwich#recipes| (or |g:sandwich#default_recipes|) and
 	|g:operator#sandwich#recipes|
 	(or |g:operator#sandwich#default_recipes|).
