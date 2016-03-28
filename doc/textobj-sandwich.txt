@@ -190,7 +190,6 @@ keymappings~
 	This keymapping could be mapped to operator-pending mode |:omap|, to
 	visual mode |:xmap|, and also to normal mode |:nmap|.
 
-
 <Plug>(textobj-sandwich-query-a)	*<Plug>(textobj-sandwich-query-a)*
 	The textobject mapping to search and select a sandwiched text
 	depending on a user input. This keymapping selects sandwiched text
@@ -199,6 +198,37 @@ keymappings~
 	could be mapped to operator-pending mode |:omap|, to visual mode
 	|:xmap|, and also to normal mode |:nmap|.
 
+
+				*<Plug>(textobj-sandwich-literal-query-i)*
+<Plug>(textobj-sandwich-literal-query-i)
+	This textobject mapping is similar as
+	|<Plug>(textobj-sandwich-query-i)| but it always ignores user
+	settings, |g:sandwich#recipes| and |g:textobj#sandwich#recipes|. The
+	user input is interpreted as-is, thus the mapping selects a text
+	surrounded by the same characters. This keymapping could be mapped to
+	operator-pending mode |:omap|, to visual mode |:xmap|, and also to
+	normal mode |:nmap|. >
+		omap if <Plug>(textobj-sandwich-literal-query-i)
+		xmap if <Plug>(textobj-sandwich-literal-query-i)
+
+		" press difa to delete a text surrounded by 'a'.
+		"   abcba   ->   aa
+<
+				*<Plug>(textobj-sandwich-literal-query-a)*
+<Plug>(textobj-sandwich-literal-query-a)
+	This textobject mapping is similar as
+	|<Plug>(textobj-sandwich-query-a)| but it always ignores user
+	settings, |g:sandwich#recipes| and |g:textobj#sandwich#recipes|. The
+	user input is interpreted as-is, thus the mapping selects a text
+	surrounded by the same characters. This keymapping could be mapped to
+	operator-pending mode |:omap|, to visual mode |:xmap|, and also to
+	normal mode |:nmap|. >
+		omap if <Plug>(textobj-sandwich-literal-query-a)
+		xmap if <Plug>(textobj-sandwich-literal-query-a)
+
+		" press dafb to delete a text surrounded by 'b' including 'b'.
+		"   abcba   ->   aa
+<
 
 
 

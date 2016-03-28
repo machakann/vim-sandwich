@@ -198,6 +198,34 @@ g:textobj_sandwich_no_default_key_mappings を定義してください。
 	|:xmap| に加えノーマルモード |:nmap| で使用することもできます。
 
 
+				*<Plug>(textobj-sandwich-literal-query-i)*
+<Plug>(textobj-sandwich-literal-query-i)
+	これは |<Plug>(textobj-sandwich-query-i)| に似ていますが、常にユーザー
+	設定 |g:sandwich#recipes| 及び |g:textobj#sandwich#recipes| を無視しま
+	す。ユーザーの入力はそのままに解釈され、その文字に囲まれたテキストを選
+	択します。オペレータ待機モード |:omap| 、ビジュアルモード |:xmap| に加
+	えノーマルモード |:nmap| で使用することができます。 >
+		omap if <Plug>(textobj-sandwich-literal-query-i)
+		xmap if <Plug>(textobj-sandwich-literal-query-i)
+
+		" press difa to delete a text surrounded by 'a'.
+		"   abcba   ->   aa
+<
+
+				*<Plug>(textobj-sandwich-literal-query-a)*
+<Plug>(textobj-sandwich-literal-query-a)
+	これは |<Plug>(textobj-sandwich-query-a)| に似ていますが、常にユーザー
+	設定 |g:sandwich#recipes| 及び |g:textobj#sandwich#recipes| を無視しま
+	す。ユーザーの入力はそのままに解釈され、その文字に囲まれたテキストを選
+	択します。オペレータ待機モード |:omap| 、ビジュアルモード |:xmap| に加
+	えノーマルモード |:nmap| で使用することができます。 >
+		omap if <Plug>(textobj-sandwich-literal-query-a)
+		xmap if <Plug>(textobj-sandwich-literal-query-a)
+
+		" press dafb to delete a text surrounded by 'b' including 'b'.
+		"   abcba   ->   aa
+<
+
 
 
 キーマッピング関数~
