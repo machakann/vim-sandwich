@@ -453,49 +453,69 @@ function! s:act_match(recipes) dict abort "{{{
   endif
 endfunction
 "}}}
-function! s:act__match_recipes(recipes) dict abort "{{{
+function! s:act__match_recipes(recipes, ...) dict abort "{{{
   let opt = self.opt
+  let is_space_skipped = get(a:000, 0, 0)
 
   let found = 0
   for candidate in a:recipes
     call opt.update('recipe_delete', candidate)
+    if !is_space_skipped || opt.of('skip_space')
+      if has_key(candidate, 'buns')
+        " search buns
+        let opt_expr = opt.has('expr') && opt.of('expr', 'recipe_delete')
+        let patterns = s:get_patterns(candidate, opt_expr, opt.of('regex'))
+        let target = s:check_edges(self.region.head, self.region.tail, patterns)
+      elseif has_key(candidate, 'external')
+        " get difference of external motion/textobject
+        let target = s:check_textobj_diff(self.region.head, self.region.tail, candidate, opt.of('noremap', 'recipe_delete'))
+      else
+        let target = deepcopy(s:null_4pos)
+      endif
 
-    if has_key(candidate, 'buns')
-      " search buns
-      let opt_expr = opt.has('expr') && opt.of('expr', 'recipe_delete')
-      let patterns = s:get_patterns(candidate, opt_expr, opt.of('regex'))
-      let target = s:check_edges(self.region.head, self.region.tail, patterns)
-    elseif has_key(candidate, 'external')
-      " get difference of external motion/textobject
-      let target = s:check_textobj_diff(self.region.head, self.region.tail, candidate, opt.of('noremap', 'recipe_delete'))
-    else
-      let target = deepcopy(s:null_4pos)
-    endif
-
-    if s:is_valid_4pos(target)
-      let found = 1
-      let self.target = target
-      break
+      if s:is_valid_4pos(target)
+        let found = 1
+        let self.target = target
+        break
+      endif
     endif
   endfor
   return found
 endfunction
 "}}}
-function! s:act__match_edges(edge_chars) dict abort "{{{
+function! s:act__match_edges(recipes, edge_chars) dict abort "{{{
   let opt = self.opt
-  call opt.clear('recipe_delete')
-
-  let found = 0
   let head = self.region.head
   let tail = self.region.tail
   let head_c = s:get_cursorchar(head)
   let tail_c = s:get_cursorchar(tail)
-  if head_c ==# tail_c && !(opt.of('skip_space') == 2 && head_c =~# '\s')
-    let found = 1
-    let self.target = {
-          \   'head1': head, 'tail1': head,
-          \   'head2': tail, 'tail2': tail,
-          \ }
+
+  let found = 0
+  if head_c ==# tail_c
+    " check duplicate with recipe
+    for candidate in a:recipes
+      call opt.update('recipe_delete', candidate)
+      if has_key(candidate, 'buns')
+        let opt_expr  = opt.has('expr') && opt.of('expr', 'recipe_delete')
+        let opt_regex = opt.of('regex')
+        if !opt_expr && !opt_regex
+          if candidate.buns == [head_c, tail_c]
+            " The pair has already checked by a recipe.
+            return 0
+          endif
+        endif
+      endif
+    endfor
+
+    " both edges are matched
+    call opt.clear('recipe_delete')
+    if !(opt.of('skip_space') == 2 && head_c =~# '\s')
+      let found = 1
+      let self.target = {
+            \   'head1': head, 'tail1': head,
+            \   'head2': tail, 'tail2': tail,
+            \ }
+    endif
   endif
 
   let a:edge_chars[0] = head_c
@@ -1070,6 +1090,13 @@ function! s:stuff_match(recipes) dict abort  "{{{
   let filter  = 's:has_action(v:val, "delete")'
   call filter(recipes, filter)
 
+  " uniq recipes
+  let opt = self.opt
+  let opt_regex   = opt.of('regex')
+  let opt_expr    = opt.has('expr') && opt.of('expr', 'recipe_delete')
+  let opt_noremap = opt.of('noremap', 'recipe_delete')
+  call s:uniq_recipes(recipes, opt_regex, opt_expr, opt_noremap)
+
   for i in range(self.n)
     let act = self.acts[i]
     call act.match(recipes)
@@ -1305,6 +1332,58 @@ function! s:is_input_matched(candidate, input, opt, flag) abort "{{{
     let idx = strlen(a:input) - 1
     return filter(inputs, 'v:val[: idx] ==# a:input') != []
   endif
+endfunction
+"}}}
+function! s:uniq_recipes(recipes, opt_regex, opt_expr, opt_noremap) abort "{{{
+  let recipes = copy(a:recipes)
+  call filter(a:recipes, 0)
+  while recipes != []
+    let recipe = remove(recipes, 0)
+    call add(a:recipes, recipe)
+    if has_key(recipe, 'buns')
+      call filter(recipes, '!s:is_duplicated_buns(v:val, recipe, a:opt_regex, a:opt_expr)')
+    elseif has_key(recipe, 'external')
+      call filter(recipes, '!s:is_duplicated_external(v:val, recipe, a:opt_noremap)')
+    endif
+  endwhile
+endfunction
+"}}}
+function! s:is_duplicated_buns(item, ref, opt_regex, opt_expr) abort  "{{{
+  if has_key(a:item, 'buns')
+        \ && type(a:ref['buns'][0]) == s:type_str
+        \ && type(a:ref['buns'][1]) == s:type_str
+        \ && type(a:item['buns'][0]) == s:type_str
+        \ && type(a:item['buns'][1]) == s:type_str
+        \ && a:ref['buns'][0] ==# a:item['buns'][0]
+        \ && a:ref['buns'][1] ==# a:item['buns'][1]
+    let regex_r = get(a:ref,  'regex', a:opt_regex)
+    let regex_i = get(a:item, 'regex', a:opt_regex)
+    let expr_r  = get(a:ref,  'expr',  a:opt_expr)
+    let expr_i  = get(a:item, 'expr',  a:opt_expr)
+
+    let expr_r = expr_r ? 1 : 0
+    let expr_i = expr_i ? 1 : 0
+
+    if regex_r == regex_i && expr_r == expr_i
+      return 1
+    endif
+  endif
+  return 0
+endfunction
+"}}}
+function! s:is_duplicated_external(item, ref, opt_noremap) abort "{{{
+  if has_key(a:item, 'external')
+        \ && a:ref['external'][0] ==# a:item['external'][0]
+        \ && a:ref['external'][1] ==# a:item['external'][1]
+    let noremap_r = get(a:ref,  'noremap', a:opt_noremap)
+    let noremap_i = get(a:item, 'noremap', a:opt_noremap)
+
+    if noremap_r == noremap_i
+      return 1
+    endif
+  endif
+
+  return 0
 endfunction
 "}}}
 let s:stuff = {
@@ -2091,7 +2170,7 @@ function! s:check_textobj_diff(head, tail, candidate, opt_noremap) abort  "{{{
     endif
   endfor
 
-  " restore operatorfunc
+  " restore visualmode
   execute 'normal! ' . visualmode . "\<Esc>"
   " restore marks
   call setpos("'<", visual_head)

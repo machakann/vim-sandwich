@@ -60,6 +60,10 @@ function! textobj#sandwich#auto(mode, a_or_i, ...) abort  "{{{
   call textobj.opt.update('default', g:textobj#sandwich#options[textobj.kind])
   call textobj.recipes.integrate(textobj.kind, textobj.mode, textobj.opt)
 
+  " uniq recipes
+  let opt = textobj.opt
+  call s:uniq_recipes(textobj.recipes.integrated, opt.of('regex'), opt.of('expr'), opt.of('noremap'))
+
   if textobj.recipes.integrated != []
     let cmd = ":\<C-u>call textobj#sandwich#select()\<CR>"
   else
@@ -1024,24 +1028,58 @@ function! s:textobj_recipes_integrate(kind, mode, opt) dict abort  "{{{
            \ && s:expr_filter(v:val)'
   call filter(self.integrated, filter)
   call reverse(self.integrated)
+endfunction
+"}}}
+function! s:uniq_recipes(recipes, opt_regex, opt_expr, opt_noremap) abort "{{{
+  let recipes = copy(a:recipes)
+  call filter(a:recipes, 0)
+  while recipes != []
+    let recipe = remove(recipes, 0)
+    call add(a:recipes, recipe)
+    if has_key(recipe, 'buns')
+      call filter(recipes, '!s:is_duplicated_buns(v:val, recipe, a:opt_regex, a:opt_expr)')
+    elseif has_key(recipe, 'external')
+      call filter(recipes, '!s:is_duplicated_external(v:val, recipe, a:opt_noremap)')
+    endif
+  endwhile
+endfunction
+"}}}
+function! s:is_duplicated_buns(item, ref, opt_regex, opt_expr) abort  "{{{
+  if has_key(a:item, 'buns')
+        \ && type(a:ref['buns'][0]) == s:type_str
+        \ && type(a:ref['buns'][1]) == s:type_str
+        \ && type(a:item['buns'][0]) == s:type_str
+        \ && type(a:item['buns'][1]) == s:type_str
+        \ && a:ref['buns'][0] ==# a:item['buns'][0]
+        \ && a:ref['buns'][1] ==# a:item['buns'][1]
+    let regex_r = get(a:ref,  'regex', a:opt_regex)
+    let regex_i = get(a:item, 'regex', a:opt_regex)
+    let expr_r  = get(a:ref,  'expr',  a:opt_expr)
+    let expr_i  = get(a:item, 'expr',  a:opt_expr)
 
-  " uniq by buns
-  let opt_regex   = a:opt.of('regex')
-  let opt_expr    = a:opt.of('expr')
-  let opt_noremap = a:opt.of('noremap')
-  if a:kind ==# 'auto'
-    let recipes = copy(self.integrated)
-    let self.integrated = []
-    while recipes != []
-      let recipe = remove(recipes, 0)
-      let self.integrated += [recipe]
-      if has_key(recipe, 'buns')
-        call filter(recipes, '!s:is_duplicated_buns(recipe, v:val, opt_regex, opt_expr)')
-      elseif has_key(recipe, 'external')
-        call filter(recipes, '!s:is_duplicated_external(recipe, v:val, opt_noremap)')
-      endif
-    endwhile
+    let expr_r = expr_r ? 1 : 0
+    let expr_i = expr_i ? 1 : 0
+
+    if regex_r == regex_i && expr_r == expr_i
+      return 1
+    endif
   endif
+  return 0
+endfunction
+"}}}
+function! s:is_duplicated_external(item, ref, opt_noremap) abort "{{{
+  if has_key(a:item, 'external')
+        \ && a:ref['external'][0] ==# a:item['external'][0]
+        \ && a:ref['external'][1] ==# a:item['external'][1]
+    let noremap_r = get(a:ref,  'noremap', a:opt_noremap)
+    let noremap_i = get(a:item, 'noremap', a:opt_noremap)
+
+    if noremap_r == noremap_i
+      return 1
+    endif
+  endif
+
+  return 0
 endfunction
 "}}}
 let s:textobj = {
@@ -1118,40 +1156,6 @@ function! s:expr_filter(candidate) abort  "{{{
     endfor
     return 1
   endif
-endfunction
-"}}}
-function! s:is_duplicated_buns(recipe, item, opt_regex, opt_expr) abort  "{{{
-  if has_key(a:item, 'buns')
-        \ && a:recipe['buns'][0] ==# a:item['buns'][0]
-        \ && a:recipe['buns'][1] ==# a:item['buns'][1]
-    let regex_r = get(a:recipe, 'regex', a:opt_regex)
-    let regex_i = get(a:item,   'regex', a:opt_regex)
-    let expr_r  = get(a:recipe, 'expr',  a:opt_expr)
-    let expr_i  = get(a:item,   'expr',  a:opt_expr)
-
-    let expr_r = expr_r ? 1 : 0
-    let expr_i = expr_i ? 1 : 0
-
-    if regex_r == regex_i && expr_r == expr_i
-      return 1
-    endif
-  endif
-  return 0
-endfunction
-"}}}
-function! s:is_duplicated_external(recipe, item, opt_noremap) abort "{{{
-  if has_key(a:item, 'external')
-        \ && a:recipe['external'][0] ==# a:item['external'][0]
-        \ && a:recipe['external'][1] ==# a:item['external'][1]
-    let noremap_r = get(a:recipe, 'noremap', a:opt_noremap)
-    let noremap_i = get(a:item,   'noremap', a:opt_noremap)
-
-    if noremap_r == noremap_i
-      return 1
-    endif
-  endif
-
-  return 0
 endfunction
 "}}}
 function! s:get(name, default) abort  "{{{
