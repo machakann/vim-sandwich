@@ -421,36 +421,35 @@ function! s:act_set_target() dict abort  "{{{
 endfunction
 "}}}
 function! s:act_skip_space() dict abort  "{{{
-  if self.opt.of('skip_space')
-    call s:skip_space(self.region.head, self.region.tail)
-  endif
+  call s:skip_space(self.region.head, self.region.tail)
 endfunction
 "}}}
 function! s:act_match(recipes) dict abort "{{{
   let region = self.region
   let opt    = self.opt
-  let region_saved = deepcopy(region)
 
+  let region_saved = deepcopy(region)
   if s:is_valid_2pos(region) && s:is_ahead(region.tail, region.head)
     let edge_chars = ['', '']
-    if self._match_recipes(a:recipes) || self._match_edges(edge_chars)
+    if self._match_recipes(a:recipes) || self._match_edges(a:recipes, edge_chars)
       " found!
       return
     else
       let [head_c, tail_c] = edge_chars
-      if opt.of('skip_space') && (head_c =~# '\s' || tail_c =~# '\s')
+      if head_c =~# '\s' || tail_c =~# '\s'
         call self.skip_space()
         if s:is_ahead(region.head, region.tail)
           " invalid region after skip spaces
           return
         else
-          if self._match_recipes(a:recipes) || self._match_edges(edge_chars)
+          if self._match_recipes(a:recipes, 1) || self._match_edges(a:recipes, edge_chars)
             " found
             return
           endif
         endif
       endif
     endif
+    let region = region_saved
 
 
     " skip characters
@@ -1245,8 +1244,10 @@ function! s:stuff_blink(hi_group, duration, ...) dict abort "{{{
 endfunction
 "}}}
 function! s:stuff_skip_space(n) dict abort  "{{{
+  let opt = self.opt
+
   " skip space only in the first count.
-  if a:n == 0
+  if a:n == 0 && opt.of('skip_space')
     for i in range(self.n)
       let act = self.acts[i]
       call act.skip_space()
