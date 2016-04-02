@@ -313,6 +313,10 @@ function! s:opt_max(opt_name, ...) dict abort "{{{
   return max([minimum] + list)
 endfunction
 "}}}
+function! s:opt_get(opt_name, kind, ...) dict abort "{{{
+  return self.has(a:opt_name) ? self.of(a:opt_name, a:kind) : get(a:000, 0, 0)
+endfunction
+"}}}
 function! s:opt_of_for_add(opt_name, ...) dict abort  "{{{
   return self._of(a:opt_name, 'recipe_add')
 endfunction
@@ -391,6 +395,7 @@ let s:opt = {
       \   'update'       : function('s:opt_update'),
       \   'has'          : function('s:opt_has'),
       \   'max'          : function('s:opt_max'),
+      \   'get'          : function('s:opt_get'),
       \   '_of'          : function('s:opt__of'),
       \   '_of_for' : {
       \     'add'    : function('s:opt_of_for_add'),
@@ -453,10 +458,9 @@ function! s:act_match(recipes) dict abort "{{{
     for candidate in a:recipes
       call opt.update('recipe_delete', candidate)
       if opt.of('skip_char') && has_key(candidate, 'buns')
-        let head = region_saved.head
-        let tail = region_saved.tail
-        let opt_expr = opt.has('expr') && opt.of('expr', 'recipe_delete')
-        let patterns = s:get_patterns(candidate, opt_expr, opt.of('regex'))
+        let head = region.head
+        let tail = region.tail
+        let patterns = s:get_patterns(candidate, opt.get('expr', 'recipe_delete', 0), opt.of('regex'))
         let target_list += [s:search_edges(head, tail, patterns)]
       endif
     endfor
@@ -479,8 +483,7 @@ function! s:act__match_recipes(recipes, ...) dict abort "{{{
     if !is_space_skipped || opt.of('skip_space')
       if has_key(candidate, 'buns')
         " search buns
-        let opt_expr = opt.has('expr') && opt.of('expr', 'recipe_delete')
-        let patterns = s:get_patterns(candidate, opt_expr, opt.of('regex'))
+        let patterns = s:get_patterns(candidate, opt.get('expr', 'recipe_delete', 0), opt.of('regex'))
         let target = s:check_edges(self.region.head, self.region.tail, patterns)
       elseif has_key(candidate, 'external')
         " get difference of external motion/textobject
@@ -512,9 +515,7 @@ function! s:act__match_edges(recipes, edge_chars) dict abort "{{{
     for candidate in a:recipes
       call opt.update('recipe_delete', candidate)
       if has_key(candidate, 'buns')
-        let opt_expr  = opt.has('expr') && opt.of('expr', 'recipe_delete')
-        let opt_regex = opt.of('regex')
-        if !opt_expr && !opt_regex
+        if !opt.get('expr', 'recipe_delete', 0) && !opt.of('regex')
           if candidate.buns == [head_c, tail_c]
             " The pair has already checked by a recipe.
             return 0
@@ -1108,10 +1109,7 @@ function! s:stuff_match(recipes) dict abort  "{{{
 
   " uniq recipes
   let opt = self.opt
-  let opt_regex   = opt.of('regex')
-  let opt_expr    = opt.has('expr') && opt.of('expr', 'recipe_delete')
-  let opt_noremap = opt.of('noremap', 'recipe_delete')
-  call s:uniq_recipes(recipes, opt_regex, opt_expr, opt_noremap)
+  call s:uniq_recipes(recipes, opt.of('regex'), opt.get('expr', 'recipe_delete', 0), opt.of('noremap', 'recipe_delete'))
 
   for i in range(self.n)
     let act = self.acts[i]
