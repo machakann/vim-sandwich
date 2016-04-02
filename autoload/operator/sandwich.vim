@@ -298,6 +298,21 @@ function! s:opt_has(opt_name) dict abort  "{{{
   return has_key(self.default, a:opt_name)
 endfunction
 "}}}
+function! s:opt_max(opt_name, ...) dict abort "{{{
+  let minimum = get(a:000, 0, 0)
+  let list = []
+  if has_key(self['recipe_delete'], a:opt_name)
+    let list += [self['recipe_delete'][a:opt_name]]
+  endif
+  if has_key(self['recipe_add'], a:opt_name)
+    let list += [self['recipe_add'][a:opt_name]]
+  endif
+  if list == []
+    let list += [self._of(a:opt_name)]
+  endif
+  return max([minimum] + list)
+endfunction
+"}}}
 function! s:opt_of_for_add(opt_name, ...) dict abort  "{{{
   return self._of(a:opt_name, 'recipe_add')
 endfunction
@@ -325,11 +340,11 @@ function! s:opt_of_for_replace(opt_name, ...) dict abort  "{{{
     elseif a:opt_name ==# 'expr'
       return self._of(a:opt_name, 'recipe_add')
     elseif a:opt_name ==# 'skip_space'
-      return max([0, self._of(a:opt_name, 'recipe_add'), self._of(a:opt_name, 'recipe_delete')])
+      return self.max(a:opt_name)
     elseif a:opt_name ==# 'skip_char'
       return self._of(a:opt_name, 'recipe_delete')
     elseif a:opt_name ==# 'highlight'
-      return max([0, self._of(a:opt_name, 'recipe_add'), self._of(a:opt_name, 'recipe_delete')])
+      return self.max(a:opt_name)
     elseif a:opt_name ==# 'command'
       let commands = []
       let commands += get(self.recipe_delete, a:opt_name, [])
@@ -339,7 +354,7 @@ function! s:opt_of_for_replace(opt_name, ...) dict abort  "{{{
       endif
       return commands
     elseif a:opt_name ==# 'linewise'
-      return max([0, self._of(a:opt_name, 'recipe_add'), self._of(a:opt_name, 'recipe_delete')])
+      return self.max(a:opt_name)
     elseif a:opt_name ==# 'autoindent'
       return self._of(a:opt_name, 'recipe_add')
     elseif a:opt_name ==# 'indentkeys'
@@ -355,7 +370,7 @@ function! s:opt_of_for_replace(opt_name, ...) dict abort  "{{{
   endif
 endfunction
 "}}}
-function! s:_opt_of(opt_name, ...) dict abort  "{{{
+function! s:opt__of(opt_name, ...) dict abort  "{{{
   let kind = get(a:000, 0, '')
   if kind !=# '' && has_key(self[kind], a:opt_name)
     return self[kind][a:opt_name]
@@ -375,7 +390,8 @@ let s:opt = {
       \   'clear'        : function('s:opt_clear'),
       \   'update'       : function('s:opt_update'),
       \   'has'          : function('s:opt_has'),
-      \   '_of'          : function('s:_opt_of'),
+      \   'max'          : function('s:opt_max'),
+      \   '_of'          : function('s:opt__of'),
       \   '_of_for' : {
       \     'add'    : function('s:opt_of_for_add'),
       \     'delete' : function('s:opt_of_for_delete'),
