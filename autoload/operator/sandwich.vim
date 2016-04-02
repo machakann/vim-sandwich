@@ -344,7 +344,7 @@ function! s:opt_of_for_replace(opt_name, ...) dict abort  "{{{
     elseif a:opt_name ==# 'expr'
       return self._of(a:opt_name, 'recipe_add')
     elseif a:opt_name ==# 'skip_space'
-      return self.max(a:opt_name)
+      return self._of(a:opt_name, 'recipe_delete')
     elseif a:opt_name ==# 'skip_char'
       return self._of(a:opt_name, 'recipe_delete')
     elseif a:opt_name ==# 'highlight'

@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:28-Mar-2016.
+						Last change:02-Apr-2016.
 
 書いた人   : machakann <mckn@outlook.jp>
 ライセンス : NYSL license
@@ -1630,7 +1630,7 @@ Query1st 系列のキーマッピングは何のためにある？~
 	は挿入文字列を指定したレシピが使われます。
 
 	`skip_space`
-	両方のレシピに指定された値のうち大きいほうが使われます。
+	置換対象文字列を指定したレシピが使われます。
 
 	`skip_char`
 	置換対象文字列を指定したレシピが使われます。

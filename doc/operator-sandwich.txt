@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:28-Mar-2016.
+						Last change:02-Apr-2016.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license
@@ -1650,7 +1650,7 @@ About the handlings of recipe-local options in the replace operator.~
 	the recipe for add action is used for adding surroundings.
 
 	`skip_space`
-	The bigger value in the two is used.
+	The recipe for delete action is used.
 
 	`skip_char`
 	The recipe for delete action is used.
