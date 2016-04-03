@@ -2220,7 +2220,7 @@ function! s:suite.charwise_x_option_linewise() abort  "{{{
   " #6
   let g:operator#sandwich#recipes = [{'buns': ['(', ')'], 'linewise': 0}]
   call append(0, ['(', 'foo', ')'])
-  normal ggv8lsd
+  normal ggv2jsd
   call g:assert.equals(getline(1),   '',           'failed at #6')
   call g:assert.equals(getline(2),   'foo',        'failed at #6')
   call g:assert.equals(getline(3),   '',           'failed at #6')
@@ -2279,7 +2279,7 @@ function! s:suite.charwise_x_option_linewise() abort  "{{{
   " #11
   let g:operator#sandwich#recipes = [{'buns': ['(', ')'], 'linewise': 0}]
   call append(0, ['(', 'foo', ')'])
-  normal ggv8lsd
+  normal ggv2jsd
   call g:assert.equals(getline(1),   '',           'failed at #11')
   call g:assert.equals(getline(2),   'foo',        'failed at #11')
   call g:assert.equals(getline(3),   '',           'failed at #11')
