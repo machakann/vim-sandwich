@@ -1,4 +1,4 @@
-*sandwich.jax*	日本語ヘルプ		Last change:14-Aug-2015.
+*sandwich.jax*	日本語ヘルプ		Last change:03-Apr-2016.
 
 “挟まれた”テキストを編集するためのオペレータとテキストオブジェクトの詰め合わせ
 です。
@@ -19,6 +19,8 @@ QUICK START			|sandwich-quick-start|
 INTRODUCTION			|sandwich-introduction|
 KEYMAPPINGS			|sandwich-keymappings|
 CONFIGURATION			|sandwich-configuration|
+MISCELLANEOUS			|sandwich-miscellaneous|
+  vim-surround のキ－マッピングを使う
 
 ==============================================================================
 QUICK START				*sandwich-quick-start*
@@ -248,6 +250,49 @@ g:sandwich#default_recipes		*g:sandwich#default_recipes*
 <
 
 
+
+==============================================================================
+MISCELLANEOUS				*sandwich-miscellaneous*
+
+vim-surround のキーマッピングを使う~
+	vim-surround (vim script #1697) と同じキーマッピングが使いたければ次の
+	行を vimrc に追加してください。
+>
+	runtime macros/sandwich/keymap/surround.vim
+<
+	ノーマルモードにおける `ys`, `yss`, `yS`, `ds`, `cs` 及び、ビジュアル
+	モードにおける `S` が使用できます。また、 vim-surround にはありません
+	が `dss` と `css` も使用できます。これらは `ds` と `cs` に似ていますが
+	削除/置換対象となる括弧やクオーテーションを自動的に選択します。
+
+	さらに vim-sandwich は便利なテキストオブジェクトが独立して使用できま
+	す。ぜひ試してみてください。
+
+	* ユーザーの入力に従い、括弧や同じ文字に囲まれた領域を選択
+	|<Plug>(textobj-sandwich-query-i)|, |<Plug>(textobj-sandwich-query-a)|
+>
+	xmap is <Plug>(textobj-sandwich-query-i)
+	xmap as <Plug>(textobj-sandwich-query-a)
+	omap is <Plug>(textobj-sandwich-query-i)
+	omap as <Plug>(textobj-sandwich-query-a)
+<
+	* 最も近い括弧に囲まれた領域を選択
+	|<Plug>(textobj-sandwich-auto-i)|, |<Plug>(textobj-sandwich-auto-a)|
+>
+	xmap iss <Plug>(textobj-sandwich-auto-i)
+	xmap ass <Plug>(textobj-sandwich-auto-a)
+	omap iss <Plug>(textobj-sandwich-auto-i)
+	omap ass <Plug>(textobj-sandwich-auto-a)
+<
+	* ユーザーの入力に従い、同じ文字に囲まれた領域を選択
+	|<Plug>(textobj-sandwich-literal-query-i)|,
+	|<Plug>(textobj-sandwich-literal-query-a)|
+>
+	xmap im <Plug>(textobj-sandwich-literal-query-i)
+	xmap am <Plug>(textobj-sandwich-literal-query-a)
+	omap im <Plug>(textobj-sandwich-literal-query-i)
+	omap am <Plug>(textobj-sandwich-literal-query-a)
+<
 
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:noet:

@@ -1,4 +1,4 @@
-*sandwich.txt*				Last change:14-Aug-2015.
+*sandwich.txt*				Last change:03-Apr-2016.
 
 The set of operator and textobject plugins to edit sandwiched textobjects.
 
@@ -18,6 +18,8 @@ QUICK START			|sandwich-quick-start|
 INTRODUCTION			|sandwich-introduction|
 KEYMAPPINGS			|sandwich-keymappings|
 CONFIGURATION			|sandwich-configuration|
+MISCELLANEOUS			|sandwich-miscellaneous|
+  Introduce vim-surround keymappings
 
 ==============================================================================
 QUICK START				*sandwich-quick-start*
@@ -240,6 +242,52 @@ g:sandwich#default_recipes		*g:sandwich#default_recipes*
 <
 
 
+
+==============================================================================
+MISCELLANEOUS				*sandwich-miscellaneous*
+
+Introduce vim-surround keymappings~
+	If you want to use with vim-surround (vim script #1697) keymappings,
+	add the following line to your vimrc.
+>
+	runtime macros/sandwich/keymap/surround.vim
+<
+	`ys`, `yss`, `yS`, `ds`, `cs` in normal mode and `S` in visual mode
+	are available. Not in vim-surround but `dss` and `css` are also
+	available, these are similar as `ds` and `cs` but determine
+	deleted/replaced texts automatically. See the file directly for
+	detail.
+
+	Additionally, vim-sandwich provides several textobjects. They would
+	also be helpful, give it a try!
+
+	* Textobjects to select a text surrounded by braket or same characters
+	  user input.
+	|<Plug>(textobj-sandwich-query-i)|, |<Plug>(textobj-sandwich-query-a)|
+>
+	xmap is <Plug>(textobj-sandwich-query-i)
+	xmap as <Plug>(textobj-sandwich-query-a)
+	omap is <Plug>(textobj-sandwich-query-i)
+	omap as <Plug>(textobj-sandwich-query-a)
+<
+	* Textobjects to select the nearest surrounded text automatically.
+	|<Plug>(textobj-sandwich-auto-i)|, |<Plug>(textobj-sandwich-auto-a)|.
+>
+	xmap iss <Plug>(textobj-sandwich-auto-i)
+	xmap ass <Plug>(textobj-sandwich-auto-a)
+	omap iss <Plug>(textobj-sandwich-auto-i)
+	omap ass <Plug>(textobj-sandwich-auto-a)
+<
+	* Textobjects to select a text surrounded by same characters user
+	  input.
+	|<Plug>(textobj-sandwich-literal-query-i)|,
+	|<Plug>(textobj-sandwich-literal-query-a)|
+>
+	xmap im <Plug>(textobj-sandwich-literal-query-i)
+	xmap am <Plug>(textobj-sandwich-literal-query-a)
+	omap im <Plug>(textobj-sandwich-literal-query-i)
+	omap am <Plug>(textobj-sandwich-literal-query-a)
+<
 
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:noet:

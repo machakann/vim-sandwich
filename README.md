@@ -21,7 +21,7 @@ For example, key sequences `sdb` or `sd(` makes **(foo)** to **foo**.
 Press `srb{addition}` or `sr{deletion}{addition}`.
 For example, key sequences `srb"` or `sr("` makes **(foo)** to **"foo"**.
 
-That's all. Now you already know enough about `sandwich.vim`.
+That's all. Now you already know enough about `sandwich.vim`. If you are using [vim-surround](https://github.com/tpope/vim-surround), you can use a preset keymappings similar as it. See [here](https://github.com/machakann/vim-sandwich/wiki/Introduce-vim-surround-keymappings)
 
 # Design
 
