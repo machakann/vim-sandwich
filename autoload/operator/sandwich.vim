@@ -4,45 +4,12 @@
 " TODO Add 'at' option
 
 " variables "{{{
-" null valiables
-let s:null_coord = [0, 0]
-let s:null_pos   = [0, 0, 0, 0]
-let s:null_2pos  = {
-      \   'head': copy(s:null_pos),
-      \   'tail': copy(s:null_pos),
-      \ }
-let s:null_4pos  = {
-      \   'head1': copy(s:null_pos),
-      \   'tail1': copy(s:null_pos),
-      \   'head2': copy(s:null_pos),
-      \   'tail2': copy(s:null_pos),
-      \ }
-
-" types
-let s:type_num  = type(0)
-let s:type_str  = type('')
-let s:type_list = type([])
-let s:type_dict = type({})
-let s:type_fref = type(function('tr'))
-
 " patchs
 if v:version > 704 || (v:version == 704 && has('patch237'))
-  let s:has_patch_7_4_771 = has('patch-7.4.771')
-  let s:has_patch_7_4_310 = has('patch-7.4.310')
-  let s:has_patch_7_4_362 = has('patch-7.4.362')
-  let s:has_patch_7_4_358 = has('patch-7.4.358')
   let s:has_patch_7_4_392 = has('patch-7.4.392')
 else
-  let s:has_patch_7_4_771 = v:version == 704 && has('patch771')
-  let s:has_patch_7_4_310 = v:version == 704 && has('patch310')
-  let s:has_patch_7_4_362 = v:version == 704 && has('patch362')
-  let s:has_patch_7_4_358 = v:version == 704 && has('patch358')
   let s:has_patch_7_4_392 = v:version == 704 && has('patch392')
 endif
-
-" features
-let s:has_reltime_and_float = has('reltime') && has('float')
-let s:has_gui_running = has('gui_running')
 
 " Others
 " NOTE: This would be updated in each operator functions (operator#sandwich#{add/delete/replce})
