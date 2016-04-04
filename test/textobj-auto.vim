@@ -865,23 +865,26 @@ function! s:suite.i_o_option_skip_regex() abort  "{{{
 endfunction
 "}}}
 function! s:suite.i_o_option_quoteescape() abort  "{{{
-  """ on
+  """ off
+  let g:textobj#sandwich#recipes = [{'buns': ['"', '"']}]
+
   " #1
   call setline('.', '"aa\"bb"')
   let @@ = 'fail'
   normal 0yib
-  call g:assert.equals(@@, 'aa\"bb', 'failed at #1')
+  call g:assert.equals(@@, 'aa\', 'failed at #1')
 
-  """ off
-  call textobj#sandwich#set('auto', 'quoteescape', 0)
+  let g:textobj#sandwich#recipes = [{'buns': ['"', '"'], 'quoteescape': 1}]
 
   " #2
-  " call setline('.', '"aa\"bb"')
-  " let @@ = 'fail'
-  " normal 0yib
-  " call g:assert.equals(@@, 'aa\', 'failed at #2')
+  call setline('.', '"aa\"bb"')
+  let @@ = 'fail'
+  normal 0yib
+  call g:assert.equals(@@, 'aa\"bb', 'failed at #2')
 
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'quoteescape': 1}]
+  """ on
+  let g:textobj#sandwich#recipes = [{'buns': ['"', '"']}]
+  call textobj#sandwich#set('auto', 'quoteescape', 1)
 
   " #3
   call setline('.', '"aa\"bb"')
@@ -2245,23 +2248,26 @@ function! s:suite.i_x_option_skip_regex() abort  "{{{
 endfunction
 "}}}
 function! s:suite.i_x_option_quoteescape() abort  "{{{
-  """ on
+  """ off
+  let g:textobj#sandwich#recipes = [{'buns': ['"', '"']}]
+
   " #1
   call setline('.', '"aa\"bb"')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'aa\"bb', 'failed at #1')
+  call g:assert.equals(@@, 'aa\', 'failed at #1')
 
-  """ off
-  call textobj#sandwich#set('auto', 'quoteescape', 0)
+  let g:textobj#sandwich#recipes = [{'buns': ['"', '"'], 'quoteescape': 1}]
 
   " #2
-  " call setline('.', '"aa\"bb"')
-  " let @@ = 'fail'
-  " normal 0viby
-  " call g:assert.equals(@@, 'aa\', 'failed at #2')
+  call setline('.', '"aa\"bb"')
+  let @@ = 'fail'
+  normal 0viby
+  call g:assert.equals(@@, 'aa\"bb', 'failed at #2')
 
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'quoteescape': 1}]
+  """ on
+  let g:textobj#sandwich#recipes = [{'buns': ['"', '"']}]
+  call textobj#sandwich#set('auto', 'quoteescape', 1)
 
   " #3
   call setline('.', '"aa\"bb"')
@@ -3535,23 +3541,26 @@ function! s:suite.a_o_option_skip_regex() abort  "{{{
 endfunction
 "}}}
 function! s:suite.a_o_option_quoteescape() abort  "{{{
-  """ on
-  " #1
-  call setline('.', '"aa\"bb"')
-  let @@ = 'fail'
-  normal 0yab
-  call g:assert.equals(@@, '"aa\"bb"', 'failed at #1')
-
   """ off
-  call textobj#sandwich#set('auto', 'quoteescape', 0)
+  let g:textobj#sandwich#recipes = [{'buns': ['"', '"']}]
 
-  " #2
+  " #1
   " call setline('.', '"aa\"bb"')
   " let @@ = 'fail'
   " normal 0yab
-  " call g:assert.equals(@@, '"aa\"', 'failed at #2')
+  " call g:assert.equals(@@, '"aa\"', 'failed at #1')
 
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'quoteescape': 1}]
+  let g:textobj#sandwich#recipes = [{'buns': ['"', '"'], 'quoteescape': 1}]
+
+  " #2
+  call setline('.', '"aa\"bb"')
+  let @@ = 'fail'
+  normal 0yab
+  call g:assert.equals(@@, '"aa\"bb"', 'failed at #2')
+
+  """ on
+  let g:textobj#sandwich#recipes = [{'buns': ['"', '"']}]
+  call textobj#sandwich#set('auto', 'quoteescape', 1)
 
   " #3
   call setline('.', '"aa\"bb"')
@@ -4934,29 +4943,32 @@ function! s:suite.a_x_option_skip_regex() abort  "{{{
 endfunction
 "}}}
 function! s:suite.a_x_option_quoteescape() abort  "{{{
-  """ on
-  " #1
+  """ off
+  let g:textobj#sandwich#recipes = [{'buns': ['"', '"']}]
+
+  " #2
   call setline('.', '"aa\"bb"')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '"aa\"bb"', 'failed at #1')
+  call g:assert.equals(@@, '"aa\"', 'failed at #2')
 
-  """ off
-  call textobj#sandwich#set('auto', 'quoteescape', 0)
-
-  " #2
-  " call setline('.', '"aa\"bb"')
-  " let @@ = 'fail'
-  " normal 0vaby
-  " call g:assert.equals(@@, '"aa\"', 'failed at #2')
-
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'quoteescape': 1}]
+  let g:textobj#sandwich#recipes = [{'buns': ['"', '"'], 'quoteescape': 1}]
 
   " #3
   call setline('.', '"aa\"bb"')
   let @@ = 'fail'
   normal 0vaby
   call g:assert.equals(@@, '"aa\"bb"', 'failed at #3')
+
+  """ on
+  let g:textobj#sandwich#recipes = [{'buns': ['"', '"']}]
+  call textobj#sandwich#set('auto', 'quoteescape', 1)
+
+  " #1
+  call setline('.', '"aa\"bb"')
+  let @@ = 'fail'
+  normal 0vaby
+  call g:assert.equals(@@, '"aa\"bb"', 'failed at #1')
 endfunction
 "}}}
 function! s:suite.a_x_option_expand_range() abort  "{{{
