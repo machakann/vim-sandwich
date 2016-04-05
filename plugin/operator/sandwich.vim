@@ -32,10 +32,18 @@ nnoremap <expr><silent> <Plug>(operator-sandwich-predot) operator#sandwich#predo
 nnoremap <expr><silent> <Plug>(operator-sandwich-dot)    operator#sandwich#dot()
 
 " highlight group
-highlight default link OperatorSandwichBuns   IncSearch
-highlight default link OperatorSandwichStuff  DiffChange
-highlight default link OperatorSandwichAdd    DiffAdd
-highlight default link OperatorSandwichDelete DiffDelete
+function! s:default_highlight() abort
+  highlight default link OperatorSandwichBuns   IncSearch
+  highlight default link OperatorSandwichStuff  DiffChange
+  highlight default link OperatorSandwichAdd    DiffAdd
+  highlight default link OperatorSandwichDelete DiffDelete
+endfunction
+call s:default_highlight()
+
+augroup sandwich-highlight
+  autocmd!
+  autocmd ColorScheme * call s:default_highlight()
+augroup END
 
 """ default keymappings
 " If g:operator_sandwich_no_default_key_mappings has been defined, then quit immediately.
