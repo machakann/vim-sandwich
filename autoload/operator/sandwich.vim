@@ -28,6 +28,7 @@ function! operator#sandwich#prerequisite(kind, mode, ...) abort "{{{
   let operator.count = a:mode ==# 'x' ? max([1, v:prevcount]) : v:count1
   let operator.mode  = a:mode
   let operator.view  = winsaveview()
+  let operator.keepable = 1
   let operator.cursor.keep[0:3] = getpos('.')[0:3]
   let operator.opt = sandwich#opt#new(a:kind)
   let operator.opt.filter = s:default_opt[a:kind]['filter']

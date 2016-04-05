@@ -528,15 +528,16 @@ function! s:operator.finalize(kind) dict abort  "{{{
 
       " set cursor position
       let cursor_opt = act.opt.of('cursor')
-      if self.state || self.keepable
-        let cursor = cursor_opt =~# '^\%(keep\|\%(inner_\)\?\%(head\|tail\)\)$' && self.cursor[cursor_opt] != s:null_pos
-                  \ ? self.cursor[cursor_opt] : self.cursor['inner_head']
+      if self.keepable
         let self.keepable = 0
       else
         " In the case of dot repeat, it is impossible to keep original position
         " unless self.keepable == 1.
-        let cursor = cursor_opt =~# '^\%(inner_\)\?\%(head\|tail\)$' && self.cursor[cursor_opt] != s:null_pos
-                  \ ? self.cursor[cursor_opt] : self.cursor['inner_head']
+        let self.cursor.keep = copy(self.cursor.inner_head)
+      endif
+      let cursor = get(self.cursor, cursor_opt, 'inner_head')
+      if cursor == s:null_pos
+        let cursor = self.cursor.inner_head
       endif
 
       if s:has_patch_7_4_310
