@@ -880,6 +880,8 @@ highlight
 >
 	highlight link OperatorSandwichBuns Visual
 <
+	NOTE: このオプションはレシピで指定しても効果がありません。
+	      変更する場合は |operator#sandwich#set()| 関数を使ってください。
 
 	デフォルト値
 	  * add
