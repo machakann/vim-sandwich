@@ -192,12 +192,15 @@ endfunction
 "}}}
 function! s:operator.add() dict abort "{{{
   let opt = self.opt
+  let opt_highlight = opt.of('highlight', '')
+  let hi_group = opt_highlight >= 2 ? 'OperatorSandwichStuff' : 'OperatorSandwichBuns'
+
   for i in range(self.count)
     call self.set_target()
     if self.state
       " query preferable buns
       call winrestview(self.view)
-      call self.show('OperatorSandwichBuns')
+      call self.show('stuff', hi_group)
       try
         let recipe = self.query()
         let self.recipes.dog_ear += [recipe]
@@ -223,6 +226,11 @@ function! s:operator.add() dict abort "{{{
     let undojoin = self.state ? 1 : 0
     call opt.clear('recipe_add')
   endfor
+
+  if opt_highlight >= 3
+    let hi_duration = s:get('highlight_duration', 200)
+    call self.blink('added', 'OperatorSandwichAdd', hi_duration)
+  endif
 endfunction
 "}}}
 function! s:operator.add_once(i, recipe) dict abort  "{{{
@@ -235,7 +243,15 @@ function! s:operator.add_once(i, recipe) dict abort  "{{{
       if stuff.active
         let act = stuff.acts[a:i]
         let act.opt = deepcopy(self.opt)
-        let success = act.add_pair(buns, stuff, undojoin)
+        let added = act.add_pair(buns, stuff, undojoin)
+
+        if added != {}
+          let success = 1
+          let stuff.added += [added]
+        else
+          let success = 0
+        endif
+
         let undojoin = success ? 0 : undojoin
         let modified = modified || success
       endif
@@ -250,16 +266,17 @@ endfunction
 "}}}
 function! s:operator.delete() dict abort  "{{{
   let hi_exited = 0
+  let opt_highlight = self.opt.of('highlight', '')
   let hi_duration = s:get('highlight_duration', 200)
-
+  let hi_group = opt_highlight >= 2 ? 'OperatorSandwichDelete' : 'OperatorSandwichBuns'
   for i in range(self.count)
     if !self.match(i)
       break
     endif
 
-    if !hi_exited && self.opt.of('highlight') && hi_duration > 0
+    if opt_highlight && !hi_exited && hi_duration > 0
       call winrestview(self.view)
-      let hi_exited = self.blink('OperatorSandwichBuns', hi_duration, self.opt.of('linewise'), 1)
+      let hi_exited = self.blink('target', hi_group, hi_duration, self.opt.of('linewise'))
     endif
 
     call self.delete_once(i)
@@ -285,6 +302,8 @@ endfunction
 "}}}
 function! s:operator.replace() dict abort  "{{{
   let opt = self.opt
+  let opt_highlight = opt.of('highlight', '')
+  let hi_group = opt_highlight >= 2 ? 'OperatorSandwichDelete' : 'OperatorSandwichBuns'
   let self.cursor.inner_head = copy(s:null_pos)
   let self.cursor.inner_tail = copy(s:null_pos)
 
@@ -297,7 +316,7 @@ function! s:operator.replace() dict abort  "{{{
     if self.state
       " query preferable buns
       call winrestview(self.view)
-      call self.show('OperatorSandwichBuns')
+      call self.show('target', hi_group)
       try
         let recipe = self.query()
         let self.recipes.dog_ear += [recipe]
@@ -322,6 +341,11 @@ function! s:operator.replace() dict abort  "{{{
     let undojoin = self.state ? 1 : 0
     call opt.clear('recipe_add')
   endfor
+
+  if opt_highlight >= 3
+    let hi_duration = s:get('highlight_duration', 200)
+    call self.blink('added', 'OperatorSandwichAdd', hi_duration)
+  endif
 endfunction
 "}}}
 function! s:operator.replace_once(i, recipe) dict abort  "{{{
@@ -333,7 +357,15 @@ function! s:operator.replace_once(i, recipe) dict abort  "{{{
     if stuff.active
       let act = stuff.acts[a:i]
       call act.opt.update('recipe_add', a:recipe)
-      let success = act.replace_pair(buns, stuff, undojoin, modified)
+      let added = act.replace_pair(buns, stuff, undojoin, modified)
+
+      if added != {}
+        let success = 1
+        let stuff.added += [added]
+      else
+        let success = 0
+      endif
+
       let undojoin = success ? 0 : undojoin
       let modified = modified || success
     endif
@@ -455,12 +487,12 @@ function! s:operator.match(i) dict abort  "{{{
   return success
 endfunction
 "}}}
-function! s:operator.show(hi_group, ...) dict abort "{{{
+function! s:operator.show(place, hi_group, ...) dict abort "{{{
   if self.opt.of('highlight')
     let linewise = get(a:000, 0, 0)
     for i in range(self.n)
       let stuff = self.basket[i]
-      call stuff.show(a:hi_group, linewise)
+      call stuff.show(a:place, a:hi_group, linewise)
     endfor
     redraw
   endif
@@ -475,14 +507,13 @@ function! s:operator.quench() dict abort "{{{
   endif
 endfunction
 "}}}
-function! s:operator.blink(hi_group, duration, ...) dict abort "{{{
+function! s:operator.blink(place, hi_group, duration, ...) dict abort "{{{
   if self.opt.of('highlight')
     let clock = sandwich#clock#new()
     let hi_exited = 0
     let linewise = get(a:000, 0, 0)
-    let feedkey = get(a:000, 1, 0)
 
-    call self.show(a:hi_group, linewise)
+    call self.show(a:place, a:hi_group, linewise)
     try
       let c = 0
       call clock.start()
@@ -497,9 +528,7 @@ function! s:operator.blink(hi_group, duration, ...) dict abort "{{{
       if c != 0
         let c = type(c) == s:type_num ? nr2char(c) : c
         let hi_exited = 1
-        if feedkey
-          call feedkeys(c, 't')
-        endif
+        call feedkeys(c, 't')
       endif
     finally
       call self.quench()

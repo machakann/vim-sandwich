@@ -867,37 +867,38 @@ cursor
 
 
 highlight
-	処理対象のハイライト機能のオン/オフを切り替えます。値が真なら、文字列
-	を囲むオペレータでは指定範囲の両端一文字が、囲みを外す/置換するオペレ
-	ータでは削除される/置換される文字列がハイライトされます。囲みを外すオ
-	ペレータでは削除される文字列が決定された後、短い時間だけハイライトされ
-	ますが、この間ユーザーの操作はブロックされませんので何らかの入力があっ
-	た場合ただちにハイライトは中止されます。合わせてグローバルオプションの
-	|g:operator#sandwich#highlight_duration| の項もご覧ください。
+	処理対象のハイライト機能のオン/オフを切り替えます。値が真なら編集位置
+	をハイライトします。値が 1 の場合は簡素な、値が 2 の場合は多色を用いた
+	リッチなハイライトを行います。さらに、値が 3 の場合は編集後も追加文字
+	列を一定時間ハイライトします。
 
-	ハイライトに使われる色は OperatorSandwichBuns
-	|hl-OperatorSandwichBuns| という名前のハイライトグループ
-	|highlight-groups| を使って指定することができます。デフォルトでは
-	IncSearch |hl-IncSearch| にリンクされています。
->
-	highlight link OperatorSandwichBuns Visual
-<
+	囲みを外すオペレータのハイライトやリッチなハイライトを使っている場合は
+	、編集後も |g:operator#sandwich#highlight_duration| に指定された時間の
+	間ハイライトが残りますが、この間もユーザーの操作はブロックされていませ
+	ん。何らかの入力があった場合直ちにハイライトを中止されます。
+
+	ハイライトに使われる色はユーザーの好きなように変更できます。
+	|operator-sandwich-highlight-group| の項をご覧ください。
+
 	NOTE: このオプションはレシピで指定しても効果がありません。
 	      変更する場合は |operator#sandwich#set()| 関数を使ってください。
+>
+	      call operator#sandwich#set('all', 'all', 'highlight', 1)
+<
 
 	デフォルト値
 	  * add
-	    - char : 1
-	    - line : 1
-	    - block: 1
+	    - char : 3
+	    - line : 3
+	    - block: 3
 	  * delete
-	    - char : 1
-	    - line : 1
-	    - block: 1
+	    - char : 3
+	    - line : 3
+	    - block: 3
 	  * replace
-	    - char : 1
-	    - line : 1
-	    - block: 1
+	    - char : 3
+	    - line : 3
+	    - block: 3
 
 
 
@@ -1378,13 +1379,38 @@ HIGHLIGHT GROUP				*operator-sandwich-highlight-group*
 は独自のハイライトグループによって管理されます。
 
 OperatorSandwichBuns			*hl-OperatorSandwichBuns*
-	このハイライトグループによってオペレータのハイライト色を宣言します。デ
-	フォルトでは IncSearch |hl-IncSearch| グループにリンクしています。
+	このハイライトグループによってオペレータのハイライト色を宣言します。
+	このグループは "highlight" オプションが 1 のときに使われます。
+	デフォルトでは IncSearch |hl-IncSearch| グループにリンクしています。
+
+
+OperatorSandwichStuff			*hl-OperatorSandwichStuff*
+	このハイライトグループによってオペレータのハイライト色を宣言します。
+	このグループは "highlight" オプションが 2 以上のときに、囲みを追加する
+	オペレーターで囲まれる文字列に使われます。
+	デフォルトでは DiffChange |hl-DiffChange| グループにリンクしています。
+
+
+OperatorSandwichDelete			*hl-OperatorSandwichDelete*
+	このハイライトグループによってオペレータのハイライト色を宣言します。
+	このグループは "highlight" オプションが 2 以上のときに、囲みを
+	削除/置換するオペレーターで削除される囲み文字列に使われます。
+	デフォルトでは DiffDelete |hl-DiffDelete| グループにリンクしています。
+
+
+OperatorSandwichAdd			*hl-OperatorSandwichAdd*
+	このハイライトグループによってオペレータのハイライト色を宣言します。
+	このグループは "highlight" オプションが 3 以上のときに、囲みを
+	追加/置換するオペレーターで追加される囲み文字列に使われます。
+	デフォルトでは DiffAdd |hl-DiffAdd| グループにリンクしています。
+
+
+	ユーザーはこれらを自由に変更できます。
 >
-	highlight link OperatorSandwichBuns IncSearch
-<
-	ユーザーはこれを自由に変更できます。
->
+	" Example 1
+	highlight link OperatorSandwichBuns Visual
+
+	" Example 2
 	highlight OperatorSandwichBuns ctermfg=White ctermbg=Red
 	                             \ guifg=White   guibg=Red
 <

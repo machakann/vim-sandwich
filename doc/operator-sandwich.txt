@@ -874,36 +874,40 @@ cursor
 
 
 highlight
-	This option switch the highlight feature. If the value is true, the
-	both ends of a assigned region are highlighted in add operator. In
-	delete/replace operators, the both deleted regions are highlighted.
-	As for the delete operator, both deleted regions are highlighted in a
-	short time, see |g:operator#sandwich#highlight_duration|, after
-	determined the following motions/textobjects. If a user press any key
-	in the time, the operator immediately quit the highlighting.
+	This option switches the highlight feature. If the value is 1, a
+	simple highlighting is used. If the value is 2, a rich highlighting
+	with multi-colors is used. In Addition, if the value is 3, highlight
+	the added texts in a short time.
 
-	The highlight color can be changed by the |highlight-groups| named
-	OperatorSandwichBuns (|hl-OperatorSandwichBuns|). It is linked to a
-	default |highlight-groups| IncSearch (|hl-IncSearch|).
->
-	highlight link OperatorSandwichBuns Visual
-<
+	The highlight for delete operator or in case of using the rich
+	highlighting, highlighted regions would be left in a short time,
+	specified in |g:operator#sandwich#highlight_duration|, after an
+	operation. The user input is not blocked also in this period. If
+	user presses any key in this period, the operator immediately quits
+	the highlighting.
+
+	The highlight color can be changed.
+	See |operator-sandwich-highlight-group|.
+
 	NOTE: This option can not be controlled by recipes. Use
 	      |operator#sandwich#set()| function to set.
+>
+	      call operator#sandwich#set('all', 'all', 'highlight', 1)
+<
 
 	Default values
 	  * add
-	    - char : 1
-	    - line : 1
-	    - block: 1
+	    - char : 3
+	    - line : 3
+	    - block: 3
 	  * delete
-	    - char : 1
-	    - line : 1
-	    - block: 1
+	    - char : 3
+	    - line : 3
+	    - block: 3
 	  * replace
-	    - char : 1
-	    - line : 1
-	    - block: 1
+	    - char : 3
+	    - line : 3
+	    - block: 3
 
 
 
@@ -1396,13 +1400,41 @@ group.
 
 OperatorSandwichBuns			*hl-OperatorSandwichBuns*
 	The highlight group to declare the highlight feature of the operators.
+	This group is used when "highlight" option is 1.
 	It is linked to a default highlight group IncSearch |hl-IncSearch| in
 	default.
+
+
+OperatorSandwichStuff			*hl-OperatorSandwichStuff*
+	The highlight group to declare the highlight feature of the operators.
+	This group is used for a text which is surrounded by add operator when
+	"highlight" option is 2 or larger.
+	It is linked to a default highlight group DiffChange |hl-DiffChange|
+	in default.
+
+
+OperatorSandwichDelete			*hl-OperatorSandwichDelete*
+	The highlight group to declare the highlight feature of the operators.
+	This group is used for deleted surrounding texts of delete/replace
+	operator when "highlight" option is 2 or larger.
+	It is linked to a default highlight group DiffDelete |hl-DiffDelete|
+	in default.
+
+
+OperatorSandwichAdd			*hl-OperatorSandwichAdd*
+	The highlight group to declare the highlight feature of the operators.
+	This group is used for added surrounding texts of add/replace operator
+	when "highlight" option is 3 or larger.
+	It is linked to a default highlight group DiffAdd |hl-DiffAdd| in
+	default.
+
+
+	Users can change these colorings as following.
 >
-	highlight link OperatorSandwichBuns IncSearch
-<
-	Users can define their preferable coloring.
->
+	" Example 1
+	highlight link OperatorSandwichBuns Visual
+
+	" Example 2
 	highlight OperatorSandwichBuns ctermfg=White ctermbg=Red
 	                             \ guifg=White   guibg=Red
 <

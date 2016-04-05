@@ -41,10 +41,14 @@ let s:stuff = {
       \   'acts'     : [],
       \   'hi_status': 0,
       \   'hi_idlist': [],
+      \   'added'    : [],
       \ }
 "}}}
 function! s:stuff.initialize(cursor, modmark, count) dict abort  "{{{
   let self.active = 1
+  let self.hi_status = 0
+  let self.hi_idlist = []
+  let self.added = []
   let self.acts = map(range(a:count), 'operator#sandwich#act#new()')
   for act in self.acts
     call act.initialize(a:cursor, a:modmark)
@@ -189,15 +193,26 @@ function! s:stuff.skip_space() dict abort  "{{{
   endif
 endfunction
 "}}}
-function! s:stuff.show(hi_group, linewise) dict abort "{{{
+function! s:stuff.show(place, hi_group, linewise) dict abort "{{{
   if self.active && !self.hi_status
-    if s:is_valid_4pos(self.target)
+    if a:place ==# 'target'
       let order_list = s:highlight_order(self.target, a:linewise)
-      for order in order_list
-        let self.hi_idlist += s:matchaddpos(a:hi_group, order)
+    elseif a:place ==# 'added'
+      let order_list = []
+      for added in self.added
+        let order_list += s:highlight_order(added, added.linewise)
       endfor
-      let self.hi_status = 1
+    elseif a:place ==# 'stuff'
+      let stuff = {'head1': self.target.head1, 'tail1': self.target.tail2, 'head2': copy(s:null_pos), 'tail2': copy(s:null_pos)}
+      let order_list = s:highlight_order(stuff, a:linewise)
+    else
+      let order_list = []
     endif
+
+    for order in order_list
+      let self.hi_idlist += s:matchaddpos(a:hi_group, order)
+    endfor
+    let self.hi_status = 1
     call filter(self.hi_idlist, 'v:val > 0')
   endif
 endfunction
@@ -476,73 +491,64 @@ function! s:skip_space(head, tail) abort  "{{{
 endfunction
 "}}}
 function! s:highlight_order(target, linewise) abort "{{{
-  return a:linewise ? s:highlight_order_linewise(a:target)
-                  \ : s:highlight_order_charwise(a:target)
-endfunction
-"}}}
-function! s:highlight_order_charwise(target) abort  "{{{
-  let n = 0
   let order = []
   let order_list = []
-  for [head, tail] in [[a:target.head1, a:target.tail1], [a:target.head2, a:target.tail2]]
-    if head != s:null_pos && tail != s:null_pos && s:is_equal_or_ahead(tail, head)
-      if head[1] == tail[1]
-        let order += [head[1:2] + [tail[2] - head[2] + 1]]
-        let n += 1
-      else
-        for lnum in range(head[1], tail[1])
-          if lnum == head[1]
-            let order += [head[1:2] + [col([head[1], '$']) - head[2] + 1]]
-          elseif lnum == tail[1]
-            let order += [[tail[1], 1] + [tail[2]]]
-          else
-            let order += [[lnum]]
-          endif
+  for [head, tail, linewise] in [[a:target.head1, a:target.tail1, a:linewise[0]],
+                              \  [a:target.head2, a:target.tail2, a:linewise[1]]]
+    if linewise
+      call s:highlight_order_linewise(order_list, order, head, tail)
+    else
+      call s:highlight_order_charwise(order_list, order, head, tail)
+    endif
+  endfor
+  if order != []
+    call add(order_list, order)
+  endif
+  return order_list
+endfunction
+"}}}
+function! s:highlight_order_charwise(order_list, order, head, tail) abort  "{{{
+  let n = len(a:order)
+  if a:head != s:null_pos && a:tail != s:null_pos && s:is_equal_or_ahead(a:tail, a:head)
+    if a:head[1] == a:tail[1]
+      call add(a:order, a:head[1:2] + [a:tail[2] - a:head[2] + 1])
+      let n += 1
+    else
+      for lnum in range(a:head[1], a:tail[1])
+        if lnum == a:head[1]
+          call add(a:order, a:head[1:2] + [col([a:head[1], '$']) - a:head[2] + 1])
+        elseif lnum == a:tail[1]
+          call add(a:order, [a:tail[1], 1] + [a:tail[2]])
+        else
+          call add(a:order, [lnum])
+        endif
 
-          if n == 7
-            let order_list += [order]
-            let order = []
-            let n = 0
-          else
-            let n += 1
-          endif
-        endfor
-      endif
+        if n == 7
+          call add(a:order_list, deepcopy(a:order))
+          call filter(a:order, 0)
+          let n = 0
+        else
+          let n += 1
+        endif
+      endfor
     endif
-  endfor
-  if order != []
-    let order_list += [order]
   endif
-  return order_list
 endfunction
 "}}}
-function! s:highlight_order_linewise(target) abort  "{{{
-  let n = 0
-  let order = []
-  let order_list = []
-  for [head, tail] in [[a:target.head1, a:target.tail1], [a:target.head2, a:target.tail2]]
-    if head != s:null_pos && tail != s:null_pos
-      if head[1] == tail[1]
-        let order += [head[1]]
-        let n += 1
+function! s:highlight_order_linewise(order_list, order, head, tail) abort  "{{{
+  let n = len(a:order)
+  if a:head != s:null_pos && a:tail != s:null_pos
+    for lnum in range(a:head[1], a:tail[1])
+      call add(a:order, [lnum])
+      if n == 7
+        call add(a:order_list, deepcopy(a:order))
+        call filter(a:order, 0)
+        let n = 0
       else
-        for lnum in range(head[1], tail[1])
-          let order += [[lnum]]
-          if n == 7
-            let order_list += [order]
-            let order = []
-            let n = 0
-          else
-            let n += 1
-          endif
-        endfor
+        let n += 1
       endif
-    endif
-  endfor
-  if order != []
-    let order_list += [order]
+    endfor
   endif
-  return order_list
 endfunction
 "}}}
 " function! s:matchaddpos(group, pos) abort "{{{
