@@ -826,6 +826,8 @@ cursor
 	  inner_tail: 囲みの内側の文字列の末尾
 	  head      : 前方の囲みの先頭
 	  tail      : 後方の囲みの末尾
+	  default   : inner_head とほぼ同じですがカーソルが行頭に来るときは最
+	              初の非空白文字まで送ります
 >
          #                 : cursor
 	foo   --->   (foo)
@@ -850,17 +852,17 @@ cursor
 
 	デフォルト値
 	  * add
-	    - char : "inner_head"
-	    - line : "inner_head"
-	    - block: "inner_head"
+	    - char : "default"
+	    - line : "default"
+	    - block: "default"
 	  * delete
-	    - char : "inner_head"
-	    - line : "inner_head"
-	    - block: "inner_head"
+	    - char : "default"
+	    - line : "default"
+	    - block: "default"
 	  * replace
-	    - char : "inner_head"
-	    - line : "inner_head"
-	    - block: "inner_head"
+	    - char : "default"
+	    - line : "default"
+	    - block: "default"
 
 
 

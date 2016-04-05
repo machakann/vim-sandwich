@@ -1015,7 +1015,7 @@ endfunction
 "}}}
 function! s:suite.charwise_n_option_cursor() abort  "{{{
   """"" cursor
-  """ inner_head
+  """ default
   " #1
   call setline('.', '(((foo)))')
   normal 0l2sd%
@@ -1027,66 +1027,85 @@ function! s:suite.charwise_n_option_cursor() abort  "{{{
   call g:assert.equals(getline('.'), 'foo',        'failed at #2')
   call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #2')
 
-  """ keep
   " #3
+  call setline('.', '(    foo)')
+  normal 0sda(
+  call g:assert.equals(getline('.'), '    foo',    'failed at #3')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #3')
+
+  """ inner_head
+  " #4
+  call operator#sandwich#set('delete', 'char', 'cursor', 'inner_head')
+  call setline('.', '(((foo)))')
+  normal 0l2sd%
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #4')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #4')
+
+  " #5
+  normal 0sda(
+  call g:assert.equals(getline('.'), 'foo',        'failed at #5')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #5')
+
+  """ keep
+  " #6
   call operator#sandwich#set('delete', 'char', 'cursor', 'keep')
   call setline('.', '(((foo)))')
   normal 0l2sd%
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #3')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #3')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #6')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #6')
 
-  " #4
+  " #7
   normal 2lsda(
-  call g:assert.equals(getline('.'), 'foo',        'failed at #4')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #4')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #7')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #7')
 
   """ inner_tail
-  " #5
+  " #8
   call operator#sandwich#set('delete', 'char', 'cursor', 'inner_tail')
   call setline('.', '(((foo)))')
   normal 0l2sd%
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #5')
-  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #5')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #8')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #8')
 
-  " #6
+  " #9
   normal hsda(
-  call g:assert.equals(getline('.'), 'foo',        'failed at #6')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #6')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #9')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #9')
 
   """ head
-  " #7
+  " #10
   call operator#sandwich#set('delete', 'char', 'cursor', 'head')
   call setline('.', '(((foo)))')
   normal 0l2sd%
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #7')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #7')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #10')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #10')
 
-  " #8
+  " #11
   normal 3lsda(
-  call g:assert.equals(getline('.'), 'foo',        'failed at #8')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #8')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #11')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #11')
 
   """ tail
-  " #9
+  " #12
   call operator#sandwich#set('delete', 'char', 'cursor', 'tail')
   call setline('.', '(((foo)))')
   normal 0l2sd%
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #9')
-  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #9')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #12')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #12')
 
-  " #10
+  " #13
   normal 3hsda(
-  call g:assert.equals(getline('.'), 'foo',        'failed at #10')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #10')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #13')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #13')
 
   """"" recipe option
-  " #11
+  " #14
   let g:operator#sandwich#recipes = [{'buns': ['(', ')'], 'cursor': 'inner_head'}]
   call operator#sandwich#set('delete', 'char', 'cursor', 'inner_tail')
   call setline('.', '(foo)')
   normal 0sda(
-  call g:assert.equals(getline('.'), 'foo',        'failed at #11')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #11')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #14')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #14')
 endfunction
 "}}}
 function! s:suite.charwise_n_option_noremap() abort  "{{{
@@ -1838,7 +1857,7 @@ endfunction
 "}}}
 function! s:suite.charwise_x_option_cursor() abort  "{{{
   """"" cursor
-  """ inner_head
+  """ default
   " #1
   call setline('.', '(((foo)))')
   normal 0lv%2sd
@@ -1850,66 +1869,85 @@ function! s:suite.charwise_x_option_cursor() abort  "{{{
   call g:assert.equals(getline('.'), 'foo',        'failed at #2')
   call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #2')
 
-  """ keep
   " #3
+  call setline('.', '(    foo)')
+  normal 0v$sd
+  call g:assert.equals(getline('.'), '    foo',    'failed at #3')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #3')
+
+  """ inner_head
+  " #4
+  call operator#sandwich#set('delete', 'char', 'cursor', 'inner_head')
+  call setline('.', '(((foo)))')
+  normal 0lv%2sd
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #4')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #4')
+
+  " #5
+  normal 0va(sd
+  call g:assert.equals(getline('.'), 'foo',        'failed at #5')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #5')
+
+  """ keep
+  " #6
   call operator#sandwich#set('delete', 'char', 'cursor', 'keep')
   call setline('.', '(((foo)))')
   normal 0lv%2sd
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #3')
-  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #3')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #6')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #6')
 
-  " #4
+  " #7
   normal va(osd
-  call g:assert.equals(getline('.'), 'foo',        'failed at #4')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #4')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #7')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #7')
 
   """ inner_tail
-  " #5
+  " #8
   call operator#sandwich#set('delete', 'char', 'cursor', 'inner_tail')
   call setline('.', '(((foo)))')
   normal 0lv%o2sd
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #5')
-  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #5')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #8')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #8')
 
-  " #6
+  " #9
   normal va(osd
-  call g:assert.equals(getline('.'), 'foo',        'failed at #6')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #6')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #9')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #9')
 
   """ head
-  " #7
+  " #10
   call operator#sandwich#set('delete', 'char', 'cursor', 'head')
   call setline('.', '(((foo)))')
   normal 0lv%2sd
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #7')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #7')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #10')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #10')
 
-  " #8
+  " #11
   normal va(sd
-  call g:assert.equals(getline('.'), 'foo',        'failed at #8')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #8')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #11')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #11')
 
   """ tail
-  " #9
+  " #12
   call operator#sandwich#set('delete', 'char', 'cursor', 'tail')
   call setline('.', '(((foo)))')
   normal 0lv%o2sd
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #9')
-  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #9')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #12')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #12')
 
-  " #10
+  " #13
   normal va(osd
-  call g:assert.equals(getline('.'), 'foo',        'failed at #10')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #10')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #13')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #13')
 
   """"" recipe option
-  " #11
+  " #14
   let g:operator#sandwich#recipes = [{'buns': ['(', ')'], 'cursor': 'inner_head'}]
   call operator#sandwich#set('delete', 'char', 'cursor', 'inner_tail')
   call setline('.', '(foo)')
   normal 0va(sd
-  call g:assert.equals(getline('.'), 'foo',        'failed at #11')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #11')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #14')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #14')
 endfunction
 "}}}
 function! s:suite.charwise_x_option_noremap() abort  "{{{
@@ -2806,7 +2844,7 @@ endfunction
 "}}}
 function! s:suite.linewise_n_option_cursor() abort  "{{{
   """"" cursor
-  """ inner_head
+  """ default
   " #1
   call setline('.', '(((foo)))')
   normal 0l2sdVl
@@ -2818,66 +2856,87 @@ function! s:suite.linewise_n_option_cursor() abort  "{{{
   call g:assert.equals(getline('.'), 'foo',        'failed at #2')
   call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #2')
 
-  """ keep
   " #3
+  %delete
+  call append(0, ['(', '    foo', ')'])
+  normal ggsd2j
+  call g:assert.equals(getline(1), '    foo',      'failed at #3')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #3')
+  %delete
+
+  """ inner_head
+  " #4
+  call operator#sandwich#set('delete', 'line', 'cursor', 'inner_head')
+  call setline('.', '(((foo)))')
+  normal 0l2sdVl
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #4')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #4')
+
+  " #5
+  normal 0sdVl
+  call g:assert.equals(getline('.'), 'foo',        'failed at #5')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #5')
+
+  """ keep
+  " #6
   call operator#sandwich#set('delete', 'line', 'cursor', 'keep')
   call setline('.', '(((foo)))')
   normal 03l2sdVl
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #3')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #3')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #6')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #6')
 
-  " #4
+  " #7
   normal lsdVl
-  call g:assert.equals(getline('.'), 'foo',        'failed at #4')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #4')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #7')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #7')
 
   """ inner_tail
-  " #5
+  " #8
   call operator#sandwich#set('delete', 'line', 'cursor', 'inner_tail')
   call setline('.', '(((foo)))')
   normal 02sdVl
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #5')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #5')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #8')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #8')
 
-  " #6
+  " #9
   normal 2hsdVl
-  call g:assert.equals(getline('.'), 'foo',        'failed at #6')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #6')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #9')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #9')
 
   """ head
-  " #7
+  " #10
   call operator#sandwich#set('delete', 'line', 'cursor', 'head')
   call setline('.', '(((foo)))')
   normal 02sdVl
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #7')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #7')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #10')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #10')
 
-  " #8
+  " #11
   normal 3lsdVl
-  call g:assert.equals(getline('.'), 'foo',        'failed at #8')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #8')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #11')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #11')
 
   """ tail
-  " #9
+  " #12
   call operator#sandwich#set('delete', 'line', 'cursor', 'tail')
   call setline('.', '(((foo)))')
   normal 02sdVl
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #9')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #9')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #12')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #12')
 
-  " #10
+  " #13
   normal 3hsdVl
-  call g:assert.equals(getline('.'), 'foo',        'failed at #10')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #10')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #13')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #13')
 
   """"" recipe option
-  " #11
+  " #14
   let g:operator#sandwich#recipes = [{'buns': ['(', ')'], 'cursor': 'inner_head'}]
   call operator#sandwich#set('delete', 'line', 'cursor', 'inner_tail')
   call setline('.', '(foo)')
   normal 0sdVl
-  call g:assert.equals(getline('.'), 'foo',        'failed at #11')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #11')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #14')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #14')
 endfunction
 "}}}
 function! s:suite.linewise_n_option_noremap() abort  "{{{
@@ -3777,10 +3836,10 @@ endfunction
 "}}}
 function! s:suite.linewise_x_option_cursor() abort  "{{{
   """"" cursor
-  """ inner_head
+  """ default
   " #1
   call setline('.', '(((foo)))')
-  normal 0lV2sd
+  normal 0V2sd
   call g:assert.equals(getline('.'), '(foo)',      'failed at #1')
   call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #1')
 
@@ -3789,66 +3848,87 @@ function! s:suite.linewise_x_option_cursor() abort  "{{{
   call g:assert.equals(getline('.'), 'foo',        'failed at #2')
   call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #2')
 
-  """ keep
   " #3
+  %delete
+  call append(0, ['(', '    foo', ')'])
+  normal ggV2jsd
+  call g:assert.equals(getline(1), '    foo',      'failed at #3')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #3')
+  %delete
+
+  """ inner_head
+  " #4
+  call operator#sandwich#set('delete', 'line', 'cursor', 'inner_head')
+  call setline('.', '(((foo)))')
+  normal 0lV2sd
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #4')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #4')
+
+  " #5
+  normal 0Vsd
+  call g:assert.equals(getline('.'), 'foo',        'failed at #5')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #5')
+
+  """ keep
+  " #6
   call operator#sandwich#set('delete', 'line', 'cursor', 'keep')
   call setline('.', '(((foo)))')
   normal 03lV2sd
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #3')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #3')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #6')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #6')
 
-  " #4
+  " #7
   normal lVsd
-  call g:assert.equals(getline('.'), 'foo',        'failed at #4')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #4')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #7')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #7')
 
   """ inner_tail
-  " #5
+  " #8
   call operator#sandwich#set('delete', 'line', 'cursor', 'inner_tail')
   call setline('.', '(((foo)))')
   normal 0V2sd
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #5')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #5')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #8')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #8')
 
-  " #6
+  " #9
   normal 2hVsd
-  call g:assert.equals(getline('.'), 'foo',        'failed at #6')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #6')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #9')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #9')
 
   """ head
-  " #7
+  " #10
   call operator#sandwich#set('delete', 'line', 'cursor', 'head')
   call setline('.', '(((foo)))')
   normal 0V2sd
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #7')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #7')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #10')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #10')
 
-  " #8
+  " #11
   normal 3lVsd
-  call g:assert.equals(getline('.'), 'foo',        'failed at #8')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #8')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #11')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #11')
 
   """ tail
-  " #9
+  " #12
   call operator#sandwich#set('delete', 'line', 'cursor', 'tail')
   call setline('.', '(((foo)))')
   normal 0V2sd
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #9')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #9')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #12')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #12')
 
-  " #10
+  " #13
   normal 3hVsd
-  call g:assert.equals(getline('.'), 'foo',        'failed at #10')
-  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #10')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #13')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #13')
 
   """"" recipe option
-  " #11
+  " #14
   let g:operator#sandwich#recipes = [{'buns': ['(', ')'], 'cursor': 'inner_head'}]
   call operator#sandwich#set('delete', 'line', 'cursor', 'inner_tail')
   call setline('.', '(foo)')
   normal 0sdVl
-  call g:assert.equals(getline('.'), 'foo',        'failed at #11')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #11')
+  call g:assert.equals(getline('.'), 'foo',        'failed at #14')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #14')
 endfunction
 "}}}
 function! s:suite.linewise_x_option_noremap() abort  "{{{
@@ -4813,7 +4893,7 @@ function! s:suite.blockwise_n_option_cursor() abort  "{{{
   set whichwrap=h,l
 
   """"" cursor
-  """ inner_head
+  """ default
   " #1
   call append(0, ['{[(foo)]}', '{[(bar)]}', '{[(baz)]}'])
   execute "normal ggl2sd\<C-v>27l"
@@ -4831,90 +4911,119 @@ function! s:suite.blockwise_n_option_cursor() abort  "{{{
 
   %delete
 
-  """ keep
   " #3
+  call append(0, ['(    foo)', '(    bar)', '(    baz)'])
+  execute "normal ggsd\<C-v>29l"
+  call g:assert.equals(getline(1),   '    foo',    'failed at #3')
+  call g:assert.equals(getline(2),   '    bar',    'failed at #3')
+  call g:assert.equals(getline(3),   '    baz',    'failed at #3')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #3')
+
+  %delete
+
+  """ inner_head
+  " #4
+  call operator#sandwich#set('delete', 'block', 'cursor', 'inner_head')
+  call append(0, ['{[(foo)]}', '{[(bar)]}', '{[(baz)]}'])
+  execute "normal ggl2sd\<C-v>27l"
+  call g:assert.equals(getline(1),   '{foo}',      'failed at #4')
+  call g:assert.equals(getline(2),   '{bar}',      'failed at #4')
+  call g:assert.equals(getline(3),   '{baz}',      'failed at #4')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #4')
+
+  " #5
+  execute "normal ggsd\<C-v>17l"
+  call g:assert.equals(getline(1),   'foo',        'failed at #5')
+  call g:assert.equals(getline(2),   'bar',        'failed at #5')
+  call g:assert.equals(getline(3),   'baz',        'failed at #5')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #5')
+
+  %delete
+
+  """ keep
+  " #6
   call operator#sandwich#set('delete', 'block', 'cursor', 'keep')
   call append(0, ['{[(foo)]}', '{[(bar)]}', '{[(baz)]}'])
   execute "normal ggl2sd\<C-v>27l"
-  call g:assert.equals(getline(1),   '{foo}',      'failed at #3')
-  call g:assert.equals(getline(2),   '{bar}',      'failed at #3')
-  call g:assert.equals(getline(3),   '{baz}',      'failed at #3')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #3')
+  call g:assert.equals(getline(1),   '{foo}',      'failed at #6')
+  call g:assert.equals(getline(2),   '{bar}',      'failed at #6')
+  call g:assert.equals(getline(3),   '{baz}',      'failed at #6')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #6')
 
-  " #4
+  " #7
   execute "normal ggsd\<C-v>17l"
-  call g:assert.equals(getline(1),   'foo',        'failed at #4')
-  call g:assert.equals(getline(2),   'bar',        'failed at #4')
-  call g:assert.equals(getline(3),   'baz',        'failed at #4')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #4')
+  call g:assert.equals(getline(1),   'foo',        'failed at #7')
+  call g:assert.equals(getline(2),   'bar',        'failed at #7')
+  call g:assert.equals(getline(3),   'baz',        'failed at #7')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #7')
 
   %delete
 
   """ inner_tail
-  " #5
+  " #8
   call operator#sandwich#set('delete', 'block', 'cursor', 'inner_tail')
   call append(0, ['{[(foo)]}', '{[(bar)]}', '{[(baz)]}'])
   execute "normal ggl2sd\<C-v>27l"
-  call g:assert.equals(getline(1),   '{foo}',      'failed at #5')
-  call g:assert.equals(getline(2),   '{bar}',      'failed at #5')
-  call g:assert.equals(getline(3),   '{baz}',      'failed at #5')
-  call g:assert.equals(getpos('.'),  [0, 3, 4, 0], 'failed at #5')
+  call g:assert.equals(getline(1),   '{foo}',      'failed at #8')
+  call g:assert.equals(getline(2),   '{bar}',      'failed at #8')
+  call g:assert.equals(getline(3),   '{baz}',      'failed at #8')
+  call g:assert.equals(getpos('.'),  [0, 3, 4, 0], 'failed at #8')
 
-  " #6
+  " #9
   execute "normal ggsd\<C-v>17l"
-  call g:assert.equals(getline(1),   'foo',        'failed at #6')
-  call g:assert.equals(getline(2),   'bar',        'failed at #6')
-  call g:assert.equals(getline(3),   'baz',        'failed at #6')
-  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #6')
+  call g:assert.equals(getline(1),   'foo',        'failed at #9')
+  call g:assert.equals(getline(2),   'bar',        'failed at #9')
+  call g:assert.equals(getline(3),   'baz',        'failed at #9')
+  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #9')
 
   %delete
 
   """ head
-  " #7
+  " #10
   call operator#sandwich#set('delete', 'block', 'cursor', 'head')
   call append(0, ['{[(foo)]}', '{[(bar)]}', '{[(baz)]}'])
   execute "normal ggl2sd\<C-v>27l"
-  call g:assert.equals(getline(1),   '{foo}',      'failed at #7')
-  call g:assert.equals(getline(2),   '{bar}',      'failed at #7')
-  call g:assert.equals(getline(3),   '{baz}',      'failed at #7')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #7')
+  call g:assert.equals(getline(1),   '{foo}',      'failed at #10')
+  call g:assert.equals(getline(2),   '{bar}',      'failed at #10')
+  call g:assert.equals(getline(3),   '{baz}',      'failed at #10')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #10')
 
-  " #8
-  execute "normal ggsd\<C-v>17l"
-  call g:assert.equals(getline(1),   'foo',        'failed at #8')
-  call g:assert.equals(getline(2),   'bar',        'failed at #8')
-  call g:assert.equals(getline(3),   'baz',        'failed at #8')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #8')
-
-  %delete
-
-  """ tail
-  " #9
-  call operator#sandwich#set('delete', 'block', 'cursor', 'tail')
-  call append(0, ['{[(foo)]}', '{[(bar)]}', '{[(baz)]}'])
-  execute "normal ggl2sd\<C-v>27l"
-  call g:assert.equals(getline(1),   '{foo}',      'failed at #9')
-  call g:assert.equals(getline(2),   '{bar}',      'failed at #9')
-  call g:assert.equals(getline(3),   '{baz}',      'failed at #9')
-  call g:assert.equals(getpos('.'),  [0, 3, 4, 0], 'failed at #9')
-
-  " #10
-  execute "normal ggsd\<C-v>17l"
-  call g:assert.equals(getline(1),   'foo',        'failed at #10')
-  call g:assert.equals(getline(2),   'bar',        'failed at #10')
-  call g:assert.equals(getline(3),   'baz',        'failed at #10')
-  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #10')
-
-  """"" recipe option
   " #11
-  let g:operator#sandwich#recipes = [{'buns': ['(', ')'], 'cursor': 'inner_head'}]
-  call operator#sandwich#set('delete', 'line', 'cursor', 'inner_tail')
-  call append(0, ['(foo)', '(bar)', '(baz)'])
   execute "normal ggsd\<C-v>17l"
   call g:assert.equals(getline(1),   'foo',        'failed at #11')
   call g:assert.equals(getline(2),   'bar',        'failed at #11')
   call g:assert.equals(getline(3),   'baz',        'failed at #11')
   call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #11')
+
+  %delete
+
+  """ tail
+  " #12
+  call operator#sandwich#set('delete', 'block', 'cursor', 'tail')
+  call append(0, ['{[(foo)]}', '{[(bar)]}', '{[(baz)]}'])
+  execute "normal ggl2sd\<C-v>27l"
+  call g:assert.equals(getline(1),   '{foo}',      'failed at #12')
+  call g:assert.equals(getline(2),   '{bar}',      'failed at #12')
+  call g:assert.equals(getline(3),   '{baz}',      'failed at #12')
+  call g:assert.equals(getpos('.'),  [0, 3, 4, 0], 'failed at #12')
+
+  " #13
+  execute "normal ggsd\<C-v>17l"
+  call g:assert.equals(getline(1),   'foo',        'failed at #13')
+  call g:assert.equals(getline(2),   'bar',        'failed at #13')
+  call g:assert.equals(getline(3),   'baz',        'failed at #13')
+  call g:assert.equals(getpos('.'),  [0, 3, 3, 0], 'failed at #13')
+
+  """"" recipe option
+  " #14
+  let g:operator#sandwich#recipes = [{'buns': ['(', ')'], 'cursor': 'inner_head'}]
+  call operator#sandwich#set('delete', 'line', 'cursor', 'inner_tail')
+  call append(0, ['(foo)', '(bar)', '(baz)'])
+  execute "normal ggsd\<C-v>17l"
+  call g:assert.equals(getline(1),   'foo',        'failed at #14')
+  call g:assert.equals(getline(2),   'bar',        'failed at #14')
+  call g:assert.equals(getline(3),   'baz',        'failed at #14')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #14')
 
   set whichwrap&
 endfunction
@@ -5904,8 +6013,37 @@ endfunction
 "}}}
 function! s:suite.blockwise_x_option_cursor() abort  "{{{
   """"" cursor
+  """ default
+  " #1
+  call append(0, ['{[(foo)]}', '{[(bar)]}', '{[(baz)]}'])
+  execute "normal ggl\<C-v>2j6l2sd"
+  call g:assert.equals(getline(1),   '{foo}',      'failed at #1')
+  call g:assert.equals(getline(2),   '{bar}',      'failed at #1')
+  call g:assert.equals(getline(3),   '{baz}',      'failed at #1')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #1')
+
+  " #2
+  execute "normal gg\<C-v>2j4lsd"
+  call g:assert.equals(getline(1),   'foo',        'failed at #2')
+  call g:assert.equals(getline(2),   'bar',        'failed at #2')
+  call g:assert.equals(getline(3),   'baz',        'failed at #2')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #2')
+
+  %delete
+
+  " #3
+  call append(0, ['(    foo)', '(    bar)', '(    baz)'])
+  execute "normal gg\<C-v>2j8lsd"
+  call g:assert.equals(getline(1),   '    foo',    'failed at #3')
+  call g:assert.equals(getline(2),   '    bar',    'failed at #3')
+  call g:assert.equals(getline(3),   '    baz',    'failed at #3')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #3')
+
+  %delete
+
   """ inner_head
   " #1
+  call operator#sandwich#set('delete', 'block', 'cursor', 'inner_head')
   call append(0, ['{[(foo)]}', '{[(bar)]}', '{[(baz)]}'])
   execute "normal ggl\<C-v>2j6l2sd"
   call g:assert.equals(getline(1),   '{foo}',      'failed at #1')

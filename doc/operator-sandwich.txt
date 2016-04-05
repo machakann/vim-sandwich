@@ -834,6 +834,8 @@ cursor
 	  inner_tail: the tail of a surrounded text
 	  head      : the head of the former surrounding
 	  tail      : the tail of the latter surrounding
+	  default   : almost same as inner_head but bring cursor to the first
+	              non-space character if in the head of line
 >
          #                 : cursor
 	foo   --->   (foo)
@@ -857,17 +859,17 @@ cursor
 
 	Default values
 	  * add
-	    - char : "inner_head"
-	    - line : "inner_head"
-	    - block: "inner_head"
+	    - char : "default"
+	    - line : "default"
+	    - block: "default"
 	  * delete
-	    - char : "inner_head"
-	    - line : "inner_head"
-	    - block: "inner_head"
+	    - char : "default"
+	    - line : "default"
+	    - block: "default"
 	  * replace
-	    - char : "inner_head"
-	    - line : "inner_head"
-	    - block: "inner_head"
+	    - char : "default"
+	    - line : "default"
+	    - block: "default"
 
 
 

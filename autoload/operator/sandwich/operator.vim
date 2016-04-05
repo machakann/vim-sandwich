@@ -59,6 +59,7 @@ let s:operator = {
       \     'keep'      : copy(s:null_pos),
       \     'inner_tail': copy(s:null_pos),
       \     'tail'      : copy(s:null_pos),
+      \     'default'   : copy(s:null_pos),
       \   },
       \   'modmark': copy(s:null_2pos),
       \ }
@@ -533,11 +534,12 @@ function! s:operator.finalize(kind) dict abort  "{{{
       else
         " In the case of dot repeat, it is impossible to keep original position
         " unless self.keepable == 1.
-        let self.cursor.keep = copy(self.cursor.inner_head)
+        let self.cursor.keep = copy(self.cursor.default)
       endif
-      let cursor = get(self.cursor, cursor_opt, 'inner_head')
+      let self.cursor.default = s:get_default_cursor_pos(self.cursor.inner_head)
+      let cursor = get(self.cursor, cursor_opt, 'default')
       if cursor == s:null_pos
-        let cursor = self.cursor.inner_head
+        let cursor = self.cursor.default
       endif
 
       if s:has_patch_7_4_310
@@ -864,9 +866,15 @@ function! s:get_buns(recipe, opt_expr) abort  "{{{
   return buns
 endfunction
 "}}}
+function! s:get_default_cursor_pos(inner_head) abort  "{{{
+  call setpos('.', a:inner_head)
+  let default = searchpos('^\s*\zs\S', 'cn', a:inner_head[1])
+  return default == s:null_coord ? a:inner_head : s:c2p(default)
+endfunction
+"}}}
 
-let [s:get_left_pos, s:is_valid_2pos, s:is_ahead, s:is_equal_or_ahead, s:get]
-      \ = operator#sandwich#lib#funcref(['get_left_pos', 'is_valid_2pos', 'is_ahead', 'is_equal_or_ahead', 'get'])
+let [s:get_left_pos, s:c2p, s:is_valid_2pos, s:is_ahead, s:is_equal_or_ahead, s:get]
+      \ = operator#sandwich#lib#funcref(['get_left_pos', 'c2p', 'is_valid_2pos', 'is_ahead', 'is_equal_or_ahead', 'get'])
 
 
 " vim:set foldmethod=marker:

@@ -285,7 +285,7 @@ let s:default_opt = {}
 
 let s:default_opt.add = {}
 let s:default_opt.add.char = {
-      \   'cursor'     : 'inner_head',
+      \   'cursor'     : 'default',
       \   'query_once' : 0,
       \   'expr'       : 0,
       \   'noremap'    : 1,
@@ -299,7 +299,7 @@ let s:default_opt.add.char = {
       \   'indentkeys-': 0,
       \ }
 let s:default_opt.add.line = {
-      \   'cursor'    : 'inner_head',
+      \   'cursor'    : 'default',
       \   'query_once': 0,
       \   'expr'      : 0,
       \   'noremap'   : 1,
@@ -313,7 +313,7 @@ let s:default_opt.add.line = {
       \   'indentkeys-': 0,
       \ }
 let s:default_opt.add.block = {
-      \   'cursor'    : 'inner_head',
+      \   'cursor'    : 'default',
       \   'query_once': 0,
       \   'expr'      : 0,
       \   'noremap'   : 1,
@@ -330,7 +330,7 @@ let s:default_opt.add.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:defa
 
 let s:default_opt.delete = {}
 let s:default_opt.delete.char = {
-      \   'cursor'    : 'inner_head',
+      \   'cursor'    : 'default',
       \   'noremap'   : 1,
       \   'regex'     : 0,
       \   'skip_space': 1,
@@ -340,7 +340,7 @@ let s:default_opt.delete.char = {
       \   'linewise'  : 0,
       \ }
 let s:default_opt.delete.line = {
-      \   'cursor'    : 'inner_head',
+      \   'cursor'    : 'default',
       \   'noremap'   : 1,
       \   'regex'     : 0,
       \   'skip_space': 2,
@@ -350,7 +350,7 @@ let s:default_opt.delete.line = {
       \   'linewise'  : 1,
       \ }
 let s:default_opt.delete.block = {
-      \   'cursor'    : 'inner_head',
+      \   'cursor'    : 'default',
       \   'noremap'   : 1,
       \   'regex'     : 0,
       \   'skip_space': 1,
@@ -363,7 +363,7 @@ let s:default_opt.delete.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:d
 
 let s:default_opt.replace = {}
 let s:default_opt.replace.char = {
-      \   'cursor'    : 'inner_head',
+      \   'cursor'    : 'default',
       \   'query_once': 0,
       \   'regex'     : 0,
       \   'expr'      : 0,
@@ -379,7 +379,7 @@ let s:default_opt.replace.char = {
       \   'indentkeys-': 0,
       \ }
 let s:default_opt.replace.line = {
-      \   'cursor'    : 'inner_head',
+      \   'cursor'    : 'default',
       \   'query_once': 0,
       \   'regex'     : 0,
       \   'expr'      : 0,
@@ -395,7 +395,7 @@ let s:default_opt.replace.line = {
       \   'indentkeys-': 0,
       \ }
 let s:default_opt.replace.block = {
-      \   'cursor'    : 'inner_head',
+      \   'cursor'    : 'default',
       \   'query_once': 0,
       \   'regex'     : 0,
       \   'expr'      : 0,

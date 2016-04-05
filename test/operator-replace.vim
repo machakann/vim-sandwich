@@ -2052,7 +2052,7 @@ endfunction
 "}}}
 function! s:suite.charwise_n_option_cursor() abort  "{{{
   """"" cursor
-  """ inner_head
+  """ default
   " #1
   call setline('.', '(((foo)))')
   normal 0l2sr%[[
@@ -2064,66 +2064,91 @@ function! s:suite.charwise_n_option_cursor() abort  "{{{
   call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #2')
   call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #2')
 
-  """ keep
   " #3
+  let g:operator#sandwich#recipes = [{'buns': ["[\n    ", "\n]"], 'input':['a']}]
+  call setline('.', '(foo)')
+  normal 0sra(a
+  call g:assert.equals(getline(1), '[',       'failed at #3')
+  call g:assert.equals(getline(2), '    foo', 'failed at #3')
+  call g:assert.equals(getline(3), ']',       'failed at #3')
+  call g:assert.equals(getpos('.'),  [0, 2, 5, 0], 'failed at #3')
+  unlet! g:operator#sandwich#recipes
+
+  %delete
+
+  """ inner_head
+  " #4
+  call operator#sandwich#set('replace', 'char', 'cursor', 'inner_head')
+  call setline('.', '(((foo)))')
+  normal 0l2sr%[[
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #4')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #4')
+
+  " #5
+  normal 0sra([
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #5')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #5')
+
+  """ keep
+  " #6
   call operator#sandwich#set('replace', 'char', 'cursor', 'keep')
   call setline('.', '(((foo)))')
   normal 04l2sr2a([[
-  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #3')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #3')
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #6')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #6')
 
-  " #4
+  " #7
   normal lsra([
-  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #4')
-  call g:assert.equals(getpos('.'),  [0, 1, 6, 0], 'failed at #4')
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #7')
+  call g:assert.equals(getpos('.'),  [0, 1, 6, 0], 'failed at #7')
 
   """ inner_tail
-  " #5
+  " #8
   call operator#sandwich#set('replace', 'char', 'cursor', 'inner_tail')
   call setline('.', '(((foo)))')
   normal 04l2sr2a([[
-  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #5')
-  call g:assert.equals(getpos('.'),  [0, 1, 6, 0], 'failed at #5')
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #8')
+  call g:assert.equals(getpos('.'),  [0, 1, 6, 0], 'failed at #8')
 
-  " #6
+  " #9
   normal hsra([
-  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #6')
-  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #6')
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #9')
+  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #9')
 
   """ head
-  " #7
+  " #10
   call operator#sandwich#set('replace', 'char', 'cursor', 'head')
   call setline('.', '(((foo)))')
   normal 04l2sr2a([[
-  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #7')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #7')
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #10')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #10')
 
-  " #8
+  " #11
   normal 3lsra([
-  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #8')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #8')
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #11')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #11')
 
   """ tail
-  " #9
+  " #12
   call operator#sandwich#set('replace', 'char', 'cursor', 'tail')
   call setline('.', '(((foo)))')
   normal 04l2sr2a([[
-  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #9')
-  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #9')
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #12')
+  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #12')
 
-  " #10
+  " #13
   normal 3hsra([
-  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #10')
-  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #10')
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #13')
+  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #13')
 
   """"" recipe option
-  " #11
+  " #14
   let g:operator#sandwich#recipes = [{'buns': ['(', ')'], 'cursor': 'inner_head', 'input':['1']}]
   call operator#sandwich#set('replace', 'char', 'cursor', 'inner_tail')
   call setline('.', '[foo]')
   normal 0sra[1
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #11')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #11')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #14')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #14')
 endfunction
 "}}}
 function! s:suite.charwise_n_option_noremap() abort  "{{{
@@ -3970,7 +3995,7 @@ endfunction
 "}}}
 function! s:suite.charwise_x_option_cursor() abort  "{{{
   """"" cursor
-  """ inner_head
+  """ default
   " #1
   call setline('.', '(((foo)))')
   normal 0lv%2sr[[
@@ -3982,66 +4007,91 @@ function! s:suite.charwise_x_option_cursor() abort  "{{{
   call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #2')
   call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #2')
 
-  """ keep
   " #3
+  let g:operator#sandwich#recipes = [{'buns': ["[\n    ", "\n]"], 'input':['a']}]
+  call setline('.', '(foo)')
+  normal 0sra(a
+  call g:assert.equals(getline(1), '[',       'failed at #3')
+  call g:assert.equals(getline(2), '    foo', 'failed at #3')
+  call g:assert.equals(getline(3), ']',       'failed at #3')
+  call g:assert.equals(getpos('.'),  [0, 2, 5, 0], 'failed at #3')
+  unlet! g:operator#sandwich#recipes
+
+  %delete
+
+  """ inner_head
+  " #4
+  call operator#sandwich#set('replace', 'char', 'cursor', 'inner_head')
+  call setline('.', '(((foo)))')
+  normal 0lv%2sr[[
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #4')
+  call g:assert.equals(getpos('.'),  [0, 1, 4, 0], 'failed at #4')
+
+  " #5
+  normal 0va(sr[
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #5')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #5')
+
+  """ keep
+  " #6
   call operator#sandwich#set('replace', 'char', 'cursor', 'keep')
   call setline('.', '(((foo)))')
   normal 0lva(2sr[[
-  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #3')
-  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #3')
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #6')
+  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #6')
 
-  " #4
+  " #7
   normal va(sr[
-  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #4')
-  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #4')
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #7')
+  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #7')
 
   """ inner_tail
-  " #5
+  " #8
   call operator#sandwich#set('replace', 'char', 'cursor', 'inner_tail')
   call setline('.', '(((foo)))')
   normal 0lva(2sr[[
-  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #5')
-  call g:assert.equals(getpos('.'),  [0, 1, 6, 0], 'failed at #5')
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #8')
+  call g:assert.equals(getpos('.'),  [0, 1, 6, 0], 'failed at #8')
 
-  " #6
+  " #9
   normal va(sr[
-  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #6')
-  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #6')
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #9')
+  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #9')
 
   """ head
-  " #7
+  " #10
   call operator#sandwich#set('replace', 'char', 'cursor', 'head')
   call setline('.', '(((foo)))')
   normal 0lva(2sr[[
-  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #7')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #7')
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #10')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #10')
 
-  " #8
+  " #11
   normal va(sr[
-  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #8')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #8')
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #11')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #11')
 
   """ tail
-  " #9
+  " #12
   call operator#sandwich#set('replace', 'char', 'cursor', 'tail')
   call setline('.', '(((foo)))')
   normal 0lva(2sr[[
-  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #9')
-  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #9')
+  call g:assert.equals(getline('.'), '([[foo]])',  'failed at #12')
+  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #12')
 
-  " #10
+  " #13
   normal va(sr[
-  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #10')
-  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #10')
+  call g:assert.equals(getline('.'), '[[[foo]]]',  'failed at #13')
+  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #13')
 
   """"" recipe option
-  " #11
+  " #14
   let g:operator#sandwich#recipes = [{'buns': ['(', ')'], 'cursor': 'inner_head', 'input':['1']}]
   call operator#sandwich#set('replace', 'char', 'cursor', 'inner_tail')
   call setline('.', '[foo]')
   normal 0va[sr1
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #11')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #11')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #14')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #14')
 endfunction
 "}}}
 function! s:suite.charwise_x_option_noremap() abort  "{{{
@@ -5975,7 +6025,7 @@ function! s:suite.linewise_n_option_cursor() abort  "{{{
   call operator#sandwich#set('replace', 'line', 'linewise', 1)
 
   """"" cursor
-  """ inner_head
+  """ default
   " #1
   call setline('.', '(((foo)))')
   normal 02srVl[[
@@ -5987,66 +6037,91 @@ function! s:suite.linewise_n_option_cursor() abort  "{{{
   call g:assert.equals(getline('.'), '([(foo)])',  'failed at #2')
   call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #2')
 
-  """ keep
   " #3
+  let g:operator#sandwich#recipes = [{'buns': ["[\n    ", "\n]"], 'input':['a']}]
+  call setline('.', '(foo)')
+  normal srVla
+  call g:assert.equals(getline(1), '[',       'failed at #3')
+  call g:assert.equals(getline(2), '    foo', 'failed at #3')
+  call g:assert.equals(getline(3), ']',       'failed at #3')
+  call g:assert.equals(getpos('.'),  [0, 2, 5, 0], 'failed at #3')
+  unlet! g:operator#sandwich#recipes
+
+  %delete
+
+  """ inner_head
+  " #4
+  call operator#sandwich#set('replace', 'line', 'cursor', 'inner_head')
+  call setline('.', '(((foo)))')
+  normal 02srVl[[
+  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #4')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #4')
+
+  " #5
+  normal srVl(
+  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #5')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #5')
+
+  """ keep
+  " #6
   call operator#sandwich#set('replace', 'line', 'cursor', 'keep')
   call setline('.', '(((foo)))')
   normal 04l2srVl[[
-  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #3')
-  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #3')
+  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #6')
+  call g:assert.equals(getpos('.'),  [0, 1, 5, 0], 'failed at #6')
 
-  " #4
+  " #7
   normal lsrVl(
-  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #4')
-  call g:assert.equals(getpos('.'),  [0, 1, 6, 0], 'failed at #4')
+  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #7')
+  call g:assert.equals(getpos('.'),  [0, 1, 6, 0], 'failed at #7')
 
   """ inner_tail
-  " #5
+  " #8
   call operator#sandwich#set('replace', 'line', 'cursor', 'inner_tail')
   call setline('.', '(((foo)))')
   normal 04l2srVl[[
-  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #5')
-  call g:assert.equals(getpos('.'),  [0, 1, 7, 0], 'failed at #5')
+  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #8')
+  call g:assert.equals(getpos('.'),  [0, 1, 7, 0], 'failed at #8')
 
-  " #6
+  " #9
   normal hsrVl(
-  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #6')
-  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #6')
+  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #9')
+  call g:assert.equals(getpos('.'),  [0, 1, 8, 0], 'failed at #9')
 
   """ head
-  " #7
+  " #10
   call operator#sandwich#set('replace', 'line', 'cursor', 'head')
   call setline('.', '(((foo)))')
   normal 04l2srVl[[
-  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #7')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #7')
+  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #10')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #10')
 
-  " #8
+  " #11
   normal 3lsrVl(
-  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #8')
-  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #8')
+  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #11')
+  call g:assert.equals(getpos('.'),  [0, 1, 1, 0], 'failed at #11')
 
   """ tail
-  " #9
+  " #12
   call operator#sandwich#set('replace', 'line', 'cursor', 'tail')
   call setline('.', '(((foo)))')
   normal 04l2srVl[[
-  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #9')
-  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #9')
+  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #12')
+  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #12')
 
-  " #10
+  " #13
   normal 3hsrVl(
-  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #10')
-  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #10')
+  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #13')
+  call g:assert.equals(getpos('.'),  [0, 1, 9, 0], 'failed at #13')
 
   """"" recipe option
-  " #11
+  " #14
   let g:operator#sandwich#recipes = [{'buns': ['(', ')'], 'cursor': 'inner_head', 'input':['1']}]
   call operator#sandwich#set('replace', 'line', 'cursor', 'inner_tail')
   call setline('.', '[foo]')
   normal 0srVl1
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #11')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #11')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #14')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #14')
 endfunction
 "}}}
 function! s:suite.linewise_n_option_noremap() abort  "{{{
@@ -6595,7 +6670,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #1')
   call g:assert.equals(getline(6),   ']',          'failed at #1')
   call g:assert.equals(getline(7),   '}',          'failed at #1')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #1')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #1')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #1')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0], 'failed at #1')
   call g:assert.equals(&l:autoindent,  0,          'failed at #1')
@@ -6619,7 +6694,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #2')
   call g:assert.equals(getline(6),   '    ]',      'failed at #2')
   call g:assert.equals(getline(7),   '    }',      'failed at #2')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #2')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #2')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #2')
   call g:assert.equals(getpos("']"), [0, 7, 6, 0], 'failed at #2')
   call g:assert.equals(&l:autoindent,  1,          'failed at #2')
@@ -6642,7 +6717,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #3')
   call g:assert.equals(getline(6),   '    ]',       'failed at #3')
   call g:assert.equals(getline(7),   '}',           'failed at #3')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #3')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #3')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #3')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #3')
   call g:assert.equals(&l:autoindent,  1,           'failed at #3')
@@ -6664,7 +6739,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #4')
   " call g:assert.equals(getline(6),   '        ]',   'failed at #4')
   call g:assert.equals(getline(7),   '}',           'failed at #4')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #4')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #4')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #4')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #4')
   call g:assert.equals(&l:autoindent,  1,           'failed at #4')
@@ -6685,7 +6760,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',                    'failed at #5')
   call g:assert.equals(getline(6),   '        ]',           'failed at #5')
   call g:assert.equals(getline(7),   '                }',   'failed at #5')
-  call g:assert.equals(getpos('.'),  [0, 4,  1, 0],         'failed at #5')
+  call g:assert.equals(getpos('.'),  [0, 4,  5, 0],         'failed at #5')
   call g:assert.equals(getpos("'["), [0, 1,  1, 0],         'failed at #5')
   call g:assert.equals(getpos("']"), [0, 7, 18, 0],         'failed at #5')
   call g:assert.equals(&l:autoindent,  1,                   'failed at #5')
@@ -6712,7 +6787,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #6')
   call g:assert.equals(getline(6),   ']',          'failed at #6')
   call g:assert.equals(getline(7),   '}',          'failed at #6')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #6')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #6')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #6')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0], 'failed at #6')
   call g:assert.equals(&l:autoindent,  0,          'failed at #6')
@@ -6736,7 +6811,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #7')
   call g:assert.equals(getline(6),   ']',          'failed at #7')
   call g:assert.equals(getline(7),   '}',          'failed at #7')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #7')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #7')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #7')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0], 'failed at #7')
   call g:assert.equals(&l:autoindent,  1,          'failed at #7')
@@ -6759,7 +6834,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #8')
   call g:assert.equals(getline(6),   ']',          'failed at #8')
   call g:assert.equals(getline(7),   '}',          'failed at #8')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #8')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #8')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #8')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0], 'failed at #8')
   call g:assert.equals(&l:autoindent,  1,          'failed at #8')
@@ -6781,7 +6856,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #9')
   call g:assert.equals(getline(6),   ']',          'failed at #9')
   call g:assert.equals(getline(7),   '}',          'failed at #9')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #9')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #9')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #9')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0], 'failed at #9')
   call g:assert.equals(&l:autoindent,  1,          'failed at #9')
@@ -6802,7 +6877,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',               'failed at #10')
   call g:assert.equals(getline(6),   ']',              'failed at #10')
   call g:assert.equals(getline(7),   '}',              'failed at #10')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],     'failed at #10')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],     'failed at #10')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],     'failed at #10')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],     'failed at #10')
   call g:assert.equals(&l:autoindent,  1,              'failed at #10')
@@ -6829,7 +6904,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #11')
   call g:assert.equals(getline(6),   '    ]',      'failed at #11')
   call g:assert.equals(getline(7),   '    }',      'failed at #11')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #11')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #11')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #11')
   call g:assert.equals(getpos("']"), [0, 7, 6, 0], 'failed at #11')
   call g:assert.equals(&l:autoindent,  0,          'failed at #11')
@@ -6853,7 +6928,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #12')
   call g:assert.equals(getline(6),   '    ]',      'failed at #12')
   call g:assert.equals(getline(7),   '    }',      'failed at #12')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #12')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #12')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #12')
   call g:assert.equals(getpos("']"), [0, 7, 6, 0], 'failed at #12')
   call g:assert.equals(&l:autoindent,  1,          'failed at #12')
@@ -6876,7 +6951,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #13')
   call g:assert.equals(getline(6),   '    ]',      'failed at #13')
   call g:assert.equals(getline(7),   '    }',      'failed at #13')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #13')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #13')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #13')
   call g:assert.equals(getpos("']"), [0, 7, 6, 0], 'failed at #13')
   call g:assert.equals(&l:autoindent,  1,          'failed at #13')
@@ -6898,7 +6973,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #14')
   call g:assert.equals(getline(6),   '    ]',      'failed at #14')
   call g:assert.equals(getline(7),   '    }',      'failed at #14')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #14')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #14')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #14')
   call g:assert.equals(getpos("']"), [0, 7, 6, 0], 'failed at #14')
   call g:assert.equals(&l:autoindent,  1,          'failed at #14')
@@ -6919,7 +6994,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',               'failed at #15')
   call g:assert.equals(getline(6),   '    ]',          'failed at #15')
   call g:assert.equals(getline(7),   '    }',          'failed at #15')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],     'failed at #15')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],     'failed at #15')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],     'failed at #15')
   call g:assert.equals(getpos("']"), [0, 7, 6, 0],     'failed at #15')
   call g:assert.equals(&l:autoindent,  1,              'failed at #15')
@@ -6946,7 +7021,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #16')
   call g:assert.equals(getline(6),   '    ]',       'failed at #16')
   call g:assert.equals(getline(7),   '}',           'failed at #16')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #16')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #16')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #16')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #16')
   call g:assert.equals(&l:autoindent,  0,           'failed at #16')
@@ -6970,7 +7045,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #17')
   call g:assert.equals(getline(6),   '    ]',       'failed at #17')
   call g:assert.equals(getline(7),   '}',           'failed at #17')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #17')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #17')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #17')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #17')
   call g:assert.equals(&l:autoindent,  1,           'failed at #17')
@@ -6993,7 +7068,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #18')
   call g:assert.equals(getline(6),   '    ]',       'failed at #18')
   call g:assert.equals(getline(7),   '}',           'failed at #18')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #18')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #18')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #18')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #18')
   call g:assert.equals(&l:autoindent,  1,           'failed at #18')
@@ -7015,7 +7090,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #19')
   call g:assert.equals(getline(6),   '    ]',       'failed at #19')
   call g:assert.equals(getline(7),   '}',           'failed at #19')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #19')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #19')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #19')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #19')
   call g:assert.equals(&l:autoindent,  1,           'failed at #19')
@@ -7036,7 +7111,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',               'failed at #20')
   call g:assert.equals(getline(6),   '    ]',          'failed at #20')
   call g:assert.equals(getline(7),   '}',              'failed at #20')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],     'failed at #20')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],     'failed at #20')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],     'failed at #20')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],     'failed at #20')
   call g:assert.equals(&l:autoindent,  1,              'failed at #20')
@@ -7063,7 +7138,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #21')
   " call g:assert.equals(getline(6),   '        ]',   'failed at #21')
   call g:assert.equals(getline(7),   '}',           'failed at #21')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #21')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #21')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #21')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #21')
   call g:assert.equals(&l:autoindent,  0,           'failed at #21')
@@ -7087,7 +7162,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #22')
   " call g:assert.equals(getline(6),   '        ]',   'failed at #22')
   call g:assert.equals(getline(7),   '}',           'failed at #22')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #22')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #22')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #22')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #22')
   call g:assert.equals(&l:autoindent,  1,           'failed at #22')
@@ -7110,7 +7185,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #23')
   " call g:assert.equals(getline(6),   '        ]',   'failed at #23')
   call g:assert.equals(getline(7),   '}',           'failed at #23')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #23')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #23')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #23')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #23')
   call g:assert.equals(&l:autoindent,  1,           'failed at #23')
@@ -7132,7 +7207,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #24')
   " call g:assert.equals(getline(6),   '        ]',   'failed at #24')
   call g:assert.equals(getline(7),   '}',           'failed at #24')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #24')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #24')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #24')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #24')
   call g:assert.equals(&l:autoindent,  1,           'failed at #24')
@@ -7153,7 +7228,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',               'failed at #25')
   " call g:assert.equals(getline(6),   '        ]',      'failed at #25')
   call g:assert.equals(getline(7),   '}',              'failed at #25')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],     'failed at #25')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],     'failed at #25')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],     'failed at #25')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],     'failed at #25')
   call g:assert.equals(&l:autoindent,  1,              'failed at #25')
@@ -7174,7 +7249,7 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #26')
   call g:assert.equals(getline(6),   ']',          'failed at #26')
   call g:assert.equals(getline(7),   '}',          'failed at #26')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #26')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #26')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #26')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0], 'failed at #26')
   call g:assert.equals(&l:autoindent,  1,          'failed at #26')
@@ -7209,7 +7284,7 @@ function! s:suite.linewise_n_option_indentkeys() abort  "{{{
   call g:assert.equals(getline(1),   '    {',      'failed at #1')
   call g:assert.equals(getline(2),   '    foo',    'failed at #1')
   call g:assert.equals(getline(3),   '    }',      'failed at #1')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #1')
+  call g:assert.equals(getpos('.'),  [0, 2, 5, 0], 'failed at #1')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #1')
   call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #1')
   call g:assert.equals(&l:cinkeys,    cinkeys,     'failed at #1')
@@ -7231,7 +7306,7 @@ function! s:suite.linewise_n_option_indentkeys() abort  "{{{
   call g:assert.equals(getline(1),   '{',          'failed at #2')
   call g:assert.equals(getline(2),   '    foo',    'failed at #2')
   call g:assert.equals(getline(3),   '}',          'failed at #2')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #2')
+  call g:assert.equals(getpos('.'),  [0, 2, 5, 0], 'failed at #2')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #2')
   call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #2')
   call g:assert.equals(&l:cinkeys,    cinkeys,     'failed at #2')
@@ -7253,7 +7328,7 @@ function! s:suite.linewise_n_option_indentkeys() abort  "{{{
   call g:assert.equals(getline(1),   '    {',      'failed at #3')
   call g:assert.equals(getline(2),   '    foo',    'failed at #3')
   call g:assert.equals(getline(3),   '    }',      'failed at #3')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #3')
+  call g:assert.equals(getpos('.'),  [0, 2, 5, 0], 'failed at #3')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #3')
   call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #3')
   call g:assert.equals(&l:cinkeys,    cinkeys,     'failed at #3')
@@ -7274,7 +7349,7 @@ function! s:suite.linewise_n_option_indentkeys() abort  "{{{
   call g:assert.equals(getline(1),   '    {',      'failed at #4')
   call g:assert.equals(getline(2),   '    foo',    'failed at #4')
   call g:assert.equals(getline(3),   '    }',      'failed at #4')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #4')
+  call g:assert.equals(getpos('.'),  [0, 2, 5, 0], 'failed at #4')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #4')
   call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #4')
   call g:assert.equals(&l:cinkeys,    cinkeys,     'failed at #4')
@@ -7297,7 +7372,7 @@ function! s:suite.linewise_n_option_indentkeys() abort  "{{{
   call g:assert.equals(getline(1),   '    {',         'failed at #5')
   call g:assert.equals(getline(2),   '    foo',       'failed at #5')
   call g:assert.equals(getline(3),   '            }', 'failed at #5')
-  call g:assert.equals(getpos('.'),  [0, 2,  1, 0],   'failed at #5')
+  call g:assert.equals(getpos('.'),  [0, 2,  5, 0],   'failed at #5')
   call g:assert.equals(getpos("'["), [0, 1,  1, 0],   'failed at #5')
   call g:assert.equals(getpos("']"), [0, 3, 14, 0],   'failed at #5')
   call g:assert.equals(&l:cinkeys,    cinkeys,        'failed at #5')
@@ -7319,7 +7394,7 @@ function! s:suite.linewise_n_option_indentkeys() abort  "{{{
   call g:assert.equals(getline(1),   '       {',      'failed at #6')
   call g:assert.equals(getline(2),   '    foo',       'failed at #6')
   call g:assert.equals(getline(3),   '            }', 'failed at #6')
-  call g:assert.equals(getpos('.'),  [0, 2,  1, 0],   'failed at #6')
+  call g:assert.equals(getpos('.'),  [0, 2,  5, 0],   'failed at #6')
   call g:assert.equals(getpos("'["), [0, 1,  1, 0],   'failed at #6')
   call g:assert.equals(getpos("']"), [0, 3, 14, 0],   'failed at #6')
   call g:assert.equals(&l:cinkeys,    cinkeys,        'failed at #6')
@@ -7341,7 +7416,7 @@ function! s:suite.linewise_n_option_indentkeys() abort  "{{{
   call g:assert.equals(getline(1),   '    {',         'failed at #7')
   call g:assert.equals(getline(2),   '    foo',       'failed at #7')
   call g:assert.equals(getline(3),   '            }', 'failed at #7')
-  call g:assert.equals(getpos('.'),  [0, 2,  1, 0],   'failed at #7')
+  call g:assert.equals(getpos('.'),  [0, 2,  5, 0],   'failed at #7')
   call g:assert.equals(getpos("'["), [0, 1,  1, 0],   'failed at #7')
   call g:assert.equals(getpos("']"), [0, 3, 14, 0],   'failed at #7')
   call g:assert.equals(&l:cinkeys,    cinkeys,        'failed at #7')
@@ -7362,7 +7437,7 @@ function! s:suite.linewise_n_option_indentkeys() abort  "{{{
   call g:assert.equals(getline(1),   '    {',         'failed at #8')
   call g:assert.equals(getline(2),   '    foo',       'failed at #8')
   call g:assert.equals(getline(3),   '            }', 'failed at #8')
-  call g:assert.equals(getpos('.'),  [0, 2,  1, 0],   'failed at #8')
+  call g:assert.equals(getpos('.'),  [0, 2,  5, 0],   'failed at #8')
   call g:assert.equals(getpos("'["), [0, 1,  1, 0],   'failed at #8')
   call g:assert.equals(getpos("']"), [0, 3, 14, 0],   'failed at #8')
   call g:assert.equals(&l:cinkeys,    cinkeys,        'failed at #8')
@@ -8061,8 +8136,33 @@ function! s:suite.linewise_x_option_cursor() abort  "{{{
   call operator#sandwich#set('replace', 'line', 'linewise', 1)
 
   """"" cursor
+  """ default
+  " #1
+  call setline('.', '(((foo)))')
+  normal 0V2sr[[
+  call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #1')
+  call g:assert.equals(getpos('.'),  [0, 1, 3, 0], 'failed at #1')
+
+  " #2
+  normal Vsr(
+  call g:assert.equals(getline('.'), '([(foo)])',  'failed at #2')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #2')
+
+  " #3
+  let g:operator#sandwich#recipes = [{'buns': ["[\n    ", "\n]"], 'input':['a']}]
+  call setline('.', '(foo)')
+  normal Vsra
+  call g:assert.equals(getline(1), '[',       'failed at #3')
+  call g:assert.equals(getline(2), '    foo', 'failed at #3')
+  call g:assert.equals(getline(3), ']',       'failed at #3')
+  call g:assert.equals(getpos('.'),  [0, 2, 5, 0], 'failed at #3')
+  unlet! g:operator#sandwich#recipes
+
+  %delete
+
   """ inner_head
   " #1
+  call operator#sandwich#set('replace', 'line', 'cursor', 'inner_head')
   call setline('.', '(((foo)))')
   normal 0V2sr[[
   call g:assert.equals(getline('.'), '[[(foo)]]',  'failed at #1')
@@ -8682,7 +8782,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #1')
   call g:assert.equals(getline(6),   ']',          'failed at #1')
   call g:assert.equals(getline(7),   '}',          'failed at #1')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #1')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #1')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #1')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0], 'failed at #1')
   call g:assert.equals(&l:autoindent,  0,          'failed at #1')
@@ -8706,7 +8806,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #2')
   call g:assert.equals(getline(6),   '    ]',      'failed at #2')
   call g:assert.equals(getline(7),   '    }',      'failed at #2')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #2')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #2')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #2')
   call g:assert.equals(getpos("']"), [0, 7, 6, 0], 'failed at #2')
   call g:assert.equals(&l:autoindent,  1,          'failed at #2')
@@ -8729,7 +8829,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #3')
   call g:assert.equals(getline(6),   '    ]',       'failed at #3')
   call g:assert.equals(getline(7),   '}',           'failed at #3')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #3')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #3')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #3')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #3')
   call g:assert.equals(&l:autoindent,  1,           'failed at #3')
@@ -8751,7 +8851,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #4')
   " call g:assert.equals(getline(6),   '        ]',   'failed at #4')
   call g:assert.equals(getline(7),   '}',           'failed at #4')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #4')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #4')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #4')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #4')
   call g:assert.equals(&l:autoindent,  1,           'failed at #4')
@@ -8772,7 +8872,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',                    'failed at #5')
   call g:assert.equals(getline(6),   '        ]',           'failed at #5')
   call g:assert.equals(getline(7),   '                }',   'failed at #5')
-  call g:assert.equals(getpos('.'),  [0, 4,  1, 0],         'failed at #5')
+  call g:assert.equals(getpos('.'),  [0, 4,  5, 0],         'failed at #5')
   call g:assert.equals(getpos("'["), [0, 1,  1, 0],         'failed at #5')
   call g:assert.equals(getpos("']"), [0, 7, 18, 0],         'failed at #5')
   call g:assert.equals(&l:autoindent,  1,                   'failed at #5')
@@ -8799,7 +8899,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #6')
   call g:assert.equals(getline(6),   ']',          'failed at #6')
   call g:assert.equals(getline(7),   '}',          'failed at #6')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #6')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #6')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #6')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0], 'failed at #6')
   call g:assert.equals(&l:autoindent,  0,          'failed at #6')
@@ -8823,7 +8923,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #7')
   call g:assert.equals(getline(6),   ']',          'failed at #7')
   call g:assert.equals(getline(7),   '}',          'failed at #7')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #7')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #7')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #7')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0], 'failed at #7')
   call g:assert.equals(&l:autoindent,  1,          'failed at #7')
@@ -8846,7 +8946,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #8')
   call g:assert.equals(getline(6),   ']',          'failed at #8')
   call g:assert.equals(getline(7),   '}',          'failed at #8')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #8')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #8')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #8')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0], 'failed at #8')
   call g:assert.equals(&l:autoindent,  1,          'failed at #8')
@@ -8868,7 +8968,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #9')
   call g:assert.equals(getline(6),   ']',          'failed at #9')
   call g:assert.equals(getline(7),   '}',          'failed at #9')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #9')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #9')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #9')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0], 'failed at #9')
   call g:assert.equals(&l:autoindent,  1,          'failed at #9')
@@ -8889,7 +8989,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',               'failed at #10')
   call g:assert.equals(getline(6),   ']',              'failed at #10')
   call g:assert.equals(getline(7),   '}',              'failed at #10')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],     'failed at #10')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],     'failed at #10')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],     'failed at #10')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],     'failed at #10')
   call g:assert.equals(&l:autoindent,  1,              'failed at #10')
@@ -8916,7 +9016,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #11')
   call g:assert.equals(getline(6),   '    ]',      'failed at #11')
   call g:assert.equals(getline(7),   '    }',      'failed at #11')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #11')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #11')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #11')
   call g:assert.equals(getpos("']"), [0, 7, 6, 0], 'failed at #11')
   call g:assert.equals(&l:autoindent,  0,          'failed at #11')
@@ -8940,7 +9040,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #12')
   call g:assert.equals(getline(6),   '    ]',      'failed at #12')
   call g:assert.equals(getline(7),   '    }',      'failed at #12')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #12')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #12')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #12')
   call g:assert.equals(getpos("']"), [0, 7, 6, 0], 'failed at #12')
   call g:assert.equals(&l:autoindent,  1,          'failed at #12')
@@ -8963,7 +9063,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #13')
   call g:assert.equals(getline(6),   '    ]',      'failed at #13')
   call g:assert.equals(getline(7),   '    }',      'failed at #13')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #13')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #13')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #13')
   call g:assert.equals(getpos("']"), [0, 7, 6, 0], 'failed at #13')
   call g:assert.equals(&l:autoindent,  1,          'failed at #13')
@@ -8985,7 +9085,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #14')
   call g:assert.equals(getline(6),   '    ]',      'failed at #14')
   call g:assert.equals(getline(7),   '    }',      'failed at #14')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #14')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #14')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #14')
   call g:assert.equals(getpos("']"), [0, 7, 6, 0], 'failed at #14')
   call g:assert.equals(&l:autoindent,  1,          'failed at #14')
@@ -9006,7 +9106,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',               'failed at #15')
   call g:assert.equals(getline(6),   '    ]',          'failed at #15')
   call g:assert.equals(getline(7),   '    }',          'failed at #15')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],     'failed at #15')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],     'failed at #15')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],     'failed at #15')
   call g:assert.equals(getpos("']"), [0, 7, 6, 0],     'failed at #15')
   call g:assert.equals(&l:autoindent,  1,              'failed at #15')
@@ -9033,7 +9133,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #16')
   call g:assert.equals(getline(6),   '    ]',       'failed at #16')
   call g:assert.equals(getline(7),   '}',           'failed at #16')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #16')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #16')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #16')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #16')
   call g:assert.equals(&l:autoindent,  0,           'failed at #16')
@@ -9057,7 +9157,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #17')
   call g:assert.equals(getline(6),   '    ]',       'failed at #17')
   call g:assert.equals(getline(7),   '}',           'failed at #17')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #17')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #17')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #17')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #17')
   call g:assert.equals(&l:autoindent,  1,           'failed at #17')
@@ -9080,7 +9180,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #18')
   call g:assert.equals(getline(6),   '    ]',       'failed at #18')
   call g:assert.equals(getline(7),   '}',           'failed at #18')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #18')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #18')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #18')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #18')
   call g:assert.equals(&l:autoindent,  1,           'failed at #18')
@@ -9102,7 +9202,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #19')
   call g:assert.equals(getline(6),   '    ]',       'failed at #19')
   call g:assert.equals(getline(7),   '}',           'failed at #19')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #19')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #19')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #19')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #19')
   call g:assert.equals(&l:autoindent,  1,           'failed at #19')
@@ -9123,7 +9223,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',               'failed at #20')
   call g:assert.equals(getline(6),   '    ]',          'failed at #20')
   call g:assert.equals(getline(7),   '}',              'failed at #20')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],     'failed at #20')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],     'failed at #20')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],     'failed at #20')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],     'failed at #20')
   call g:assert.equals(&l:autoindent,  1,              'failed at #20')
@@ -9150,7 +9250,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #21')
   " call g:assert.equals(getline(6),   '        ]',   'failed at #21')
   call g:assert.equals(getline(7),   '}',           'failed at #21')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #21')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #21')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #21')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #21')
   call g:assert.equals(&l:autoindent,  0,           'failed at #21')
@@ -9174,7 +9274,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #22')
   " call g:assert.equals(getline(6),   '        ]',   'failed at #22')
   call g:assert.equals(getline(7),   '}',           'failed at #22')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #22')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #22')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #22')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #22')
   call g:assert.equals(&l:autoindent,  1,           'failed at #22')
@@ -9197,7 +9297,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #23')
   " call g:assert.equals(getline(6),   '        ]',   'failed at #23')
   call g:assert.equals(getline(7),   '}',           'failed at #23')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #23')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #23')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #23')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #23')
   call g:assert.equals(&l:autoindent,  1,           'failed at #23')
@@ -9219,7 +9319,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',            'failed at #24')
   " call g:assert.equals(getline(6),   '        ]',   'failed at #24')
   call g:assert.equals(getline(7),   '}',           'failed at #24')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],  'failed at #24')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],  'failed at #24')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],  'failed at #24')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],  'failed at #24')
   call g:assert.equals(&l:autoindent,  1,           'failed at #24')
@@ -9240,7 +9340,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',               'failed at #25')
   " call g:assert.equals(getline(6),   '        ]',      'failed at #25')
   call g:assert.equals(getline(7),   '}',              'failed at #25')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0],     'failed at #25')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0],     'failed at #25')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0],     'failed at #25')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0],     'failed at #25')
   call g:assert.equals(&l:autoindent,  1,              'failed at #25')
@@ -9261,7 +9361,7 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(getline(5),   '',           'failed at #26')
   call g:assert.equals(getline(6),   ']',          'failed at #26')
   call g:assert.equals(getline(7),   '}',          'failed at #26')
-  call g:assert.equals(getpos('.'),  [0, 4, 1, 0], 'failed at #26')
+  call g:assert.equals(getpos('.'),  [0, 4, 5, 0], 'failed at #26')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #26')
   call g:assert.equals(getpos("']"), [0, 7, 2, 0], 'failed at #26')
   call g:assert.equals(&l:autoindent,  1,          'failed at #26')
@@ -9296,7 +9396,7 @@ function! s:suite.linewise_x_option_indentkeys() abort  "{{{
   call g:assert.equals(getline(1),   '    {',      'failed at #1')
   call g:assert.equals(getline(2),   '    foo',    'failed at #1')
   call g:assert.equals(getline(3),   '    }',      'failed at #1')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #1')
+  call g:assert.equals(getpos('.'),  [0, 2, 5, 0], 'failed at #1')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #1')
   call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #1')
   call g:assert.equals(&l:cinkeys,    cinkeys,     'failed at #1')
@@ -9318,7 +9418,7 @@ function! s:suite.linewise_x_option_indentkeys() abort  "{{{
   call g:assert.equals(getline(1),   '{',          'failed at #2')
   call g:assert.equals(getline(2),   '    foo',    'failed at #2')
   call g:assert.equals(getline(3),   '}',          'failed at #2')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #2')
+  call g:assert.equals(getpos('.'),  [0, 2, 5, 0], 'failed at #2')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #2')
   call g:assert.equals(getpos("']"), [0, 3, 2, 0], 'failed at #2')
   call g:assert.equals(&l:cinkeys,    cinkeys,     'failed at #2')
@@ -9340,7 +9440,7 @@ function! s:suite.linewise_x_option_indentkeys() abort  "{{{
   call g:assert.equals(getline(1),   '    {',      'failed at #3')
   call g:assert.equals(getline(2),   '    foo',    'failed at #3')
   call g:assert.equals(getline(3),   '    }',      'failed at #3')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #3')
+  call g:assert.equals(getpos('.'),  [0, 2, 5, 0], 'failed at #3')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #3')
   call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #3')
   call g:assert.equals(&l:cinkeys,    cinkeys,     'failed at #3')
@@ -9361,7 +9461,7 @@ function! s:suite.linewise_x_option_indentkeys() abort  "{{{
   call g:assert.equals(getline(1),   '    {',      'failed at #4')
   call g:assert.equals(getline(2),   '    foo',    'failed at #4')
   call g:assert.equals(getline(3),   '    }',      'failed at #4')
-  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #4')
+  call g:assert.equals(getpos('.'),  [0, 2, 5, 0], 'failed at #4')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #4')
   call g:assert.equals(getpos("']"), [0, 3, 6, 0], 'failed at #4')
   call g:assert.equals(&l:cinkeys,    cinkeys,     'failed at #4')
@@ -9384,7 +9484,7 @@ function! s:suite.linewise_x_option_indentkeys() abort  "{{{
   call g:assert.equals(getline(1),   '    {',         'failed at #5')
   call g:assert.equals(getline(2),   '    foo',       'failed at #5')
   call g:assert.equals(getline(3),   '            }', 'failed at #5')
-  call g:assert.equals(getpos('.'),  [0, 2,  1, 0],   'failed at #5')
+  call g:assert.equals(getpos('.'),  [0, 2,  5, 0],   'failed at #5')
   call g:assert.equals(getpos("'["), [0, 1,  1, 0],   'failed at #5')
   call g:assert.equals(getpos("']"), [0, 3, 14, 0],   'failed at #5')
   call g:assert.equals(&l:cinkeys,    cinkeys,        'failed at #5')
@@ -9406,7 +9506,7 @@ function! s:suite.linewise_x_option_indentkeys() abort  "{{{
   call g:assert.equals(getline(1),   '       {',      'failed at #6')
   call g:assert.equals(getline(2),   '    foo',       'failed at #6')
   call g:assert.equals(getline(3),   '            }', 'failed at #6')
-  call g:assert.equals(getpos('.'),  [0, 2,  1, 0],   'failed at #6')
+  call g:assert.equals(getpos('.'),  [0, 2,  5, 0],   'failed at #6')
   call g:assert.equals(getpos("'["), [0, 1,  1, 0],   'failed at #6')
   call g:assert.equals(getpos("']"), [0, 3, 14, 0],   'failed at #6')
   call g:assert.equals(&l:cinkeys,    cinkeys,        'failed at #6')
@@ -9428,7 +9528,7 @@ function! s:suite.linewise_x_option_indentkeys() abort  "{{{
   call g:assert.equals(getline(1),   '    {',         'failed at #7')
   call g:assert.equals(getline(2),   '    foo',       'failed at #7')
   call g:assert.equals(getline(3),   '            }', 'failed at #7')
-  call g:assert.equals(getpos('.'),  [0, 2,  1, 0],   'failed at #7')
+  call g:assert.equals(getpos('.'),  [0, 2,  5, 0],   'failed at #7')
   call g:assert.equals(getpos("'["), [0, 1,  1, 0],   'failed at #7')
   call g:assert.equals(getpos("']"), [0, 3, 14, 0],   'failed at #7')
   call g:assert.equals(&l:cinkeys,    cinkeys,        'failed at #7')
@@ -9449,7 +9549,7 @@ function! s:suite.linewise_x_option_indentkeys() abort  "{{{
   call g:assert.equals(getline(1),   '    {',         'failed at #8')
   call g:assert.equals(getline(2),   '    foo',       'failed at #8')
   call g:assert.equals(getline(3),   '            }', 'failed at #8')
-  call g:assert.equals(getpos('.'),  [0, 2,  1, 0],   'failed at #8')
+  call g:assert.equals(getpos('.'),  [0, 2,  5, 0],   'failed at #8')
   call g:assert.equals(getpos("'["), [0, 1,  1, 0],   'failed at #8')
   call g:assert.equals(getpos("']"), [0, 3, 14, 0],   'failed at #8')
   call g:assert.equals(&l:cinkeys,    cinkeys,        'failed at #8')
@@ -10142,7 +10242,7 @@ function! s:suite.blockwise_n_option_cursor() abort  "{{{
   set whichwrap=h,l
 
   """"" cursor
-  """ inner_head
+  """ default
   " #1
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg2sr\<C-v>29l[]"
@@ -10160,90 +10260,109 @@ function! s:suite.blockwise_n_option_cursor() abort  "{{{
 
   %delete
 
-  """ keep
+  """ inner_head
   " #3
-  call operator#sandwich#set('replace', 'block', 'cursor', 'keep')
+  call operator#sandwich#set('replace', 'block', 'cursor', 'inner_head')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg2sr\<C-v>29l[]"
   call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #3')
   call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #3')
   call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #3')
-  call g:assert.equals(getpos('.'), [0, 1, 1, 0], 'failed at #3')
+  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #3')
 
   " #4
-  execute "normal 2lsr\<C-v>25l["
+  execute "normal sr\<C-v>25l["
   call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #4')
   call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #4')
   call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #4')
-  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #4')
+  call g:assert.equals(getpos('.'), [0, 1, 4, 0], 'failed at #4')
 
   %delete
 
-  """ inner_tail
+  """ keep
   " #5
-  call operator#sandwich#set('replace', 'block', 'cursor', 'inner_tail')
+  call operator#sandwich#set('replace', 'block', 'cursor', 'keep')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg2sr\<C-v>29l[]"
   call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #5')
   call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #5')
   call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #5')
-  call g:assert.equals(getpos('.'), [0, 3, 7, 0], 'failed at #5')
+  call g:assert.equals(getpos('.'), [0, 1, 1, 0], 'failed at #5')
 
   " #6
-  execute "normal gg2lsr\<C-v>25l["
+  execute "normal 2lsr\<C-v>25l["
   call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #6')
   call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #6')
   call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #6')
-  call g:assert.equals(getpos('.'), [0, 3, 6, 0], 'failed at #6')
+  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #6')
 
   %delete
 
-  """ head
+  """ inner_tail
   " #7
-  call operator#sandwich#set('replace', 'block', 'cursor', 'head')
+  call operator#sandwich#set('replace', 'block', 'cursor', 'inner_tail')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg2sr\<C-v>29l[]"
   call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #7')
   call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #7')
   call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #7')
-  call g:assert.equals(getpos('.'), [0, 1, 1, 0], 'failed at #7')
+  call g:assert.equals(getpos('.'), [0, 3, 7, 0], 'failed at #7')
 
   " #8
-  execute "normal 2lsr\<C-v>25l["
+  execute "normal gg2lsr\<C-v>25l["
   call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #8')
   call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #8')
   call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #8')
-  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #8')
+  call g:assert.equals(getpos('.'), [0, 3, 6, 0], 'failed at #8')
 
   %delete
 
-  """ tail
+  """ head
   " #9
-  call operator#sandwich#set('replace', 'block', 'cursor', 'tail')
+  call operator#sandwich#set('replace', 'block', 'cursor', 'head')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg2sr\<C-v>29l[]"
   call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #9')
   call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #9')
   call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #9')
-  call g:assert.equals(getpos('.'), [0, 3, 9, 0], 'failed at #9')
+  call g:assert.equals(getpos('.'), [0, 1, 1, 0], 'failed at #9')
 
   " #10
-  execute "normal 6h2ksr\<C-v>25l["
+  execute "normal 2lsr\<C-v>25l["
   call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #10')
   call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #10')
   call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #10')
-  call g:assert.equals(getpos('.'), [0, 3, 7, 0], 'failed at #10')
+  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #10')
+
+  %delete
+
+  """ tail
+  " #11
+  call operator#sandwich#set('replace', 'block', 'cursor', 'tail')
+  call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
+  execute "normal gg2sr\<C-v>29l[]"
+  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #11')
+  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #11')
+  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #11')
+  call g:assert.equals(getpos('.'), [0, 3, 9, 0], 'failed at #11')
+
+  " #12
+  execute "normal 6h2ksr\<C-v>25l["
+  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #12')
+  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #12')
+  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #12')
+  call g:assert.equals(getpos('.'), [0, 3, 7, 0], 'failed at #12')
 
   %delete
 
   """"" recipe option
-  " #11
+  " #13
   let g:operator#sandwich#recipes = [{'buns': ['(', ')'], 'cursor': 'inner_head', 'input':['1']}]
   call operator#sandwich#set('replace', 'block', 'cursor', 'inner_tail')
   call setline('.', '[foo]')
   execute "normal ^sr\<C-v>5l1"
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #11')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #11')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #13')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #13')
 endfunction
 "}}}
 function! s:suite.blockwise_n_option_noremap() abort  "{{{
@@ -12232,7 +12351,7 @@ endfunction
 "}}}
 function! s:suite.blockwise_x_option_cursor() abort  "{{{
   """"" cursor
-  """ inner_head
+  """ default
   " #1
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg\<C-v>2j8l2sr[]"
@@ -12250,90 +12369,109 @@ function! s:suite.blockwise_x_option_cursor() abort  "{{{
 
   %delete
 
-  """ keep
+  """ inner_head
   " #3
-  call operator#sandwich#set('replace', 'block', 'cursor', 'keep')
+  call operator#sandwich#set('replace', 'block', 'cursor', 'inner_head')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg\<C-v>2j8l2sr[]"
   call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #3')
   call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #3')
   call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #3')
-  call g:assert.equals(getpos('.'), [0, 3, 9, 0], 'failed at #3')
+  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #3')
 
   " #4
-  execute "normal 2h\<C-v>2k4hsr["
+  execute "normal \<C-v>2j4lsr["
   call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #4')
   call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #4')
   call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #4')
-  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #4')
+  call g:assert.equals(getpos('.'), [0, 1, 4, 0], 'failed at #4')
 
   %delete
 
-  """ inner_tail
+  """ keep
   " #5
-  call operator#sandwich#set('replace', 'block', 'cursor', 'inner_tail')
+  call operator#sandwich#set('replace', 'block', 'cursor', 'keep')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg\<C-v>2j8l2sr[]"
   call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #5')
   call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #5')
   call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #5')
-  call g:assert.equals(getpos('.'), [0, 3, 7, 0], 'failed at #5')
+  call g:assert.equals(getpos('.'), [0, 3, 9, 0], 'failed at #5')
 
   " #6
-  execute "normal gg2l\<C-v>2j4lsr["
+  execute "normal 2h\<C-v>2k4hsr["
   call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #6')
   call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #6')
   call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #6')
-  call g:assert.equals(getpos('.'), [0, 3, 6, 0], 'failed at #6')
+  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #6')
 
   %delete
 
-  """ head
+  """ inner_tail
   " #7
-  call operator#sandwich#set('replace', 'block', 'cursor', 'head')
+  call operator#sandwich#set('replace', 'block', 'cursor', 'inner_tail')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg\<C-v>2j8l2sr[]"
   call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #7')
   call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #7')
   call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #7')
-  call g:assert.equals(getpos('.'), [0, 1, 1, 0], 'failed at #7')
+  call g:assert.equals(getpos('.'), [0, 3, 7, 0], 'failed at #7')
 
   " #8
-  execute "normal 2l\<C-v>2j4lsr["
+  execute "normal gg2l\<C-v>2j4lsr["
   call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #8')
   call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #8')
   call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #8')
-  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #8')
+  call g:assert.equals(getpos('.'), [0, 3, 6, 0], 'failed at #8')
 
   %delete
 
-  """ tail
+  """ head
   " #9
-  call operator#sandwich#set('replace', 'block', 'cursor', 'tail')
+  call operator#sandwich#set('replace', 'block', 'cursor', 'head')
   call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
   execute "normal gg\<C-v>2j8l2sr[]"
   call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #9')
   call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #9')
   call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #9')
-  call g:assert.equals(getpos('.'), [0, 3, 9, 0], 'failed at #9')
+  call g:assert.equals(getpos('.'), [0, 1, 1, 0], 'failed at #9')
 
   " #10
-  execute "normal 6h2k\<C-v>2j4lsr["
+  execute "normal 2l\<C-v>2j4lsr["
   call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #10')
   call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #10')
   call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #10')
-  call g:assert.equals(getpos('.'), [0, 3, 7, 0], 'failed at #10')
+  call g:assert.equals(getpos('.'), [0, 1, 3, 0], 'failed at #10')
+
+  %delete
+
+  """ tail
+  " #11
+  call operator#sandwich#set('replace', 'block', 'cursor', 'tail')
+  call append(0, ['(((foo)))', '(((bar)))', '(((baz)))'])
+  execute "normal gg\<C-v>2j8l2sr[]"
+  call g:assert.equals(getline(1),  '[[(foo)]]',  'failed at #11')
+  call g:assert.equals(getline(2),  '[[(bar)]]',  'failed at #11')
+  call g:assert.equals(getline(3),  '[[(baz)]]',  'failed at #11')
+  call g:assert.equals(getpos('.'), [0, 3, 9, 0], 'failed at #11')
+
+  " #12
+  execute "normal 6h2k\<C-v>2j4lsr["
+  call g:assert.equals(getline(1),  '[[[foo]]]',  'failed at #12')
+  call g:assert.equals(getline(2),  '[[[bar]]]',  'failed at #12')
+  call g:assert.equals(getline(3),  '[[[baz]]]',  'failed at #12')
+  call g:assert.equals(getpos('.'), [0, 3, 7, 0], 'failed at #12')
 
   %delete
 
   """"" recipe option
-  " #11
+  " #13
   let g:operator#sandwich#recipes = [{'buns': ['(', ')'], 'cursor': 'inner_head', 'input':['1']}]
   call operator#sandwich#set('replace', 'block', 'cursor', 'inner_tail')
   call setline('.', '[foo]')
   execute "normal ^\<C-v>4lsr1"
-  call g:assert.equals(getline('.'), '(foo)',      'failed at #11')
-  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #11')
+  call g:assert.equals(getline('.'), '(foo)',      'failed at #13')
+  call g:assert.equals(getpos('.'),  [0, 1, 2, 0], 'failed at #13')
 endfunction
 "}}}
 function! s:suite.blockwise_x_option_noremap() abort  "{{{
