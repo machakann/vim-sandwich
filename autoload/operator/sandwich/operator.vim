@@ -258,7 +258,7 @@ function! s:operator.delete() dict abort  "{{{
 
     if !hi_exited && self.opt.of('highlight') && hi_duration > 0
       call winrestview(self.view)
-      let hi_exited = self.blink('OperatorSandwichBuns', hi_duration, 1)
+      let hi_exited = self.blink('OperatorSandwichBuns', hi_duration, self.opt.of('linewise'), 1)
     endif
 
     call self.delete_once(i)
@@ -454,11 +454,12 @@ function! s:operator.match(i) dict abort  "{{{
   return success
 endfunction
 "}}}
-function! s:operator.show(hi_group) dict abort "{{{
+function! s:operator.show(hi_group, ...) dict abort "{{{
   if self.opt.of('highlight')
+    let linewise = get(a:000, 0, 0)
     for i in range(self.n)
       let stuff = self.basket[i]
-      call stuff.show(a:hi_group)
+      call stuff.show(a:hi_group, linewise)
     endfor
     redraw
   endif
@@ -477,9 +478,10 @@ function! s:operator.blink(hi_group, duration, ...) dict abort "{{{
   if self.opt.of('highlight')
     let clock = sandwich#clock#new()
     let hi_exited = 0
-    let feedkey = get(a:000, 0, 0)
+    let linewise = get(a:000, 0, 0)
+    let feedkey = get(a:000, 1, 0)
 
-    call self.show(a:hi_group)
+    call self.show(a:hi_group, linewise)
     try
       let c = 0
       call clock.start()

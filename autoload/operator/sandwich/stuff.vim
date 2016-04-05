@@ -189,10 +189,10 @@ function! s:stuff.skip_space() dict abort  "{{{
   endif
 endfunction
 "}}}
-function! s:stuff.show(hi_group) dict abort "{{{
+function! s:stuff.show(hi_group, linewise) dict abort "{{{
   if self.active && !self.hi_status
     if s:is_valid_4pos(self.target)
-      let order_list = s:highlight_order(self.target)
+      let order_list = s:highlight_order(self.target, a:linewise)
       for order in order_list
         let self.hi_idlist += s:matchaddpos(a:hi_group, order)
       endfor
@@ -475,7 +475,12 @@ function! s:skip_space(head, tail) abort  "{{{
   endif
 endfunction
 "}}}
-function! s:highlight_order(target) abort "{{{
+function! s:highlight_order(target, linewise) abort "{{{
+  return a:linewise ? s:highlight_order_linewise(a:target)
+                  \ : s:highlight_order_charwise(a:target)
+endfunction
+"}}}
+function! s:highlight_order_charwise(target) abort  "{{{
   let n = 0
   let order = []
   let order_list = []
@@ -485,11 +490,14 @@ function! s:highlight_order(target) abort "{{{
         let order += [head[1:2] + [tail[2] - head[2] + 1]]
         let n += 1
       else
-        let order += [head[1:2] + [col([head[1], '$']) - head[2] + 1]]
-        let order += [[tail[1], 1] + [tail[2]]]
-        let n += 2
-        for lnum in range(head[1]+1, tail[1]-1)
-          let order += [[lnum]]
+        for lnum in range(head[1], tail[1])
+          if lnum == head[1]
+            let order += [head[1:2] + [col([head[1], '$']) - head[2] + 1]]
+          elseif lnum == tail[1]
+            let order += [[tail[1], 1] + [tail[2]]]
+          else
+            let order += [[lnum]]
+          endif
 
           if n == 7
             let order_list += [order]
@@ -503,7 +511,36 @@ function! s:highlight_order(target) abort "{{{
     endif
   endfor
   if order != []
-    call add(order_list, order)
+    let order_list += [order]
+  endif
+  return order_list
+endfunction
+"}}}
+function! s:highlight_order_linewise(target) abort  "{{{
+  let n = 0
+  let order = []
+  let order_list = []
+  for [head, tail] in [[a:target.head1, a:target.tail1], [a:target.head2, a:target.tail2]]
+    if head != s:null_pos && tail != s:null_pos
+      if head[1] == tail[1]
+        let order += [head[1]]
+        let n += 1
+      else
+        for lnum in range(head[1], tail[1])
+          let order += [[lnum]]
+          if n == 7
+            let order_list += [order]
+            let order = []
+            let n = 0
+          else
+            let n += 1
+          endif
+        endfor
+      endif
+    endif
+  endfor
+  if order != []
+    let order_list += [order]
   endif
   return order_list
 endfunction
