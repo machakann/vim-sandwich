@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:02-Apr-2016.
+						Last change:05-Apr-2016.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license
@@ -1262,17 +1262,18 @@ indentkeys-
 	applied to 'cinkeys'.
 
 	The applying order of these options is "indentkeys" -> "indentkeys+"
-	-> "indentkeys-".
+	-> "indentkeys-". If the value is not a string, like 0, it does not
+	change 'indentkeys' or 'cinkeys'.
 
 	Default values
 	  * add
-	    - char : ''
-	    - line : ''
-	    - block: ''
+	    - char : 0
+	    - line : 0
+	    - block: 0
 	  * replace
-	    - char : ''
-	    - line : ''
-	    - block: ''
+	    - char : 0
+	    - line : 0
+	    - block: 0
 
 
 

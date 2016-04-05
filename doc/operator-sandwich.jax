@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:02-Apr-2016.
+						Last change:05-Apr-2016.
 
 書いた人   : machakann <mckn@outlook.jp>
 ライセンス : NYSL license
@@ -1246,17 +1246,18 @@ indentkeys-
 	'cinkeys' へ処理が切り替わります。
 
 	処理される順番は "indentkeys" -> "indentkeys+" -> "indentkeys-" のよう
-	になっています。
+	になっています。値が文字列以外の場合は 'indentkeys' 及び 'cinkeys' の
+	値を変更しません。
 
 	Default values
 	  * add
-	    - char : ''
-	    - line : ''
-	    - block: ''
+	    - char : 0
+	    - line : 0
+	    - block: 0
 	  * replace
-	    - char : ''
-	    - line : ''
-	    - block: ''
+	    - char : 0
+	    - line : 0
+	    - block: 0
 
 
 

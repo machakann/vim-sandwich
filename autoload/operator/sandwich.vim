@@ -293,9 +293,9 @@ let s:default_opt.add.char = {
       \   'command'    : [],
       \   'linewise'   : 0,
       \   'autoindent' : -1,
-      \   'indentkeys' : '',
-      \   'indentkeys+': '',
-      \   'indentkeys-': '',
+      \   'indentkeys' : 0,
+      \   'indentkeys+': 0,
+      \   'indentkeys-': 0,
       \ }
 let s:default_opt.add.line = {
       \   'cursor'    : 'inner_head',
@@ -307,9 +307,9 @@ let s:default_opt.add.line = {
       \   'command'   : [],
       \   'linewise'  : 1,
       \   'autoindent' : -1,
-      \   'indentkeys' : '',
-      \   'indentkeys+': '',
-      \   'indentkeys-': '',
+      \   'indentkeys' : 0,
+      \   'indentkeys+': 0,
+      \   'indentkeys-': 0,
       \ }
 let s:default_opt.add.block = {
       \   'cursor'    : 'inner_head',
@@ -321,9 +321,9 @@ let s:default_opt.add.block = {
       \   'command'   : [],
       \   'linewise'  : 0,
       \   'autoindent' : -1,
-      \   'indentkeys' : '',
-      \   'indentkeys+': '',
-      \   'indentkeys-': '',
+      \   'indentkeys' : 0,
+      \   'indentkeys+': 0,
+      \   'indentkeys-': 0,
       \ }
 let s:default_opt.add.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:default_opt['add']['char']), '\|'))
 
@@ -373,9 +373,9 @@ let s:default_opt.replace.char = {
       \   'command'   : [],
       \   'linewise'  : 0,
       \   'autoindent' : -1,
-      \   'indentkeys' : '',
-      \   'indentkeys+': '',
-      \   'indentkeys-': '',
+      \   'indentkeys' : 0,
+      \   'indentkeys+': 0,
+      \   'indentkeys-': 0,
       \ }
 let s:default_opt.replace.line = {
       \   'cursor'    : 'inner_head',
@@ -389,9 +389,9 @@ let s:default_opt.replace.line = {
       \   'command'   : [],
       \   'linewise'  : 0,
       \   'autoindent' : -1,
-      \   'indentkeys' : '',
-      \   'indentkeys+': '',
-      \   'indentkeys-': '',
+      \   'indentkeys' : 0,
+      \   'indentkeys+': 0,
+      \   'indentkeys-': 0,
       \ }
 let s:default_opt.replace.block = {
       \   'cursor'    : 'inner_head',
@@ -405,9 +405,9 @@ let s:default_opt.replace.block = {
       \   'command'   : [],
       \   'linewise'  : 0,
       \   'autoindent' : -1,
-      \   'indentkeys' : '',
-      \   'indentkeys+': '',
-      \   'indentkeys-': '',
+      \   'indentkeys' : 0,
+      \   'indentkeys+': 0,
+      \   'indentkeys-': 0,
       \ }
 let s:default_opt.replace.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:default_opt['replace']['char']), '\|'))
 
@@ -457,7 +457,7 @@ function! operator#sandwich#set(kind, motionwise, option, value) abort  "{{{
       return
     endif
 
-    if type(a:value) != type(s:default_opt[a:kind][a:motionwise][a:option])
+    if a:option !~# 'indentkeys[-+]\?' && type(a:value) != type(s:default_opt[a:kind][a:motionwise][a:option])
       echohl WarningMsg
       echomsg 'Invalid type of value. ' . string(a:value)
       echohl NONE
@@ -480,8 +480,9 @@ function! operator#sandwich#set(kind, motionwise, option, value) abort  "{{{
   for kind in kinds
     for motionwise in motionwises
       if filter(keys(s:default_opt[kind][motionwise]), 'v:val ==# a:option') != []
-            \ && type(a:value) == type(s:default_opt[kind][motionwise][a:option])
-        let g:operator#sandwich#options[kind][motionwise][a:option] = a:value
+        if a:option =~# 'indentkeys[-+]\?' || type(a:value) == type(s:default_opt[kind][motionwise][a:option])
+          let g:operator#sandwich#options[kind][motionwise][a:option] = a:value
+        endif
       endif
     endfor
   endfor

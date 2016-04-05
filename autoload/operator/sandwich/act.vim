@@ -10,6 +10,9 @@ let s:null_4pos  = {
       \   'tail2': copy(s:null_pos),
       \ }
 
+" types
+let s:type_str = type('')
+
 " features
 let s:has_gui_running = has('gui_running')
 "}}}
@@ -261,15 +264,23 @@ function! s:set_indent(opt) abort "{{{
     let indentopt.indentkeys.name  = 'cinkeys'
     let indentopt.indentkeys.value = &l:cinkeys
   endif
-  for [sign, val] in [['', a:opt.of('indentkeys')], ['+', a:opt.of('indentkeys+')]]
-    if val !=# ''
-      execute printf('setlocal %s%s=%s', indentopt.indentkeys.name, sign, val)
-      let indentopt.indentkeys.restore = 1
-    endif
-  endfor
-  if a:opt.of('indentkeys-') !=# ''
+
+  let val = a:opt.of('indentkeys')
+  if type(val) == s:type_str
+    execute printf('setlocal %s=%s', indentopt.indentkeys.name, val)
+    let indentopt.indentkeys.restore = 1
+  endif
+
+  let val = a:opt.of('indentkeys+')
+  if type(val) == s:type_str && val !=# ''
+    execute printf('setlocal %s+=%s', indentopt.indentkeys.name, val)
+    let indentopt.indentkeys.restore = 1
+  endif
+
+  let val = a:opt.of('indentkeys-')
+  if type(val) == s:type_str && val !=# ''
     " It looks there is no way to add ',' itself to 'indentkeys'
-    for item in split(a:opt.of('indentkeys-'), ',')
+    for item in split(val, ',')
       execute printf('setlocal %s-=%s', indentopt.indentkeys.name, item)
     endfor
     let indentopt.indentkeys.restore = 1
