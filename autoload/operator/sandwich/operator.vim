@@ -16,7 +16,6 @@ let s:null_4pos  = {
       \ }
 
 " types
-let s:type_str  = type('')
 let s:type_num  = type(0)
 let s:type_fref = type(function('tr'))
 
@@ -789,10 +788,6 @@ endfunction
 "}}}
 function! s:is_duplicated_buns(item, ref, opt_regex, opt_expr) abort  "{{{
   if has_key(a:item, 'buns')
-        \ && type(a:ref['buns'][0]) == s:type_str
-        \ && type(a:ref['buns'][1]) == s:type_str
-        \ && type(a:item['buns'][0]) == s:type_str
-        \ && type(a:item['buns'][1]) == s:type_str
         \ && a:ref['buns'][0] ==# a:item['buns'][0]
         \ && a:ref['buns'][1] ==# a:item['buns'][1]
     let regex_r = get(a:ref,  'regex', a:opt_regex)
@@ -853,25 +848,17 @@ endfunction
 function! s:get_buns(recipe, opt_expr) abort  "{{{
   if a:opt_expr == 2
     let buns = deepcopy(a:recipe.buns)
-    let buns[0] = s:eval(buns[0], 1)
-    let buns[1] = s:eval(buns[1], 0)
+    let buns[0] = eval(buns[0])
+    let buns[1] = eval(buns[1])
   elseif a:opt_expr == 1 && !a:recipe.evaluated
     let buns = a:recipe.buns
-    let buns[0] = s:eval(buns[0], 1)
-    let buns[1] = s:eval(buns[1], 0)
+    let buns[0] = eval(buns[0])
+    let buns[1] = eval(buns[1])
     let a:recipe.evaluated = 1
   else
     let buns = a:recipe.buns
   endif
   return buns
-endfunction
-"}}}
-function! s:eval(expr, ...) abort "{{{
-  if type(a:expr) == s:type_fref
-    return call(a:expr, a:000)
-  else
-    return eval(a:expr)
-  endif
 endfunction
 "}}}
 

@@ -861,7 +861,6 @@ function! s:suite.i_o_option_expr() abort "{{{
         \   {'buns': ['1+1', '1+2'], 'input': ['a']},
         \   {'buns': ['SandwichExprEmpty()', '1+2'], 'input': ['b']},
         \   {'buns': ['1+1', 'SandwichExprEmpty()'], 'input': ['c']},
-        \   {'buns': [function('SandwichExprBuns'), function('SandwichExprBuns')], 'expr': 1, 'input': ['d']},
         \   {'buns': ['1+1', '1+2'], 'expr': 0, 'input': ['0']},
         \   {'buns': ['1+1', '1+2'], 'expr': 1, 'input': ['1']},
         \ ]
@@ -912,16 +911,10 @@ function! s:suite.i_o_option_expr() abort "{{{
   call g:assert.equals(@@, '', 'failed at #7')
 
   " #8
-  call setline('.', 'headfootail')
-  let @@ = 'fail'
-  normal 0yisd
-  call g:assert.equals(@@, 'foo', 'failed at #8')
-
-  " #9
   call setline('.', '1+1aa1+2')
   let @@ = 'fail'
   normal 0yis0
-  call g:assert.equals(@@, 'aa', 'failed at #9')
+  call g:assert.equals(@@, 'aa', 'failed at #8')
 endfunction
 "}}}
 function! s:suite.i_o_option_regex() abort "{{{
@@ -2158,7 +2151,6 @@ function! s:suite.i_x_option_expr() abort "{{{
         \   {'buns': ['1+1', '1+2'], 'input': ['a']},
         \   {'buns': ['SandwichExprEmpty()', '1+2'], 'input': ['b']},
         \   {'buns': ['1+1', 'SandwichExprEmpty()'], 'input': ['c']},
-        \   {'buns': [function('SandwichExprBuns'), function('SandwichExprBuns')], 'expr': 1, 'input': ['d']},
         \   {'buns': ['1+1', '1+2'], 'expr': 0, 'input': ['0']},
         \   {'buns': ['1+1', '1+2'], 'expr': 1, 'input': ['1']},
         \ ]
@@ -2209,16 +2201,10 @@ function! s:suite.i_x_option_expr() abort "{{{
   call g:assert.equals(@@, '2', 'failed at #7')
 
   " #8
-  call setline('.', 'headfootail')
-  let @@ = 'fail'
-  normal 0visdy
-  call g:assert.equals(@@, 'foo', 'failed at #8')
-
-  " #9
   call setline('.', '1+1aa1+2')
   let @@ = 'fail'
   normal 0vis0y
-  call g:assert.equals(@@, 'aa', 'failed at #9')
+  call g:assert.equals(@@, 'aa', 'failed at #8')
 endfunction
 "}}}
 function! s:suite.i_x_option_regex() abort "{{{
@@ -3411,7 +3397,6 @@ function! s:suite.a_o_option_expr() abort "{{{
         \   {'buns': ['1+1', '1+2'], 'input': ['a']},
         \   {'buns': ['SandwichExprEmpty()', '1+2'], 'input': ['b']},
         \   {'buns': ['1+1', 'SandwichExprEmpty()'], 'input': ['c']},
-        \   {'buns': [function('SandwichExprBuns'), function('SandwichExprBuns')], 'expr': 1, 'input': ['d']},
         \   {'buns': ['1+1', '1+2'], 'expr': 0, 'input': ['0']},
         \   {'buns': ['1+1', '1+2'], 'expr': 1, 'input': ['1']},
         \ ]
@@ -3462,16 +3447,10 @@ function! s:suite.a_o_option_expr() abort "{{{
   call g:assert.equals(@@, '', 'failed at #7')
 
   " #8
-  call setline('.', 'headfootail')
-  let @@ = 'fail'
-  normal 0yasd
-  call g:assert.equals(@@, 'headfootail', 'failed at #8')
-
-  " #9
   call setline('.', '1+1aa1+2')
   let @@ = 'fail'
   normal 0yas0
-  call g:assert.equals(@@, '1+1aa1+2', 'failed at #9')
+  call g:assert.equals(@@, '1+1aa1+2', 'failed at #8')
 endfunction
 "}}}
 function! s:suite.a_o_option_regex() abort "{{{
@@ -4734,7 +4713,6 @@ function! s:suite.a_x_option_expr() abort "{{{
         \   {'buns': ['1+1', '1+2'], 'input': ['a']},
         \   {'buns': ['SandwichExprEmpty()', '1+2'], 'input': ['b']},
         \   {'buns': ['1+1', 'SandwichExprEmpty()'], 'input': ['c']},
-        \   {'buns': [function('SandwichExprBuns'), function('SandwichExprBuns')], 'expr': 1, 'input': ['d']},
         \   {'buns': ['1+1', '1+2'], 'expr': 0, 'input': ['0']},
         \   {'buns': ['1+1', '1+2'], 'expr': 1, 'input': ['1']},
         \ ]
@@ -4785,16 +4763,10 @@ function! s:suite.a_x_option_expr() abort "{{{
   call g:assert.equals(@@, '2', 'failed at #7')
 
   " #8
-  call setline('.', 'headfootail')
-  let @@ = 'fail'
-  normal 0vasdy
-  call g:assert.equals(@@, 'headfootail', 'failed at #8')
-
-  " #9
   call setline('.', '1+1aa1+2')
   let @@ = 'fail'
   normal 0vas0y
-  call g:assert.equals(@@, '1+1aa1+2', 'failed at #9')
+  call g:assert.equals(@@, '1+1aa1+2', 'failed at #8')
 endfunction
 "}}}
 function! s:suite.a_x_option_regex() abort "{{{

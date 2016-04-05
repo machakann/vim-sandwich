@@ -483,9 +483,9 @@ function! s:stuff.get_buns(clock) dict abort  "{{{
   if (opt_expr && !self.evaluated) || opt_expr == 2
     call a:clock.pause()
     let buns = opt_expr == 2 ? deepcopy(buns) : buns
-    let buns[0] = s:eval(buns[0], 1)
+    let buns[0] = eval(buns[0])
     if buns[0] !=# ''
-      let buns[1] = s:eval(buns[1], 0)
+      let buns[1] = eval(buns[1])
     endif
     let self.evaluated = 1
     call a:clock.start()

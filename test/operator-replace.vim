@@ -2558,7 +2558,6 @@ function! s:suite.charwise_n_option_expr() abort "{{{
         \   {'buns': ['1+1', '1+2'], 'input': ['a']},
         \   {'buns': ['SandwichExprCancel()', '1+2'], 'input': ['b']},
         \   {'buns': ['1+1', 'SandwichExprCancel()'], 'input': ['c']},
-        \   {'buns': [function('SandwichExprBuns'), function('SandwichExprBuns')], 'expr': 1, 'input': ['d']},
         \   {'buns': ['1+1', '1+2'], 'expr': 0, 'input': ['0']},
         \   {'buns': ['1+1', '1+2'], 'expr': 1, 'input': ['1']},
         \ ]
@@ -2619,13 +2618,8 @@ function! s:suite.charwise_n_option_expr() abort "{{{
 
   " #10
   call setline('.', '"foo"')
-  normal 0sra"d
-  call g:assert.equals(getline('.'), 'headfootail', 'failed at #10')
-
-  " #11
-  call setline('.', '"foo"')
   normal 0sra"0
-  call g:assert.equals(getline('.'), '1+1foo1+2', 'failed at #11')
+  call g:assert.equals(getline('.'), '1+1foo1+2', 'failed at #10')
 
   """ 2
   " This case cannot be tested since this option makes difference only in
@@ -4480,7 +4474,6 @@ function! s:suite.charwise_x_option_expr() abort "{{{
         \   {'buns': ['1+1', '1+2'], 'input': ['a']},
         \   {'buns': ['SandwichExprCancel()', '1+2'], 'input': ['b']},
         \   {'buns': ['1+1', 'SandwichExprCancel()'], 'input': ['c']},
-        \   {'buns': [function('SandwichExprBuns'), function('SandwichExprBuns')], 'expr': 1, 'input': ['d']},
         \   {'buns': ['1+1', '1+2'], 'expr': 0, 'input': ['0']},
         \   {'buns': ['1+1', '1+2'], 'expr': 1, 'input': ['1']},
         \ ]
@@ -4541,13 +4534,8 @@ function! s:suite.charwise_x_option_expr() abort "{{{
 
   " #10
   call setline('.', '"foo"')
-  normal 0va"srd
-  call g:assert.equals(getline('.'), 'headfootail', 'failed at #10')
-
-  " #11
-  call setline('.', '"foo"')
   normal 0va"sr0
-  call g:assert.equals(getline('.'), '1+1foo1+2', 'failed at #11')
+  call g:assert.equals(getline('.'), '1+1foo1+2', 'failed at #10')
 
   """ 2
   " This case cannot be tested since this option makes difference only in
@@ -6509,7 +6497,6 @@ function! s:suite.linewise_n_option_expr() abort "{{{
         \   {'buns': ['1+1', '1+2'], 'input': ['a']},
         \   {'buns': ['SandwichExprCancel()', '1+2'], 'input': ['b']},
         \   {'buns': ['1+1', 'SandwichExprCancel()'], 'input': ['c']},
-        \   {'buns': [function('SandwichExprBuns'), function('SandwichExprBuns')], 'expr': 1, 'input': ['d']},
         \   {'buns': ['1+1', '1+2'], 'expr': 0, 'input': ['0']},
         \   {'buns': ['1+1', '1+2'], 'expr': 1, 'input': ['1']},
         \ ]
@@ -6570,13 +6557,8 @@ function! s:suite.linewise_n_option_expr() abort "{{{
 
   " #10
   call setline('.', '"foo"')
-  normal 0srVld
-  call g:assert.equals(getline('.'), 'headfootail', 'failed at #10')
-
-  " #11
-  call setline('.', '"foo"')
   normal 0srVl0
-  call g:assert.equals(getline('.'), '1+1foo1+2', 'failed at #11')
+  call g:assert.equals(getline('.'), '1+1foo1+2', 'failed at #10')
 
   """ 2
   " This case cannot be tested since this option makes difference only in
@@ -8601,7 +8583,6 @@ function! s:suite.linewise_x_option_expr() abort "{{{
         \   {'buns': ['1+1', '1+2'], 'input': ['a']},
         \   {'buns': ['SandwichExprCancel()', '1+2'], 'input': ['b']},
         \   {'buns': ['1+1', 'SandwichExprCancel()'], 'input': ['c']},
-        \   {'buns': [function('SandwichExprBuns'), function('SandwichExprBuns')], 'expr': 1, 'input': ['d']},
         \   {'buns': ['1+1', '1+2'], 'expr': 0, 'input': ['0']},
         \   {'buns': ['1+1', '1+2'], 'expr': 1, 'input': ['1']},
         \ ]
@@ -8663,13 +8644,8 @@ function! s:suite.linewise_x_option_expr() abort "{{{
 
   " #10
   call setline('.', '"foo"')
-  normal Vsrd
-  call g:assert.equals(getline('.'), 'headfootail', 'failed at #10')
-
-  " #11
-  call setline('.', '"foo"')
   normal Vsr0
-  call g:assert.equals(getline('.'), '1+1foo1+2', 'failed at #11')
+  call g:assert.equals(getline('.'), '1+1foo1+2', 'failed at #10')
 
   """ 2
   " This case cannot be tested since this option makes difference only in
@@ -10705,7 +10681,6 @@ function! s:suite.blockwise_n_option_expr() abort "{{{
         \   {'buns': ['1+1', '1+2'], 'input': ['a']},
         \   {'buns': ['SandwichExprCancel()', '1+2'], 'input': ['b']},
         \   {'buns': ['1+1', 'SandwichExprCancel()'], 'input': ['c']},
-        \   {'buns': [function('SandwichExprBuns'), function('SandwichExprBuns')], 'expr': 1, 'input': ['d']},
         \   {'buns': ['1+1', '1+2'], 'expr': 0, 'input': ['0']},
         \   {'buns': ['1+1', '1+2'], 'expr': 1, 'input': ['1']},
         \ ]
@@ -10800,19 +10775,10 @@ function! s:suite.blockwise_n_option_expr() abort "{{{
 
   " #10
   call append(0, ['"foo"', '"bar"', '"baz"'])
-  execute "normal ggsr\<C-v>17ld"
-  call g:assert.equals(getline(1), 'headfootail', 'failed at #10')
-  call g:assert.equals(getline(2), 'headbartail', 'failed at #10')
-  call g:assert.equals(getline(3), 'headbaztail', 'failed at #10')
-
-  %delete
-
-  " #11
-  call append(0, ['"foo"', '"bar"', '"baz"'])
   execute "normal ggsr\<C-v>17l0"
-  call g:assert.equals(getline(1), '1+1foo1+2', 'failed at #11')
-  call g:assert.equals(getline(2), '1+1bar1+2', 'failed at #11')
-  call g:assert.equals(getline(3), '1+1baz1+2', 'failed at #11')
+  call g:assert.equals(getline(1), '1+1foo1+2', 'failed at #10')
+  call g:assert.equals(getline(2), '1+1bar1+2', 'failed at #10')
+  call g:assert.equals(getline(3), '1+1baz1+2', 'failed at #10')
 
   """ 2
   " This case cannot be tested since this option makes difference only in
@@ -12796,7 +12762,6 @@ function! s:suite.blockwise_x_option_expr() abort "{{{
         \   {'buns': ['1+1', '1+2'], 'input': ['a']},
         \   {'buns': ['SandwichExprCancel()', '1+2'], 'input': ['b']},
         \   {'buns': ['1+1', 'SandwichExprCancel()'], 'input': ['c']},
-        \   {'buns': [function('SandwichExprBuns'), function('SandwichExprBuns')], 'expr': 1, 'input': ['d']},
         \   {'buns': ['1+1', '1+2'], 'expr': 0, 'input': ['0']},
         \   {'buns': ['1+1', '1+2'], 'expr': 1, 'input': ['1']},
         \ ]
@@ -12819,27 +12784,17 @@ function! s:suite.blockwise_x_option_expr() abort "{{{
   %delete
 
   """ 1
-  " #2
+  " #3
   call operator#sandwich#set('replace', 'block', 'expr', 1)
   call append(0, ['"foo"', '"bar"', '"baz"'])
   execute "normal gg\<C-v>2j4lsra"
-  call g:assert.equals(getline('.'), '2foo3',  'failed at #2')
-
-  %delete
-
-  " #3
-  call append(0, ['"foo"', '"bar"', '"baz"'])
-  execute "normal gg\<C-v>2j4lsrb"
-  call g:assert.equals(getline(1), '"foo"', 'failed at #3')
-  call g:assert.equals(getline(2), '"bar"', 'failed at #3')
-  call g:assert.equals(getline(3), '"baz"', 'failed at #3')
-  call g:assert.equals(exists(s:object), 0, 'failed at #3')
+  call g:assert.equals(getline('.'), '2foo3',  'failed at #3')
 
   %delete
 
   " #4
   call append(0, ['"foo"', '"bar"', '"baz"'])
-  execute "normal gg\<C-v>2j4lsrc"
+  execute "normal gg\<C-v>2j4lsrb"
   call g:assert.equals(getline(1), '"foo"', 'failed at #4')
   call g:assert.equals(getline(2), '"bar"', 'failed at #4')
   call g:assert.equals(getline(3), '"baz"', 'failed at #4')
@@ -12848,18 +12803,18 @@ function! s:suite.blockwise_x_option_expr() abort "{{{
   %delete
 
   " #5
-  call append(0, ['"''foo''"', '"''bar''"', '"''baz''"'])
-  execute "normal gg\<C-v>2j7l2srab"
-  call g:assert.equals(getline(1), '2''foo''3', 'failed at #5')
-  call g:assert.equals(getline(2), '2''bar''3', 'failed at #5')
-  call g:assert.equals(getline(3), '2''baz''3', 'failed at #5')
-  call g:assert.equals(exists(s:object), 0,     'failed at #5')
+  call append(0, ['"foo"', '"bar"', '"baz"'])
+  execute "normal gg\<C-v>2j4lsrc"
+  call g:assert.equals(getline(1), '"foo"', 'failed at #5')
+  call g:assert.equals(getline(2), '"bar"', 'failed at #5')
+  call g:assert.equals(getline(3), '"baz"', 'failed at #5')
+  call g:assert.equals(exists(s:object), 0, 'failed at #5')
 
   %delete
 
   " #6
   call append(0, ['"''foo''"', '"''bar''"', '"''baz''"'])
-  execute "normal gg\<C-v>2j7l2srac"
+  execute "normal gg\<C-v>2j7l2srab"
   call g:assert.equals(getline(1), '2''foo''3', 'failed at #6')
   call g:assert.equals(getline(2), '2''bar''3', 'failed at #6')
   call g:assert.equals(getline(3), '2''baz''3', 'failed at #6')
@@ -12869,17 +12824,17 @@ function! s:suite.blockwise_x_option_expr() abort "{{{
 
   " #7
   call append(0, ['"''foo''"', '"''bar''"', '"''baz''"'])
-  execute "normal gg\<C-v>2j7l2srba"
-  call g:assert.equals(getline(1), '"''foo''"', 'failed at #7')
-  call g:assert.equals(getline(2), '"''bar''"', 'failed at #7')
-  call g:assert.equals(getline(3), '"''baz''"', 'failed at #7')
+  execute "normal gg\<C-v>2j7l2srac"
+  call g:assert.equals(getline(1), '2''foo''3', 'failed at #7')
+  call g:assert.equals(getline(2), '2''bar''3', 'failed at #7')
+  call g:assert.equals(getline(3), '2''baz''3', 'failed at #7')
   call g:assert.equals(exists(s:object), 0,     'failed at #7')
 
   %delete
 
   " #8
   call append(0, ['"''foo''"', '"''bar''"', '"''baz''"'])
-  execute "normal gg\<C-v>2j7l2srca"
+  execute "normal gg\<C-v>2j7l2srba"
   call g:assert.equals(getline(1), '"''foo''"', 'failed at #8')
   call g:assert.equals(getline(2), '"''bar''"', 'failed at #8')
   call g:assert.equals(getline(3), '"''baz''"', 'failed at #8')
@@ -12888,20 +12843,21 @@ function! s:suite.blockwise_x_option_expr() abort "{{{
   %delete
 
   " #9
-  call append(0, ['"foo"', '"bar"', '"baz"'])
-  execute "normal gg\<C-v>2j4lsrd"
-  call g:assert.equals(getline(1), 'headfootail', 'failed at #9')
-  call g:assert.equals(getline(2), 'headbartail', 'failed at #9')
-  call g:assert.equals(getline(3), 'headbaztail', 'failed at #9')
+  call append(0, ['"''foo''"', '"''bar''"', '"''baz''"'])
+  execute "normal gg\<C-v>2j7l2srca"
+  call g:assert.equals(getline(1), '"''foo''"', 'failed at #9')
+  call g:assert.equals(getline(2), '"''bar''"', 'failed at #9')
+  call g:assert.equals(getline(3), '"''baz''"', 'failed at #9')
+  call g:assert.equals(exists(s:object), 0,     'failed at #9')
 
   %delete
 
-  " #11
+  " #10
   call append(0, ['"foo"', '"bar"', '"baz"'])
   execute "normal gg\<C-v>2j4lsr0"
-  call g:assert.equals(getline(1), '1+1foo1+2', 'failed at #11')
-  call g:assert.equals(getline(2), '1+1bar1+2', 'failed at #11')
-  call g:assert.equals(getline(3), '1+1baz1+2', 'failed at #11')
+  call g:assert.equals(getline(1), '1+1foo1+2', 'failed at #10')
+  call g:assert.equals(getline(2), '1+1bar1+2', 'failed at #10')
+  call g:assert.equals(getline(3), '1+1baz1+2', 'failed at #10')
 
   """ 2
   " This case cannot be tested since this option makes difference only in

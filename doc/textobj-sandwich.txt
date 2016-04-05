@@ -1,5 +1,5 @@
 *textobj-sandwich.txt*	The textobject plugin to select sandwiched texts.
-						Last change:28-Mar-2016.
+						Last change:05-Apr-2016.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license
@@ -810,16 +810,6 @@ expr
 	        return c ==# "\<Esc>" || c ==# "\<C-c>" ? '' : c
 	      endfunction
 <
-	If the item is |Funcref|, it should be possible to accept an argument.
->
-	:function {func}(is_head, ...)
-<
-	If a:is_head is 1, the function is required to return head
-	surrounding. If a:is_head is 0, the function is required to return
-	tail surrounding. Not necessarily to use the argument, use if needed.
-	In future, the arguments are possible to append. Thus it might be
-	better to assign variable-length argument.
-
 	Default values
 	  * query: 0
 	  * auto : 0

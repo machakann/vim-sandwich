@@ -762,13 +762,6 @@ function! s:suite.i_o_option_expr() abort "{{{
   normal $yib
   call g:assert.equals(@@, '', 'failed at #7')
 
-  " #8
-  let g:textobj#sandwich#recipes = [{'buns': [function('SandwichExprBuns'), function('SandwichExprBuns')], 'expr': 1, 'input': ['d']}]
-  call setline('.', 'headfootail')
-  let @@ = 'fail'
-  normal $yib
-  call g:assert.equals(@@, 'foo', 'failed at #8')
-
   " #9
   let g:textobj#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'expr': 0}]
   call setline('.', '1+1aa1+2')
@@ -2146,18 +2139,11 @@ function! s:suite.i_x_option_expr() abort "{{{
   call g:assert.equals(@@, '3', 'failed at #7')
 
   " #8
-  let g:textobj#sandwich#recipes = [{'buns': [function('SandwichExprBuns'), function('SandwichExprBuns')], 'expr': 1, 'input': ['d']}]
-  call setline('.', 'headfootail')
-  let @@ = 'fail'
-  normal $viby
-  call g:assert.equals(@@, 'foo', 'failed at #8')
-
-  " #9
   let g:textobj#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'expr': 0}]
   call setline('.', '1+1aa1+2')
   let @@ = 'fail'
   normal 0viby
-  call g:assert.equals(@@, 'aa', 'failed at #9')
+  call g:assert.equals(@@, 'aa', 'failed at #8')
 endfunction
 "}}}
 function! s:suite.i_x_option_regex() abort "{{{
@@ -3439,18 +3425,11 @@ function! s:suite.a_o_option_expr() abort "{{{
   call g:assert.equals(@@, '', 'failed at #7')
 
   " #8
-  let g:textobj#sandwich#recipes = [{'buns': [function('SandwichExprBuns'), function('SandwichExprBuns')], 'expr': 1, 'input': ['d']}]
-  call setline('.', 'headfootail')
-  let @@ = 'fail'
-  normal $yab
-  call g:assert.equals(@@, 'headfootail', 'failed at #8')
-
-  " #9
   let g:textobj#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'expr': 0}]
   call setline('.', '1+1aa1+2')
   let @@ = 'fail'
   normal 0yab
-  call g:assert.equals(@@, '1+1aa1+2', 'failed at #9')
+  call g:assert.equals(@@, '1+1aa1+2', 'failed at #8')
 endfunction
 "}}}
 function! s:suite.a_o_option_regex() abort "{{{
@@ -4843,18 +4822,11 @@ function! s:suite.a_x_option_expr() abort "{{{
   call g:assert.equals(@@, '3', 'failed at #7')
 
   " #8
-  let g:textobj#sandwich#recipes = [{'buns': [function('SandwichExprBuns'), function('SandwichExprBuns')], 'expr': 1, 'input': ['d']}]
-  call setline('.', 'headfootail')
-  let @@ = 'fail'
-  normal $vaby
-  call g:assert.equals(@@, 'headfootail', 'failed at #8')
-
-  " #9
   let g:textobj#sandwich#recipes = [{'buns': ['1+1', '1+2'], 'expr': 0}]
   call setline('.', '1+1aa1+2')
   let @@ = 'fail'
   normal 0vaby
-  call g:assert.equals(@@, '1+1aa1+2', 'failed at #9')
+  call g:assert.equals(@@, '1+1aa1+2', 'failed at #8')
 endfunction
 "}}}
 function! s:suite.a_x_option_regex() abort "{{{
