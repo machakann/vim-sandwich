@@ -215,14 +215,16 @@ function! textobj#sandwich#set(kind, option, value) abort "{{{
     return
   endif
 
-  if filter(keys(s:default_opt[a:kind]), 'v:val ==# a:option') == []
+  " NOTE: Regaardless of a:kind, keys(s:default_opt[a:kind]) is fixed since
+  "       the two textobjects have same kinds of options.
+  if filter(keys(s:default_opt['auto']), 'v:val ==# a:option') == []
     echohl WarningMsg
     echomsg 'Invalid option name "' . a:kind . '".'
     echohl NONE
     return
   endif
 
-  if type(a:value) != type(s:default_opt[a:kind][a:option])
+  if type(a:value) != type(s:default_opt['auto'][a:option])
     echohl WarningMsg
     echomsg 'Invalid type of value. ' . string(a:value)
     echohl NONE
