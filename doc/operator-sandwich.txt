@@ -1748,9 +1748,6 @@ About the handlings of recipe-local options in the replace operator.~
 	`skip_char`
 	The recipe for delete action is used.
 
-	`highlight`
-	The bigger value in the two is used.
-
 	`command`
 	Both recipes are valid, the recipe for add action is executed later.
 

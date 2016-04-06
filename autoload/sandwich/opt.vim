@@ -95,7 +95,7 @@ function! s:of_for_replace(opt_name, ...) dict abort  "{{{
     elseif a:opt_name ==# 'skip_char'
       return self._of(a:opt_name, 'recipe_delete')
     elseif a:opt_name ==# 'highlight'
-      return self.max(a:opt_name)
+      return self._of(a:opt_name, '')
     elseif a:opt_name ==# 'command'
       let commands = []
       let commands += get(self.recipe_delete, a:opt_name, [])
