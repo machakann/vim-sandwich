@@ -878,7 +878,7 @@ highlight
 	This option switches the highlight feature. If the value is 1, a
 	simple highlighting is used. If the value is 2, a rich highlighting
 	with multi-colors is used. In Addition, if the value is 3, highlight
-	the added texts in a short time.
+	the added texts in a short time. Set it 0 to turn off highlighting.
 
 	The highlight for delete operator or in case of using the rich
 	highlighting, highlighted regions would be left in a short time,
