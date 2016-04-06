@@ -38,6 +38,7 @@ endfunction
 " s:operator "{{{
 let s:operator = {
       \   'state'     : 0,
+      \   'kind'      : '',
       \   'count'     : 1,
       \   'n'         : 0,
       \   'mode'      : 'n',
@@ -45,6 +46,7 @@ let s:operator = {
       \   'blockwidth': 0,
       \   'extended'  : 0,
       \   'keepable'  : 0,
+      \   'at_work'   : 0,
       \   'opt'       : {},
       \   'basket'    : [],
       \   'recipes'   : {
@@ -98,13 +100,13 @@ function! s:operator.initialize(kind, motionwise) dict abort "{{{
   call self.recipes.integrate(a:kind, a:motionwise, self.mode)
   let region = s:get_assigned_region(a:kind, a:motionwise)
   let region_list = a:motionwise ==# 'block' ? self.split(region) : [region]
-
   if region == s:null_2pos
     " deactivate
     let self.state = -1
   endif
 
   let self.n = len(region_list)  " Number of lines in the target region
+  let self.at_work = 1
   let self.cursor.inner_head = deepcopy(region.head)
   let self.cursor.inner_tail = deepcopy(region.tail)
   call self.opt.update('default', g:operator#sandwich#options[a:kind][a:motionwise])
@@ -205,7 +207,7 @@ function! s:operator.add() dict abort "{{{
         let recipe = self.query()
         let self.recipes.dog_ear += [recipe]
       finally
-        call self.quench()
+        call self.quench('stuff')
       endtry
 
       call opt.update('recipe_add', recipe)
@@ -321,7 +323,7 @@ function! s:operator.replace() dict abort  "{{{
         let recipe = self.query()
         let self.recipes.dog_ear += [recipe]
       finally
-        call self.quench()
+        call self.quench('target')
       endtry
 
       call opt.update('recipe_add', recipe)
@@ -488,23 +490,29 @@ function! s:operator.match(i) dict abort  "{{{
 endfunction
 "}}}
 function! s:operator.show(place, hi_group, ...) dict abort "{{{
-  if self.opt.of('highlight')
+  let force = get(a:000, 1, 0)
+  let success = 0
+  if self.opt.of('highlight') || force
     let linewise = get(a:000, 0, 0)
     for i in range(self.n)
       let stuff = self.basket[i]
-      call stuff.show(a:place, a:hi_group, linewise)
+      let success = stuff.show(a:place, a:hi_group, linewise) || success
     endfor
     redraw
   endif
+  return !success
 endfunction
 "}}}
-function! s:operator.quench() dict abort "{{{
-  if self.opt.of('highlight')
+function! s:operator.quench(place, ...) dict abort "{{{
+  let force = get(a:000, 0, 0)
+  let success = 0
+  if self.opt.of('highlight') || force
     for i in range(self.n)
       let stuff = self.basket[i]
-      call stuff.quench()
+      let success = stuff.quench(a:place) || success
     endfor
   endif
+  return !success
 endfunction
 "}}}
 function! s:operator.blink(place, hi_group, duration, ...) dict abort "{{{
@@ -531,7 +539,7 @@ function! s:operator.blink(place, hi_group, duration, ...) dict abort "{{{
         call feedkeys(c, 't')
       endif
     finally
-      call self.quench()
+      call self.quench(a:place)
       call clock.stop()
       return hi_exited
     endtry
@@ -582,6 +590,7 @@ function! s:operator.finalize(kind) dict abort  "{{{
 
   " set state
   let self.state = 0
+  let self.at_work = 0
 endfunction
 "}}}
 function! s:operator.last_succeeded() abort "{{{

@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:05-Apr-2016.
+						Last change:06-Apr-2016.
 
 書いた人   : machakann <mckn@outlook.jp>
 ライセンス : NYSL license
@@ -1452,6 +1452,68 @@ OperatorSandwichReplacePost		*OperatorSandwichReplacePost*
  autocmd User OperatorSandwichAddPre,OperatorSandwichReplacePre NoMatchParen
  autocmd User OperatorSandwichAddPost,OperatorSandwichReplacePost DoMatchParen
 <
+
+
+
+==============================================================================
+API					*operator-sandwich-api*
+
+|operator-sandwich| はいくつかの関数を API として提供します。これらの関数は
+"expr" オプション付きの設定を便利にするのに役立つことでしょう。
+
+					*operator#sandwich#show()*
+operator#sandwich#show({place}[, {group}])
+	この関数はテキストをハイライトするのに使います。ハイライトするテキスト
+	は {place} によって指定され、次の値が指定可能です。
+	    'target': 置換オペレータにより置換の対象となるテキスト
+	    'stuff' : 囲みを追加するオペレータにより囲まれるテキスト
+	    'added' : 囲みを追加/置換するオペレータにより追加されたテキスト
+
+	{group} が与えられた場合、テキストはこのハイライトグループ
+	|highlight-group| によりハイライトされます。テキストが既にハイライトさ
+	れている場合は {group} が現在の値と違う場合のみ更新しますが、そうでな
+	ければ何もせず終了します。ハイライトの追加あるいは更新に成功した場合、
+	関数は 0 を返します。それ以外の場合は 1 を返します。
+
+
+					*operator#sandwich#quench()*
+operator#sandwich#quench({place})
+	|operator#sandwich#show()| 関数によるハイライトを削除します。 {place}
+	には |operator#sandwich#show()| に与えたものと同じ値を指定してくだ
+	さい。削除に成功すれば 0 、それ以外の場合は 1 を返します。
+
+例えば、 query1st 系列のキーマッピング
+|<Plug>(operator-sandwich-add-query1st)| は、その囲むテキストをハイライトしま
+せん。しかし、ユーザーに入力を促すような "expr" 設定を使った場合、ハイライトが
+行われると見栄えがよくなる場合があります。下記の例はユーザーに関数名を問い合わ
+せ、その関数で囲むような新しいキーマッピングを定義しています。
+>
+	nmap sf <Plug>(operator-sandwich-add-query1st)<C-f>
+	xmap sf <Plug>(operator-sandwich-add)<C-f>
+
+	let g:operator#sandwich#recipes += [
+	    \   {
+	    \     'buns': ['FuncName()', '")"'],
+	    \     'kind': ['add'],
+	    \     'action': ['add'],
+	    \     'expr': 1,
+	    \     'cursor': 'inner_tail',
+	    \     'input': ["\<C-f>"]
+	    \   },
+	    \ ]
+
+	function! FuncName() abort
+	  call operator#sandwich#show('stuff')
+	  let funcname = input('funcname: ')
+	  call operator#sandwich#quench('stuff')
+	  if funcname ==# ''
+	    throw 'OperatorSandwichCancel'
+	  endif
+	  return funcname . '('
+	endfunction
+<
+この新しいオペレータキーマッピング `sf` は `sfiwfunc<CR>` という入力により
+"foo" を "func(foo)" にします。
 
 
 

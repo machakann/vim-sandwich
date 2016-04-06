@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:05-Apr-2016.
+						Last change:06-Apr-2016.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license
@@ -47,6 +47,7 @@ CONFIGURATION			|operator-sandwich-configuration|
     highlight_duration		|g:operator#sandwich#highlight_duration|
 HIGHLIGHT GROUP			|operator-sandwich-highlight-group|
 AUTOCOMMANDS			|operator-sandwich-autocommands|
+API				|operator-sandwich-api|
 MISCELLANEOUS			|operator-sandwich-miscellaneous|
   Highlighting in the delete operator is really irritating.
   Highlighting is always irritating.
@@ -1477,6 +1478,71 @@ add/replace operators action.
  autocmd User OperatorSandwichAddPre,OperatorSandwichReplacePre NoMatchParen
  autocmd User OperatorSandwichAddPost,OperatorSandwichReplacePost DoMatchParen
 <
+
+
+
+==============================================================================
+API					*operator-sandwich-api*
+
+|operator-sandwich| provides some functions as Application Programming
+Interface. The functions would be helpful to make your "expr" buns more
+convenient.
+
+					*operator#sandwich#show()*
+operator#sandwich#show({place}[, {group}])
+	This function highlight texts. The kind of highlighted text is
+	assigned by {place}, and {place} should be:
+	    'target': the text to be replaced in replace operators.
+	    'stuff' : the text to be surrounded in add operators.
+	    'added' : the added text in add/replace operators.
+
+	If user gives {group}, the text will be highlighted with {group} which
+	is defined by |:highlight| command. Default highlight groups are
+	listed in |highlight-groups|. When |operator-sandwich| has highlighted
+	the text already, this function updates highlight if {group} is
+	different. Otherwise finish immediately. If it successfully adds or
+	updates highlighting, it returns 0. Otherwise returns 1.
+
+
+					*operator#sandwich#quench()*
+operator#sandwich#quench({place})
+	This function deletes highlight added by |operator#sandwich#show()|.
+	Give same {place} with |operator#sandwich#show()| to delete. If it
+	successfully deletes highlighting, it returns 0. Otherwise returns 1.
+
+For example, a query1st series keymapping
+|<Plug>(operator-sandwich-add-query1st)| does not highlight a text to be
+surrounded. However if "expr" buns request user input, it would looks better
+to highlight the surrounded text. The following example is to define a new
+keymapping to surround text by a function, like func(), depending on an user
+input of function name.
+>
+	nmap sf <Plug>(operator-sandwich-add-query1st)<C-f>
+	xmap sf <Plug>(operator-sandwich-add)<C-f>
+
+	let g:operator#sandwich#recipes += [
+	    \   {
+	    \     'buns': ['FuncName()', '")"'],
+	    \     'kind': ['add'],
+	    \     'action': ['add'],
+	    \     'expr': 1,
+	    \     'cursor': 'inner_tail',
+	    \     'input': ["\<C-f>"]
+	    \   },
+	    \ ]
+
+	function! FuncName() abort
+	  call operator#sandwich#show('stuff')
+	  let funcname = input('funcname: ')
+	  call operator#sandwich#quench('stuff')
+	  if funcname ==# ''
+	    throw 'OperatorSandwichCancel'
+	  endif
+	  return funcname . '('
+	endfunction
+<
+This new operator keymapping `sf` makes "foo" to "func(foo)" by a key sequence
+`sfiwfunc<CR>`.
 
 
 

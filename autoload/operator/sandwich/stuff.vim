@@ -39,17 +39,19 @@ let s:stuff = {
       \   'edges'    : copy(s:null_2pos),
       \   'target'   : copy(s:null_4pos),
       \   'acts'     : [],
-      \   'hi_status': 0,
-      \   'hi_idlist': [],
       \   'added'    : [],
+      \   'highlight': {
+      \     'target': {'status': 0, 'group': '', 'id': []},
+      \     'added' : {'status': 0, 'group': '', 'id': []},
+      \     'stuff' : {'status': 0, 'group': '', 'id': []},
+      \   },
       \ }
 "}}}
 function! s:stuff.initialize(cursor, modmark, count) dict abort  "{{{
   let self.active = 1
-  let self.hi_status = 0
-  let self.hi_idlist = []
-  let self.added = []
   let self.acts = map(range(a:count), 'operator#sandwich#act#new()')
+  let self.added = []
+  call map(self.highlight, 'extend(v:val, {"status": 0, "group": "", "id": []})')
   for act in self.acts
     call act.initialize(a:cursor, a:modmark)
   endfor
@@ -194,35 +196,57 @@ function! s:stuff.skip_space() dict abort  "{{{
 endfunction
 "}}}
 function! s:stuff.show(place, hi_group, linewise) dict abort "{{{
-  if self.active && !self.hi_status
-    if a:place ==# 'target'
-      let order_list = s:highlight_order(self.target, a:linewise)
-    elseif a:place ==# 'added'
-      let order_list = []
-      for added in self.added
-        let order_list += s:highlight_order(added, added.linewise)
-      endfor
-    elseif a:place ==# 'stuff'
-      let stuff = {'head1': self.target.head1, 'tail1': self.target.tail2, 'head2': copy(s:null_pos), 'tail2': copy(s:null_pos)}
-      let order_list = s:highlight_order(stuff, a:linewise)
-    else
-      let order_list = []
+  let highlight = get(self.highlight, a:place, {})
+  let success = 0
+  if self.active && highlight != {}
+    if highlight.status && a:hi_group !=# highlight.group
+      call self.quench(a:place)
     endif
 
-    for order in order_list
-      let self.hi_idlist += s:matchaddpos(a:hi_group, order)
-    endfor
-    let self.hi_status = 1
-    call filter(self.hi_idlist, 'v:val > 0')
+    if !highlight.status
+      let order_list = self.highlight_order(a:place, a:linewise)
+      if order_list != []
+        for order in order_list
+          let highlight.id += s:matchaddpos(a:hi_group, order)
+        endfor
+        let highlight.status = 1
+        let highlight.group = a:hi_group
+        call filter(highlight.id, 'v:val > 0')
+        let success = 1
+      endif
+    endif
   endif
+  return success
 endfunction
 "}}}
-function! s:stuff.quench() dict abort "{{{
-  if self.active && self.hi_status
-    call map(self.hi_idlist, 'matchdelete(v:val)')
-    call filter(self.hi_idlist, 'v:val > 0')
-    let self.hi_status = 0
+function! s:stuff.quench(place) dict abort "{{{
+  let highlight = get(self.highlight, a:place, {'status': 0})
+  let success = 0
+  if self.active && highlight.status
+    call map(highlight.id, 'matchdelete(v:val)')
+    call filter(highlight.id, 'v:val > 0')
+    let highlight.status = 0
+    let highlight.group = ''
+    let success = 1
   endif
+  return success
+endfunction
+"}}}
+function! s:stuff.highlight_order(place, linewise) dict abort "{{{
+  if a:place ==# 'target'
+    let order_list = s:highlight_order(self.target, a:linewise)
+  elseif a:place ==# 'added'
+    let order_list = []
+    for added in self.added
+      let order_list += s:highlight_order(added, added.linewise)
+    endfor
+  elseif a:place ==# 'stuff'
+    let stuff = {'head1': self.edges.head, 'tail1': self.edges.tail, 'head2': copy(s:null_pos), 'tail2': copy(s:null_pos)}
+    let order_list = s:highlight_order(stuff, a:linewise)
+  else
+    let order_list = []
+  endif
+  return order_list
 endfunction
 "}}}
 

@@ -25,6 +25,7 @@ function! operator#sandwich#prerequisite(kind, mode, ...) abort "{{{
   " prerequisite
   let operator = g:operator#sandwich#object
   let operator.state = 1
+  let operator.kind  = a:kind
   let operator.count = a:mode ==# 'x' ? max([1, v:prevcount]) : v:count1
   let operator.mode  = a:mode
   let operator.view  = winsaveview()
@@ -258,7 +259,54 @@ function! operator#sandwich#dot() abort  "{{{
 endfunction
 "}}}
 
-" For communication
+" API
+function! operator#sandwich#show(place, ...) abort  "{{{
+  if !exists('g:operator#sandwich#object') || !g:operator#sandwich#object.at_work
+    echoerr 'operator-sandwich: Not in an operator-sandwich operation!'
+    return 1
+  endif
+
+  let operator = g:operator#sandwich#object
+  let kind = operator.kind
+  let opt  = operator.opt
+  if kind ==# 'add'
+    if a:place ==# 'added'
+      let hi_group = get(a:000, 0, 'OperatorSandwichAdd')
+    else
+      let hi_group = opt.of('highlight') >= 2
+                  \ ? get(a:000, 0, 'OperatorSandwichStuff')
+                  \ : get(a:000, 0, 'OperatorSandwichBuns')
+    endif
+  elseif kind ==# 'delete'
+    let hi_group = opt.of('highlight') >= 2
+                \ ? get(a:000, 0, 'OperatorSandwichDelete')
+                \ : get(a:000, 0, 'OperatorSandwichBuns')
+  elseif kind ==# 'replace'
+    if a:place ==# 'added'
+      let hi_group = get(a:000, 0, 'OperatorSandwichAdd')
+    else
+      let hi_group = opt.of('highlight') >= 2
+                  \ ? get(a:000, 0, 'OperatorSandwichDelete')
+                  \ : get(a:000, 0, 'OperatorSandwichBuns')
+    endif
+  else
+    return 1
+  endif
+  return operator.show(a:place, hi_group, opt.of('linewise'), 1)
+endfunction
+"}}}
+function! operator#sandwich#quench(place) abort  "{{{
+  if !exists('g:operator#sandwich#object') || !g:operator#sandwich#object.at_work
+    echoerr 'operator-sandwich: Not in an operator-sandwich operation!'
+    return 1
+  else
+    let operator = g:operator#sandwich#object
+    return operator.quench(a:place, 1)
+  endif
+endfunction
+"}}}
+
+" For internal communication
 function! operator#sandwich#is_in_cmd_window() abort  "{{{
   return s:is_in_cmdline_window
 endfunction
