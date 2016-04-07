@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:06-Apr-2016.
+						Last change:07-Apr-2016.
 
 書いた人   : machakann <mckn@outlook.jp>
 ライセンス : NYSL license
@@ -473,6 +473,11 @@ CONFIGURATION				*operator-sandwich-configuration*
 g:operator#sandwich#recipes		*g:operator#sandwich#recipes*
 	オペレータのみから参照されるレシピのリストです。このリストが存在しない
 	場合は |g:operator#sandwich#default_recipes| が使用されます。
+					*b:operator_sandwich_recipes*
+	|b:operator_sandwich_recipes| が存在する場合は、
+	|g:operator#sandwich#recipes| のかわりにそちらが使われます。これはバッ
+	ファについてローカルな値なので、ファイルタイプ固有な設定が増えすぎた時
+	に使うと便利かもしれません。
 
 
 
@@ -1465,9 +1470,9 @@ API					*operator-sandwich-api*
 operator#sandwich#show({place}[, {group}])
 	この関数はテキストをハイライトするのに使います。ハイライトするテキスト
 	は {place} によって指定され、次の値が指定可能です。
-	    'target': 置換オペレータにより置換の対象となるテキスト
-	    'stuff' : 囲みを追加するオペレータにより囲まれるテキスト
-	    'added' : 囲みを追加/置換するオペレータにより追加されたテキスト
+	    `target`: 置換オペレータにより置換の対象となるテキスト
+	    `stuff` : 囲みを追加するオペレータにより囲まれるテキスト
+	    `added` : 囲みを追加/置換するオペレータにより追加されたテキスト
 
 	{group} が与えられた場合、テキストはこのハイライトグループ
 	|highlight-group| によりハイライトされます。テキストが既にハイライトさ

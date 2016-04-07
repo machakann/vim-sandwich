@@ -1,8 +1,13 @@
 " prepare recipes
 function! sandwich#get_recipes() abort  "{{{
-  let default = exists('g:sandwich#no_default_recipes')
-            \ ? [] : g:sandwich#default_recipes
-  return deepcopy(get(g:, 'sandwich#recipes', default))
+  if exists('b:sandwich_recipes')
+    let recipes = b:sandwich_recipes
+  elseif exists('g:sandwich#recipes')
+    let recipes = g:sandwich#recipes
+  else
+    let recipes = g:sandwich#default_recipes
+  endif
+  return deepcopy(recipes)
 endfunction
 "}}}
 if exists('g:sandwich#default_recipes')

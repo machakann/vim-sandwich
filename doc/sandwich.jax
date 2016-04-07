@@ -1,4 +1,4 @@
-*sandwich.jax*	日本語ヘルプ		Last change:03-Apr-2016.
+*sandwich.jax*	日本語ヘルプ		Last change:07-Apr-2016.
 
 “挟まれた”テキストを編集するためのオペレータとテキストオブジェクトの詰め合わせ
 です。
@@ -211,6 +211,10 @@ g:sandwich#recipes			*g:sandwich#recipes*
 	|operator-sandwich| と |textobj-sandwich| の両方から参照されるレシピの
 	リストです。もし存在しなければ |g:sandwich#default_recipes| がかわりに
 	つかわれます。
+					*b:sandwich_recipes*
+	|b:sandwich_recipes| が存在する場合は、 |g:sandwich#recipes| のかわり
+	にそちらが使われます。これはバッファについてローカルな値なので、ファイ
+	ルタイプ固有な設定が増えすぎた時に使うと便利かもしれません。
 
 
 

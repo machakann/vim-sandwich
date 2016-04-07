@@ -314,9 +314,14 @@ endfunction
 
 " recipes "{{{
 function! operator#sandwich#get_recipes() abort  "{{{
-  let default = exists('g:operator#sandwich#no_default_recipes')
-            \ ? [] : g:operator#sandwich#default_recipes
-  return deepcopy(s:get('recipes', default))
+  if exists('b:operator_sandwich_recipes')
+    let recipes = b:operator_sandwich_recipes
+  elseif exists('g:operator#sandwich#recipes')
+    let recipes = g:operator#sandwich#recipes
+  else
+    let recipes = g:operator#sandwich#default_recipes
+  endif
+  return deepcopy(recipes)
 endfunction
 "}}}
 if exists('g:operator#sandwich#default_recipes')

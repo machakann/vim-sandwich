@@ -137,9 +137,14 @@ let [s:get] = textobj#sandwich#lib#funcref(['get'])
 
 " recipe  "{{{
 function! textobj#sandwich#get_recipes() abort  "{{{
-  let default = exists('g:textobj#sandwich#no_default_recipes')
-            \ ? [] : g:textobj#sandwich#default_recipes
-  return deepcopy(s:get('recipes', default))
+  if exists('b:textobj_sandwich_recipes')
+    let recipes = b:textobj_sandwich_recipes
+  elseif exists('g:textobj#sandwich#recipes')
+    let recipes = g:textobj#sandwich#recipes
+  else
+    let recipes = g:textobj#sandwich#default_recipes
+  endif
+  return deepcopy(recipes)
 endfunction
 "}}}
 if exists('g:textobj#sandwich#default_recipes')

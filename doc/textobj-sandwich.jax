@@ -1,5 +1,5 @@
 *textobj-sandwich.jax*	『挟まれた』テキストを選択する。
-						Last change:05-Apr-2016.
+						Last change:07-Apr-2016.
 
 書いた人   : machakann <mckn@outlook.jp>
 ライセンス : NYSL license
@@ -320,6 +320,11 @@ CONFIGURATION				*textobj-sandwich-configuration*
 g:textobj#sandwich#recipes		*g:textobj#sandwich#recipes*
 	テキストオブジェクトのみから参照されるレシピのリストです。このリストが
 	存在しない場合は |g:textobj#sandwich#default_recipes| が使用されます。
+					*b:textobj_sandwich_recipes*
+	|b:textobj_sandwich_recipes| が存在する場合は、
+	|g:textobj#sandwich#recipes| のかわりにそちらが使われます。これはバッ
+	ファについてローカルな値なので、ファイルタイプ固有な設定が増えすぎた時
+	に使うと便利かもしれません。
 
 
 

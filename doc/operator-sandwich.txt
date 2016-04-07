@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:06-Apr-2016.
+						Last change:07-Apr-2016.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license
@@ -485,6 +485,10 @@ g:operator#sandwich#recipes		*g:operator#sandwich#recipes*
 	This is one of the lists of recipes which is referred only from
 	|operator-sandwich|.  If this list does not exist,
 	|g:operator#sandwich#default_recipes| is used.
+					*b:operator_sandwich_recipes*
+	If |b:operator_sandwich_recipes| exists, it would be used instead of
+	|g:operator#sandwich#recipes|. This is buffer local, thus it might be
+	convenient to manage too many filetype-specific recipes.
 
 
 
@@ -1492,9 +1496,9 @@ convenient.
 operator#sandwich#show({place}[, {group}])
 	This function highlight texts. The kind of highlighted text is
 	assigned by {place}, and {place} should be:
-	    'target': the text to be replaced in replace operators.
-	    'stuff' : the text to be surrounded in add operators.
-	    'added' : the added text in add/replace operators.
+	    `target`: the text to be replaced in replace operators.
+	    `stuff` : the text to be surrounded in add operators.
+	    `added` : the added text in add/replace operators.
 
 	If user gives {group}, the text will be highlighted with {group} which
 	is defined by |:highlight| command. Default highlight groups are

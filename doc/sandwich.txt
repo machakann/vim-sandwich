@@ -1,4 +1,4 @@
-*sandwich.txt*				Last change:03-Apr-2016.
+*sandwich.txt*				Last change:07-Apr-2016.
 
 The set of operator and textobject plugins to edit sandwiched textobjects.
 
@@ -203,6 +203,10 @@ g:sandwich#recipes			*g:sandwich#recipes*
 	This is one of the lists of recipes which is referred from both
 	|operator-sandwich| and |textobj-sandwich|. If this list does not
 	exist, |g:sandwich#default_recipes| is used.
+					*b:sandwich_recipes*
+	If |b:sandwich_recipes| exists, it would be used instead of
+	|g:sandwich#recipes|. This is buffer local, thus it might be
+	convenient to manage too many filetype-specific recipes.
 
 
 
