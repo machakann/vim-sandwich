@@ -53,7 +53,7 @@ function! s:stuff.initialize(cursor, modmark, count) dict abort  "{{{
   let self.added = []
   call map(self.highlight, 'extend(v:val, {"status": 0, "group": "", "id": []})')
   for act in self.acts
-    call act.initialize(a:cursor, a:modmark)
+    call act.initialize(a:cursor, a:modmark, self.added)
   endfor
 endfunction
 "}}}

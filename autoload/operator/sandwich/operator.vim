@@ -246,15 +246,7 @@ function! s:operator.add_once(i, recipe) dict abort  "{{{
       if stuff.active
         let act = stuff.acts[a:i]
         let act.opt = deepcopy(self.opt)
-        let added = act.add_pair(buns, stuff, undojoin)
-
-        if added != {}
-          let success = 1
-          let stuff.added += [added]
-        else
-          let success = 0
-        endif
-
+        let success = act.add_pair(buns, stuff, undojoin)
         let undojoin = success ? 0 : undojoin
         let modified = modified || success
       endif
@@ -360,15 +352,7 @@ function! s:operator.replace_once(i, recipe) dict abort  "{{{
     if stuff.active
       let act = stuff.acts[a:i]
       call act.opt.update('recipe_add', a:recipe)
-      let added = act.replace_pair(buns, stuff, undojoin, modified)
-
-      if added != {}
-        let success = 1
-        let stuff.added += [added]
-      else
-        let success = 0
-      endif
-
+      let success = act.replace_pair(buns, stuff, undojoin, modified)
       let undojoin = success ? 0 : undojoin
       let modified = modified || success
     endif

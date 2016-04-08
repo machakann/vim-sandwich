@@ -28,12 +28,14 @@ let s:act = {
       \   'modmark': {},
       \   'opt'    : {},
       \   'success': 0,
+      \   'added'  : [],
       \ }
 "}}}
-function! s:act.initialize(cursor, modmark) dict abort  "{{{
+function! s:act.initialize(cursor, modmark, added) dict abort  "{{{
   let self.cursor  = a:cursor
   let self.modmark = a:modmark
   let self.opt     = {}
+  let self.added   = a:added
   let self.success = 0
 endfunction
 "}}}
@@ -45,7 +47,6 @@ function! s:act.add_pair(buns, stuff, undojoin) dict abort "{{{
   let indent  = [0, 0]
   let is_linewise = [0, 0]
 
-  let added = {}
   if s:is_valid_4pos(target) && s:is_equal_or_ahead(target.head2, target.head1)
     if target.head2[2] != col([target.head2[1], '$'])
       let target.head2[0:3] = s:get_right_pos(target.head2)
@@ -63,13 +64,17 @@ function! s:act.add_pair(buns, stuff, undojoin) dict abort "{{{
       call s:restore_indent(indentopt)
     endtry
     let [mod_head, mod_tail] = s:execute_command(head1, tail2, opt.of('command'))
-    let added = {
-          \   'head1': head1,
-          \   'tail1': s:get_left_pos(tail1),
-          \   'head2': head2,
-          \   'tail2': s:get_left_pos(tail2),
-          \   'linewise': is_linewise
-          \ }
+
+    if opt.of('highlight', '') >= 3
+      call map(self.added, 's:shift_added("s:shift_for_add", v:val, target, a:buns, indent, is_linewise)')
+      call add(self.added, {
+            \   'head1': head1,
+            \   'tail1': s:get_left_pos(tail1),
+            \   'head2': head2,
+            \   'tail2': s:get_left_pos(tail2),
+            \   'linewise': is_linewise
+            \ })
+    endif
 
     " update modmark
     if modmark.head == s:null_pos || s:is_ahead(modmark.head, mod_head)
@@ -95,8 +100,7 @@ function! s:act.add_pair(buns, stuff, undojoin) dict abort "{{{
 
     let self.success = 1
   endif
-
-  return added
+  return self.success
 endfunction
 "}}}
 function! s:act.delete_pair(stuff, modified) dict abort  "{{{
@@ -161,7 +165,6 @@ function! s:act.replace_pair(buns, stuff, undojoin, modified) dict abort "{{{
   let modmark = self.modmark
   let opt     = self.opt
 
-  let added = {}
   if s:is_valid_4pos(target) && s:is_ahead(target.head2, target.tail1)
     set virtualedit=
     let next_head = s:get_right_pos(target.tail1)
@@ -193,13 +196,17 @@ function! s:act.replace_pair(buns, stuff, undojoin, modified) dict abort "{{{
       call s:restore_indent(indentopt)
     endtry
     let [mod_head, mod_tail] = s:execute_command(head1, tail2, opt.of('command'))
-    let added = {
-          \   'head1': head1,
-          \   'tail1': s:get_left_pos(tail1),
-          \   'head2': head2,
-          \   'tail2': s:get_left_pos(tail2),
-          \   'linewise': is_linewise
-          \ }
+
+    if opt.of('highlight', '') >= 3
+      call map(self.added, 's:shift_added("s:shift_for_replace", v:val, target, a:buns, deletion, indent, is_linewise)')
+      call add(self.added, {
+            \   'head1': head1,
+            \   'tail1': s:get_left_pos(tail1),
+            \   'head2': head2,
+            \   'tail2': s:get_left_pos(tail2),
+            \   'linewise': is_linewise
+            \ })
+    endif
 
     " update modmark
     if modmark.head == s:null_pos || s:is_ahead(modmark.head, mod_head)
@@ -238,7 +245,7 @@ function! s:act.replace_pair(buns, stuff, undojoin, modified) dict abort "{{{
 
     let self.success = 1
   endif
-  return added
+  return self.success
 endfunction
 "}}}
 
@@ -577,6 +584,13 @@ function! s:shift_for_replace(shifted_pos, target, addition, deletion, indent, i
     endif
   endif
   return a:shifted_pos
+endfunction
+"}}}
+function! s:shift_added(func_name, added, ...) abort  "{{{
+  for pos in ['head1', 'tail1', 'head2', 'tail2']
+    call call(a:func_name, [a:added[pos]] + a:000)
+  endfor
+  return a:added
 endfunction
 "}}}
 function! s:push1(shifted_pos, target, addition, indent, is_linewise) abort  "{{{
