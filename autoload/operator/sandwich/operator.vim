@@ -66,15 +66,15 @@ let s:operator = {
       \   'modmark': copy(s:null_2pos),
       \ }
 "}}}
-function! s:operator.execute(kind, motionwise) dict abort  "{{{
+function! s:operator.execute(motionwise) dict abort  "{{{
   " FIXME: What is the best practice to handle exceptions?
   "        Serious lack of the experience with error handlings...
   let errormsg = ''
-  let options = s:shift_options(a:kind, self.mode)
+  let options = s:shift_options(self.kind, self.mode)
   try
-    call self.initialize(a:kind, a:motionwise)
+    call self.initialize(a:motionwise)
     if self.state >= 0
-      call self[a:kind]()
+      call self[self.kind]()
     endif
   catch /^OperatorSandwichError:\%(Add\|Delete\|Replace\):ReadOnly/
     let errormsg = 'operator-sandwich: Cannot make changes to read-only buffer.'
@@ -91,14 +91,14 @@ function! s:operator.execute(kind, motionwise) dict abort  "{{{
       echohl NONE
     endif
 
-    call self.finalize(a:kind)
-    call s:restore_options(a:kind, self.mode, options)
+    call self.finalize()
+    call s:restore_options(self.kind, self.mode, options)
   endtry
 endfunction
 "}}}
-function! s:operator.initialize(kind, motionwise) dict abort "{{{
-  call self.recipes.integrate(a:kind, a:motionwise, self.mode)
-  let region = s:get_assigned_region(a:kind, a:motionwise)
+function! s:operator.initialize(motionwise) dict abort "{{{
+  call self.recipes.integrate(self.kind, a:motionwise, self.mode)
+  let region = s:get_assigned_region(self.kind, a:motionwise)
   let region_list = a:motionwise ==# 'block' ? self.split(region) : [region]
   if region == s:null_2pos
     " deactivate
@@ -110,7 +110,7 @@ function! s:operator.initialize(kind, motionwise) dict abort "{{{
   let self.cursor.inner_head = deepcopy(region.head)
   let self.cursor.inner_tail = deepcopy(region.tail)
   let option_dict = get(b:, 'operator_sandwich_options', g:operator#sandwich#options)
-  call self.opt.update('default', option_dict[a:kind][a:motionwise])
+  call self.opt.update('default', option_dict[self.kind][a:motionwise])
 
   if self.state
     let self.basket = map(range(self.n), 'operator#sandwich#stuff#new()')
@@ -531,7 +531,7 @@ function! s:operator.blink(place, hi_group, duration, ...) dict abort "{{{
   endif
 endfunction
 "}}}
-function! s:operator.finalize(kind) dict abort  "{{{
+function! s:operator.finalize() dict abort  "{{{
   if self.state >= 0
     " restore view
     if self.view != {}
