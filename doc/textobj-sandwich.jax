@@ -1,5 +1,5 @@
 *textobj-sandwich.jax*	『挟まれた』テキストを選択する。
-						Last change:07-Apr-2016.
+						Last change:08-Apr-2016.
 
 書いた人   : machakann <mckn@outlook.jp>
 ライセンス : NYSL license
@@ -614,6 +614,10 @@ g:textobj#sandwich#options		*g:textobj#sandwich#options*
 	" or
 	let g:textobj#sandwich#options.query.skip_break = 1
 <
+					*b:textobj_sandwich_options*
+	|b:textobj_sandwich_options| が存在する場合はそちらが優先されます。
+	バッファについてローカルなオプション設定を使うのに便利でしょう。
+
 	使用可能な引数を次に列挙します。
 	  * kind
 	    - query
@@ -644,6 +648,15 @@ textobj#sandwich#set(kind, option, value)
 	数は |g:textobj#sandwich#options| の項に列挙されています。また、これに
 	加えて、この関数では "all" を kind に指定することができます。
 
+
+
+					*textobj#sandwich#setlocal()*
+textobj#sandwich#setlocal(kind, option, value)
+	local option のバッファについてローカルなデフォルト値を安全かつ簡単に
+	変更するための関数です。引数の組み合わせが不正な場合、関数はメッセージ
+	を表示します。使用可能な引数は |g:textobj#sandwich#options| の項に列挙
+	されています。また、これに加えて、この関数では "all" を kind に指定す
+	ることができます。
 
 
 textobj#sandwich#set_default()		*textobj#sandwich#set_default()*

@@ -28,7 +28,7 @@ function! textobj#sandwich#auto(mode, a_or_i, ...) abort  "{{{
   let textobj.opt = sandwich#opt#new('textobj')
   let textobj.opt.filter = s:default_opt.filter
   call textobj.opt.update('arg', get(a:000, 0, {}))
-  call textobj.opt.update('default', g:textobj#sandwich#options[textobj.kind])
+  call textobj.opt.update('default', s:default_options(textobj.kind))
   call textobj.recipes.integrate(textobj.kind, textobj.mode, textobj.opt)
 
   " uniq recipes
@@ -61,7 +61,7 @@ function! textobj#sandwich#query(mode, a_or_i, ...) abort  "{{{
   let textobj.opt = sandwich#opt#new('textobj')
   let textobj.opt.filter = s:default_opt.filter
   call textobj.opt.update('arg', get(a:000, 0, {}))
-  call textobj.opt.update('default', g:textobj#sandwich#options[textobj.kind])
+  call textobj.opt.update('default', s:default_options(textobj.kind))
   call textobj.recipes.integrate(textobj.kind, textobj.mode, textobj.opt)
 
   call textobj.query()
@@ -76,6 +76,10 @@ endfunction
 "}}}
 function! textobj#sandwich#select() abort  "{{{
   call g:textobj#sandwich#object.start()
+endfunction
+"}}}
+function! s:default_options(kind) abort "{{{
+  return get(b:, 'textobj_sandwich_options', g:textobj#sandwich#options)[a:kind]
 endfunction
 "}}}
 
@@ -213,26 +217,7 @@ function! textobj#sandwich#set_default() abort  "{{{
 endfunction
 "}}}
 function! textobj#sandwich#set(kind, option, value) abort "{{{
-  if !(a:kind ==# 'auto' || a:kind ==# 'query' || a:kind ==# 'all')
-    echohl WarningMsg
-    echomsg 'Invalid kind "' . a:kind . '".'
-    echohl NONE
-    return
-  endif
-
-  " NOTE: Regaardless of a:kind, keys(s:default_opt[a:kind]) is fixed since
-  "       the two textobjects have same kinds of options.
-  if filter(keys(s:default_opt['auto']), 'v:val ==# a:option') == []
-    echohl WarningMsg
-    echomsg 'Invalid option name "' . a:kind . '".'
-    echohl NONE
-    return
-  endif
-
-  if type(a:value) != type(s:default_opt['auto'][a:option])
-    echohl WarningMsg
-    echomsg 'Invalid type of value. ' . string(a:value)
-    echohl NONE
+  if s:argument_error(a:kind, a:option, a:value)
     return
   endif
 
@@ -243,8 +228,54 @@ function! textobj#sandwich#set(kind, option, value) abort "{{{
   endif
 
   for kind in kinds
-    let g:textobj#sandwich#options[a:kind][a:option] = a:value
+    let g:textobj#sandwich#options[kind][a:option] = a:value
   endfor
+endfunction
+"}}}
+function! textobj#sandwich#setlocal(kind, option, value) abort "{{{
+  if s:argument_error(a:kind, a:option, a:value)
+    return
+  endif
+
+  if !exists('b:textobj_sandwich_options')
+    let b:textobj_sandwich_options = deepcopy(g:textobj#sandwich#options)
+  endif
+
+  if a:kind ==# 'all'
+    let kinds = ['auto', 'query']
+  else
+    let kinds = [a:kind]
+  endif
+
+  for kind in kinds
+    let b:textobj_sandwich_options[kind][a:option] = a:value
+  endfor
+endfunction
+"}}}
+function! s:argument_error(kind, option, value) abort "{{{
+  if !(a:kind ==# 'auto' || a:kind ==# 'query' || a:kind ==# 'all')
+    echohl WarningMsg
+    echomsg 'Invalid kind "' . a:kind . '".'
+    echohl NONE
+    return 1
+  endif
+
+  " NOTE: Regaardless of a:kind, keys(s:default_opt[a:kind]) is fixed since
+  "       the two textobjects have same kinds of options.
+  if filter(keys(s:default_opt['auto']), 'v:val ==# a:option') == []
+    echohl WarningMsg
+    echomsg 'Invalid option name "' . a:kind . '".'
+    echohl NONE
+    return 1
+  endif
+
+  if type(a:value) != type(s:default_opt['auto'][a:option])
+    echohl WarningMsg
+    echomsg 'Invalid type of value. ' . string(a:value)
+    echohl NONE
+    return 1
+  endif
+  return 0
 endfunction
 "}}}
 "}}}

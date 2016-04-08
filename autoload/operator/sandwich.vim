@@ -489,34 +489,8 @@ function! operator#sandwich#set_default() abort "{{{
 endfunction
 "}}}
 function! operator#sandwich#set(kind, motionwise, option, value) abort  "{{{
-  if !(a:kind ==# 'add' || a:kind ==# 'delete' || a:kind ==# 'replace' || a:kind ==# 'all')
-    echohl WarningMsg
-    echomsg 'Invalid kind "' . a:kind . '".'
-    echohl NONE
+  if s:argument_error(a:kind, a:motionwise, a:option, a:value)
     return
-  endif
-
-  if !(a:motionwise ==# 'char' || a:motionwise ==# 'line' || a:motionwise ==# 'block' || a:motionwise ==# 'all')
-    echohl WarningMsg
-    echomsg 'Invalid motion-wise "' . a:motionwise . '".'
-    echohl NONE
-    return
-  endif
-
-  if a:kind !=# 'all' && a:motionwise !=# 'all'
-    if filter(keys(s:default_opt[a:kind][a:motionwise]), 'v:val ==# a:option') == []
-      echohl WarningMsg
-      echomsg 'Invalid option name "' . a:option . '".'
-      echohl NONE
-      return
-    endif
-
-    if a:option !~# 'indentkeys[-+]\?' && type(a:value) != type(s:default_opt[a:kind][a:motionwise][a:option])
-      echohl WarningMsg
-      echomsg 'Invalid type of value. ' . string(a:value)
-      echohl NONE
-      return
-    endif
   endif
 
   if a:kind ==# 'all'
@@ -531,11 +505,72 @@ function! operator#sandwich#set(kind, motionwise, option, value) abort  "{{{
     let motionwises = [a:motionwise]
   endif
 
-  for kind in kinds
-    for motionwise in motionwises
+  call s:set_option_value(g:operator#sandwich#options, kinds, motionwises, a:option, a:value)
+endfunction
+"}}}
+function! operator#sandwich#setlocal(kind, motionwise, option, value) abort  "{{{
+  if s:argument_error(a:kind, a:motionwise, a:option, a:value)
+    return
+  endif
+
+  if !exists('b:operator_sandwich_options')
+    let b:operator_sandwich_options = deepcopy(g:operator#sandwich#options)
+  endif
+
+  if a:kind ==# 'all'
+    let kinds = ['add', 'delete', 'replace']
+  else
+    let kinds = [a:kind]
+  endif
+
+  if a:motionwise ==# 'all'
+    let motionwises = ['char', 'line', 'block']
+  else
+    let motionwises = [a:motionwise]
+  endif
+
+  call s:set_option_value(b:operator_sandwich_options, kinds, motionwises, a:option, a:value)
+endfunction
+"}}}
+function! s:argument_error(kind, motionwise, option, value) abort "{{{
+  if !(a:kind ==# 'add' || a:kind ==# 'delete' || a:kind ==# 'replace' || a:kind ==# 'all')
+    echohl WarningMsg
+    echomsg 'Invalid kind "' . a:kind . '".'
+    echohl NONE
+    return 1
+  endif
+
+  if !(a:motionwise ==# 'char' || a:motionwise ==# 'line' || a:motionwise ==# 'block' || a:motionwise ==# 'all')
+    echohl WarningMsg
+    echomsg 'Invalid motion-wise "' . a:motionwise . '".'
+    echohl NONE
+    return 1
+  endif
+
+  if a:kind !=# 'all' && a:motionwise !=# 'all'
+    if filter(keys(s:default_opt[a:kind][a:motionwise]), 'v:val ==# a:option') == []
+      echohl WarningMsg
+      echomsg 'Invalid option name "' . a:option . '".'
+      echohl NONE
+      return 1
+    endif
+
+    if a:option !~# 'indentkeys[-+]\?' && type(a:value) != type(s:default_opt[a:kind][a:motionwise][a:option])
+      echohl WarningMsg
+      echomsg 'Invalid type of value. ' . string(a:value)
+      echohl NONE
+      return 1
+    endif
+  endif
+  return 0
+endfunction
+"}}}
+function! s:set_option_value(dest, kinds, motionwises, option, value) abort  "{{{
+  for kind in a:kinds
+    for motionwise in a:motionwises
       if filter(keys(s:default_opt[kind][motionwise]), 'v:val ==# a:option') != []
         if a:option =~# 'indentkeys[-+]\?' || type(a:value) == type(s:default_opt[kind][motionwise][a:option])
-          let g:operator#sandwich#options[kind][motionwise][a:option] = a:value
+          let a:dest[kind][motionwise][a:option] = a:value
         endif
       endif
     endfor

@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:07-Apr-2016.
+						Last change:08-Apr-2016.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license
@@ -788,6 +788,11 @@ g:operator#sandwich#options		*g:operator#sandwich#options*
 	" or
 	let g:operator#sandwich#options.add.char.highlight = 0
 <
+					*b:operator_sandwich_options*
+	If |b:operator_sandwich_options| exists, it will be used instead of
+	|g:operator#sandwich#options|. It would be useful when a user wants to
+	use buffer-local option settings.
+
 	Available keys are listed below.
 	  * kind
 	    - add
@@ -822,6 +827,16 @@ operator#sandwich#set(kind, motionwise, option, value)
 	function shows error messages. The available arguments are listed in
 	|g:operator#sandwich#options|. In addition to that, "all" is available
 	for kind and motionwise.
+
+
+
+					*operator#sandwich#setlocal()*
+operator#sandwich#setlocal(kind, motionwise, option, value)
+	The function to change buffer local default values of local options
+	easily and safely. If the combination of arguments is not appropriate,
+	this function shows error messages. The available arguments are listed
+	in |g:operator#sandwich#options|. In addition to that, "all" is
+	available for kind and motionwise.
 
 
 

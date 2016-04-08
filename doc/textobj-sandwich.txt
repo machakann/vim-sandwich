@@ -1,5 +1,5 @@
 *textobj-sandwich.txt*	The textobject plugin to select sandwiched texts.
-						Last change:07-Apr-2016.
+						Last change:08-Apr-2016.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license
@@ -606,6 +606,11 @@ g:textobj#sandwich#options		*g:textobj#sandwich#options*
 	" or
 	let g:textobj#sandwich#options.query.skip_break = 1
 <
+					*b:textobj_sandwich_options*
+	If |b:textobj_sandwich_options| exists, it will be used instead of
+	|g:textobj#sandwich#options|. It would be useful when a user wants to
+	use buffer-local option settings.
+
 	Available keys are listed below.
 	  * kind
 	    - query
@@ -636,6 +641,16 @@ textobj#sandwich#set(kind, option, value)
 	function shows error messages. The available arguments are listed in
 	|g:textobj#sandwich#options|. In addition to that, "all" is available
 	for kind.
+
+
+
+					*textobj#sandwich#setlocal()*
+textobj#sandwich#setlocal(kind, option, value)
+	The function to change buffer-local default values of local options
+	easily and safely. If the combination of arguments is not appropriate,
+	this function shows error messages. The available arguments are listed
+	in |g:textobj#sandwich#options|. In addition to that, "all" is
+	available for kind.
 
 
 

@@ -109,7 +109,8 @@ function! s:operator.initialize(kind, motionwise) dict abort "{{{
   let self.at_work = 1
   let self.cursor.inner_head = deepcopy(region.head)
   let self.cursor.inner_tail = deepcopy(region.tail)
-  call self.opt.update('default', g:operator#sandwich#options[a:kind][a:motionwise])
+  let option_dict = get(b:, 'operator_sandwich_options', g:operator#sandwich#options)
+  call self.opt.update('default', option_dict[a:kind][a:motionwise])
 
   if self.state
     let self.basket = map(range(self.n), 'operator#sandwich#stuff#new()')
