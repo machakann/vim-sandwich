@@ -81,6 +81,9 @@ function! s:operator.execute(motionwise) dict abort  "{{{
   catch /^OperatorSandwichCancel/
     " I don't know why it can be released here, but anyway it can be done.
     unlet! g:operator#sandwich#object
+  catch /^Vim:Interrupt$/
+    " cancelled by <C-c>
+    unlet! g:operator#sandwich#object
   catch
     let errormsg = printf('operator-sandwich: Unanticipated error. [%s] %s', v:throwpoint, v:exception)
     unlet! g:operator#sandwich#object
@@ -446,7 +449,7 @@ function! s:operator.query() dict abort  "{{{
   if filter(recipes, 's:is_input_matched(v:val, input, self.opt, 1)') != []
     let recipe = recipes[0]
   else
-    if input ==# "\<Esc>" || input ==# "\<C-c>" || input ==# ''
+    if input ==# "\<Esc>" || input ==# ''
       let recipe = {}
     else
       let c = split(input, '\zs')[0]
