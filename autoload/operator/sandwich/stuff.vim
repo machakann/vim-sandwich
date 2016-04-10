@@ -105,7 +105,10 @@ function! s:stuff.match(recipes, opt) dict abort "{{{
       if a:opt.of('skip_char') && has_key(candidate, 'buns')
         let head = edges.head
         let tail = edges.tail
-        let patterns = s:get_patterns(candidate, a:opt.get('expr', 'recipe_delete', 0), a:opt.of('regex'))
+        let opt_expr = a:opt.get('expr', 'recipe_delete', 0)
+        let opt_listexpr = a:opt.get('listexpr', 'recipe_delete', 0)
+        let opt_regex = a:opt.of('regex')
+        let patterns = s:get_patterns(candidate, opt_expr, opt_listexpr, opt_regex)
         let target_list += [s:search_edges(head, tail, patterns)]
       endif
     endfor
@@ -130,7 +133,10 @@ function! s:stuff._match_recipes(recipes, opt, ...) dict abort "{{{
     if !is_space_skipped || a:opt.of('skip_space')
       if has_key(candidate, 'buns')
         " search buns
-        let patterns = s:get_patterns(candidate, a:opt.get('expr', 'recipe_delete', 0), a:opt.of('regex'))
+        let opt_expr = a:opt.get('expr', 'recipe_delete', 0)
+        let opt_listexpr = a:opt.get('listexpr', 'recipe_delete', 0)
+        let opt_regex = a:opt.of('regex')
+        let patterns = s:get_patterns(candidate, opt_expr, opt_listexpr, opt_regex)
         let target = s:check_edges(self.edges.head, self.edges.tail, patterns)
       elseif has_key(candidate, 'external')
         " get difference of external motion/textobject
@@ -161,7 +167,7 @@ function! s:stuff._match_edges(recipes, opt, edge_chars) dict abort "{{{
     for candidate in a:recipes
       call a:opt.update('recipe_delete', candidate)
       if has_key(candidate, 'buns')
-        if !a:opt.get('expr', 'recipe_delete', 0) && !a:opt.of('regex')
+        if !a:opt.get('expr', 'recipe_delete', 0) && !a:opt.get('listexpr', 'recipe_delete', 0) && !a:opt.of('regex')
           if candidate.buns == [head_c, tail_c]
             " The pair has already checked by a recipe.
             return 0
@@ -399,8 +405,8 @@ function! s:check_textobj_diff(head, tail, candidate, opt_noremap) abort  "{{{
   endif
 endfunction
 "}}}
-function! s:get_patterns(candidate, opt_expr, opt_regex) abort "{{{
-  if a:opt_expr
+function! s:get_patterns(candidate, opt_expr, opt_listexpr, opt_regex) abort "{{{
+  if a:opt_expr || a:opt_listexpr
     return ['', '']
   endif
 

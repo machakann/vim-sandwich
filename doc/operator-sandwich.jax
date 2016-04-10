@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:08-Apr-2016.
+						Last change:10-Apr-2016.
 
 書いた人   : machakann <mckn@outlook.jp>
 ライセンス : NYSL license
@@ -803,6 +803,7 @@ g:operator#sandwich#options		*g:operator#sandwich#options*
 	    - command			(for all kinds)
 	    - query_once		(for add and replace)
 	    - expr			(for add and replace)
+	    - listexpr			(for add and replace)
 	    - autoindent		(for add and replace)
 	    - indentkeys		(for add and replace)
 	    - indentkeys-		(for add and replace)
@@ -1174,6 +1175,46 @@ expr
 	                      \ matchstr(s:TagLast, '^\a[^[:blank:]>/]*'))
 	        endif
 	        return tag
+	      endfunction
+<
+	デフォルト値
+	  * add
+	    - char : 0
+	    - line : 0
+	    - block: 0
+	  * replace
+	    - char : 0
+	    - line : 0
+	    - block: 0
+
+
+
+listexpr
+	このオプションは上の "expr" オプションに似ていますが、一つの文字列を
+	buns として渡します。この文字列の評価値が文字列二つを含むリストを返す
+	ことが必要です。これは html タグのように前後の囲みが文字列を共有する場
+	合を "expr" の場合よりも自然に記述できます。
+>
+	      let g:operator#sandwich#recipes += [
+	        \   {
+	        \     'buns'    : 'HTMLTagInput()',
+	        \     'listexpr': 1,
+	        \     'filetype': ['html'],
+	        \     'kind'    : ['add', 'replace'],
+	        \     'action'  : ['add'],
+	        \     'input'   : ['t'],
+	        \   },
+	        \ ]
+
+	      function! HTMLTagInput() abort
+	        let tagstring = input('Tag: ')
+	        if tagstring ==# ''
+	          throw 'OperatorSandwichCancel'
+	        endif
+	        let former = printf('<%s>', tagstring)
+	        let latter = printf('</%s>',
+	                    \ matchstr(tagstring, '^\a[^[:blank:]>/]*'))
+	        return [former, latter]
 	      endfunction
 <
 	デフォルト値

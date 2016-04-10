@@ -17,6 +17,8 @@ let s:null_4pos  = {
 
 " types
 let s:type_num  = type(0)
+let s:type_str  = type('')
+let s:type_list = type([])
 let s:type_fref = type(function('tr'))
 
 " patchs
@@ -78,6 +80,19 @@ function! s:operator.execute(motionwise) dict abort  "{{{
     endif
   catch /^OperatorSandwichError:\%(Add\|Delete\|Replace\):ReadOnly/
     let errormsg = 'operator-sandwich: Cannot make changes to read-only buffer.'
+  catch /^OperatorSandwichError:IncorrectBuns:.*/
+    let errormsg = 'operator-sandwich: Incorrect buns.'
+    let [_, errorkind, errorbuns, _, _, _, _, _, _, _] = matchlist(v:exception, '^OperatorSandwichError:IncorrectBuns:\([^:]\+\):\(.*\)')
+    if errorkind ==# 'NotAList'
+      let errormsg .= ' : not a list -> ' . errorbuns
+    elseif errorkind ==# 'ListTooShort'
+      let errormsg .= ' : list too short -> ' . errorbuns
+    elseif errorkind ==# 'NotStringBuns'
+      let errormsg .= ' : not string buns -> ' . errorbuns
+    else
+      let errormsg .= ' -> ' . errorbuns
+    endif
+    unlet! g:operator#sandwich#object
   catch /^OperatorSandwichCancel/
     " I don't know why it can be released here, but anyway it can be done.
     unlet! g:operator#sandwich#object
@@ -223,7 +238,7 @@ function! s:operator.add() dict abort "{{{
       let recipe = self.recipes.dog_ear[i]
       call opt.update('recipe_add', recipe)
     endif
-    if !has_key(recipe, 'buns') || recipe.buns == []
+    if !has_key(recipe, 'buns') || empty(recipe.buns)
       break
     endif
 
@@ -240,7 +255,7 @@ function! s:operator.add() dict abort "{{{
 endfunction
 "}}}
 function! s:operator.add_once(i, recipe) dict abort  "{{{
-  let buns = s:get_buns(a:recipe, self.opt.of('expr'))
+  let buns = s:get_buns(a:recipe, self.opt.of('expr'), self.opt.of('listexpr'))
   let undojoin = a:i == 0 || self.state == 0 ? 0 : 1
   let modified = 0
   if buns[0] !=# '' || buns[1] !=# ''
@@ -331,7 +346,7 @@ function! s:operator.replace() dict abort  "{{{
       let recipe = self.recipes.dog_ear[i]
       call opt.update('recipe_add', recipe)
     endif
-    if !has_key(recipe, 'buns') || recipe.buns == []
+    if !has_key(recipe, 'buns') || empty(recipe.buns)
       break
     endif
 
@@ -347,7 +362,7 @@ function! s:operator.replace() dict abort  "{{{
 endfunction
 "}}}
 function! s:operator.replace_once(i, recipe) dict abort  "{{{
-  let buns = s:get_buns(a:recipe, self.opt.of('expr'))
+  let buns = s:get_buns(a:recipe, self.opt.of('expr'), self.opt.of('listexpr'))
   let undojoin = a:i == 0 || self.state == 0 ? 0 : 1
   let modified = 0
   for j in range(self.n)
@@ -861,8 +876,8 @@ function! s:is_input_matched(candidate, input, opt, flag) abort "{{{
   let candidate = deepcopy(a:candidate)
   call a:opt.update('recipe_add', candidate)
 
-  " 'input' is necessary for 'expr' buns
-  if a:opt.of('expr') && !has_key(candidate, 'input')
+  " 'input' is necessary for 'expr' ('listexpr') buns
+  if (a:opt.of('expr') || a:opt.of('listexpr')) && !has_key(candidate, 'input')
     return 0
   endif
 
@@ -876,8 +891,14 @@ function! s:is_input_matched(candidate, input, opt, flag) abort "{{{
   endif
 endfunction
 "}}}
-function! s:get_buns(recipe, opt_expr) abort  "{{{
-  if a:opt_expr == 2
+function! s:get_buns(recipe, opt_expr, opt_listexpr) abort  "{{{
+  if a:opt_listexpr == 1 || a:opt_listexpr == 2
+    let buns = eval(a:recipe.buns)
+    if a:opt_listexpr == 1
+      unlet a:recipe.buns
+      let a:recipe.buns = buns
+    endif
+  elseif a:opt_expr == 2
     let buns = deepcopy(a:recipe.buns)
     let buns[0] = eval(buns[0])
     let buns[1] = eval(buns[1])
@@ -889,7 +910,20 @@ function! s:get_buns(recipe, opt_expr) abort  "{{{
   else
     let buns = a:recipe.buns
   endif
+  call s:check_buns(buns)
   return buns
+endfunction
+"}}}
+function! s:check_buns(buns) abort  "{{{
+  let error = 'OperatorSandwichError:IncorrectBuns:'
+  if type(a:buns) != s:type_list
+    throw error . 'NotAList:' . string(a:buns)
+  elseif len(a:buns) < 2
+    throw error . 'ListTooShort:' . string(a:buns)
+  elseif !(type(a:buns[0]) == s:type_str || type(a:buns[0]) == s:type_num)
+    \ || !(type(a:buns[1]) == s:type_str || type(a:buns[1]) == s:type_num)
+    throw error . 'NotStringBuns:' . string(a:buns)
+  endif
 endfunction
 "}}}
 function! s:get_default_cursor_pos(inner_head) abort  "{{{

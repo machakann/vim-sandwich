@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:08-Apr-2016.
+						Last change:10-Apr-2016.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license
@@ -811,6 +811,7 @@ g:operator#sandwich#options		*g:operator#sandwich#options*
 	    - command			(for all kinds)
 	    - query_once		(for add and replace)
 	    - expr			(for add and replace)
+	    - listexpr			(for add and replace)
 	    - autoindent		(for add and replace)
 	    - indentkeys		(for add and replace)
 	    - indentkeys-		(for add and replace)
@@ -1192,6 +1193,50 @@ expr
 	                      \ matchstr(s:TagLast, '^\a[^[:blank:]>/]*'))
 	        endif
 	        return tag
+	      endfunction
+<
+	      See also the next "listexpr" option. In case of html tags, it is
+	      easier to write using "listexpr" option.
+
+	Default values
+	  * add
+	    - char : 0
+	    - line : 0
+	    - block: 0
+	  * replace
+	    - char : 0
+	    - line : 0
+	    - block: 0
+
+
+
+listexpr
+	This option is similar as the above "expr" option, but give a
+	expression string as buns. As far as user can guarantee that the
+	expression is evaluated to a list including two string, this option is
+	available. This is useful when former and latter surroundings shared a
+	part of string, like html tags.
+>
+	      let g:operator#sandwich#recipes += [
+	        \   {
+	        \     'buns'    : 'HTMLTagInput()',
+	        \     'listexpr': 1,
+	        \     'filetype': ['html'],
+	        \     'kind'    : ['add', 'replace'],
+	        \     'action'  : ['add'],
+	        \     'input'   : ['t'],
+	        \   },
+	        \ ]
+
+	      function! HTMLTagInput() abort
+	        let tagstring = input('Tag: ')
+	        if tagstring ==# ''
+	          throw 'OperatorSandwichCancel'
+	        endif
+	        let former = printf('<%s>', tagstring)
+	        let latter = printf('</%s>',
+	                    \ matchstr(tagstring, '^\a[^[:blank:]>/]*'))
+	        return [former, latter]
 	      endfunction
 <
 	Default values

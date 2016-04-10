@@ -1297,6 +1297,56 @@ function! s:suite.charwise_n_option_expr() abort "{{{
   " dot-repeat.
 endfunction
 "}}}
+function! s:suite.charwise_n_option_listexpr() abort "{{{
+  """"" expr
+  let g:operator#sandwich#recipes = [
+        \   {'buns': 'SandwichListexprBuns(0)', 'input': ['a']},
+        \   {'buns': 'SandwichListexprBuns(1)', 'input': ['b']},
+        \   {'buns': 'SandwichListexprBuns(0)', 'listexpr': 0, 'input': ['0']},
+        \   {'buns': 'SandwichListexprBuns(0)', 'listexpr': 1, 'input': ['1']},
+        \ ]
+
+  """ 0
+  " #1
+  call setline('.', 'bar')
+  normal 0saiwa
+  call g:assert.equals(getline('.'), 'bar', 'failed at #1')
+  call g:assert.equals(exists(s:object), 0, 'failed at #1')
+
+  " #2
+  call setline('.', 'bar')
+  normal 0saiw1
+  call g:assert.equals(getline('.'), 'foobarbaz', 'failed at #2')
+
+  """ 1
+  " #3
+  call operator#sandwich#set('add', 'char', 'listexpr', 1)
+  call setline('.', 'bar')
+  normal 0saiwa
+  call g:assert.equals(getline('.'), 'foobarbaz', 'failed at #3')
+
+  " #4
+  call setline('.', 'bar')
+  normal 0saiwb
+  call g:assert.equals(getline('.'), 'bar', 'failed at #4')
+  call g:assert.equals(exists(s:object), 0, 'failed at #4')
+
+  " #5
+  call setline('.', 'bar')
+  normal 0saiw0
+  call g:assert.equals(getline('.'), 'bar', 'failed at #5')
+  call g:assert.equals(exists(s:object), 0, 'failed at #5')
+
+  " #6
+  call setline('.', 'bar')
+  normal 0saiw1
+  call g:assert.equals(getline('.'), 'foobarbaz', 'failed at #6')
+
+  """ 2
+  " This case cannot be tested since this option makes difference only in
+  " dot-repeat.
+endfunction
+"}}}
 function! s:suite.charwise_n_option_noremap() abort  "{{{
   """"" noremap
   let g:operator#sandwich#recipes = [
@@ -2732,6 +2782,56 @@ function! s:suite.charwise_x_option_expr() abort  "{{{
   call setline('.', 'foo')
   normal 0viwsa0
   call g:assert.equals(getline('.'), '1+1foo1+2', 'failed at #10')
+
+  """ 2
+  " This case cannot be tested since this option makes difference only in
+  " dot-repeat.
+endfunction
+"}}}
+function! s:suite.charwise_x_option_listexpr() abort "{{{
+  """"" expr
+  let g:operator#sandwich#recipes = [
+        \   {'buns': 'SandwichListexprBuns(0)', 'input': ['a']},
+        \   {'buns': 'SandwichListexprBuns(1)', 'input': ['b']},
+        \   {'buns': 'SandwichListexprBuns(0)', 'listexpr': 0, 'input': ['0']},
+        \   {'buns': 'SandwichListexprBuns(0)', 'listexpr': 1, 'input': ['1']},
+        \ ]
+
+  """ 0
+  " #1
+  call setline('.', 'bar')
+  normal 0viwsaa
+  call g:assert.equals(getline('.'), 'bar', 'failed at #1')
+  call g:assert.equals(exists(s:object), 0, 'failed at #1')
+
+  " #2
+  call setline('.', 'bar')
+  normal 0viwsa1
+  call g:assert.equals(getline('.'), 'foobarbaz', 'failed at #2')
+
+  """ 1
+  " #3
+  call operator#sandwich#set('add', 'char', 'listexpr', 1)
+  call setline('.', 'bar')
+  normal 0viwsaa
+  call g:assert.equals(getline('.'), 'foobarbaz', 'failed at #3')
+
+  " #4
+  call setline('.', 'bar')
+  normal 0viwsab
+  call g:assert.equals(getline('.'), 'bar', 'failed at #4')
+  call g:assert.equals(exists(s:object), 0, 'failed at #4')
+
+  " #5
+  call setline('.', 'bar')
+  normal 0viwsa0
+  call g:assert.equals(getline('.'), 'bar', 'failed at #5')
+  call g:assert.equals(exists(s:object), 0, 'failed at #5')
+
+  " #6
+  call setline('.', 'bar')
+  normal 0viwsa1
+  call g:assert.equals(getline('.'), 'foobarbaz', 'failed at #6')
 
   """ 2
   " This case cannot be tested since this option makes difference only in
@@ -4446,6 +4546,72 @@ function! s:suite.linewise_n_option_expr() abort  "{{{
 
   """ 2
   " This case cannot be tested since this option makes only in
+  " dot-repeat.
+endfunction
+"}}}
+function! s:suite.linewise_n_option_listexpr() abort "{{{
+  """"" expr
+  let g:operator#sandwich#recipes = [
+        \   {'buns': 'SandwichListexprBuns(0)', 'input': ['a']},
+        \   {'buns': 'SandwichListexprBuns(1)', 'input': ['b']},
+        \   {'buns': 'SandwichListexprBuns(0)', 'listexpr': 0, 'input': ['0']},
+        \   {'buns': 'SandwichListexprBuns(0)', 'listexpr': 1, 'input': ['1']},
+        \ ]
+
+  """ 0
+  " #1
+  call setline('.', 'bar')
+  normal 0saVla
+  call g:assert.equals(getline(1), 'bar', 'failed at #1')
+  call g:assert.equals(exists(s:object), 0, 'failed at #1')
+
+  %delete
+
+  " #2
+  call setline('.', 'bar')
+  normal 0saVl1
+  call g:assert.equals(getline(1), 'foo', 'failed at #2')
+  call g:assert.equals(getline(2), 'bar', 'failed at #2')
+  call g:assert.equals(getline(3), 'baz', 'failed at #2')
+
+  %delete
+
+  """ 1
+  " #3
+  call operator#sandwich#set('add', 'line', 'listexpr', 1)
+  call setline('.', 'bar')
+  normal 0saVla
+  call g:assert.equals(getline(1), 'foo', 'failed at #3')
+  call g:assert.equals(getline(2), 'bar', 'failed at #3')
+  call g:assert.equals(getline(3), 'baz', 'failed at #3')
+
+  %delete
+
+  " #4
+  call setline('.', 'bar')
+  normal 0saVlb
+  call g:assert.equals(getline(1), 'bar', 'failed at #4')
+  call g:assert.equals(exists(s:object), 0, 'failed at #4')
+
+  %delete
+
+  " #5
+  call setline('.', 'bar')
+  normal 0saVl0
+  call g:assert.equals(getline(1), 'bar', 'failed at #5')
+  call g:assert.equals(exists(s:object), 0, 'failed at #5')
+
+  %delete
+
+  " #6
+  call setline('.', 'bar')
+  normal 0saVl1
+  call g:assert.equals(getline(1), 'foo', 'failed at #6')
+  call g:assert.equals(getline(2), 'bar', 'failed at #6')
+  call g:assert.equals(getline(3), 'baz', 'failed at #6')
+
+  """ 2
+  " This case cannot be tested since this option makes difference only in
   " dot-repeat.
 endfunction
 "}}}
@@ -6191,6 +6357,72 @@ function! s:suite.linewise_x_option_expr() abort  "{{{
 
   """ 2
   " This case cannot be tested since this option makes only in
+  " dot-repeat.
+endfunction
+"}}}
+function! s:suite.linewise_x_option_listexpr() abort "{{{
+  """"" expr
+  let g:operator#sandwich#recipes = [
+        \   {'buns': 'SandwichListexprBuns(0)', 'input': ['a']},
+        \   {'buns': 'SandwichListexprBuns(1)', 'input': ['b']},
+        \   {'buns': 'SandwichListexprBuns(0)', 'listexpr': 0, 'input': ['0']},
+        \   {'buns': 'SandwichListexprBuns(0)', 'listexpr': 1, 'input': ['1']},
+        \ ]
+
+  """ 0
+  " #1
+  call setline('.', 'bar')
+  normal 0Vsaa
+  call g:assert.equals(getline(1), 'bar', 'failed at #1')
+  call g:assert.equals(exists(s:object), 0, 'failed at #1')
+
+  %delete
+
+  " #2
+  call setline('.', 'bar')
+  normal 0Vsa1
+  call g:assert.equals(getline(1), 'foo', 'failed at #2')
+  call g:assert.equals(getline(2), 'bar', 'failed at #2')
+  call g:assert.equals(getline(3), 'baz', 'failed at #2')
+
+  %delete
+
+  """ 1
+  " #3
+  call operator#sandwich#set('add', 'line', 'listexpr', 1)
+  call setline('.', 'bar')
+  normal 0Vsaa
+  call g:assert.equals(getline(1), 'foo', 'failed at #3')
+  call g:assert.equals(getline(2), 'bar', 'failed at #3')
+  call g:assert.equals(getline(3), 'baz', 'failed at #3')
+
+  %delete
+
+  " #4
+  call setline('.', 'bar')
+  normal 0Vsab
+  call g:assert.equals(getline(1), 'bar', 'failed at #4')
+  call g:assert.equals(exists(s:object), 0, 'failed at #4')
+
+  %delete
+
+  " #5
+  call setline('.', 'bar')
+  normal 0Vsa0
+  call g:assert.equals(getline(1), 'bar', 'failed at #5')
+  call g:assert.equals(exists(s:object), 0, 'failed at #5')
+
+  %delete
+
+  " #6
+  call setline('.', 'bar')
+  normal 0Vsa1
+  call g:assert.equals(getline(1), 'foo', 'failed at #6')
+  call g:assert.equals(getline(2), 'bar', 'failed at #6')
+  call g:assert.equals(getline(3), 'baz', 'failed at #6')
+
+  """ 2
+  " This case cannot be tested since this option makes difference only in
   " dot-repeat.
 endfunction
 "}}}
@@ -7959,6 +8191,56 @@ function! s:suite.blockwise_n_option_expr() abort "{{{
   " dot-repeat.
 endfunction
 "}}}
+function! s:suite.blockwise_n_option_listexpr() abort "{{{
+  """"" expr
+  let g:operator#sandwich#recipes = [
+        \   {'buns': 'SandwichListexprBuns(0)', 'input': ['a']},
+        \   {'buns': 'SandwichListexprBuns(1)', 'input': ['b']},
+        \   {'buns': 'SandwichListexprBuns(0)', 'listexpr': 0, 'input': ['0']},
+        \   {'buns': 'SandwichListexprBuns(0)', 'listexpr': 1, 'input': ['1']},
+        \ ]
+
+  """ 0
+  " #1
+  call setline('.', 'bar')
+  execute "normal 0sa\<C-v>iwa"
+  call g:assert.equals(getline('.'), 'bar', 'failed at #1')
+  call g:assert.equals(exists(s:object), 0, 'failed at #1')
+
+  " #2
+  call setline('.', 'bar')
+  execute "normal 0sa\<C-v>iw1"
+  call g:assert.equals(getline('.'), 'foobarbaz', 'failed at #2')
+
+  """ 1
+  " #3
+  call operator#sandwich#set('add', 'block', 'listexpr', 1)
+  call setline('.', 'bar')
+  execute "normal 0sa\<C-v>iwa"
+  call g:assert.equals(getline('.'), 'foobarbaz', 'failed at #3')
+
+  " #4
+  call setline('.', 'bar')
+  execute "normal 0sa\<C-v>iwb"
+  call g:assert.equals(getline('.'), 'bar', 'failed at #4')
+  call g:assert.equals(exists(s:object), 0, 'failed at #4')
+
+  " #5
+  call setline('.', 'bar')
+  execute "normal 0sa\<C-v>iw0"
+  call g:assert.equals(getline('.'), 'bar', 'failed at #5')
+  call g:assert.equals(exists(s:object), 0, 'failed at #5')
+
+  " #6
+  call setline('.', 'bar')
+  execute "normal 0sa\<C-v>iw1"
+  call g:assert.equals(getline('.'), 'foobarbaz', 'failed at #6')
+
+  """ 2
+  " This case cannot be tested since this option makes difference only in
+  " dot-repeat.
+endfunction
+"}}}
 function! s:suite.blockwise_n_option_noremap() abort  "{{{
   """"" noremap
   let g:operator#sandwich#recipes = [
@@ -9711,6 +9993,56 @@ function! s:suite.blockwise_x_option_expr() abort "{{{
   call setline('.', 'foo')
   execute "normal 0\<C-v>iwsa0"
   call g:assert.equals(getline('.'), '1+1foo1+2', 'failed at #10')
+
+  """ 2
+  " This case cannot be tested since this option makes difference only in
+  " dot-repeat.
+endfunction
+"}}}
+function! s:suite.blockwise_x_option_listexpr() abort "{{{
+  """"" expr
+  let g:operator#sandwich#recipes = [
+        \   {'buns': 'SandwichListexprBuns(0)', 'input': ['a']},
+        \   {'buns': 'SandwichListexprBuns(1)', 'input': ['b']},
+        \   {'buns': 'SandwichListexprBuns(0)', 'listexpr': 0, 'input': ['0']},
+        \   {'buns': 'SandwichListexprBuns(0)', 'listexpr': 1, 'input': ['1']},
+        \ ]
+
+  """ 0
+  " #1
+  call setline('.', 'bar')
+  execute "normal 0\<C-v>iwsaa"
+  call g:assert.equals(getline('.'), 'bar', 'failed at #1')
+  call g:assert.equals(exists(s:object), 0, 'failed at #1')
+
+  " #2
+  call setline('.', 'bar')
+  execute "normal 0\<C-v>iwsa1"
+  call g:assert.equals(getline('.'), 'foobarbaz', 'failed at #2')
+
+  """ 1
+  " #3
+  call operator#sandwich#set('add', 'block', 'listexpr', 1)
+  call setline('.', 'bar')
+  execute "normal 0\<C-v>iwsaa"
+  call g:assert.equals(getline('.'), 'foobarbaz', 'failed at #3')
+
+  " #4
+  call setline('.', 'bar')
+  execute "normal 0\<C-v>iwsab"
+  call g:assert.equals(getline('.'), 'bar', 'failed at #4')
+  call g:assert.equals(exists(s:object), 0, 'failed at #4')
+
+  " #5
+  call setline('.', 'bar')
+  execute "normal 0\<C-v>iwsa0"
+  call g:assert.equals(getline('.'), 'bar', 'failed at #5')
+  call g:assert.equals(exists(s:object), 0, 'failed at #5')
+
+  " #6
+  call setline('.', 'bar')
+  execute "normal 0\<C-v>iwsa1"
+  call g:assert.equals(getline('.'), 'foobarbaz', 'failed at #6')
 
   """ 2
   " This case cannot be tested since this option makes difference only in

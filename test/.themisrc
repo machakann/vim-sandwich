@@ -33,6 +33,14 @@ function! SandwichExprBuns(is_head) abort
   endif
 endfunction
 
+function! SandwichListexprBuns(cancel) abort
+  if a:cancel
+    throw 'OperatorSandwichCancel'
+  else
+    return ['foo', 'baz']
+  endif
+endfunction
+
 function! SandwichSkipIntermediate(is_head, pos, ...) abort
   if a:is_head
     return !(a:pos[2] == 1)
