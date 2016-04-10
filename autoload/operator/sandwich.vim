@@ -186,11 +186,11 @@ function! operator#sandwich#query1st(kind, mode, ...) abort "{{{
   call operator#sandwich#prerequisite(a:kind, a:mode, arg_opt, arg_recipes)
   let operator = g:operator#sandwich#object
   " NOTE: force to set highlight=0 and query_once=1
-  call operator.opt.update('default', {'highlight': 0, 'query_once': 1, 'expr': 0})
+  call operator.opt.update('default', {'highlight': 0, 'query_once': 1, 'expr': 0, 'listexpr': 0})
   let operator.recipes.arg_given = a:0 > 1
 
   let stuff = operator#sandwich#stuff#new()
-  call stuff.initialize(operator.cursor, operator.modmark, operator.count)
+  call stuff.initialize(operator.count, operator.cursor, operator.modmark, operator.message)
   let operator.basket = [stuff]
 
   " pick 'recipe' up and query prefered buns
