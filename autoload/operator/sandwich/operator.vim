@@ -59,9 +59,11 @@ let s:operator = {
       \   },
       \   'cursor': {
       \     'head'      : copy(s:null_pos),
+      \     'headend'   : copy(s:null_pos),
       \     'inner_head': copy(s:null_pos),
       \     'keep'      : copy(s:null_pos),
       \     'inner_tail': copy(s:null_pos),
+      \     'tailstart' : copy(s:null_pos),
       \     'tail'      : copy(s:null_pos),
       \     'default'   : copy(s:null_pos),
       \   },
@@ -557,6 +559,11 @@ function! s:operator.finalize() dict abort  "{{{
         " unless self.keepable == 1.
         let self.cursor.keep = copy(self.cursor.default)
       endif
+      if cursor_opt ==# 'headend'
+        let self.cursor.headend = s:get_headend_cursor_pos(self.cursor.head, self.cursor.inner_head)
+      elseif cursor_opt ==# 'tailstart'
+        let self.cursor.tailstart = s:get_tailstart_cursor_pos(self.cursor.tail, self.cursor.inner_tail)
+      endif
       let self.cursor.default = s:get_default_cursor_pos(self.cursor.inner_head)
       let cursor = get(self.cursor, cursor_opt, 'default')
       if cursor == s:null_pos
@@ -916,9 +923,25 @@ function! s:get_default_cursor_pos(inner_head) abort  "{{{
   return default == s:null_coord ? a:inner_head : s:c2p(default)
 endfunction
 "}}}
+function! s:get_headend_cursor_pos(head, inner_head) abort  "{{{
+  let headend = s:get_left_pos(a:inner_head)
+  if headend == s:null_pos || s:is_ahead(a:head, headend)
+    let headend = copy(a:head)
+  endif
+  return headend
+endfunction
+"}}}
+function! s:get_tailstart_cursor_pos(tail, inner_tail) abort  "{{{
+  let tailstart = s:get_right_pos(a:inner_tail)
+  if tailstart == s:null_pos || s:is_ahead(tailstart, a:tail)
+    let tailstart = copy(a:tail)
+  endif
+  return tailstart
+endfunction
+"}}}
 
-let [s:get_left_pos, s:c2p, s:is_valid_2pos, s:is_ahead, s:is_equal_or_ahead, s:get]
-      \ = operator#sandwich#lib#funcref(['get_left_pos', 'c2p', 'is_valid_2pos', 'is_ahead', 'is_equal_or_ahead', 'get'])
+let [s:get_left_pos, s:get_right_pos, s:c2p, s:is_valid_2pos, s:is_ahead, s:is_equal_or_ahead, s:get]
+      \ = operator#sandwich#lib#funcref(['get_left_pos', 'get_right_pos', 'c2p', 'is_valid_2pos', 'is_ahead', 'is_equal_or_ahead', 'get'])
 
 
 " vim:set foldmethod=marker:

@@ -855,6 +855,8 @@ cursor
 	  inner_tail: the tail of a surrounded text
 	  head      : the head of the former surrounding
 	  tail      : the tail of the latter surrounding
+	  headend   : the end of the former surrounding
+	  tailstart : the start of the latter surrounding
 	  default   : almost same as inner_head but bring cursor to the first
 	              non-space character if in the head of line
 >
