@@ -40,6 +40,7 @@ let s:stuff = {
       \   'target'   : copy(s:null_4pos),
       \   'acts'     : [],
       \   'added'    : [],
+      \   'message'  : {},
       \   'highlight': {
       \     'target': {'status': 0, 'group': '', 'id': []},
       \     'added' : {'status': 0, 'group': '', 'id': []},
@@ -47,13 +48,14 @@ let s:stuff = {
       \   },
       \ }
 "}}}
-function! s:stuff.initialize(cursor, modmark, count) dict abort  "{{{
+function! s:stuff.initialize(count, cursor, modmark, message) dict abort  "{{{
   let self.active = 1
   let self.acts = map(range(a:count), 'operator#sandwich#act#new()')
   let self.added = []
+  let self.message = a:message
   call map(self.highlight, 'extend(v:val, {"status": 0, "group": "", "id": []})')
   for act in self.acts
-    call act.initialize(a:cursor, a:modmark, self.added)
+    call act.initialize(a:cursor, a:modmark, self.added, a:message)
   endfor
 endfunction
 "}}}
@@ -567,7 +569,7 @@ endfunction
 "}}}
 function! s:highlight_order_linewise(order_list, order, head, tail) abort  "{{{
   let n = len(a:order)
-  if a:head != s:null_pos && a:tail != s:null_pos
+  if a:head != s:null_pos && a:tail != s:null_pos && a:head[1] <= a:tail[1]
     for lnum in range(a:head[1], a:tail[1])
       call add(a:order, [lnum])
       if n == 7

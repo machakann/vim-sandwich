@@ -66,51 +66,31 @@ let s:operator = {
       \     'default'   : copy(s:null_pos),
       \   },
       \   'modmark': copy(s:null_2pos),
+      \   'message': sandwich#message#new(),
       \ }
 "}}}
 function! s:operator.execute(motionwise) dict abort  "{{{
-  " FIXME: What is the best practice to handle exceptions?
-  "        Serious lack of the experience with error handlings...
-  let errormsg = ''
   let options = s:shift_options(self.kind, self.mode)
   try
     call self.initialize(a:motionwise)
     if self.state >= 0
       call self[self.kind]()
     endif
-  catch /^OperatorSandwichError:\%(Add\|Delete\|Replace\):ReadOnly/
-    let errormsg = 'operator-sandwich: Cannot make changes to read-only buffer.'
-  catch /^OperatorSandwichError:IncorrectBuns:.*/
-    let errormsg = 'operator-sandwich: Incorrect buns.'
-    let [_, errorkind, errorbuns, _, _, _, _, _, _, _] = matchlist(v:exception, '^OperatorSandwichError:IncorrectBuns:\([^:]\+\):\(.*\)')
-    if errorkind ==# 'NotAList'
-      let errormsg .= ' : not a list -> ' . errorbuns
-    elseif errorkind ==# 'ListTooShort'
-      let errormsg .= ' : list too short -> ' . errorbuns
-    elseif errorkind ==# 'NotStringBuns'
-      let errormsg .= ' : not string buns -> ' . errorbuns
-    else
-      let errormsg .= ' -> ' . errorbuns
-    endif
+  catch /^OperatorSandwichError:ReadOnly/
+  catch /^OperatorSandwichError:IncorrectBuns/
     unlet! g:operator#sandwich#object
   catch /^OperatorSandwichCancel/
-    " I don't know why it can be released here, but anyway it can be done.
     unlet! g:operator#sandwich#object
   catch /^Vim:Interrupt$/
     " cancelled by <C-c>
     unlet! g:operator#sandwich#object
   catch
-    let errormsg = printf('operator-sandwich: Unanticipated error. [%s] %s', v:throwpoint, v:exception)
+    call self.message.error.set(printf('Unanticipated error. [%s] %s', v:throwpoint, v:exception))
     unlet! g:operator#sandwich#object
   finally
-    if errormsg !=# ''
-      echohl ErrorMsg
-      echomsg errormsg
-      echohl NONE
-    endif
-
     call self.finalize()
     call s:restore_options(self.kind, self.mode, options)
+    return self.message
   endtry
 endfunction
 "}}}
@@ -137,9 +117,10 @@ function! s:operator.initialize(motionwise) dict abort "{{{
     let self.modmark.head = copy(s:null_pos)
     let self.modmark.tail = copy(s:null_pos)
     call self.fill()
+    call self.message.initialize()
   endif
   for stuff in self.basket
-    call stuff.initialize(self.cursor, self.modmark, self.count)
+    call stuff.initialize(self.count, self.cursor, self.modmark, self.message)
   endfor
 
   " set initial values
@@ -255,7 +236,7 @@ function! s:operator.add() dict abort "{{{
 endfunction
 "}}}
 function! s:operator.add_once(i, recipe) dict abort  "{{{
-  let buns = s:get_buns(a:recipe, self.opt.of('expr'), self.opt.of('listexpr'))
+  let buns = s:get_buns(a:recipe, self.opt.of('expr'), self.opt.of('listexpr'), self.message)
   let undojoin = a:i == 0 || self.state == 0 ? 0 : 1
   let modified = 0
   if buns[0] !=# '' || buns[1] !=# ''
@@ -362,7 +343,7 @@ function! s:operator.replace() dict abort  "{{{
 endfunction
 "}}}
 function! s:operator.replace_once(i, recipe) dict abort  "{{{
-  let buns = s:get_buns(a:recipe, self.opt.of('expr'), self.opt.of('listexpr'))
+  let buns = s:get_buns(a:recipe, self.opt.of('expr'), self.opt.of('listexpr'), self.message)
   let undojoin = a:i == 0 || self.state == 0 ? 0 : 1
   let modified = 0
   for j in range(self.n)
@@ -891,7 +872,7 @@ function! s:is_input_matched(candidate, input, opt, flag) abort "{{{
   endif
 endfunction
 "}}}
-function! s:get_buns(recipe, opt_expr, opt_listexpr) abort  "{{{
+function! s:get_buns(recipe, opt_expr, opt_listexpr, message) abort  "{{{
   if a:opt_listexpr == 1 || a:opt_listexpr == 2
     let buns = eval(a:recipe.buns)
     if a:opt_listexpr == 1
@@ -910,19 +891,22 @@ function! s:get_buns(recipe, opt_expr, opt_listexpr) abort  "{{{
   else
     let buns = a:recipe.buns
   endif
-  call s:check_buns(buns)
+  call s:check_buns(buns, a:message)
   return buns
 endfunction
 "}}}
-function! s:check_buns(buns) abort  "{{{
-  let error = 'OperatorSandwichError:IncorrectBuns:'
+function! s:check_buns(buns, message) abort  "{{{
+  let error = 'OperatorSandwichError:IncorrectBuns'
   if type(a:buns) != s:type_list
-    throw error . 'NotAList:' . string(a:buns)
+    call a:message.error.set('Incorrect buns. : not a list -> ' . string(a:buns))
+    throw error
   elseif len(a:buns) < 2
-    throw error . 'ListTooShort:' . string(a:buns)
+    call a:message.error.set('Incorrect buns. : list too short -> ' . string(a:buns))
+    throw error
   elseif !(type(a:buns[0]) == s:type_str || type(a:buns[0]) == s:type_num)
     \ || !(type(a:buns[1]) == s:type_str || type(a:buns[1]) == s:type_num)
-    throw error . 'NotStringBuns:' . string(a:buns)
+    call a:message.error.set('Incorrect buns. : not string buns -> ' . string(a:buns))
+    throw error
   endif
 endfunction
 "}}}

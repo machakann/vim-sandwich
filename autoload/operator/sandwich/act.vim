@@ -31,12 +31,13 @@ let s:act = {
       \   'added'  : [],
       \ }
 "}}}
-function! s:act.initialize(cursor, modmark, added) dict abort  "{{{
+function! s:act.initialize(cursor, modmark, added, message) dict abort  "{{{
   let self.cursor  = a:cursor
   let self.modmark = a:modmark
   let self.opt     = {}
   let self.added   = a:added
   let self.success = 0
+  let self.message = a:message
 endfunction
 "}}}
 function! s:act.add_pair(buns, stuff, undojoin) dict abort "{{{
@@ -59,7 +60,8 @@ function! s:act.add_pair(buns, stuff, undojoin) dict abort "{{{
       let pos = s:push1(copy(target.head2), target, a:buns, indent, is_linewise)
       let [is_linewise[1], indent[1], head2, tail2] = s:add_latter(a:buns, pos, opt)
     catch /^Vim\%((\a\+)\)\=:E21/
-      throw 'OperatorSandwichError:Add:ReadOnly'
+      call self.message.notice.queue(['Cannot make changes to read-only buffer.', 'WarningMsg'])
+      throw 'OperatorSandwichError:ReadOnly'
     finally
       call s:restore_indent(indentopt)
     endtry
@@ -123,7 +125,8 @@ function! s:act.delete_pair(stuff, modified) dict abort  "{{{
       let latter_tail = s:pull1(copy(target.tail2), target, deletion, is_linewise)
       let [deletion[1], is_linewise[1], tail] = s:delete_latter(latter_head, latter_tail, former_head, opt)
     catch /^Vim\%((\a\+)\)\=:E21/
-      throw 'OperatorSandwichError:Delete:ReadOnly'
+      call self.message.notice.queue(['Cannot make changes to read-only buffer.', 'WarningMsg'])
+      throw 'OperatorSandwichError:ReadOnly'
     finally
       call call('setreg', reg)
     endtry
@@ -190,7 +193,8 @@ function! s:act.replace_pair(buns, stuff, undojoin, modified) dict abort "{{{
       call s:push1(latter_tail, target, a:buns, indent, is_linewise)
       let [deletion[1], is_linewise[1], indent[1], head2, tail2] = s:replace_latter(a:buns[1], latter_head, latter_tail, within_a_line, opt)
     catch /^Vim\%((\a\+)\)\=:E21/
-      throw 'OperatorSandwichError:Replace:ReadOnly'
+      call self.message.notice.queue(['Cannot make changes to read-only buffer.', 'WarningMsg'])
+      throw 'OperatorSandwichError:ReadOnly'
     finally
       call call('setreg', reg)
       call s:restore_indent(indentopt)

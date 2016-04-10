@@ -2,6 +2,7 @@ scriptencoding utf-8
 
 let s:suite = themis#suite('operator-sandwich: add:')
 let s:object = 'g:operator#sandwich#object'
+call themis#helper('command').with(s:)
 
 function! s:suite.before_each() abort "{{{
   %delete
@@ -1309,7 +1310,7 @@ function! s:suite.charwise_n_option_listexpr() abort "{{{
   """ 0
   " #1
   call setline('.', 'bar')
-  normal 0saiwa
+  Throws /^Vim(echoerr):operator-sandwich: Incorrect buns./ :normal 0saiwa
   call g:assert.equals(getline('.'), 'bar', 'failed at #1')
   call g:assert.equals(exists(s:object), 0, 'failed at #1')
 
@@ -1333,7 +1334,7 @@ function! s:suite.charwise_n_option_listexpr() abort "{{{
 
   " #5
   call setline('.', 'bar')
-  normal 0saiw0
+  Throws /^Vim(echoerr):operator-sandwich: Incorrect buns./ :normal 0saiw0
   call g:assert.equals(getline('.'), 'bar', 'failed at #5')
   call g:assert.equals(exists(s:object), 0, 'failed at #5')
 
@@ -2800,7 +2801,7 @@ function! s:suite.charwise_x_option_listexpr() abort "{{{
   """ 0
   " #1
   call setline('.', 'bar')
-  normal 0viwsaa
+  Throws /^Vim(echoerr):operator-sandwich: Incorrect buns./ :normal 0viwsaa
   call g:assert.equals(getline('.'), 'bar', 'failed at #1')
   call g:assert.equals(exists(s:object), 0, 'failed at #1')
 
@@ -2824,7 +2825,7 @@ function! s:suite.charwise_x_option_listexpr() abort "{{{
 
   " #5
   call setline('.', 'bar')
-  normal 0viwsa0
+  Throws /^Vim(echoerr):operator-sandwich: Incorrect buns./ :normal 0viwsa0
   call g:assert.equals(getline('.'), 'bar', 'failed at #5')
   call g:assert.equals(exists(s:object), 0, 'failed at #5')
 
@@ -4561,7 +4562,7 @@ function! s:suite.linewise_n_option_listexpr() abort "{{{
   """ 0
   " #1
   call setline('.', 'bar')
-  normal 0saVla
+  Throws /^Vim(echoerr):operator-sandwich: Incorrect buns./ :normal 0saVla
   call g:assert.equals(getline(1), 'bar', 'failed at #1')
   call g:assert.equals(exists(s:object), 0, 'failed at #1')
 
@@ -4597,7 +4598,7 @@ function! s:suite.linewise_n_option_listexpr() abort "{{{
 
   " #5
   call setline('.', 'bar')
-  normal 0saVl0
+  Throws /^Vim(echoerr):operator-sandwich: Incorrect buns./ :normal 0saVl0
   call g:assert.equals(getline(1), 'bar', 'failed at #5')
   call g:assert.equals(exists(s:object), 0, 'failed at #5')
 
@@ -6372,7 +6373,7 @@ function! s:suite.linewise_x_option_listexpr() abort "{{{
   """ 0
   " #1
   call setline('.', 'bar')
-  normal 0Vsaa
+  Throws /^Vim(echoerr):operator-sandwich: Incorrect buns./ :normal 0Vsaa
   call g:assert.equals(getline(1), 'bar', 'failed at #1')
   call g:assert.equals(exists(s:object), 0, 'failed at #1')
 
@@ -6408,7 +6409,7 @@ function! s:suite.linewise_x_option_listexpr() abort "{{{
 
   " #5
   call setline('.', 'bar')
-  normal 0Vsa0
+  Throws /^Vim(echoerr):operator-sandwich: Incorrect buns./ :normal 0Vsa0
   call g:assert.equals(getline(1), 'bar', 'failed at #5')
   call g:assert.equals(exists(s:object), 0, 'failed at #5')
 
@@ -8203,7 +8204,7 @@ function! s:suite.blockwise_n_option_listexpr() abort "{{{
   """ 0
   " #1
   call setline('.', 'bar')
-  execute "normal 0sa\<C-v>iwa"
+  Throws /^Vim(echoerr):operator-sandwich: Incorrect buns./ :execute "normal 0sa\<C-v>iwa"
   call g:assert.equals(getline('.'), 'bar', 'failed at #1')
   call g:assert.equals(exists(s:object), 0, 'failed at #1')
 
@@ -8227,7 +8228,7 @@ function! s:suite.blockwise_n_option_listexpr() abort "{{{
 
   " #5
   call setline('.', 'bar')
-  execute "normal 0sa\<C-v>iw0"
+  Throws /^Vim(echoerr):operator-sandwich: Incorrect buns./ :execute "normal 0sa\<C-v>iw0"
   call g:assert.equals(getline('.'), 'bar', 'failed at #5')
   call g:assert.equals(exists(s:object), 0, 'failed at #5')
 
@@ -10011,7 +10012,7 @@ function! s:suite.blockwise_x_option_listexpr() abort "{{{
   """ 0
   " #1
   call setline('.', 'bar')
-  execute "normal 0\<C-v>iwsaa"
+  Throws /^Vim(echoerr):operator-sandwich: Incorrect buns./ :execute "normal 0\<C-v>iwsaa"
   call g:assert.equals(getline('.'), 'bar', 'failed at #1')
   call g:assert.equals(exists(s:object), 0, 'failed at #1')
 
@@ -10035,7 +10036,7 @@ function! s:suite.blockwise_x_option_listexpr() abort "{{{
 
   " #5
   call setline('.', 'bar')
-  execute "normal 0\<C-v>iwsa0"
+  Throws /^Vim(echoerr):operator-sandwich: Incorrect buns./ :execute "normal 0\<C-v>iwsa0"
   call g:assert.equals(getline('.'), 'bar', 'failed at #5')
   call g:assert.equals(exists(s:object), 0, 'failed at #5')
 

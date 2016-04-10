@@ -81,8 +81,9 @@ function! operator#sandwich#add(motionwise, ...) abort  "{{{
   if exists('g:operator#sandwich#object')
     call s:update_is_in_cmdline_window()
     call s:doautocmd('OperatorSandwichAddPre')
-    call g:operator#sandwich#object.execute(a:motionwise)
+    let message = g:operator#sandwich#object.execute(a:motionwise)
     call s:doautocmd('OperatorSandwichAddPost')
+    call message.notify('operator-sandwich: ')
   endif
 endfunction
 "}}}
@@ -90,8 +91,9 @@ function! operator#sandwich#delete(motionwise, ...) abort  "{{{
   if exists('g:operator#sandwich#object')
     call s:update_is_in_cmdline_window()
     call s:doautocmd('OperatorSandwichDeletePre')
-    call g:operator#sandwich#object.execute(a:motionwise)
+    let message = g:operator#sandwich#object.execute(a:motionwise)
     call s:doautocmd('OperatorSandwichDeletePost')
+    call message.notify('operator-sandwich: ')
   endif
 endfunction
 "}}}
@@ -99,8 +101,9 @@ function! operator#sandwich#replace(motionwise, ...) abort  "{{{
   if exists('g:operator#sandwich#object')
     call s:update_is_in_cmdline_window()
     call s:doautocmd('OperatorSandwichReplacePre')
-    call g:operator#sandwich#object.execute(a:motionwise)
+    let message = g:operator#sandwich#object.execute(a:motionwise)
     call s:doautocmd('OperatorSandwichReplacePost')
+    call message.notify('operator-sandwich: ')
   endif
 endfunction
 "}}}
