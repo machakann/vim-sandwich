@@ -810,7 +810,7 @@ function! s:uniq_recipes(recipes, opt_regex, opt_expr, opt_noremap) abort "{{{
   while recipes != []
     let recipe = remove(recipes, 0)
     call add(a:recipes, recipe)
-    if has_key(recipe, 'buns') && type(recipe['buns']) == s:type_list
+    if has_key(recipe, 'buns')
       call filter(recipes, '!s:is_duplicated_buns(v:val, recipe, a:opt_regex, a:opt_expr)')
     elseif has_key(recipe, 'external')
       call filter(recipes, '!s:is_duplicated_external(v:val, recipe, a:opt_noremap)')
@@ -819,13 +819,17 @@ function! s:uniq_recipes(recipes, opt_regex, opt_expr, opt_noremap) abort "{{{
 endfunction
 "}}}
 function! s:is_duplicated_buns(item, ref, opt_regex, opt_expr) abort  "{{{
-  if has_key(a:item, 'buns') && type(a:item['buns']) == s:type_list
+  if has_key(a:item, 'buns')
         \ && a:ref['buns'][0] ==# a:item['buns'][0]
         \ && a:ref['buns'][1] ==# a:item['buns'][1]
     let regex_r = get(a:ref,  'regex', a:opt_regex)
     let regex_i = get(a:item, 'regex', a:opt_regex)
-    let expr_r  = get(a:ref,  'expr',  a:opt_expr) ? 1 : 0
-    let expr_i  = get(a:item, 'expr',  a:opt_expr) ? 1 : 0
+    let expr_r  = get(a:ref,  'expr',  a:opt_expr)
+    let expr_i  = get(a:item, 'expr',  a:opt_expr)
+
+    let expr_r = expr_r ? 1 : 0
+    let expr_i = expr_i ? 1 : 0
+
     if regex_r == regex_i && expr_r == expr_i
       return 1
     endif
@@ -839,10 +843,12 @@ function! s:is_duplicated_external(item, ref, opt_noremap) abort "{{{
         \ && a:ref['external'][1] ==# a:item['external'][1]
     let noremap_r = get(a:ref,  'noremap', a:opt_noremap)
     let noremap_i = get(a:item, 'noremap', a:opt_noremap)
+
     if noremap_r == noremap_i
       return 1
     endif
   endif
+
   return 0
 endfunction
 "}}}
