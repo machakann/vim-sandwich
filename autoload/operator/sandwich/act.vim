@@ -407,7 +407,6 @@ endfunction
 "}}}
 function! s:replace_former(bun, head, tail, within_a_line, opt, ...) abort "{{{
   let is_linewise  = 0
-  let opt_linewise = a:opt.of('linewise')
   let undojoin_cmd = get(a:000, 0, 0) ? 'undojoin | ' : ''
   let deletion = s:delete_portion(a:head, a:tail, undojoin_cmd)
 
@@ -415,6 +414,7 @@ function! s:replace_former(bun, head, tail, within_a_line, opt, ...) abort "{{{
     " workaround for a bug in cmdline-window
     call s:paste(a:bun)
   else
+    let opt_linewise = a:opt.of('linewise')
     if opt_linewise == 1 && getline('.') =~# '^\s*$'
       .delete
       let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! O' : "normal \<Plug>(sandwich-O)"

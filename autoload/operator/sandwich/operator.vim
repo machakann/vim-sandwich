@@ -203,7 +203,6 @@ function! s:operator.add() dict abort "{{{
     call self.set_target()
     if self.state
       " query preferable buns
-      call winrestview(self.view)
       call self.show('stuff', hi_group)
       try
         let recipe = self.query()
@@ -271,7 +270,6 @@ function! s:operator.delete() dict abort  "{{{
     endif
 
     if opt_highlight && !hi_exited && hi_duration > 0
-      call winrestview(self.view)
       let hi_exited = self.blink('target', hi_group, hi_duration, self.opt.of('linewise'))
     endif
 
@@ -311,7 +309,6 @@ function! s:operator.replace() dict abort  "{{{
 
     if self.state
       " query preferable buns
-      call winrestview(self.view)
       call self.show('target', hi_group)
       try
         let recipe = self.query()
@@ -484,6 +481,7 @@ function! s:operator.show(place, hi_group, ...) dict abort "{{{
       let stuff = self.basket[i]
       let success = stuff.show(a:place, a:hi_group, linewise) || success
     endfor
+    call winrestview(self.view)
     redraw
   endif
   return !success
