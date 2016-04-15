@@ -92,6 +92,8 @@ function! s:of_for_replace(opt_name, ...) dict abort  "{{{
       return self._of(a:opt_name, 'recipe_add')
     elseif a:opt_name ==# 'listexpr'
       return self._of(a:opt_name, 'recipe_add')
+    elseif a:opt_name ==# 'noremap'
+      return self._of(a:opt_name, '')
     elseif a:opt_name ==# 'skip_space'
       return self._of(a:opt_name, 'recipe_delete')
     elseif a:opt_name ==# 'skip_char'

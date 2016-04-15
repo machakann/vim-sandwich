@@ -455,12 +455,16 @@ function! s:operator.query() dict abort  "{{{
 endfunction
 "}}}
 function! s:operator.match(i) dict abort  "{{{
-  let filter  = 's:has_action(v:val, "delete")'
+  let opt = self.opt
+  let default_expr     = opt.get('expr',     '', 0)
+  let default_listexpr = opt.get('listexpr', '', 0)
+  let filter = 's:has_action(v:val, "delete")
+           \ && s:is_not_expr(v:val, default_expr, default_listexpr)
+           \ && s:is_appropriate_patterns(v:val)'
   let recipes = filter(deepcopy(self.recipes.integrated), filter)
 
   " uniq recipes
-  let opt = self.opt
-  call s:uniq_recipes(recipes, opt.of('regex'), opt.get('expr', 'recipe_delete', 0), opt.of('noremap', 'recipe_delete'))
+  call s:uniq_recipes(recipes, opt.of('regex'), opt.get('noremap', ''))
 
   let success = 0
   for j in range(self.n)
@@ -804,35 +808,27 @@ function! s:set_displaycoord(disp_coord) abort "{{{
   endif
 endfunction
 "}}}
-function! s:uniq_recipes(recipes, opt_regex, opt_expr, opt_noremap) abort "{{{
+function! s:uniq_recipes(recipes, opt_regex, opt_noremap) abort "{{{
   let recipes = copy(a:recipes)
   call filter(a:recipes, 0)
   while recipes != []
     let recipe = remove(recipes, 0)
     call add(a:recipes, recipe)
     if has_key(recipe, 'buns')
-      call filter(recipes, '!s:is_duplicated_buns(v:val, recipe, a:opt_regex, a:opt_expr)')
+      let ref_regex = get(recipe, 'regex', a:opt_regex)
+      call filter(recipes, '!s:is_duplicated_buns(v:val, recipe, ref_regex, a:opt_regex)')
     elseif has_key(recipe, 'external')
       call filter(recipes, '!s:is_duplicated_external(v:val, recipe, a:opt_noremap)')
     endif
   endwhile
 endfunction
 "}}}
-function! s:is_duplicated_buns(item, ref, opt_regex, opt_expr) abort  "{{{
+function! s:is_duplicated_buns(item, ref, ref_regex, opt_regex) abort  "{{{
   if has_key(a:item, 'buns')
         \ && a:ref['buns'][0] ==# a:item['buns'][0]
         \ && a:ref['buns'][1] ==# a:item['buns'][1]
-    let regex_r = get(a:ref,  'regex', a:opt_regex)
-    let regex_i = get(a:item, 'regex', a:opt_regex)
-    let expr_r  = get(a:ref,  'expr',  a:opt_expr)
-    let expr_i  = get(a:item, 'expr',  a:opt_expr)
-
-    let expr_r = expr_r ? 1 : 0
-    let expr_i = expr_i ? 1 : 0
-
-    if regex_r == regex_i && expr_r == expr_i
-      return 1
-    endif
+        \ && get(a:item, 'regex', a:opt_regex) == a:ref_regex
+    return 1
   endif
   return 0
 endfunction
@@ -850,6 +846,20 @@ function! s:is_duplicated_external(item, ref, opt_noremap) abort "{{{
   endif
 
   return 0
+endfunction
+"}}}
+function! s:is_not_expr(item, default_expr, default_listexpr) abort "{{{
+  return get(a:item, 'expr', a:default_expr) || get(a:item, 'listexpr', a:default_listexpr) ? 0 : 1
+endfunction
+"}}}
+function! s:is_appropriate_patterns(item) abort "{{{
+  if has_key(a:item, 'buns')
+    return type(a:item.buns) == s:type_list && len(a:item.buns) >= 2 ? 1 : 0
+  elseif has_key(a:item, 'external')
+    return type(a:item.external) == s:type_list && len(a:item.external) >= 2 ? 1 : 0
+  else
+    return 0
+  endif
 endfunction
 "}}}
 function! s:is_input_matched(candidate, input, opt, flag) abort "{{{
