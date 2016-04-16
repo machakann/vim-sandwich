@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:10-Apr-2016.
+						Last change:16-Apr-2016.
 
 書いた人   : machakann <mckn@outlook.jp>
 ライセンス : NYSL license
@@ -353,9 +353,16 @@ option の "cursor" に関係しており、このオプションの選択肢 "k
 	も有効にするために使われます。このキーマッピング自体は |.| キーを送ら
 	ないので、 |.| キーシークエンスを送るマッピングに先駆けるようにマップ
 	してください。 |.| キーにマップするような他のプラグイン、例えば
-	repeat.vim (vimscript #2136) をお使いの場合に使います。次の行を vimrc
-	に追加してください。
+	`<Plug>(ExampleDot)` というマッピングを |.| キーに定義するプラグインを
+	ご使用の場合は次のように使います。
 >
+	nmap . <Plug>(operator-sandwich-predot)<Plug>(ExampleDot)
+<
+	repeat.vim (vimscript #2136) をご使用の場合は `<Plug>(RepeatDot)` の
+	定義が遅延されているので、そのキーマッピングの存在を保証するために次の
+	行を vimrc へ追加します。
+>
+	runtime autoload/repeat.vim
 	nmap . <Plug>(operator-sandwich-predot)<Plug>(RepeatDot)
 <
 

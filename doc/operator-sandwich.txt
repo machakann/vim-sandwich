@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:10-Apr-2016.
+						Last change:16-Apr-2016.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license
@@ -364,9 +364,16 @@ environment. See a topic of a local option "cursor" in
 	dot repeating. This keymapping itself does not send key sequence of
 	|.|. Map this key ahead of |.| key sequence. If you are using other
 	plugins which make keymapping to |.| key, use this keymapping. For
-	example, if you are using repeat.vim (vimscript #2136), use this
-	keymapping. Add the following line into your vimrc.
+	example, if you are using a plugin which defines a mapping
+	`<Plug>(ExampleDot)`:
 >
+	nmap . <Plug>(operator-sandwich-predot)<Plug>(ExampleDot)
+<
+	In case of using repeat.vim (vimscript #2136), the mapping
+	`<Plug>(RepeatDot)` is defined retadatively. Thus, in order to ensure
+	the mapping exists, add the lines:
+>
+	runtime autoload/repeat.vim
 	nmap . <Plug>(operator-sandwich-predot)<Plug>(RepeatDot)
 <
 
