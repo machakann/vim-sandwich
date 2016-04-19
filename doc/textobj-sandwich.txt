@@ -771,6 +771,10 @@ skip_regex_tail
 	Cursor is moving in searching positions, thus user can use the pattern
 	\%# |/\%#|.
 
+	Default values
+	  * query: []
+	  * auto : []
+
 
 
 
@@ -785,6 +789,9 @@ quoteescape
 	" Press dib
 	" "foo\"bar"   --->   foo\"bar
 <
+	Default values
+	  * query: 0
+	  * auto : 0
 
 
 
@@ -1147,6 +1154,10 @@ skip_expr
 <
 	NOTE: Given |expression|s are evaluated in |sandbox| for security
 	      purpose.
+
+	Default values
+	  * query: []
+	  * auto : []
 
 
 

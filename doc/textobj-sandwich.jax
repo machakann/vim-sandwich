@@ -767,6 +767,10 @@ skip_regex_tail
 	検索の間、内部的にカーソルを動かしているので、カーソルを表す正規表現の
 	\%# |/\%#| が使えます。
 
+	デフォルト値
+	  * query: []
+	  * auto : []
+
 
 
 quoteescape
@@ -780,6 +784,9 @@ quoteescape
 	" Press dib
 	" "foo\"bar"   --->   foo\"bar
 <
+	デフォルト値
+	  * query: 0
+	  * auto : 0
 
 
 
@@ -1130,6 +1137,10 @@ skip_expr
 	" aaaaa   --->   aa
 <
 	NOTE: 与えられた式は安全上の理由から |sandbox| 内で評価されます。
+
+	デフォルト値
+	  * query: []
+	  * auto : []
 
 
 
