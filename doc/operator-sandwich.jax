@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:16-Apr-2016.
+						Last change:19-Apr-2016.
 
 書いた人   : machakann <mckn@outlook.jp>
 ライセンス : NYSL license
@@ -756,6 +756,7 @@ expr_filter
 	  \    {'buns': ['(', ')'], 'expr_filter': ['FilterInvalid()']}
 	  \  ]
 <
+	NOTE: 与えられた式は安全上の理由から |sandbox| 内で評価されます。
 
 
 
@@ -1148,6 +1149,8 @@ expr
 	NOTE: このオプションが真の時、 "buns" はレシピを呼ぶためのキー入力とは
 	      みなされませんので、 "input" の指定が必要になります。
 
+	NOTE: 与えられた式は安全上の理由から |sandbox| 内で評価されます。
+
 	NOTE: もし式が |getchar()| や |input()| でユーザーに入力を求める場合、
 	      |operator-sandwich| の囲みを外すオペレータや |textobj-sandwich|
 	      の |<Plug>(textobj-sandwich-auto-i)| や
@@ -1226,6 +1229,8 @@ listexpr
 	        return [former, latter]
 	      endfunction
 <
+	NOTE: 与えられた式は安全上の理由から |sandbox| 内で評価されます。
+
 	デフォルト値
 	  * add
 	    - char : 0

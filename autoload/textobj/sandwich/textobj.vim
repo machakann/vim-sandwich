@@ -360,7 +360,8 @@ function! s:expr_filter(candidate) abort  "{{{
     return 1
   else
     for filter in a:candidate['expr_filter']
-      if !eval(filter)
+      sandbox let keep = eval(filter)
+      if !keep
         return 0
       endif
     endfor

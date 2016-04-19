@@ -679,7 +679,8 @@ function! s:expr_filter(candidate) abort  "{{{
     return 1
   else
     for filter in a:candidate['expr_filter']
-      if !eval(filter)
+      sandbox let keep = eval(filter)
+      if !keep
         return 0
       endif
     endfor
@@ -889,19 +890,19 @@ endfunction
 "}}}
 function! s:get_buns(recipe, opt_expr, opt_listexpr, message) abort  "{{{
   if a:opt_listexpr == 1 || a:opt_listexpr == 2
-    let buns = eval(a:recipe.buns)
+    sandbox let buns = eval(a:recipe.buns)
     if a:opt_listexpr == 1
       unlet a:recipe.buns
       let a:recipe.buns = buns
     endif
   elseif a:opt_expr == 2
     let buns = deepcopy(a:recipe.buns)
-    let buns[0] = eval(buns[0])
-    let buns[1] = eval(buns[1])
+    sandbox let buns[0] = eval(buns[0])
+    sandbox let buns[1] = eval(buns[1])
   elseif a:opt_expr == 1 && !a:recipe.evaluated
     let buns = a:recipe.buns
-    let buns[0] = eval(buns[0])
-    let buns[1] = eval(buns[1])
+    sandbox let buns[0] = eval(buns[0])
+    sandbox let buns[1] = eval(buns[1])
     let a:recipe.evaluated = 1
   else
     let buns = a:recipe.buns

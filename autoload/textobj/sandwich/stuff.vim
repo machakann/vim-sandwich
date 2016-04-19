@@ -483,9 +483,9 @@ function! s:stuff.get_buns(clock) dict abort  "{{{
   if (opt_expr && !self.evaluated) || opt_expr == 2
     call a:clock.pause()
     let buns = opt_expr == 2 ? deepcopy(buns) : buns
-    let buns[0] = eval(buns[0])
+    sandbox let buns[0] = eval(buns[0])
     if buns[0] !=# ''
-      let buns[1] = eval(buns[1])
+      sandbox let buns[1] = eval(buns[1])
     endif
     let self.evaluated = 1
     call a:clock.start()
@@ -597,7 +597,8 @@ function! s:is_equal_or_ahead(coord1, coord2) abort  "{{{
 endfunction
 "}}}
 function! s:eval(expr, ...) abort "{{{
-  return type(a:expr) == s:type_fref ? call(a:expr, a:000) : eval(a:expr)
+  sandbox let result = type(a:expr) == s:type_fref ? call(a:expr, a:000) : eval(a:expr)
+  return result
 endfunction
 "}}}
 

@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:16-Apr-2016.
+						Last change:19-Apr-2016.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license
@@ -764,6 +764,8 @@ expr_filter
 	  \    {'buns': ['(', ')'], 'expr_filter': ['FilterInvalid()']}
 	  \  ]
 <
+	NOTE: Given |expression|s are evaluated in |sandbox| for security
+	      purpose.
 
 
 
@@ -1165,6 +1167,9 @@ expr
 	NOTE: If this option is true, the recipe requires "input" to call by
 	      key inputs. "buns" never be regarded as key inputs to trigger.
 
+	NOTE: Given |expression|s are evaluated in |sandbox| for security
+	      purpose.
+
 	NOTE: If the expressions query user something by |getchar()| or
 	      |input()|, the recipe may cause problems on the
 	      |operator-sandwich| delete operator and |textobj-sandwich|
@@ -1248,6 +1253,9 @@ listexpr
 	        return [former, latter]
 	      endfunction
 <
+	NOTE: Given |expression|s are evaluated in |sandbox| for security
+	      purpose.
+
 	Default values
 	  * add
 	    - char : 0
