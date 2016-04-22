@@ -299,10 +299,7 @@ function! operator#sandwich#show(place, ...) abort  "{{{
 endfunction
 "}}}
 function! operator#sandwich#quench(place) abort  "{{{
-  if !exists('g:operator#sandwich#object') || !g:operator#sandwich#object.at_work
-    echoerr 'operator-sandwich: Not in an operator-sandwich operation!'
-    return 1
-  else
+  if exists('g:operator#sandwich#object')
     let operator = g:operator#sandwich#object
     return operator.quench(a:place, 1)
   endif
