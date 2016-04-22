@@ -47,7 +47,6 @@ let s:operator = {
       \   'view'      : {},
       \   'blockwidth': 0,
       \   'extended'  : 0,
-      \   'keepable'  : 0,
       \   'at_work'   : 0,
       \   'opt'       : {},
       \   'basket'    : [],
@@ -66,6 +65,7 @@ let s:operator = {
       \     'tailstart' : copy(s:null_pos),
       \     'tail'      : copy(s:null_pos),
       \     'default'   : copy(s:null_pos),
+      \     'keepable'  : 0,
       \   },
       \   'modmark': copy(s:null_2pos),
       \   'message': sandwich#message#new(),
@@ -554,11 +554,11 @@ function! s:operator.finalize() dict abort  "{{{
 
       " set cursor position
       let cursor_opt = act.opt.of('cursor')
-      if self.keepable
-        let self.keepable = 0
+      if self.cursor.keepable
+        let self.cursor.keepable = 0
       else
         " In the case of dot repeat, it is impossible to keep original position
-        " unless self.keepable == 1.
+        " unless self.cursor.keepable == 1.
         let self.cursor.keep = copy(self.cursor.default)
       endif
       if cursor_opt ==# 'headend'
