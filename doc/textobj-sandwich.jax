@@ -1,5 +1,5 @@
 *textobj-sandwich.jax*	『挟まれた』テキストを選択する。
-						Last change:19-Apr-2016.
+						Last change:08-Apr-2016.
 
 書いた人   : machakann <mckn@outlook.jp>
 ライセンス : NYSL license
@@ -582,7 +582,6 @@ expr_filter
 	  \    {'buns': ['(', ')'], 'expr_filter': ['FilterOperator("d")']}
 	  \  ]
 <
-	NOTE: 与えられた式は安全上の理由から |sandbox| 内で評価されます。
 
 
 
@@ -803,8 +802,6 @@ expr
 <
 	NOTE: このオプションが真の時、 "buns" はレシピを呼ぶためのキー入力とは
 	      みなされませんので "input" の指定が必要になります。
-
-	NOTE: 与えられた式は安全上の理由から |sandbox| 内で評価されます。
 
 	NOTE: もし式が |getchar()| や |input()| でユーザーに入力を求める場合、
 	      |operator-sandwich| の囲みを外すオペレータや |textobj-sandwich|
@@ -1136,7 +1133,6 @@ skip_expr
 	" Press dib
 	" aaaaa   --->   aa
 <
-	NOTE: 与えられた式は安全上の理由から |sandbox| 内で評価されます。
 
 	デフォルト値
 	  * query: []

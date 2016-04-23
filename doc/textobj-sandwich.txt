@@ -1,5 +1,5 @@
 *textobj-sandwich.txt*	The textobject plugin to select sandwiched texts.
-						Last change:19-Apr-2016.
+						Last change:08-Apr-2016.
 
 Author  : machakann <mckn@outlook.jp>
 License : NYSL license
@@ -576,8 +576,6 @@ expr_filter
 	  \    {'buns': ['(', ')'], 'expr_filter': ['FilterOperator("d")']}
 	  \  ]
 <
-	NOTE: Given |expression|s are evaluated in |sandbox| for security
-	      purpose.
 
 
 
@@ -809,9 +807,6 @@ expr
 	NOTE: If this option is true, the recipe requires "input" to use with
 	      query-textobjects. "buns" never be regarded as key inputs to
 	      trigger.
-
-	NOTE: Given |expression|s are evaluated in |sandbox| for security
-	      purpose.
 
 	NOTE: If the expressions query user something by |getchar()| or
 	      |input()|, the recipe may cause problem on the
@@ -1152,8 +1147,6 @@ skip_expr
 	" Press dib
 	" aaaaa   --->   aa
 <
-	NOTE: Given |expression|s are evaluated in |sandbox| for security
-	      purpose.
 
 	Default values
 	  * query: []
