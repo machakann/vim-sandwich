@@ -230,7 +230,7 @@ function! s:operator.add() dict abort "{{{
     call opt.clear('recipe_add')
   endfor
 
-  if opt_highlight >= 3
+  if opt_highlight >= 3 && !empty(self.last_succeeded())
     let hi_duration = s:get('highlight_duration', 200)
     call self.blink('added', 'OperatorSandwichAdd', hi_duration)
   endif
@@ -335,7 +335,7 @@ function! s:operator.replace() dict abort  "{{{
     call opt.clear('recipe_add')
   endfor
 
-  if opt_highlight >= 3
+  if opt_highlight >= 3 && !empty(self.last_succeeded())
     let hi_duration = s:get('highlight_duration', 200)
     call self.blink('added', 'OperatorSandwichAdd', hi_duration)
   endif
