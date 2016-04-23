@@ -30,6 +30,7 @@ endif
 
 " features
 let s:has_gui_running = has('gui_running')
+let s:has_timer       = has('timers')
 "}}}
 
 function! operator#sandwich#operator#new() abort  "{{{
@@ -504,34 +505,51 @@ function! s:operator.quench(place, ...) dict abort "{{{
 endfunction
 "}}}
 function! s:operator.blink(place, hi_group, duration, ...) dict abort "{{{
+  let hi_exited = 0
   if self.opt.of('highlight')
-    let clock = sandwich#clock#new()
-    let hi_exited = 0
     let linewise = get(a:000, 0, 0)
-
     call self.show(a:place, a:hi_group, linewise)
-    try
-      let c = 0
-      call clock.start()
-      while empty(c)
-        let c = getchar(0)
-        if clock.started && clock.elapsed() > a:duration
-          break
-        endif
-        sleep 20m
-      endwhile
 
-      if c != 0
-        let c = type(c) == s:type_num ? nr2char(c) : c
-        let hi_exited = 1
-        call feedkeys(c, 't')
-      endif
-    finally
-      call self.quench(a:place)
-      call clock.stop()
-      return hi_exited
-    endtry
+    let quench_method = s:get('quench_method', 'input')
+    if quench_method ==# 'timer' && s:has_timer
+      let hi_exited = self._quench_by_timer(a:place, a:duration)
+    else
+      let hi_exited = self._quench_by_input(a:place, a:duration)
+    endif
   endif
+  return hi_exited
+endfunction
+"}}}
+function! s:operator._quench_by_input(place, duration) dict abort "{{{
+  let clock = sandwich#clock#new()
+  let hi_exited = 0
+  try
+    let c = 0
+    call clock.start()
+    while empty(c)
+      let c = getchar(0)
+      if clock.started && clock.elapsed() > a:duration
+        break
+      endif
+      sleep 20m
+    endwhile
+
+    if c != 0
+      let c = type(c) == s:type_num ? nr2char(c) : c
+      let hi_exited = 1
+      call feedkeys(c, 't')
+    endif
+  finally
+    call self.quench(a:place)
+    call clock.stop()
+    return hi_exited
+  endtry
+endfunction
+"}}}
+function! s:operator._quench_by_timer(place, duration) dict abort "{{{
+  let id = timer_start(a:duration, 'operator#sandwich#operator#timer_quench')
+  let s:highlighted[id] = {'place': a:place, 'basket': deepcopy(self.basket), 'n': self.n}
+  return 0
 endfunction
 "}}}
 function! s:operator.finalize() dict abort  "{{{
@@ -621,6 +639,20 @@ function! s:operator.recipes.fill(recipe, count) dict abort  "{{{
   while len(self.dog_ear) < a:count
     call add(self.dog_ear, a:recipe)
   endwhile
+endfunction
+"}}}
+
+" for timer highlight-quenching "{{{
+let s:highlighted = {}
+function! operator#sandwich#operator#timer_quench(id) abort
+  let n      = s:highlighted[a:id].n
+  let place  = s:highlighted[a:id].place
+  let basket = s:highlighted[a:id].basket
+  for i in range(n)
+    let stuff = basket[i]
+    call stuff.quench(place)
+  endfor
+  unlet s:highlighted[a:id]
 endfunction
 "}}}
 
