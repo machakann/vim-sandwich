@@ -238,7 +238,7 @@ endfunction
 "}}}
 function! s:stuff.highlight_order(place, linewise) dict abort "{{{
   if a:place ==# 'target'
-    let order_list = s:highlight_order(self.target, a:linewise)
+    let order_list = s:highlight_order(self.target, [a:linewise, a:linewise])
   elseif a:place ==# 'added'
     let order_list = []
     for added in self.added
@@ -246,7 +246,7 @@ function! s:stuff.highlight_order(place, linewise) dict abort "{{{
     endfor
   elseif a:place ==# 'stuff'
     let stuff = {'head1': self.edges.head, 'tail1': self.edges.tail, 'head2': copy(s:null_pos), 'tail2': copy(s:null_pos)}
-    let order_list = s:highlight_order(stuff, a:linewise)
+    let order_list = s:highlight_order(stuff, [a:linewise, a:linewise])
   else
     let order_list = []
   endif
