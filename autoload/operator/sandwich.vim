@@ -287,9 +287,13 @@ function! operator#sandwich#show(place, ...) abort  "{{{
   elseif kind ==# 'replace'
     if a:place ==# 'added'
       let hi_group = get(a:000, 0, 'OperatorSandwichAdd')
-    else
+    elseif a:place ==# 'target'
       let hi_group = opt.of('highlight') >= 2
                   \ ? get(a:000, 0, 'OperatorSandwichDelete')
+                  \ : get(a:000, 0, 'OperatorSandwichBuns')
+    else
+      let hi_group = opt.of('highlight') >= 2
+                  \ ? get(a:000, 0, 'OperatorSandwichStuff')
                   \ : get(a:000, 0, 'OperatorSandwichBuns')
     endif
   else
