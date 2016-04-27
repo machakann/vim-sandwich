@@ -31,6 +31,13 @@ endif
 " features
 let s:has_gui_running = has('gui_running')
 let s:has_timer       = has('timers')
+
+" SID
+function! s:SID() abort
+  return matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_SID$')
+endfunction
+let s:SID = s:SID()
+delfunction s:SID
 "}}}
 
 function! operator#sandwich#operator#new() abort  "{{{
@@ -547,7 +554,7 @@ function! s:operator._quench_by_input(place, duration) dict abort "{{{
 endfunction
 "}}}
 function! s:operator._quench_by_timer(place, duration) dict abort "{{{
-  let id = timer_start(a:duration, 'operator#sandwich#operator#timer_quench')
+  let id = timer_start(a:duration, "\<SNR>" . s:SID . '_timer_quench')
   let s:highlighted[id] = {'place': a:place, 'basket': deepcopy(self.basket), 'n': self.n}
   return 0
 endfunction
@@ -644,7 +651,7 @@ endfunction
 
 " for timer highlight-quenching "{{{
 let s:highlighted = {}
-function! operator#sandwich#operator#timer_quench(id) abort
+function! s:timer_quench(id) abort
   let n      = s:highlighted[a:id].n
   let place  = s:highlighted[a:id].place
   let basket = s:highlighted[a:id].basket
