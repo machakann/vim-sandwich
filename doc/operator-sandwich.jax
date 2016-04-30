@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:16-Apr-2016.
+						Last change:30-Apr-2016.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -1395,8 +1395,24 @@ g:operator#sandwich#timeoutlen		*g:operator#sandwich#timeoutlen*
 
 				*g:operator#sandwich#highlight_duration*
 g:operator#sandwich#highlight_duration
-	囲みを外すオペレータにおけるハイライトが持続する時間をミリ秒単位で指定
-	します。デフォルト値は 200 です。
+	オペレータにおける編集後にハイライトが持続する時間をミリ秒単位で指定し
+	ます。デフォルト値は 200 です。
+
+
+
+				*g:operator#sandwich#persistent_highlight*
+g:operator#sandwich#persistent_highlight
+	囲みを追加/置換するオペレータの編集後のハイライトの方法を指定します。
+	どちらの場合も一定時間 (|g:operator#sandwich#highlight_duration| に指
+	定された時間) の間ハイライトが持続します。このオプションに "blink" が
+	指定されれば、ハイライトはユーザーの入力によりただちに中止されるでしょ
+	う。 "glow" が指定されれば、ユーザーがテキストを編集するまで中止されま
+	せん。デフォルト値は "glow" です。
+
+	NOTE: 囲みを外すオペレータは "blink" の挙動で固定されています。
+
+	NOTE: |g:operator#sandwich#highlight_duration| が小さい場合は二つの選
+	      択肢にほとんど違いは見られないでしょう。
 
 
 

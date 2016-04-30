@@ -21,12 +21,9 @@ let s:type_list = type([])
 " patchs
 if v:version > 704 || (v:version == 704 && has('patch237'))
   let s:has_patch_7_4_771 = has('patch-7.4.771')
-  let s:has_patch_7_4_362 = has('patch-7.4.362')
   let s:has_patch_7_4_358 = has('patch-7.4.358')
 else
   let s:has_patch_7_4_771 = v:version == 704 && has('patch771')
-  let s:has_patch_7_4_310 = v:version == 704 && has('patch310')
-  let s:has_patch_7_4_362 = v:version == 704 && has('patch362')
   let s:has_patch_7_4_358 = v:version == 704 && has('patch358')
 endif
 "}}}
@@ -45,9 +42,9 @@ let s:stuff = {
       \   'added'    : [],
       \   'message'  : {},
       \   'highlight': {
-      \     'target': {'status': 0, 'group': '', 'id': []},
-      \     'added' : {'status': 0, 'group': '', 'id': []},
-      \     'stuff' : {'status': 0, 'group': '', 'id': []},
+      \     'target': {},
+      \     'added' : {},
+      \     'stuff' : {},
       \   },
       \ }
 "}}}
@@ -56,7 +53,7 @@ function! s:stuff.initialize(count, cursor, modmark, message) dict abort  "{{{
   let self.acts = map(range(a:count), 'operator#sandwich#act#new()')
   let self.added = []
   let self.message = a:message
-  call map(self.highlight, 'extend(v:val, {"status": 0, "group": "", "id": []})')
+  call map(self.highlight, 'sandwich#highlight#new()')
   for act in self.acts
     call act.initialize(a:cursor, a:modmark, self.added, a:message)
   endfor
@@ -203,54 +200,36 @@ function! s:stuff.show(place, hi_group, linewise) dict abort "{{{
   let highlight = get(self.highlight, a:place, {})
   let success = 0
   if self.active && highlight != {}
-    if highlight.status && a:hi_group !=# highlight.group
-      call self.quench(a:place)
+    if a:place ==# 'target'
+      call highlight.order(self.target, [a:linewise, a:linewise])
+    elseif a:place ==# 'added'
+      for added in self.added
+        call highlight.order(added, added.linewise)
+      endfor
+    elseif a:place ==# 'stuff'
+      let stuff = {'head1': self.edges.head, 'tail1': self.edges.tail, 'head2': copy(s:null_pos), 'tail2': copy(s:null_pos)}
+      call highlight.order(stuff, [a:linewise, a:linewise])
     endif
-
-    if !highlight.status
-      let order_list = self.highlight_order(a:place, a:linewise)
-      if order_list != []
-        for order in order_list
-          let highlight.id += s:matchaddpos(a:hi_group, order)
-        endfor
-        let highlight.status = 1
-        let highlight.group = a:hi_group
-        call filter(highlight.id, 'v:val > 0')
-        let success = 1
-      endif
-    endif
+    let success = highlight.show(a:hi_group)
   endif
   return success
 endfunction
 "}}}
 function! s:stuff.quench(place) dict abort "{{{
-  let highlight = get(self.highlight, a:place, {'status': 0})
+  let highlight = get(self.highlight, a:place, {})
   let success = 0
-  if self.active && highlight.status
-    call map(highlight.id, 'matchdelete(v:val)')
-    call filter(highlight.id, 'v:val > 0')
-    let highlight.status = 0
-    let highlight.group = ''
-    let success = 1
+  if self.active && highlight != {}
+    let success = highlight.quench()
   endif
   return success
 endfunction
 "}}}
-function! s:stuff.highlight_order(place, linewise) dict abort "{{{
-  if a:place ==# 'target'
-    let order_list = s:highlight_order(self.target, [a:linewise, a:linewise])
-  elseif a:place ==# 'added'
-    let order_list = []
-    for added in self.added
-      let order_list += s:highlight_order(added, added.linewise)
-    endfor
-  elseif a:place ==# 'stuff'
-    let stuff = {'head1': self.edges.head, 'tail1': self.edges.tail, 'head2': copy(s:null_pos), 'tail2': copy(s:null_pos)}
-    let order_list = s:highlight_order(stuff, [a:linewise, a:linewise])
-  else
-    let order_list = []
+function! s:stuff.scheduled_quench(place, time, id) dict abort "{{{
+  let highlight = get(self.highlight, a:place, {})
+  if self.active && highlight != {}
+    return highlight.scheduled_quench(a:time, a:id)
   endif
-  return order_list
+  return -1
 endfunction
 "}}}
 
@@ -513,86 +492,6 @@ function! s:skip_space(head, tail) abort  "{{{
     let a:tail[0:3] = tail[0:3]
   endif
 endfunction
-"}}}
-function! s:highlight_order(target, linewise) abort "{{{
-  let order = []
-  let order_list = []
-  for [head, tail, linewise] in [[a:target.head1, a:target.tail1, a:linewise[0]],
-                              \  [a:target.head2, a:target.tail2, a:linewise[1]]]
-    if linewise
-      call s:highlight_order_linewise(order_list, order, head, tail)
-    else
-      call s:highlight_order_charwise(order_list, order, head, tail)
-    endif
-  endfor
-  if order != []
-    call add(order_list, order)
-  endif
-  return order_list
-endfunction
-"}}}
-function! s:highlight_order_charwise(order_list, order, head, tail) abort  "{{{
-  let n = len(a:order)
-  if a:head != s:null_pos && a:tail != s:null_pos && s:is_equal_or_ahead(a:tail, a:head)
-    if a:head[1] == a:tail[1]
-      call add(a:order, a:head[1:2] + [a:tail[2] - a:head[2] + 1])
-      let n += 1
-    else
-      for lnum in range(a:head[1], a:tail[1])
-        if lnum == a:head[1]
-          call add(a:order, a:head[1:2] + [col([a:head[1], '$']) - a:head[2] + 1])
-        elseif lnum == a:tail[1]
-          call add(a:order, [a:tail[1], 1] + [a:tail[2]])
-        else
-          call add(a:order, [lnum])
-        endif
-
-        if n == 7
-          call add(a:order_list, deepcopy(a:order))
-          call filter(a:order, 0)
-          let n = 0
-        else
-          let n += 1
-        endif
-      endfor
-    endif
-  endif
-endfunction
-"}}}
-function! s:highlight_order_linewise(order_list, order, head, tail) abort  "{{{
-  let n = len(a:order)
-  if a:head != s:null_pos && a:tail != s:null_pos && a:head[1] <= a:tail[1]
-    for lnum in range(a:head[1], a:tail[1])
-      call add(a:order, [lnum])
-      if n == 7
-        call add(a:order_list, deepcopy(a:order))
-        call filter(a:order, 0)
-        let n = 0
-      else
-        let n += 1
-      endif
-    endfor
-  endif
-endfunction
-"}}}
-" function! s:matchaddpos(group, pos) abort "{{{
-if s:has_patch_7_4_362
-  function! s:matchaddpos(group, pos) abort
-    return [matchaddpos(a:group, a:pos)]
-  endfunction
-else
-  function! s:matchaddpos(group, pos) abort
-    let id_list = []
-    for pos in a:pos
-      if len(pos) == 1
-        let id_list += [matchadd(a:group, printf('\%%%dl', pos[0]))]
-      else
-        let id_list += [matchadd(a:group, printf('\%%%dl\%%>%dc.*\%%<%dc', pos[0], pos[1]-1, pos[1]+pos[2]))]
-      endif
-    endfor
-    return id_list
-  endfunction
-endif
 "}}}
 
 let [s:get_wider_region, s:c2p, s:is_valid_2pos, s:is_valid_4pos, s:is_ahead, s:is_equal_or_ahead, s:escape]
