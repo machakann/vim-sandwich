@@ -1,7 +1,7 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
 						Last change:16-Apr-2016.
 
-Author  : machakann <mckn@outlook.jp>
+Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
           Japanese <http://www.kmonos.net/nysl/>
           English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>

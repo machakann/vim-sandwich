@@ -1,8 +1,8 @@
-*sandwich.txt*				Last change:07-Apr-2016.
+*sandwich.txt*				Last change:30-Apr-2016.
 
 The set of operator and textobject plugins to edit sandwiched textobjects.
 
-Author  : machakann <mckn@outlook.jp>
+Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
           Japanese <http://www.kmonos.net/nysl/>
           English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>

@@ -1,7 +1,7 @@
 *textobj-sandwich.txt*	The textobject plugin to select sandwiched texts.
-						Last change:08-Apr-2016.
+						Last change:30-Apr-2016.
 
-Author  : machakann <mckn@outlook.jp>
+Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
           Japanese <http://www.kmonos.net/nysl/>
           English (Unofficial) <http://www.kmonos.net/nysl/index.en.html>
