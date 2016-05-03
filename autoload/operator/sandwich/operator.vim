@@ -31,13 +31,6 @@ endif
 " features
 let s:has_gui_running = has('gui_running')
 let s:has_timer       = has('timers')
-
-" SID
-function! s:SID() abort
-  return matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_SID$')
-endfunction
-let s:SID = printf("\<SNR>%s_", s:SID())
-delfunction s:SID
 "}}}
 
 function! operator#sandwich#operator#new() abort  "{{{
@@ -234,7 +227,6 @@ function! s:operator.add() dict abort "{{{
 
     call self.skip_space(i)
     call self.add_once(i, recipe)
-    let undojoin = self.state ? 1 : 0
     call opt.clear('recipe_add')
   endfor
 
@@ -314,7 +306,6 @@ function! s:operator.replace() dict abort  "{{{
   let self.cursor.inner_head = copy(s:null_pos)
   let self.cursor.inner_tail = copy(s:null_pos)
 
-  let undojoin = 0
   for i in range(self.count)
     if !self.match(i)
       break
@@ -344,7 +335,6 @@ function! s:operator.replace() dict abort  "{{{
     endif
 
     call self.replace_once(i, recipe)
-    let undojoin = self.state ? 1 : 0
     call opt.clear('recipe_add')
   endfor
 
@@ -435,10 +425,10 @@ function! s:operator.query() dict abort  "{{{
     let input .= c
 
     " check forward match
-    let n_fwd = len(filter(recipes, 's:is_input_matched(v:val, input, self.opt, 0)'))
+    let n_fwd = len(filter(recipes, 's:is_input_matched(v:val, input, opt, 0)'))
 
     " check complete match
-    let n_comp = len(filter(copy(recipes), 's:is_input_matched(v:val, input, self.opt, 1)'))
+    let n_comp = len(filter(copy(recipes), 's:is_input_matched(v:val, input, opt, 1)'))
     if n_comp
       if len(recipes) == n_comp
         break
@@ -459,7 +449,7 @@ function! s:operator.query() dict abort  "{{{
   call clock.stop()
 
   " pick up and register a recipe
-  if filter(recipes, 's:is_input_matched(v:val, input, self.opt, 1)') != []
+  if filter(recipes, 's:is_input_matched(v:val, input, opt, 1)') != []
     let recipe = recipes[0]
   else
     if input ==# "\<Esc>" || input ==# ''
@@ -566,7 +556,7 @@ function! s:operator.glow(place, hi_group, duration, ...) dict abort "{{{
       let id = stuff.scheduled_quench(a:place, a:duration, id)
     endfor
     augroup sandwich-highlight-cancel
-      execute printf('autocmd TextChanged <buffer> call %sque_canceler(%s)', s:SID, id)
+      execute printf('autocmd TextChanged <buffer> call s:que_canceler(%s)', id)
     augroup END
   endif
 endfunction
