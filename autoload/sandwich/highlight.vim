@@ -112,9 +112,17 @@ function! s:scheduled_quench(id) abort  "{{{
   unlet s:quench_table[a:id]
 endfunction
 "}}}
-function! sandwich#highlight#cancel(id) abort "{{{
-  call s:scheduled_quench(a:id)
-  call timer_stop(a:id)
+function! sandwich#highlight#cancel(...) abort "{{{
+  if a:0 > 0
+    let id_list = type(a:1) == s:type_list ? a:1 : a000
+  else
+    let id_list = keys(s:quench_table)
+  endif
+
+  for id in id_list
+    call s:scheduled_quench(id)
+    call timer_stop(id)
+  endfor
 endfunction
 "}}}
 "}}}

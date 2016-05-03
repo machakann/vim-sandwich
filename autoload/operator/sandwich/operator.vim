@@ -554,6 +554,9 @@ endfunction
 "}}}
 function! s:operator.glow(place, hi_group, duration, ...) dict abort "{{{
   if self.opt.of('highlight')
+    " highlight off: limit the number of highlighting region to one explicitly
+    call sandwich#highlight#cancel()
+
     let linewise = get(a:000, 0, 0)
     call self.show(a:place, a:hi_group, linewise)
 
