@@ -114,7 +114,7 @@ endfunction
 "}}}
 function! sandwich#highlight#cancel(...) abort "{{{
   if a:0 > 0
-    let id_list = type(a:1) == s:type_list ? a:1 : a000
+    let id_list = type(a:1) == s:type_list ? a:1 : a:000
   else
     let id_list = keys(s:quench_table)
   endif
