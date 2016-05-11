@@ -1,5 +1,5 @@
 *textobj-sandwich.jax*	『挟まれた』テキストを選択する。
-						Last change:10-May-2016.
+						Last change:11-May-2016.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -337,7 +337,6 @@ g:textobj#sandwich#default_recipes	*g:textobj#sandwich#default_recipes*
 	:let g:textobj#sandwich#recipes
 	 \ = deepcopy(g:textobj#sandwich#default_recipes)
 <
-
 
 
 NOTE: もしレシピが競合する場合は |g:textobj#sandwich#default_recipes| か
@@ -803,23 +802,22 @@ expr
 	NOTE: このオプションが真の時、 "buns" はレシピを呼ぶためのキー入力とは
 	      みなされませんので "input" の指定が必要になります。
 
+	NOTE: 評価の結果 "buns" が空文字列を含むと |textobj-sandwich| は選択を
+	      中止します。
+
 	NOTE: もし式が |getchar()| や |input()| でユーザーに入力を求める場合、
 	      |operator-sandwich| の囲みを外すオペレータや |textobj-sandwich|
 	      の |<Plug>(textobj-sandwich-auto-i)| や
 	      |<Plug>(textobj-sandwich-auto-a)| で不都合が出ることがあります。
-	      この問題を避けるために、 "kind" フィルター及び "synchro" オプシ
-	      ョンを併用することが推奨されます。例えば次のレシピは二文字の入力
-	      を求め、その二文字に囲まれたテキストを選択します。
-
-	NOTE: 評価の結果 "buns" が空文字列を含むと |textobj-sandwich| は選択を
-	      中止します。
+	      この問題を避けるために、 "kind" フィルターを併用することが推奨さ
+	      れます。例えば次のレシピは二文字の入力を求め、その二文字に囲まれ
+	      たテキストを選択します。
 >
 	      let g:textobj#sandwich#recipes += [
 	        \    {
 	        \      'buns': ['GetChar()', 'GetChar()'],
 	        \      'kind': ['query'],
 	        \      'expr': 1,
-	        \      'synchro': 1,
 	        \      'input': ['f']
 	        \    },
 	        \ ]
@@ -847,8 +845,8 @@ synchro
 	NOTE: この機能はビジュアル選択に対しては意味を持ちません。
 
 	デフォルト値
-	  * query: 0
-	  * auto : 0
+	  * query: 1
+	  * auto : 1
 
 
 

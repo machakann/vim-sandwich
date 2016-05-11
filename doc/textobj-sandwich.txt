@@ -1,5 +1,5 @@
 *textobj-sandwich.txt*	The textobject plugin to select sandwiched texts.
-						Last change:10-May-2016.
+						Last change:11-May-2016.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -337,7 +337,6 @@ g:textobj#sandwich#default_recipes	*g:textobj#sandwich#default_recipes*
 	:let g:textobj#sandwich#recipes
 	 \ = deepcopy(g:textobj#sandwich#default_recipes)
 <
-
 
 
 NOTE: If recipes are conflicted in some reason,
@@ -808,24 +807,23 @@ expr
 	      query-textobjects. "buns" never be regarded as key inputs to
 	      trigger.
 
+	NOTE: If "buns" include empty string resulting of the evaluation,
+	      |textobj-sandwich| cancels the selection.
+
 	NOTE: If the expressions query user something by |getchar()| or
 	      |input()|, the recipe may cause problem on the
 	      |operator-sandwich| delete operator and |textobj-sandwich|
 	      textobjects, |<Plug>(textobj-sandwich-auto-i)| and
 	      |<Plug>(textobj-sandwich-auto-a)|. To avoid this problem, it is
-	      recommended to use "kind" filter and "synchro" option. For
-	      example, the following recipe asks two characters to select a
-	      text between the two characters.
-	
-	NOTE: If "buns" include empty string resulting of the evaluation,
-	      |textobj-sandwich| cancels the selection.
+	      recommended to use "kind" filter. For example, the following
+	      recipe asks two characters to select a text between the two
+	      characters.
 >
 	      let g:textobj#sandwich#recipes += [
 	        \    {
 	        \      'buns': ['GetChar()', 'GetChar()'],
 	        \      'kind': ['query'],
 	        \      'expr': 1,
-	        \      'synchro': 1,
 	        \      'input': ['f']
 	        \    },
 	        \ ]
@@ -855,8 +853,8 @@ synchro
 	NOTE: This feature is not valid with visual mode selection.
 
 	Default values
-	  * query: 0
-	  * auto : 0
+	  * query: 1
+	  * auto : 1
 
 
 
