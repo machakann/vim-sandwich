@@ -1,5 +1,5 @@
 *textobj-sandwich.jax*	『挟まれた』テキストを選択する。
-						Last change:30-Apr-2016.
+						Last change:10-May-2016.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -841,11 +841,7 @@ synchro
 	|<Plug>(operator-sandwich-replace)| と組み合わせて使われると、マッチし
 	たレシピがこれらのオペレータに渡され高い優先度で削除/置換されます。こ
 	のオプションは |g:textobj#sandwich#recipes| 内の "expr" オプションで評
-	価されたレシピをこれらのオペレータと連携させるのに役にたつでしょう。レ
-	シピが渡される際に "kind" キーをもち、 "delete" と "replace" の両方を
-	持たない場合、 "kind" フィルターに "replace" と "delete" が自動的に追
-	加されます。また、"action" フィルターを持ち "delete" が有効でない場合
-	"action" フィルターに "delete" が追加されます。
+	価されたレシピをこれらのオペレータと連携させるのに役にたつでしょう。
 	こちらの項もご覧ください。 |operator-sandwich-configuration|
 
 	NOTE: この機能はビジュアル選択に対しては意味を持ちません。

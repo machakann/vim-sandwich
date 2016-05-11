@@ -512,21 +512,16 @@ function! s:stuff.synchronize() dict abort  "{{{
       call extend(recipe, {'expr': 0})
     elseif self.searchby ==# 'external'
       call extend(recipe, {'external': self.external})
-      call extend(recipe, {'excursus': [self.range.count, [0] + self.cursor + [0]]})
+      let excursus = {
+            \   'count' : self.range.count,
+            \   'cursor': [0] + self.cursor + [0],
+            \   'coord' : self.coord,
+            \ }
+      call extend(recipe, {'excursus': excursus})
     endif
     call extend(recipe, self.opt.recipe, 'keep')
 
-    " If the recipe has 'kind' key and has no 'delete', 'replace' keys, then add these items.
-    if has_key(recipe, 'kind') && filter(copy(recipe.kind), 'v:val ==# "delete" || v:val ==# "replace"') == []
-      let recipe.kind += ['delete', 'replace']
-    endif
-
-    " Add 'delete' item to 'action' filter, if the recipe is not valid in 'delete' action.
-    if has_key(recipe, 'action') && filter(copy(recipe.action), 'v:val ==# "delete"') == []
-      let recipe.action += ['delete']
-    endif
-
-    let g:operator#sandwich#object.recipes.synchro = [recipe]
+    call operator#sandwich#synchronize(recipe)
   endif
 endfunction
 "}}}

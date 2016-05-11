@@ -315,6 +315,12 @@ function! operator#sandwich#is_in_cmd_window() abort  "{{{
   return s:is_in_cmdline_window
 endfunction
 "}}}
+function! operator#sandwich#synchronize(recipe) abort "{{{
+  if exists('g:operator#sandwich#object')
+    let g:operator#sandwich#object.recipes.synchro = [a:recipe]
+  endif
+endfunction
+"}}}
 
 " recipes "{{{
 function! operator#sandwich#get_recipes() abort  "{{{

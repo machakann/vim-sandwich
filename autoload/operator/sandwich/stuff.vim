@@ -298,10 +298,26 @@ endfunction
 "}}}
 function! s:check_textobj_diff(head, tail, candidate, opt_noremap) abort  "{{{
   let target = deepcopy(s:null_4pos)
+  if has_key(a:candidate, 'excursus')
+    let options = s:shift_options()
+    let coord = a:candidate.excursus.coord
+    let target.head1 = s:c2p(coord.head)
+    let target.tail1 = s:get_left_pos(s:c2p(coord.inner_head))
+    let target.head2 = s:get_right_pos(s:c2p(coord.inner_tail))
+    let target.tail2 = s:c2p(coord.tail)
+    call s:restore_options(options)
+
+    if target.head1 == a:head && target.tail2 == a:tail
+          \ && target.tail1 != s:null_pos && target.head2 != s:null_pos
+          \ && s:is_equal_or_ahead(target.tail1, target.head1)
+          \ && s:is_equal_or_ahead(target.tail2, target.head2)
+      return target
+    endif
+  endif
+
   let [textobj_i, textobj_a] = a:candidate.external
   let [visual_head, visual_tail] = [getpos("'<"), getpos("'>")]
   let visualmode = visualmode()
-
   if a:opt_noremap
     let cmd = 'normal!'
     let v   = 'v'
@@ -312,11 +328,11 @@ function! s:check_textobj_diff(head, tail, candidate, opt_noremap) abort  "{{{
 
   let order_list = [[1, a:head], [1, a:tail]]
   if has_key(a:candidate, 'excursus')
-    let order_list = [a:candidate.excursus] + order_list
+    let order_list = [[a:candidate.excursus.count, a:candidate.excursus.cursor]] + order_list
   endif
 
-  " try twice (at least)
   let found = 0
+  let options = s:shift_options()
   for [l:count, cursor] in order_list
     " get outer positions
     call setpos('.', cursor)
@@ -368,6 +384,7 @@ function! s:check_textobj_diff(head, tail, candidate, opt_noremap) abort  "{{{
       break
     endif
   endfor
+  call s:restore_options(options)
 
   " restore visualmode
   execute 'normal! ' . visualmode . "\<Esc>"
@@ -493,9 +510,19 @@ function! s:skip_space(head, tail) abort  "{{{
   endif
 endfunction
 "}}}
+function! s:shift_options() abort "{{{
+  let  virtualedit = &virtualedit
+  let &virtualedit = ''
+  return {'virtualedit': virtualedit}
+endfunction
+"}}}
+function! s:restore_options(options) abort "{{{
+  let &virtualedit = a:options.virtualedit
+endfunction
+"}}}
 
-let [s:get_wider_region, s:c2p, s:is_valid_2pos, s:is_valid_4pos, s:is_ahead, s:is_equal_or_ahead, s:escape]
-      \ = operator#sandwich#lib#funcref(['get_wider_region', 'c2p', 'is_valid_2pos', 'is_valid_4pos', 'is_ahead', 'is_equal_or_ahead', 'escape'])
+let [s:get_wider_region, s:get_left_pos, s:get_right_pos, s:c2p, s:is_valid_2pos, s:is_valid_4pos, s:is_ahead, s:is_equal_or_ahead, s:escape]
+      \ = operator#sandwich#lib#funcref(['get_wider_region', 'get_left_pos', 'get_right_pos', 'c2p', 'is_valid_2pos', 'is_valid_4pos', 'is_ahead', 'is_equal_or_ahead', 'escape'])
 
 
 " vim:set foldmethod=marker:
