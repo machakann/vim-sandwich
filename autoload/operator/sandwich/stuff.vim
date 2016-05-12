@@ -352,7 +352,7 @@ function! s:check_textobj_diff(head, tail, candidate, opt_noremap) abort  "{{{
     execute "normal! \<Esc>"
     let motionwise_i = visualmode()
     " FIXME: How should I treat a line breaking?
-    let [target.tail1, target.head2] = s:get_wider_region(getpos("'<"), getpos("'>"))
+    let [target.tail1, target.head2] = [getpos("'<"), getpos("'>")]
     if target.tail1 == cursor && target.head2 == cursor
       let [target.tail1, target.head2] = [copy(s:null_coord), copy(s:null_coord)]
     elseif motionwise_i ==# 'V'
@@ -372,14 +372,14 @@ function! s:check_textobj_diff(head, tail, candidate, opt_noremap) abort  "{{{
         let target.tail1 = getpos('.')
       endif
       execute "normal! \<Esc>"
-      let [target.tail1, target.head2] = s:get_wider_region(target.tail1, target.head2)
     endif
 
     " check validity
     if target.head1 == a:head && target.tail2 == a:tail
           \ && target.tail1 != s:null_pos && target.head2 != s:null_pos
-          \ && s:is_equal_or_ahead(target.tail1, target.head1)
-          \ && s:is_equal_or_ahead(target.tail2, target.head2)
+          \ && s:is_ahead(target.tail1, target.head1)
+          \ && s:is_ahead(target.tail2, target.head2)
+      let [target.tail1, target.head2] = s:get_wider_region(target.tail1, target.head2)
       let found = 1
       break
     endif

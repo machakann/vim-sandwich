@@ -15,6 +15,7 @@ function! s:suite.before_each() abort "{{{
   set virtualedit&
   silent! mapc!
   silent! ounmap ii
+  silent! xunmap ii
   silent! ounmap ssd
   silent! xunmap i{
   silent! xunmap a{
@@ -859,6 +860,15 @@ function! s:suite.charwise_n_external_textobj() abort "{{{
   normal 0sd$
   call g:assert.equals(getline('.'), 'foo', 'failed at #4')
 
+  " #5
+  xnoremap ii :<C-u>call TextobjFail()<CR>
+  let g:operator#sandwich#recipes = [
+        \   {'external': ['ii', 'a('], 'noremap': 0},
+        \ ]
+  call setline('.', '(foo)')
+  normal 0sd5l
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #5')
+
   unlet g:sandwich#recipes
   unlet g:operator#sandwich#recipes
 endfunction
@@ -1700,6 +1710,15 @@ function! s:suite.charwise_x_external_textobj() abort "{{{
   call setline('.', '<title>foo</title>')
   normal 0v$sd
   call g:assert.equals(getline('.'), 'foo', 'failed at #4')
+
+  " #5
+  xnoremap ii :<C-u>call TextobjFail()<CR>
+  let g:operator#sandwich#recipes = [
+        \   {'external': ['ii', 'a('], 'noremap': 0},
+        \ ]
+  call setline('.', '(foo)')
+  normal 0v$sd
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #5')
 
   unlet g:sandwich#recipes
   unlet g:operator#sandwich#recipes
@@ -2658,6 +2677,15 @@ function! s:suite.linewise_n_external_textobj() abort "{{{
   call setline('.', '<title>foo</title>')
   normal 0sdV$
   call g:assert.equals(getline('.'), 'foo', 'failed at #4')
+
+  " #5
+  xnoremap ii :<C-u>call TextobjFail()<CR>
+  let g:operator#sandwich#recipes = [
+        \   {'external': ['ii', 'a('], 'noremap': 0},
+        \ ]
+  call setline('.', '(foo)')
+  normal 0sdVl
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #5')
 
   unlet g:sandwich#recipes
   unlet g:operator#sandwich#recipes
@@ -3650,6 +3678,15 @@ function! s:suite.linewise_x_external_textobj() abort "{{{
   call setline('.', '<title>foo</title>')
   normal 0Vsd
   call g:assert.equals(getline('.'), 'foo', 'failed at #4')
+
+  " #5
+  xnoremap ii :<C-u>call TextobjFail()<CR>
+  let g:operator#sandwich#recipes = [
+        \   {'external': ['ii', 'a('], 'noremap': 0},
+        \ ]
+  call setline('.', '(foo)')
+  normal 0Vsd
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #5')
 
   unlet g:sandwich#recipes
   unlet g:operator#sandwich#recipes
@@ -4664,12 +4701,24 @@ function! s:suite.blockwise_n_external_textobj() abort  "{{{
   %delete
 
   " #4
-  call setline('.', '<title>foo</title>')
   call append(0, ['<title>foo</title>', '<title>bar</title>', '<title>baz</title>'])
   execute "normal ggsd\<C-v>56l"
   call g:assert.equals(getline(1), 'foo', 'failed at #4')
   call g:assert.equals(getline(2), 'bar', 'failed at #4')
   call g:assert.equals(getline(3), 'baz', 'failed at #4')
+
+  %delete
+
+  " #5
+  xnoremap ii :<C-u>call TextobjFail()<CR>
+  let g:operator#sandwich#recipes = [
+        \   {'external': ['ii', 'a('], 'noremap': 0},
+        \ ]
+  call append(0, ['(foo)', '(bar)', '(baz)'])
+  normal ggsd17l
+  call g:assert.equals(getline(1), '(foo)', 'failed at #5')
+  call g:assert.equals(getline(2), '(bar)', 'failed at #5')
+  call g:assert.equals(getline(3), '(baz)', 'failed at #5')
 
   set whichwrap&
   unlet g:sandwich#recipes
@@ -5793,6 +5842,19 @@ function! s:suite.blockwise_x_external_textobj() abort  "{{{
   call g:assert.equals(getline(1), 'foo', 'failed at #4')
   call g:assert.equals(getline(2), 'bar', 'failed at #4')
   call g:assert.equals(getline(3), 'baz', 'failed at #4')
+
+  %delete
+
+  " #5
+  xnoremap ii :<C-u>call TextobjFail()<CR>
+  let g:operator#sandwich#recipes = [
+        \   {'external': ['ii', 'a('], 'noremap': 0},
+        \ ]
+  call append(0, ['(foo)', '(bar)', '(baz)'])
+  execute "normal gg\<C-v>2j4lsd"
+  call g:assert.equals(getline(1), '(foo)', 'failed at #5')
+  call g:assert.equals(getline(2), '(bar)', 'failed at #5')
+  call g:assert.equals(getline(3), '(baz)', 'failed at #5')
 
   unlet g:sandwich#recipes
   unlet g:operator#sandwich#recipes
