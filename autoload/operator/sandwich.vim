@@ -316,7 +316,7 @@ function! operator#sandwich#is_in_cmd_window() abort  "{{{
 endfunction
 "}}}
 function! operator#sandwich#synchronize(recipe) abort "{{{
-  if exists('g:operator#sandwich#object')
+  if exists('g:operator#sandwich#object') && !empty(a:recipe)
     let g:operator#sandwich#object.recipes.synchro = [a:recipe]
   endif
 endfunction

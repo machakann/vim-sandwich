@@ -1,5 +1,5 @@
 *textobj-sandwich.txt*	The textobject plugin to select sandwiched texts.
-						Last change:11-May-2016.
+						Last change:12-May-2016.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -848,9 +848,11 @@ synchro
 	priority. This option is useful when a evaluated recipe by "expr"
 	option in |g:textobj#sandwich#recipes| collaborates with these
 	operators.
-	See |operator-sandwich-configuration|.
 
 	NOTE: This feature is not valid with visual mode selection.
+	NOTE: When the recipe is passed to these operators, the "action"
+	      filter is fixed to only "delete". See
+	      |operator-sandwich-configuration| also.
 
 	Default values
 	  * query: 1
@@ -1193,7 +1195,7 @@ g:textobj#sandwich#latest_jump		*g:textobj#sandwich#latest_jump*
 	\        'input("textobj-sandwich:head: ")',
 	\        'input("textobj-sandwich:tail: ")'
 	\    ],
-	\    'kind': ['query'],
+	\    'kind': ['delete', 'replace', 'query'],
 	\    'expr': 1,
 	\    'regex': 1,
 	\    'synchro': 1,

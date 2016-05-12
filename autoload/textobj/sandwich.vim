@@ -155,7 +155,7 @@ if exists('g:textobj#sandwich#default_recipes')
   unlockvar! g:textobj#sandwich#default_recipes
 endif
 let g:textobj#sandwich#default_recipes = [
-      \   {'buns': ['input("textobj-sandwich:head: ")', 'input("textobj-sandwich:tail: ")'], 'kind': ['query'], 'expr': 1, 'regex': 1, 'synchro': 1, 'input': ['i']},
+      \   {'buns': ['input("textobj-sandwich:head: ")', 'input("textobj-sandwich:tail: ")'], 'kind': ['delete', 'replace', 'query'], 'expr': 1, 'regex': 1, 'synchro': 1, 'input': ['i']},
       \ ]
 lockvar! g:textobj#sandwich#default_recipes
 "}}}

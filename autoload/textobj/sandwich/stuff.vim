@@ -101,6 +101,7 @@ endfunction
 " s:stuff "{{{
 let s:stuff = {
       \   'buns'     : [],
+      \   'recipe'   : {},
       \   'external' : [],
       \   'searchby' : '',
       \   'state'    : 0,
@@ -476,7 +477,7 @@ function! s:stuff.is_valid_candidate(candidates) dict abort "{{{
 endfunction
 "}}}
 function! s:stuff.get_buns(clock) dict abort  "{{{
-  let buns  = self.buns
+  let buns = self.buns
   let opt_expr  = self.opt.of('expr')
   let opt_regex = self.opt.of('regex')
 
@@ -499,30 +500,30 @@ function! s:stuff.get_buns(clock) dict abort  "{{{
   return buns
 endfunction
 "}}}
-function! s:stuff.synchronize() dict abort  "{{{
+function! s:stuff.synchronized_recipe() dict abort  "{{{
   " For the cooperation with operator-sandwich
   " NOTE: After visual selection by a user-defined textobject, v:operator is set as ':'
   " NOTE: 'synchro' option is not valid for visual mode, because there is no guarantee that g:operator#sandwich#object exists.
   if self.opt.of('synchro') && exists('g:operator#sandwich#object')
         \ && ((self.searchby ==# 'buns' && v:operator ==# 'g@') || (self.searchby ==# 'external' && v:operator =~# '\%(:\|g@\)'))
         \ && &operatorfunc =~# '^operator#sandwich#\%(delete\|replace\)'
-    let recipe = {}
+    let recipe = self.recipe
     if self.searchby ==# 'buns'
-      call extend(recipe, {'buns': self.buns})
-      call extend(recipe, {'expr': 0})
+      call extend(recipe, {'buns': self.buns}, 'force')
+      call extend(recipe, {'expr': 0}, 'force')
     elseif self.searchby ==# 'external'
-      call extend(recipe, {'external': self.external})
       let excursus = {
             \   'count' : self.range.count,
             \   'cursor': [0] + self.cursor + [0],
             \   'coord' : self.coord,
             \ }
-      call extend(recipe, {'excursus': excursus})
+      call extend(recipe, {'excursus': excursus}, 'force')
     endif
-    call extend(recipe, self.opt.recipe, 'keep')
-
-    call operator#sandwich#synchronize(recipe)
+    call extend(recipe, {'action': ['delete']}, 'force')
+  else
+    let recipe = {}
   endif
+  return recipe
 endfunction
 "}}}
 

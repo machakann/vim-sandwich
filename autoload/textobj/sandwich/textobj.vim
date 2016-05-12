@@ -186,7 +186,7 @@ function! s:textobj.new_stuff(recipe) dict abort "{{{
   call stuff.range.initialize(self.cursor[0], stuff.opt.of('expand_range'))
 
   if has_buns
-    let stuff.buns = remove(a:recipe, 'buns')
+    let stuff.buns = a:recipe.buns
     let stuff.searchby = 'buns'
     if stuff.opt.of('nesting')
       let stuff.search = stuff._search_with_nest
@@ -194,10 +194,11 @@ function! s:textobj.new_stuff(recipe) dict abort "{{{
       let stuff.search = stuff._search_without_nest
     endif
   elseif has_external
-    let stuff.external = remove(a:recipe, 'external')
+    let stuff.external = a:recipe.external
     let stuff.searchby = 'external'
     let stuff.search = stuff._get_region
   endif
+  let stuff.recipe = a:recipe
 
   return stuff
 endfunction
@@ -280,7 +281,7 @@ function! s:textobj.select(target) dict abort  "{{{
       normal! l
     endif
 
-    call a:target.synchronize()
+    call operator#sandwich#synchronize(a:target.synchronized_recipe())
     let self.done = 1
   else
     if self.mode ==# 'x'
