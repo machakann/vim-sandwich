@@ -611,17 +611,17 @@ function! s:obsolete_message() abort
         let g:operator#sandwich#options[kind][motionwise]['hi_duration'] = g:operator#sandwich#highlight_duration
       endfor
     endfor
-  endif
 
-  echohl WarningMsg
-  echomsg 'operator-sandwich: ''g:operator#sandwich#highlight_duration'' would be obsolete soon.'
-  echomsg 'operator-sandwich: Use ''call operator#sandwich#set(''all'', ''all'', ''hi_duration'', {duration}) instead.'
-  echohl MoreMsg
-  echo 'sandwich.vim: There is a notice, check it by '':message'' command.'
-  echohl NONE
-  augroup sandwich-obsolete-message
-    autocmd!
-  augroup END
+    echohl WarningMsg
+    echomsg 'operator-sandwich: ''g:operator#sandwich#highlight_duration'' would be obsolete soon.'
+    echomsg 'operator-sandwich: Use ''call operator#sandwich#set(''all'', ''all'', ''hi_duration'', {duration}) instead.'
+    echohl MoreMsg
+    echo 'sandwich.vim: There is a notice, check it by '':message'' command.'
+    echohl NONE
+    augroup sandwich-obsolete-message
+      autocmd!
+    augroup END
+  endif
 endfunction
 augroup sandwich-obsolete-message
   autocmd!
