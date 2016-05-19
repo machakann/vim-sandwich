@@ -413,16 +413,7 @@ function! s:get_buf_length(start, end) abort  "{{{
   if a:start[0] == a:end[0]
     let len = a:end[1] - a:start[1] + 1
   else
-    let length_list = map(getline(a:start[0], a:end[0]), 'len(v:val) + 1')
-    let idx = 0
-    let accumm_length = 0
-    let accumm_list   = [0]
-    for length in length_list[1:]
-      let accumm_length  = accumm_length + length_list[idx]
-      let accumm_list   += [accumm_length]
-      let idx += 1
-    endfor
-    let len = accumm_list[a:end[0] - a:start[0]] + a:end[1] - a:start[1] + 1
+    let len = (line2byte(a:end[0]) + a:end[1]) - (line2byte(a:start[0]) + a:start[1]) + 1
   endif
   return len
 endfunction
