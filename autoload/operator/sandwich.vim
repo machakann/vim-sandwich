@@ -355,6 +355,7 @@ let s:default_opt.add.char = {
       \   'noremap'    : 1,
       \   'skip_space' : 0,
       \   'highlight'  : 3,
+      \   'hi_duration': 200,
       \   'command'    : [],
       \   'linewise'   : 0,
       \   'autoindent' : -1,
@@ -363,30 +364,32 @@ let s:default_opt.add.char = {
       \   'indentkeys-': 0,
       \ }
 let s:default_opt.add.line = {
-      \   'cursor'    : 'default',
-      \   'query_once': 0,
-      \   'expr'      : 0,
-      \   'listexpr'  : 0,
-      \   'noremap'   : 1,
-      \   'skip_space': 1,
-      \   'highlight' : 3,
-      \   'command'   : [],
-      \   'linewise'  : 1,
+      \   'cursor'     : 'default',
+      \   'query_once' : 0,
+      \   'expr'       : 0,
+      \   'listexpr'   : 0,
+      \   'noremap'    : 1,
+      \   'skip_space' : 1,
+      \   'highlight'  : 3,
+      \   'hi_duration': 200,
+      \   'command'    : [],
+      \   'linewise'   : 1,
       \   'autoindent' : -1,
       \   'indentkeys' : 0,
       \   'indentkeys+': 0,
       \   'indentkeys-': 0,
       \ }
 let s:default_opt.add.block = {
-      \   'cursor'    : 'default',
-      \   'query_once': 0,
-      \   'expr'      : 0,
-      \   'listexpr'  : 0,
-      \   'noremap'   : 1,
-      \   'skip_space': 1,
-      \   'highlight' : 3,
-      \   'command'   : [],
-      \   'linewise'  : 0,
+      \   'cursor'     : 'default',
+      \   'query_once' : 0,
+      \   'expr'       : 0,
+      \   'listexpr'   : 0,
+      \   'noremap'    : 1,
+      \   'skip_space' : 1,
+      \   'highlight'  : 3,
+      \   'hi_duration': 200,
+      \   'command'    : [],
+      \   'linewise'   : 0,
       \   'autoindent' : -1,
       \   'indentkeys' : 0,
       \   'indentkeys+': 0,
@@ -396,84 +399,90 @@ let s:default_opt.add.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:defa
 
 let s:default_opt.delete = {}
 let s:default_opt.delete.char = {
-      \   'cursor'    : 'default',
-      \   'noremap'   : 1,
-      \   'regex'     : 0,
-      \   'skip_space': 1,
-      \   'skip_char' : 0,
-      \   'highlight' : 3,
-      \   'command'   : [],
-      \   'linewise'  : 0,
+      \   'cursor'     : 'default',
+      \   'noremap'    : 1,
+      \   'regex'      : 0,
+      \   'skip_space' : 1,
+      \   'skip_char'  : 0,
+      \   'highlight'  : 3,
+      \   'hi_duration': 200,
+      \   'command'    : [],
+      \   'linewise'   : 0,
       \ }
 let s:default_opt.delete.line = {
-      \   'cursor'    : 'default',
-      \   'noremap'   : 1,
-      \   'regex'     : 0,
-      \   'skip_space': 2,
-      \   'skip_char' : 0,
-      \   'highlight' : 3,
-      \   'command'   : [],
-      \   'linewise'  : 1,
+      \   'cursor'     : 'default',
+      \   'noremap'    : 1,
+      \   'regex'      : 0,
+      \   'skip_space' : 2,
+      \   'skip_char'  : 0,
+      \   'highlight'  : 3,
+      \   'hi_duration': 200,
+      \   'command'    : [],
+      \   'linewise'   : 1,
       \ }
 let s:default_opt.delete.block = {
-      \   'cursor'    : 'default',
-      \   'noremap'   : 1,
-      \   'regex'     : 0,
-      \   'skip_space': 1,
-      \   'skip_char' : 0,
-      \   'highlight' : 3,
-      \   'command'   : [],
-      \   'linewise'  : 0,
+      \   'cursor'     : 'default',
+      \   'noremap'    : 1,
+      \   'regex'      : 0,
+      \   'skip_space' : 1,
+      \   'skip_char'  : 0,
+      \   'highlight'  : 3,
+      \   'hi_duration': 200,
+      \   'command'    : [],
+      \   'linewise'   : 0,
       \ }
 let s:default_opt.delete.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:default_opt['delete']['char']), '\|'))
 
 let s:default_opt.replace = {}
 let s:default_opt.replace.char = {
-      \   'cursor'    : 'default',
-      \   'query_once': 0,
-      \   'regex'     : 0,
-      \   'expr'      : 0,
-      \   'listexpr'  : 0,
-      \   'noremap'   : 1,
-      \   'skip_space': 1,
-      \   'skip_char' : 0,
-      \   'highlight' : 3,
-      \   'command'   : [],
-      \   'linewise'  : 0,
+      \   'cursor'     : 'default',
+      \   'query_once' : 0,
+      \   'regex'      : 0,
+      \   'expr'       : 0,
+      \   'listexpr'   : 0,
+      \   'noremap'    : 1,
+      \   'skip_space' : 1,
+      \   'skip_char'  : 0,
+      \   'highlight'  : 3,
+      \   'hi_duration': 200,
+      \   'command'    : [],
+      \   'linewise'   : 0,
       \   'autoindent' : -1,
       \   'indentkeys' : 0,
       \   'indentkeys+': 0,
       \   'indentkeys-': 0,
       \ }
 let s:default_opt.replace.line = {
-      \   'cursor'    : 'default',
-      \   'query_once': 0,
-      \   'regex'     : 0,
-      \   'expr'      : 0,
-      \   'listexpr'  : 0,
-      \   'noremap'   : 1,
-      \   'skip_space': 2,
-      \   'skip_char' : 0,
-      \   'highlight' : 3,
-      \   'command'   : [],
-      \   'linewise'  : 0,
+      \   'cursor'     : 'default',
+      \   'query_once' : 0,
+      \   'regex'      : 0,
+      \   'expr'       : 0,
+      \   'listexpr'   : 0,
+      \   'noremap'    : 1,
+      \   'skip_space' : 2,
+      \   'skip_char'  : 0,
+      \   'highlight'  : 3,
+      \   'hi_duration': 200,
+      \   'command'    : [],
+      \   'linewise'   : 0,
       \   'autoindent' : -1,
       \   'indentkeys' : 0,
       \   'indentkeys+': 0,
       \   'indentkeys-': 0,
       \ }
 let s:default_opt.replace.block = {
-      \   'cursor'    : 'default',
-      \   'query_once': 0,
-      \   'regex'     : 0,
-      \   'expr'      : 0,
-      \   'listexpr'  : 0,
-      \   'noremap'   : 1,
-      \   'skip_space': 1,
-      \   'skip_char' : 0,
-      \   'highlight' : 3,
-      \   'command'   : [],
-      \   'linewise'  : 0,
+      \   'cursor'     : 'default',
+      \   'query_once' : 0,
+      \   'regex'      : 0,
+      \   'expr'       : 0,
+      \   'listexpr'   : 0,
+      \   'noremap'    : 1,
+      \   'skip_space' : 1,
+      \   'skip_char'  : 0,
+      \   'highlight'  : 3,
+      \   'hi_duration': 200,
+      \   'command'    : [],
+      \   'linewise'   : 0,
       \   'autoindent' : -1,
       \   'indentkeys' : 0,
       \   'indentkeys+': 0,
@@ -594,6 +603,30 @@ function! s:set_option_value(dest, kinds, motionwises, option, value) abort  "{{
 endfunction
 "}}}
 "}}}
+
+function! s:obsolete_message() abort
+  if exists('g:operator#sandwich#highlight_duration')
+    for kind in ['add', 'delete', 'replace']
+      for motionwise in ['char', 'line', 'block']
+        let g:operator#sandwich#options[kind][motionwise]['hi_duration'] = g:operator#sandwich#highlight_duration
+      endfor
+    endfor
+  endif
+
+  echohl WarningMsg
+  echomsg 'operator-sandwich: ''g:operator#sandwich#highlight_duration'' would be obsolete soon.'
+  echomsg 'operator-sandwich: Use ''call operator#sandwich#set(''all'', ''all'', ''hi_duration'', {duration}) instead.'
+  echohl MoreMsg
+  echo 'sandwich.vim: There is a notice, check it by '':message'' command.'
+  echohl NONE
+  augroup sandwich-obsolete-message
+    autocmd!
+  augroup END
+endfunction
+augroup sandwich-obsolete-message
+  autocmd!
+  autocmd VimEnter * call s:obsolete_message()
+augroup END
 
 unlet! g:operator#sandwich#object
 

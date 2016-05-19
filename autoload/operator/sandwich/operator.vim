@@ -231,8 +231,8 @@ function! s:operator.add() dict abort "{{{
   endfor
 
   if opt_highlight >= 3 && !empty(self.last_succeeded())
-    let hi_duration = s:get('highlight_duration', 200)
     let hi_method   = s:get('persistent_highlight', 'glow')
+    let hi_duration = opt.of('hi_duration', '')
     if hi_method ==# 'glow' && s:has_timer
       call self.glow('added', 'OperatorSandwichAdd', hi_duration)
     else
@@ -267,7 +267,7 @@ endfunction
 function! s:operator.delete() dict abort  "{{{
   let hi_exited = 0
   let opt_highlight = self.opt.of('highlight', '')
-  let hi_duration = s:get('highlight_duration', 200)
+  let hi_duration   = self.opt.of('hi_duration', '')
   let hi_group = opt_highlight >= 2 ? 'OperatorSandwichDelete' : 'OperatorSandwichBuns'
   for i in range(self.count)
     if !self.match(i)
@@ -339,7 +339,7 @@ function! s:operator.replace() dict abort  "{{{
   endfor
 
   if opt_highlight >= 3 && !empty(self.last_succeeded())
-    let hi_duration = s:get('highlight_duration', 200)
+    let hi_duration = opt.of('hi_duration', '')
     let hi_method   = s:get('persistent_highlight', 'glow')
     if hi_method ==# 'glow' && s:has_timer
       call self.glow('added', 'OperatorSandwichAdd', hi_duration)
