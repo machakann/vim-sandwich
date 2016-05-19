@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:30-Apr-2016.
+						Last change:19-May-2016.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -30,6 +30,7 @@ CONFIGURATION			|operator-sandwich-configuration|
   LOCAL OPTIONS
     cursor
     highlight
+    hi_duration
     skip_space
     noremap
     linewise
@@ -924,7 +925,6 @@ highlight
 >
 	      call operator#sandwich#set('all', 'all', 'highlight', 1)
 <
-
 	Default values
 	  * add
 	    - char : 3
@@ -938,6 +938,33 @@ highlight
 	    - char : 3
 	    - line : 3
 	    - block: 3
+
+
+
+hi_duration
+g:operator#sandwich#highlight_duration
+	This option determines the time duration to show deletions in an
+	operator action. Give number in milli seconds.
+	The default value is 200.
+
+	NOTE: This option can not be controlled by recipes. Use
+	      |operator#sandwich#set()| function to set.
+>
+	      call operator#sandwich#set('all', 'all', 'hi_duration', 300)
+<
+	Default values
+	  * add
+	    - char : 200
+	    - line : 200
+	    - block: 200
+	  * delete
+	    - char : 200
+	    - line : 200
+	    - block: 200
+	  * replace
+	    - char : 200
+	    - line : 200
+	    - block: 200
 
 
 
@@ -1421,6 +1448,9 @@ g:operator#sandwich#highlight_duration
 	This option determines the time duration to show deletions in an
 	operator action. Give number in milli seconds.
 	The default value is 200.
+
+	NOTE: THIS OPTION BECOME OBSOLETE SOON! Use a local option
+	      "hi_duration" instead.
 
 
 

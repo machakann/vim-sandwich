@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:30-Apr-2016.
+						Last change:19-May-2016.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -30,6 +30,7 @@ CONFIGURATION			|operator-sandwich-configuration|
   LOCAL OPTIONS
     cursor
     highlight
+    hi_duration
     skip_space
     noremap
     linewise
@@ -931,6 +932,31 @@ highlight
 
 
 
+hi_duration
+	オペレータにおける編集後にハイライトが持続する時間をミリ秒単位で指定し
+	ます。デフォルト値は 200 です。
+
+	NOTE: このオプションはレシピで指定しても効果がありません。
+	      変更する場合は |operator#sandwich#set()| 関数を使ってください。
+>
+	      call operator#sandwich#set('all', 'all', 'hi_duration', 1)
+<
+	デフォルト値
+	  * add
+	    - char : 200
+	    - line : 200
+	    - block: 200
+	  * delete
+	    - char : 200
+	    - line : 200
+	    - block: 200
+	  * replace
+	    - char : 200
+	    - line : 200
+	    - block: 200
+
+
+
 skip_space
 	値が 1 なら、指定された文字列の両端のスペースをスキップします。
 >
@@ -1397,6 +1423,9 @@ g:operator#sandwich#timeoutlen		*g:operator#sandwich#timeoutlen*
 g:operator#sandwich#highlight_duration
 	オペレータにおける編集後にハイライトが持続する時間をミリ秒単位で指定し
 	ます。デフォルト値は 200 です。
+
+	NOTE: このオプションは近々廃止される予定です。代わりに local option の
+	      "hi_duration" をご使用ください。
 
 
 
