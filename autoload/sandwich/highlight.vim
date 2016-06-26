@@ -10,9 +10,14 @@ let s:type_list = type([])
 " patchs
 if v:version > 704 || (v:version == 704 && has('patch237'))
   let s:has_patch_7_4_362 = has('patch-7.4.362')
+  let s:has_patch_7_4_392 = has('patch-7.4.392')
 else
   let s:has_patch_7_4_362 = v:version == 704 && has('patch362')
+  let s:has_patch_7_4_392 = v:version == 704 && has('patch392')
 endif
+
+" features
+let s:has_gui_running = has('gui_running')
 
 " SID
 function! s:SID() abort
@@ -33,6 +38,9 @@ let s:highlight = {
       \   'group' : '',
       \   'id'    : [],
       \   'order_list': [],
+      \   'region': {},
+      \   'linewise': '',
+      \   'bufnr': 0,
       \ }
 "}}}
 function! s:highlight.order(target, linewise) dict abort  "{{{
@@ -50,6 +58,8 @@ function! s:highlight.order(target, linewise) dict abort  "{{{
     call add(order_list, order)
   endif
   let self.order_list += order_list
+  let self.region = deepcopy(a:target)
+  let self.linewise = a:linewise
 endfunction
 "}}}
 function! s:highlight.show(hi_group) dict abort "{{{
@@ -68,9 +78,10 @@ function! s:highlight.show(hi_group) dict abort "{{{
   for order in self.order_list
     let self.id += s:matchaddpos(a:hi_group, order)
   endfor
+  call filter(self.id, 'v:val > 0')
   let self.status = 1
   let self.group = a:hi_group
-  call filter(self.id, 'v:val > 0')
+  let self.bufnr = bufnr('%')
   return 1
 endfunction
 "}}}
@@ -79,11 +90,39 @@ function! s:highlight.quench() dict abort "{{{
     return 0
   endif
 
-  call map(self.id, 'matchdelete(v:val)')
-  call filter(self.id, 'v:val > 0')
-  let self.status = 0
-  let self.group = ''
-  return 1
+  let tabnr = tabpagenr()
+  let winnr = winnr()
+  let view = winsaveview()
+  if s:is_highlight_exists(self.id)
+    call map(self.id, 'matchdelete(v:val)')
+    call filter(self.id, 'v:val > 0')
+    let succeeded = 1
+  else
+    if s:is_in_cmdline_window()
+      let s:quenching_queue += [self]
+      augroup sandwich-quech-queue
+        autocmd!
+        autocmd CmdWinLeave * call s:exodus_from_cmdwindow()
+      augroup END
+      let succeeded = 0
+    else
+      if s:search_highlighted_windows(self.id, tabnr) != [0, 0]
+        call map(self.id, 'matchdelete(v:val)')
+        call filter(self.id, 'v:val > 0')
+        let succeeded = 1
+      else
+        call filter(self.id, 0)
+        let succeeded = 0
+      endif
+      call s:goto_window(winnr, tabnr, view)
+    endif
+  endif
+
+  if succeeded
+    let self.status = 0
+    let self.group = ''
+  endif
+  return succeeded
 endfunction
 "}}}
 function! s:highlight.scheduled_quench(time, ...) dict abort  "{{{
@@ -103,13 +142,20 @@ endfunction
 " for scheduled-quench "{{{
 let s:quench_table = {}
 function! s:scheduled_quench(id) abort  "{{{
-  for highlight in s:quench_table[a:id]
-    call highlight.quench()
-  endfor
-  augroup sandwich-highlight-cancel
-    autocmd!
-  augroup END
-  unlet s:quench_table[a:id]
+  let options = s:shift_options()
+  try
+    for highlight in get(s:quench_table, a:id, [])
+      call highlight.quench()
+    endfor
+    redraw
+    execute 'augroup sandwich-highlight-cancel-' . a:id
+      autocmd!
+    augroup END
+    execute 'augroup! sandwich-highlight-cancel-' . a:id
+    unlet s:quench_table[a:id]
+  finally
+    call s:restore_options(options)
+  endtry
 endfunction
 "}}}
 function! sandwich#highlight#cancel(...) abort "{{{
@@ -123,6 +169,34 @@ function! sandwich#highlight#cancel(...) abort "{{{
     call s:scheduled_quench(id)
     call timer_stop(id)
   endfor
+endfunction
+"}}}
+function! sandwich#highlight#get(id) abort "{{{
+  return get(s:quench_table, a:id, [])
+endfunction
+"}}}
+let s:quenching_queue = []
+function! s:quench_queued(...) abort "{{{
+  if s:is_in_cmdline_window()
+    return
+  endif
+
+  augroup sandwich-quech-queue
+    autocmd!
+  augroup END
+
+  let list = copy(s:quenching_queue)
+  let s:quenching_queue = []
+  for highlight in list
+    call highlight.quench()
+  endfor
+endfunction
+"}}}
+function! s:exodus_from_cmdwindow() abort "{{{
+  augroup sandwich-quech-queue
+    autocmd!
+    autocmd CursorMoved * call s:quench_queued()
+  augroup END
 endfunction
 "}}}
 "}}}
@@ -193,6 +267,128 @@ endif
 "}}}
 function! s:is_equal_or_ahead(pos1, pos2) abort  "{{{
   return a:pos1[1] > a:pos2[1] || (a:pos1[1] == a:pos2[1] && a:pos1[2] >= a:pos2[2])
+endfunction
+"}}}
+function! s:goto_window(winnr, tabnr, ...) abort "{{{
+  if a:tabnr != tabpagenr()
+    execute 'tabnext ' . a:tabnr
+  endif
+  if tabpagenr() != a:tabnr
+    return 0
+  endif
+
+  try
+    if a:winnr != winnr()
+      execute a:winnr . 'wincmd w'
+    endif
+  catch /^Vim\%((\a\+)\)\=:E16/
+    return 0
+  endtry
+
+  if a:0 > 0
+    call winrestview(a:1)
+  endif
+
+  return 1
+endfunction
+"}}}
+" function! s:is_in_cmdline_window() abort  "{{{
+if s:has_patch_7_4_392
+  function! s:is_in_cmdline_window() abort
+    return getcmdwintype() !=# ''
+  endfunction
+else
+  function! s:is_in_cmdline_window() abort
+    let is_in_cmdline_window = 0
+    try
+      execute 'tabnext ' . tabpagenr()
+    catch /^Vim\%((\a\+)\)\=:E11/
+      let is_in_cmdline_window = 1
+    catch
+    finally
+      return is_in_cmdline_window
+    endtry
+  endfunction
+endif
+"}}}
+function! s:shift_options() abort "{{{
+  let options = {}
+
+  """ tweak appearance
+  " hide_cursor
+  if s:has_gui_running
+    let options.cursor = &guicursor
+    set guicursor+=n-o:block-NONE
+  else
+    let options.cursor = &t_ve
+    set t_ve=
+  endif
+
+  return options
+endfunction
+"}}}
+function! s:restore_options(options) abort "{{{
+  if s:has_gui_running
+    set guicursor&
+    let &guicursor = a:options.cursor
+  else
+    let &t_ve = a:options.cursor
+  endif
+endfunction
+"}}}
+function! s:search_highlighted_windows(id, ...) abort  "{{{
+  let original_winnr = winnr()
+  let original_tabnr = tabpagenr()
+  if a:id != []
+    let tablist = range(1, tabpagenr('$'))
+    if a:0 > 0
+      let tabnr = a:1
+      let [tabnr, winnr] = s:scan_windows(a:id, tabnr)
+      if tabnr != 0
+        return [tabnr, winnr]
+      endif
+      call filter(tablist, 'v:val != tabnr')
+    endif
+
+    for tabnr in tablist
+      let [tabnr, winnr] = s:scan_windows(a:id, tabnr)
+      if tabnr != 0
+        return [tabnr, winnr]
+      endif
+    endfor
+  endif
+  execute 'tabnext ' . original_tabnr
+  execute original_winnr . 'wincmd w'
+  return [0, 0]
+endfunction
+"}}}
+function! s:scan_windows(id, tabnr) abort "{{{
+  for winnr in range(1, winnr('$'))
+    if s:is_highlight_exists(a:id, winnr, a:tabnr)
+      return [a:tabnr, winnr]
+    endif
+  endfor
+  return [0, 0]
+endfunction
+"}}}
+function! s:is_highlight_exists(id, ...) abort "{{{
+  if a:id != []
+    if a:0 > 1
+      if !s:goto_window(a:1, a:2)
+        return 0
+      endif
+    elseif a:0 > 0
+      if !s:goto_window(a:1, tabpagenr())
+        return 0
+      endif
+    endif
+
+    let id = a:id[0]
+    if filter(getmatches(), 'v:val.id == id') != []
+      return 1
+    endif
+  endif
+  return 0
 endfunction
 "}}}
 

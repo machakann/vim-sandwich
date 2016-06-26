@@ -555,8 +555,9 @@ function! s:operator.glow(place, hi_group, duration, ...) dict abort "{{{
       let stuff = self.basket[i]
       let id = stuff.scheduled_quench(a:place, a:duration, id)
     endfor
-    augroup sandwich-highlight-cancel
-      execute printf('autocmd TextChanged <buffer> call s:que_canceler(%s)', id)
+    execute 'augroup sandwich-highlight-cancel-' . id
+      autocmd!
+      execute printf('autocmd TextChanged <buffer> call s:queue_canceler(%s)', id)
     augroup END
   endif
 endfunction
@@ -974,11 +975,29 @@ function! s:get_tailstart_cursor_pos(tail, inner_tail) abort  "{{{
   return tailstart
 endfunction
 "}}}
-function! s:que_canceler(id) abort  "{{{
-  augroup sandwich-highlight-cancel
+function! s:queue_canceler(id) abort  "{{{
+  execute 'augroup sandwich-highlight-cancel-' . a:id
     autocmd!
-    execute printf('autocmd TextChanged,TextChangedI <buffer> call sandwich#highlight#cancel(%s)', a:id)
+    execute printf('autocmd TextChanged,InsertEnter <buffer> call s:highlight_cancel(%s)', a:id)
   augroup END
+endfunction
+"}}}
+function! s:highlight_cancel(id) abort  "{{{
+  let highlightlist = sandwich#highlight#get(a:id)
+  let bufnrlist = map(deepcopy(highlightlist), 'v:val.bufnr')
+  let currentbuf = bufnr('%')
+  if filter(bufnrlist, 'v:val == currentbuf') != []
+    let curpos = getpos('.')
+    for highlight in highlightlist
+      if s:is_equal_or_ahead(highlight.region.tail2, curpos)
+        call sandwich#highlight#cancel(a:id)
+        execute 'augroup sandwich-highlight-cancel-' . a:id
+          autocmd!
+        augroup END
+        break
+      endif
+    endfor
+  endif
 endfunction
 "}}}
 
