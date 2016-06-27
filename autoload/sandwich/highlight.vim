@@ -162,7 +162,7 @@ function! sandwich#highlight#cancel(...) abort "{{{
   if a:0 > 0
     let id_list = type(a:1) == s:type_list ? a:1 : a:000
   else
-    let id_list = keys(s:quench_table)
+    let id_list = map(keys(s:quench_table), 'str2nr(v:val)')
   endif
 
   for id in id_list
