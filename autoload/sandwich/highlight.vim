@@ -318,7 +318,7 @@ function! s:shift_options() abort "{{{
   " hide_cursor
   if s:has_gui_running
     let options.cursor = &guicursor
-    set guicursor+=n-o:block-NONE
+    set guicursor+=a:block-NONE
   else
     let options.cursor = &t_ve
     set t_ve=
