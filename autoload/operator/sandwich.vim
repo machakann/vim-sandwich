@@ -4,6 +4,8 @@
 " TODO Add 'at' option
 
 " variables "{{{
+let s:colmax = sandwich#constants#get('colmax')
+
 " patchs
 if v:version > 704 || (v:version == 704 && has('patch237'))
   let s:has_patch_7_4_392 = has('patch-7.4.392')
@@ -43,7 +45,7 @@ function! operator#sandwich#prerequisite(kind, mode, ...) abort "{{{
     let reg = ['"', getreg('"'), getregtype('"')]
     try
       normal! gv
-      let is_extended = winsaveview().curswant == 1/0
+      let is_extended = winsaveview().curswant == s:colmax
       silent normal! ""y
       let regtype = getregtype('"')
     finally
