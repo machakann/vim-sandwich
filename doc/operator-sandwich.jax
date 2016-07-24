@@ -48,6 +48,7 @@ CONFIGURATION			|operator-sandwich-configuration|
     highlight_duration		|g:operator#sandwich#highlight_duration|
 HIGHLIGHT GROUP			|operator-sandwich-highlight-group|
 AUTOCOMMANDS			|operator-sandwich-autocommands|
+API				|operator-sandwich-api|
 MISCELLANEOUS			|operator-sandwich-miscellaneous|
   囲みを外すオペレータのハイライトはいらない
   ハイライトは全部いらない
