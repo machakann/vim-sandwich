@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:19-May-2016.
+						Last change:25-Jul-2016.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -1575,6 +1575,15 @@ API					*operator-sandwich-api*
 
 |operator-sandwich| はいくつかの関数を API として提供します。これらの関数は
 "expr" オプション付きの設定を便利にするのに役立つことでしょう。
+
+operator#sandwich#get_info({info})	*operator#sandwich#get_info()*
+	現在のオペレーターの情報を返します。有効な {info} は次です。
+	    `state`: |.| リピート時には 0 です。それ以外は 1 です。
+	    `kind` : オペレーターの種類です。
+	             "add", "delete", "replace" のどれかが返ります。
+	    `count`: オペレーターに与えられた [count] です。
+	    `mode` : オペレーターの使用されたモードを表す一文字です。ノーマル
+	             モードなら "n" が、ビジュアルモードなら "x" です。
 
 					*operator#sandwich#show()*
 operator#sandwich#show({place}[, {group}])

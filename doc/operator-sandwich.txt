@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:19-May-2016.
+						Last change:25-Jul-2016.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -1608,6 +1608,16 @@ API					*operator-sandwich-api*
 |operator-sandwich| provides some functions as Application Programming
 Interface. The functions would be helpful to make your "expr" buns more
 convenient.
+
+operator#sandwich#get_info({info})	*operator#sandwich#get_info()*
+	This function returns information of the working operator. Available
+	{info}s are listed below.
+	    `state`: 1 if in |.| repeating, otherwise 0.
+	    `kind` : The kind of working operator,
+	             "add", "delete" or "replace".
+	    `count`: The given [count] for the operator.
+	    `mode` : A character represents the mode working in,
+	             "n" for normal mode, "x" for visual mode.
 
 					*operator#sandwich#show()*
 operator#sandwich#show({place}[, {group}])

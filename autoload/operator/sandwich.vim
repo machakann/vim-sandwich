@@ -311,6 +311,23 @@ function! operator#sandwich#quench(place) abort  "{{{
   endif
 endfunction
 "}}}
+function! operator#sandwich#get_info(...) abort  "{{{
+  if !exists('g:operator#sandwich#object') || !g:operator#sandwich#object.at_work
+    echoerr 'operator-sandwich: Not in an operator-sandwich operation!'
+    return 1
+  endif
+
+  let info = get(a:000, 0, '')
+  if a:0 == 0 || info ==# ''
+    return g:operator#sandwich#object
+  elseif info ==# 'state' || info ==# 'kind' || info ==# 'count' || info ==# 'mode'
+    return g:operator#sandwich#object[info]
+  else
+    echoerr printf('operator-sandwich: Identifier "%s" is not supported.', string(info))
+    return 1
+  endif
+endfunction
+"}}}
 
 " For internal communication
 function! operator#sandwich#is_in_cmd_window() abort  "{{{
