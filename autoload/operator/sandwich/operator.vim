@@ -514,6 +514,9 @@ endfunction
 function! s:operator.blink(place, hi_group, duration, ...) dict abort "{{{
   let hi_exited = 0
   if self.opt.of('highlight')
+    " highlight off: limit the number of highlighting region to one explicitly
+    call sandwich#highlight#cancel()
+
     let clock = sandwich#clock#new()
     let hi_exited = 0
     let linewise = get(a:000, 0, 0)
