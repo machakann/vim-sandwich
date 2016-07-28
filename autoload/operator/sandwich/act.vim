@@ -1,7 +1,7 @@
 " act object - editing buffer
 
 " variables "{{{
-let s:colmax = sandwich#constants#get('colmax')
+let s:constants = function('sandwich#constants#get')
 
 " null valiables
 let s:null_pos   = [0, 0, 0, 0]
@@ -691,7 +691,7 @@ function! s:pull1(shifted_pos, target, deletion, is_linewise) abort "{{{
 
     if a:shifted_pos[2] == 0
       let a:shifted_pos[2] = 1
-    elseif a:shifted_pos[2] == s:colmax
+    elseif a:shifted_pos[2] == s:constants('colmax')
       let a:shifted_pos[2]  = col([a:shifted_pos[1], '$']) - 1
       let a:shifted_pos[2] += shift[2]
     else
@@ -731,7 +731,7 @@ function! s:pull2(shifted_pos, target, deletion, is_linewise) abort "{{{
     if a:is_linewise[1]
       if a:shifted_pos[1] == head[1]
         " col
-        let a:shifted_pos[2]  = s:colmax
+        let a:shifted_pos[2]  = s:constants('colmax')
       endif
       if a:shifted_pos[1] >= head[1]
         " lnum

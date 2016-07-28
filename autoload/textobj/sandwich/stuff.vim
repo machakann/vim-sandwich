@@ -1,8 +1,6 @@
 " stuff object
 
 " variables "{{{
-let s:colmax = sandwich#constants#get('colmax')
-
 " null valiables
 let s:null_coord  = [0, 0]
 let s:null_4coord = {
