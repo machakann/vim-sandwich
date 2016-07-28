@@ -41,7 +41,6 @@ let s:highlight = {
       \   'region': {},
       \   'linewise': '',
       \   'bufnr': 0,
-      \   'text': ''
       \ }
 "}}}
 function! s:highlight.order(target, linewise) dict abort  "{{{
@@ -61,7 +60,6 @@ function! s:highlight.order(target, linewise) dict abort  "{{{
   let self.order_list += order_list
   let self.region = deepcopy(a:target)
   let self.linewise = a:linewise
-  let self.text = s:get_buf_text(self.region, self.linewise)
 endfunction
 "}}}
 function! s:highlight.show(hi_group) dict abort "{{{
@@ -138,10 +136,6 @@ function! s:highlight.scheduled_quench(time, ...) dict abort  "{{{
   endif
   let s:quench_table[id] += [self]
   return id
-endfunction
-"}}}
-function! s:highlight.is_text_identical() dict abort "{{{
-  return s:get_buf_text(self.region, self.linewise) ==# self.text
 endfunction
 "}}}
 
@@ -395,35 +389,6 @@ function! s:is_highlight_exists(id, ...) abort "{{{
     endif
   endif
   return 0
-endfunction
-"}}}
-function! s:get_buf_text(region, type) abort  "{{{
-  " NOTE: Do *not* use operator+textobject in another textobject!
-  "       For example, getting a text with the command is not appropriate.
-  "         execute printf('normal! %s:call setpos(".", %s)%s""y', a:type, string(a:region.tail), "\<CR>")
-  "       Because it causes confusions for the unit of dot-repeating.
-  "       Use visual selection+operator as following.
-  let text = ''
-  let visual = [getpos("'<"), getpos("'>")]
-  let reg = ['"', getreg('"'), getregtype('"')]
-  let view = winsaveview()
-  try
-    call setpos('.', a:region.head1)
-    execute 'normal! ' . s:v(a:type)
-    call setpos('.', a:region.tail2)
-    silent normal! ""y
-    let text = @@
-  finally
-    call call('setreg', reg)
-    call setpos("'<", visual[0])
-    call setpos("'>", visual[1])
-    call winrestview(view)
-    return text
-  endtry
-endfunction
-"}}}
-function! s:v(linewise) abort  "{{{
-  return a:linewise ? 'V' : 'v'
 endfunction
 "}}}
 

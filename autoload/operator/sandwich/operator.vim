@@ -981,18 +981,18 @@ endfunction
 function! s:queue_canceler(id) abort  "{{{
   execute 'augroup sandwich-highlight-cancel-' . a:id
     autocmd!
-    execute printf('autocmd TextChanged <buffer> call s:highlight_cancel(%s, "TextChanged")', a:id)
-    execute printf('autocmd InsertEnter <buffer> call s:highlight_cancel(%s, "InsertEnter")', a:id)
+    execute printf('autocmd TextChanged,InsertEnter <buffer> call s:highlight_cancel(%s)', a:id)
   augroup END
 endfunction
 "}}}
-function! s:highlight_cancel(id, event) abort  "{{{
+function! s:highlight_cancel(id) abort  "{{{
   let highlightlist = sandwich#highlight#get(a:id)
   let bufnrlist = map(deepcopy(highlightlist), 'v:val.bufnr')
   let currentbuf = bufnr('%')
   if filter(bufnrlist, 'v:val == currentbuf') != []
+    let curpos = getpos('.')
     for highlight in highlightlist
-      if s:highlight_off_by_{a:event}(highlight)
+      if s:is_equal_or_ahead(highlight.region.tail2, curpos)
         call sandwich#highlight#cancel(a:id)
         execute 'augroup sandwich-highlight-cancel-' . a:id
           autocmd!
@@ -1001,14 +1001,6 @@ function! s:highlight_cancel(id, event) abort  "{{{
       endif
     endfor
   endif
-endfunction
-"}}}
-function! s:highlight_off_by_InsertEnter(highlight) abort "{{{
-  return 1
-endfunction
-"}}}
-function! s:highlight_off_by_TextChanged(highlight) abort "{{{
-  return !a:highlight.is_text_identical()
 endfunction
 "}}}
 
