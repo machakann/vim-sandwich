@@ -41,6 +41,7 @@ let s:highlight = {
       \   'region': {},
       \   'linewise': '',
       \   'bufnr': 0,
+      \   'text': ''
       \ }
 "}}}
 function! s:highlight.order(target, linewise) dict abort  "{{{
@@ -60,6 +61,7 @@ function! s:highlight.order(target, linewise) dict abort  "{{{
   let self.order_list += order_list
   let self.region = deepcopy(a:target)
   let self.linewise = a:linewise
+  let self.text = s:get_surround_text(self.region, self.linewise)
 endfunction
 "}}}
 function! s:highlight.show(hi_group) dict abort "{{{
@@ -136,6 +138,10 @@ function! s:highlight.scheduled_quench(time, ...) dict abort  "{{{
   endif
   let s:quench_table[id] += [self]
   return id
+endfunction
+"}}}
+function! s:highlight.is_text_identical() dict abort "{{{
+  return s:get_surround_text(self.region, self.linewise) ==# self.text
 endfunction
 "}}}
 
@@ -389,6 +395,43 @@ function! s:is_highlight_exists(id, ...) abort "{{{
     endif
   endif
   return 0
+endfunction
+"}}}
+function! s:get_surround_text(region, linewise) abort  "{{{
+  let head = a:region.head1
+  if a:linewise[0]
+    let head[2] = 1
+  endif
+
+  if a:region.tail2 == s:null_pos
+    let tail = a:region.tail1
+  else
+    let tail = a:region.tail2
+  endif
+  if a:linewise[1]
+    let tail[2] = col([tail[1], '$']) - 1
+  endif
+  return s:get_buf_text(head, tail)
+endfunction
+"}}}
+function! s:get_buf_text(head, tail) abort  "{{{
+  let endline = line('$')
+  if a:head == s:null_pos || a:tail == s:null_pos || s:is_ahead(a:head, a:tail) || a:head[1] > endline || a:tail[1] > endline
+    return ''
+  endif
+
+  let lines = getline(a:head[1], a:tail[1])
+  if a:head[1] == a:tail[1]
+    let lines[0] = lines[0][a:head[2]-1 : a:tail[2]-1]
+  else
+    let lines[0] = lines[0][a:head[2]-1 :]
+    let lines[-1] = lines[-1][: a:tail[2]-1]
+  endif
+  return join(lines, "\n")
+endfunction
+"}}}
+function! s:is_ahead(pos1, pos2) abort  "{{{
+  return a:pos1[1] > a:pos2[1] || (a:pos1[1] == a:pos2[1] && a:pos1[2] > a:pos2[2])
 endfunction
 "}}}
 
