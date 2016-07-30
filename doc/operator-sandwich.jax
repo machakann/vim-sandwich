@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:25-Jul-2016.
+						Last change:30-Jul-2016.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -1573,8 +1573,13 @@ OperatorSandwichReplacePost		*OperatorSandwichReplacePost*
 ==============================================================================
 API					*operator-sandwich-api*
 
-|operator-sandwich| はいくつかの関数を API として提供します。これらの関数は
-"expr" オプション付きの設定を便利にするのに役立つことでしょう。
+|operator-sandwich| はいくつかの関数と変数を API として提供します。これらの
+関数は"expr" オプション付きの設定を便利にするのに役立つことでしょう。
+
+operator#sandwich#last_deletion		*operator#sandwich#last_deletion*
+	最後に削除されたあるいは置換された文字列が格納されています。置換する
+	オペレーターで expr オプションを使うときに、置換されたテキストを再利用
+	したい場合に便利です。
 
 operator#sandwich#get_info({info})	*operator#sandwich#get_info()*
 	現在のオペレーターの情報を返します。有効な {info} は次です。

@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:25-Jul-2016.
+						Last change:30-Jul-2016.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -1605,9 +1605,14 @@ add/replace operators action.
 ==============================================================================
 API					*operator-sandwich-api*
 
-|operator-sandwich| provides some functions as Application Programming
-Interface. The functions would be helpful to make your "expr" buns more
-convenient.
+|operator-sandwich| provides some functions and variables as Application
+Programming Interface. The functions would be helpful to make your "expr" buns
+more convenient.
+
+operator#sandwich#last_deletion		*operator#sandwich#last_deletion*
+	This is a string, the last deleted text by delete/replace operator is
+	in. It would be convenient if user wants to reuse the deletion in expr
+	buns of replace operator.
 
 operator#sandwich#get_info({info})	*operator#sandwich#get_info()*
 	This function returns information of the working operator. Available
