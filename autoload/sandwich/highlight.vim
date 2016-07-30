@@ -275,13 +275,13 @@ function! s:is_equal_or_ahead(pos1, pos2) abort  "{{{
   return a:pos1[1] > a:pos2[1] || (a:pos1[1] == a:pos2[1] && a:pos1[2] >= a:pos2[2])
 endfunction
 "}}}
-function! s:goto_window(winnr, tabnr, ...) abort "{{{
-  if a:tabnr != tabpagenr()
-    execute 'tabnext ' . a:tabnr
+function! s:goto_window(winnr, ...) abort "{{{
+  if a:0 > 0
+    if !s:goto_tab(a:1)
+      return 0
+    endif
   endif
-  if tabpagenr() != a:tabnr
-    return 0
-  endif
+
 
   try
     if a:winnr != winnr()
@@ -291,11 +291,18 @@ function! s:goto_window(winnr, tabnr, ...) abort "{{{
     return 0
   endtry
 
-  if a:0 > 0
-    call winrestview(a:1)
+  if a:0 > 1
+    call winrestview(a:2)
   endif
 
   return 1
+endfunction
+"}}}
+function! s:goto_tab(tabnr) abort  "{{{
+  if a:tabnr != tabpagenr()
+    execute 'tabnext ' . a:tabnr
+  endif
+  return tabpagenr() == a:tabnr ? 1 : 0
 endfunction
 "}}}
 " function! s:is_in_cmdline_window() abort  "{{{
@@ -369,26 +376,18 @@ function! s:search_highlighted_windows(id, ...) abort  "{{{
 endfunction
 "}}}
 function! s:scan_windows(id, tabnr) abort "{{{
-  for winnr in range(1, winnr('$'))
-    if s:is_highlight_exists(a:id, winnr, a:tabnr)
-      return [a:tabnr, winnr]
-    endif
-  endfor
+  if s:goto_tab(a:tabnr)
+    for winnr in range(1, winnr('$'))
+      if s:goto_window(winnr) && s:is_highlight_exists(a:id)
+        return [a:tabnr, winnr]
+      endif
+    endfor
+  endif
   return [0, 0]
 endfunction
 "}}}
-function! s:is_highlight_exists(id, ...) abort "{{{
+function! s:is_highlight_exists(id) abort "{{{
   if a:id != []
-    if a:0 > 1
-      if !s:goto_window(a:1, a:2)
-        return 0
-      endif
-    elseif a:0 > 0
-      if !s:goto_window(a:1, tabpagenr())
-        return 0
-      endif
-    endif
-
     let id = a:id[0]
     if filter(getmatches(), 'v:val.id == id') != []
       return 1
