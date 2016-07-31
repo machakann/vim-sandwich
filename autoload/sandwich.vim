@@ -20,6 +20,8 @@ let g:sandwich#default_recipes = [
       \   {'buns': ['{', '}'], 'nesting': 1, 'match_syntax': 1, 'skip_break': 1},
       \   {'buns': ['[', ']'], 'nesting': 1, 'match_syntax': 1},
       \   {'buns': ['(', ')'], 'nesting': 1, 'match_syntax': 1},
+      \   {'buns': 'sandwich#magicchar#t#taginput()', 'listexpr': 1, 'kind': ['add', 'replace'], 'action': ['add'], 'filetype': ['html', 'xhtml', 'xml'], 'input': ['t']},
+      \   {'external': ['it', 'at'], 'noremap' : 1, 'kind' : ['delete', 'replace', 'textobj'], 'synchro': 1, 'input': ['t']},
       \ ]
 lockvar! g:sandwich#default_recipes
 

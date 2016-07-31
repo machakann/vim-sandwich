@@ -81,8 +81,8 @@ let g:sandwich#recipes = [
       \   },
       \
       \   {
-      \     'buns'    : ['SandwichTagInput(1)', 'SandwichTagInput(0)'],
-      \     'expr'    : 1,
+      \     'buns'    : 'sandwich#magicchar#t#taginput()',
+      \     'listexpr': 1,
       \     'kind'    : ['add', 'replace'],
       \     'action'  : ['add'],
       \     'input'   : ['<'],
@@ -95,19 +95,3 @@ let g:sandwich#recipes = [
       \     'input'   : ['t'],
       \   },
       \ ]
-
-function! SandwichTagInput(is_head) abort
-  if a:is_head
-    echohl MoreMsg
-    let s:TagLast = input('Input tag: ')
-    echohl NONE
-    if s:TagLast !=# ''
-      let tag = printf('<%s>', s:TagLast)
-    else
-      throw 'OperatorSandwichCancel'
-    endif
-  else
-    let tag = printf('</%s>', matchstr(s:TagLast, '^\a[^[:blank:]>/]*'))
-  endif
-  return tag
-endfunction
