@@ -22,6 +22,8 @@ let g:sandwich#default_recipes = [
       \   {'buns': ['(', ')'], 'nesting': 1, 'match_syntax': 1},
       \   {'buns': 'sandwich#magicchar#t#taginput()', 'listexpr': 1, 'kind': ['add', 'replace'], 'action': ['add'], 'filetype': ['html', 'xhtml', 'xml'], 'input': ['t']},
       \   {'external': ['it', 'at'], 'noremap' : 1, 'kind' : ['delete', 'replace', 'textobj'], 'synchro': 1, 'input': ['t']},
+      \   {'buns': ['sandwich#magicchar#f#fname()', '")"'], 'kind': ['add', 'replace'], 'action': ['add'], 'expr': 1, 'cursor': 'inner_tail', 'input': ['f']},
+      \   {'external': ["\<Plug>(textobj-sandwich-function-i)", "\<Plug>(textobj-sandwich-function-a)"], 'noremap': 0, 'kind': ['delete', 'replace', 'query'], 'input': ['f']},
       \ ]
 lockvar! g:sandwich#default_recipes
 
