@@ -17,9 +17,6 @@ let s:type_str = type('')
 
 " features
 let s:has_gui_running = has('gui_running')
-
-" API
-let g:operator#sandwich#last_deletion = get(g:, 'operator#sandwich#last_deletion', '')
 "}}}
 
 function! operator#sandwich#act#new() abort "{{{
@@ -371,7 +368,6 @@ function! s:delete_former(head, tail, latter_head, opt, ...) abort  "{{{
   let opt_linewise = a:opt.of('linewise')
   let undojoin_cmd = get(a:000, 0, 0) ? 'undojoin | ' : ''
   let deletion = s:delete_portion(a:head, a:tail, undojoin_cmd)
-  let g:operator#sandwich#last_deletion = deletion
   if opt_linewise == 2 || (opt_linewise == 1 && match(getline('.'), '^\s*$') > -1)
     if line('.') != a:latter_head[1]
       .delete
@@ -389,7 +385,6 @@ function! s:delete_latter(head, tail, former_head, opt) abort  "{{{
   let opt_linewise = a:opt.of('linewise')
   let undojoin_cmd = ''
   let deletion = s:delete_portion(a:head, a:tail, undojoin_cmd)
-  let g:operator#sandwich#last_deletion = deletion
   if opt_linewise == 2 || (opt_linewise == 1 && match(getline('.'), '^\s*$') > -1)
     .delete
     let is_linewise = 1
@@ -416,7 +411,6 @@ function! s:replace_former(bun, head, tail, within_a_line, opt, ...) abort "{{{
   let is_linewise  = 0
   let undojoin_cmd = get(a:000, 0, 0) ? 'undojoin | ' : ''
   let deletion = s:delete_portion(a:head, a:tail, undojoin_cmd)
-  let g:operator#sandwich#last_deletion = deletion
 
   if operator#sandwich#is_in_cmd_window()
     " workaround for a bug in cmdline-window
@@ -448,7 +442,6 @@ function! s:replace_latter(bun, head, tail, within_a_line, opt) abort "{{{
   let opt_linewise = a:opt.of('linewise')
   let undojoin_cmd = ''
   let deletion = s:delete_portion(a:head, a:tail, undojoin_cmd)
-  let g:operator#sandwich#last_deletion = deletion
 
   if operator#sandwich#is_in_cmd_window()
     " workaround for a bug in cmdline-window

@@ -265,7 +265,6 @@ endfunction
 "}}}
 
 " API
-let g:operator#sandwich#last_deletion = get(g:, 'operator#sandwich#last_deletion', '')
 function! operator#sandwich#show(place, ...) abort  "{{{
   if !exists('g:operator#sandwich#object') || !g:operator#sandwich#object.at_work
     echoerr 'operator-sandwich: Not in an operator-sandwich operation!'
