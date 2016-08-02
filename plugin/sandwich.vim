@@ -22,6 +22,10 @@ onoremap <Plug>(textobj-sandwich-function-i) :<C-u>call sandwich#magicchar#f#i()
 onoremap <Plug>(textobj-sandwich-function-a) :<C-u>call sandwich#magicchar#f#a()<CR>
 xnoremap <Plug>(textobj-sandwich-function-i) :<C-u>call sandwich#magicchar#f#i()<CR>
 xnoremap <Plug>(textobj-sandwich-function-a) :<C-u>call sandwich#magicchar#f#a()<CR>
+onoremap <Plug>(textobj-sandwich-tagname-i) :<C-u>call sandwich#magicchar#t#i()<CR>
+onoremap <Plug>(textobj-sandwich-tagname-a) :<C-u>call sandwich#magicchar#t#a()<CR>
+xnoremap <Plug>(textobj-sandwich-tagname-i) :<C-u>call sandwich#magicchar#t#i()<CR>
+xnoremap <Plug>(textobj-sandwich-tagname-a) :<C-u>call sandwich#magicchar#t#a()<CR>
 
 """ default keymappings
 " If g:sandwich_no_default_key_mappings has been defined, then quit immediately.
