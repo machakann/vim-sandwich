@@ -265,7 +265,7 @@ endfunction
 "}}}
 
 " API
-function! operator#sandwich#show(place, ...) abort  "{{{
+function! operator#sandwich#show(...) abort  "{{{
   if !exists('g:operator#sandwich#object') || !g:operator#sandwich#object.at_work
     echoerr 'operator-sandwich: Not in an operator-sandwich operation!'
     return 1
@@ -274,40 +274,63 @@ function! operator#sandwich#show(place, ...) abort  "{{{
   let operator = g:operator#sandwich#object
   let kind = operator.kind
   let opt  = operator.opt
+  let place = get(a:000, 0, '')
   if kind ==# 'add'
-    if a:place ==# 'added'
-      let hi_group = get(a:000, 0, 'OperatorSandwichAdd')
+    if place ==# ''
+      let place = 'stuff'
+    endif
+    if place ==# 'added'
+      let hi_group = get(a:000, 1, 'OperatorSandwichAdd')
     else
       let hi_group = opt.of('highlight') >= 2
-                  \ ? get(a:000, 0, 'OperatorSandwichStuff')
-                  \ : get(a:000, 0, 'OperatorSandwichBuns')
+                  \ ? get(a:000, 1, 'OperatorSandwichStuff')
+                  \ : get(a:000, 1, 'OperatorSandwichBuns')
     endif
   elseif kind ==# 'delete'
+    if place ==# ''
+      let place = 'target'
+    endif
     let hi_group = opt.of('highlight') >= 2
-                \ ? get(a:000, 0, 'OperatorSandwichDelete')
-                \ : get(a:000, 0, 'OperatorSandwichBuns')
+                \ ? get(a:000, 1, 'OperatorSandwichDelete')
+                \ : get(a:000, 1, 'OperatorSandwichBuns')
   elseif kind ==# 'replace'
-    if a:place ==# 'added'
-      let hi_group = get(a:000, 0, 'OperatorSandwichAdd')
-    elseif a:place ==# 'target'
+    if place ==# ''
+      let place = 'target'
+    endif
+    if place ==# 'added'
+      let hi_group = get(a:000, 1, 'OperatorSandwichAdd')
+    elseif place ==# 'target'
       let hi_group = opt.of('highlight') >= 2
-                  \ ? get(a:000, 0, 'OperatorSandwichDelete')
-                  \ : get(a:000, 0, 'OperatorSandwichBuns')
+                  \ ? get(a:000, 1, 'OperatorSandwichDelete')
+                  \ : get(a:000, 1, 'OperatorSandwichBuns')
     else
       let hi_group = opt.of('highlight') >= 2
-                  \ ? get(a:000, 0, 'OperatorSandwichStuff')
-                  \ : get(a:000, 0, 'OperatorSandwichBuns')
+                  \ ? get(a:000, 1, 'OperatorSandwichStuff')
+                  \ : get(a:000, 1, 'OperatorSandwichBuns')
     endif
   else
     return 1
   endif
-  return operator.show(a:place, hi_group, opt.of('linewise'), 1)
+  return operator.show(place, hi_group, opt.of('linewise'), 1)
 endfunction
 "}}}
-function! operator#sandwich#quench(place) abort  "{{{
+function! operator#sandwich#quench(...) abort  "{{{
   if exists('g:operator#sandwich#object')
     let operator = g:operator#sandwich#object
-    return operator.quench(a:place, 1)
+    let kind = operator.kind
+    let place = get(a:000, 0, '')
+    if place ==# ''
+      if kind ==# 'add'
+        let place = 'stuff'
+      elseif kind ==# 'delete'
+        let place = 'target'
+      elseif kind ==# 'replace'
+        let place = 'target'
+      else
+        return 1
+      endif
+    endif
+    return operator.quench(place, 1)
   endif
 endfunction
 "}}}

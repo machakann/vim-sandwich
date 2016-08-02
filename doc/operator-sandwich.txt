@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:25-Jul-2016.
+						Last change:02-Aug-2016.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -1620,12 +1620,14 @@ operator#sandwich#get_info({info})	*operator#sandwich#get_info()*
 	             "n" for normal mode, "x" for visual mode.
 
 					*operator#sandwich#show()*
-operator#sandwich#show({place}[, {group}])
+operator#sandwich#show([{place}[, {group}]])
 	This function highlight texts. The kind of highlighted text is
 	assigned by {place}, and {place} should be:
 	    `target`: the text to be replaced in replace operators.
 	    `stuff` : the text to be surrounded in add operators.
 	    `added` : the added text in add/replace operators.
+	If {place} is not given, `stuff` is employed for add operator and
+	`target` for delete/replace operator.
 
 	If user gives {group}, the text will be highlighted with {group} which
 	is defined by |:highlight| command. Default highlight groups are
@@ -1636,10 +1638,13 @@ operator#sandwich#show({place}[, {group}])
 
 
 					*operator#sandwich#quench()*
-operator#sandwich#quench({place})
+operator#sandwich#quench([{place}])
 	This function deletes highlight added by |operator#sandwich#show()|.
-	Give same {place} with |operator#sandwich#show()| to delete. If it
-	successfully deletes highlighting, it returns 0. Otherwise returns 1.
+	Give same {place} with |operator#sandwich#show()| to delete. If
+	{place} is not given, `stuff` is employed for add operator and
+	`target` for delete/replace operator. If it successfully deletes
+	highlighting, it returns 0. Otherwise returns 1.
+
 
 For example, a query1st series keymapping
 |<Plug>(operator-sandwich-add-query1st)| does not highlight a text to be

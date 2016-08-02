@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:25-Jul-2016.
+						Last change:02-Aug-2016.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -1586,12 +1586,14 @@ operator#sandwich#get_info({info})	*operator#sandwich#get_info()*
 	             モードなら "n" が、ビジュアルモードなら "x" です。
 
 					*operator#sandwich#show()*
-operator#sandwich#show({place}[, {group}])
+operator#sandwich#show([{place}[, {group}]])
 	この関数はテキストをハイライトするのに使います。ハイライトするテキスト
 	は {place} によって指定され、次の値が指定可能です。
-	    `target`: 置換オペレータにより置換の対象となるテキスト
-	    `stuff` : 囲みを追加するオペレータにより囲まれるテキスト
-	    `added` : 囲みを追加/置換するオペレータにより追加されたテキスト
+	    `target`: 置換オペレーターにより置換の対象となるテキスト
+	    `stuff` : 囲みを追加するオペレーターにより囲まれるテキスト
+	    `added` : 囲みを追加/置換するオペレーターにより追加されたテキスト
+	{place} が省略された場合、 囲みを追加するオペレーターには `stuff` を、
+	削除/置換するオペレータには `target` を使います。
 
 	{group} が与えられた場合、テキストはこのハイライトグループ
 	|highlight-group| によりハイライトされます。テキストが既にハイライトさ
@@ -1601,10 +1603,12 @@ operator#sandwich#show({place}[, {group}])
 
 
 					*operator#sandwich#quench()*
-operator#sandwich#quench({place})
+operator#sandwich#quench([{place}])
 	|operator#sandwich#show()| 関数によるハイライトを削除します。 {place}
 	には |operator#sandwich#show()| に与えたものと同じ値を指定してくだ
-	さい。削除に成功すれば 0 、それ以外の場合は 1 を返します。
+	さい。 {place} が省略された場合、 囲みを追加するオペレーターには
+	`stuff` を、削除/置換するオペレータには `target` を使います。
+	削除に成功すれば 0 、それ以外の場合は 1 を返します。
 
 例えば、 query1st 系列のキーマッピング
 |<Plug>(operator-sandwich-add-query1st)| は、その囲むテキストをハイライトしま
