@@ -1,5 +1,5 @@
 " The set of operator/textobj plugins to do well with 'sandwich' like structure
-" Last Change: 01-Aug-2016.
+" Last Change: 02-Aug-2016.
 " Maintainer : Masaaki Nakamura <mckn@outlook.jp>
 
 " License    : NYSL
@@ -18,14 +18,14 @@ nnoremap <Plug>(sandwich-O) O
 nnoremap <Plug>(sandwich-v) v
 nnoremap <Plug>(sandwich-V) V
 nnoremap <Plug>(sandwich-CTRL-v) <C-v>
-onoremap <Plug>(textobj-sandwich-function-i) :<C-u>call sandwich#magicchar#f#i()<CR>
-onoremap <Plug>(textobj-sandwich-function-a) :<C-u>call sandwich#magicchar#f#a()<CR>
-xnoremap <Plug>(textobj-sandwich-function-i) :<C-u>call sandwich#magicchar#f#i()<CR>
-xnoremap <Plug>(textobj-sandwich-function-a) :<C-u>call sandwich#magicchar#f#a()<CR>
-onoremap <Plug>(textobj-sandwich-tagname-i) :<C-u>call sandwich#magicchar#t#i()<CR>
-onoremap <Plug>(textobj-sandwich-tagname-a) :<C-u>call sandwich#magicchar#t#a()<CR>
-xnoremap <Plug>(textobj-sandwich-tagname-i) :<C-u>call sandwich#magicchar#t#i()<CR>
-xnoremap <Plug>(textobj-sandwich-tagname-a) :<C-u>call sandwich#magicchar#t#a()<CR>
+onoremap <silent> <Plug>(textobj-sandwich-function-i) :<C-u>call sandwich#magicchar#f#i()<CR>
+onoremap <silent> <Plug>(textobj-sandwich-function-a) :<C-u>call sandwich#magicchar#f#a()<CR>
+xnoremap <silent> <Plug>(textobj-sandwich-function-i) :<C-u>call sandwich#magicchar#f#i()<CR>
+xnoremap <silent> <Plug>(textobj-sandwich-function-a) :<C-u>call sandwich#magicchar#f#a()<CR>
+onoremap <silent> <Plug>(textobj-sandwich-tagname-i) :<C-u>call sandwich#magicchar#t#i()<CR>
+onoremap <silent> <Plug>(textobj-sandwich-tagname-a) :<C-u>call sandwich#magicchar#t#a()<CR>
+xnoremap <silent> <Plug>(textobj-sandwich-tagname-i) :<C-u>call sandwich#magicchar#t#i()<CR>
+xnoremap <silent> <Plug>(textobj-sandwich-tagname-a) :<C-u>call sandwich#magicchar#t#a()<CR>
 
 """ default keymappings
 " If g:sandwich_no_default_key_mappings has been defined, then quit immediately.
