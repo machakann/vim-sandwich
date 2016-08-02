@@ -318,7 +318,7 @@ function! s:stuff._get_region(candidates, clock, stimeoutlen) dict abort "{{{
   finally
     " restore visualmode
     execute 'normal! ' . visualmode
-    execute 'normal! ' . "\<Esc>"
+    execute "normal! \<Esc>"
     call cursor(self.cursor)
     " restore marks
     call setpos("'<", visual_head)
