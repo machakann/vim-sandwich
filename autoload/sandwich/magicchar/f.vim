@@ -45,13 +45,11 @@ let s:patterns['julia'] = [
       \ ]
 
 function! sandwich#magicchar#f#fname() abort  "{{{
-  let kind = operator#sandwich#get_info('kind')
-  let place = kind ==# 'replace' ? 'target' : 'stuff'
-  call operator#sandwich#show(place)
+  call operator#sandwich#show()
   echohl MoreMsg
   let funcname = input('funcname: ', '', 'custom,sandwich#magicchar#f#fnamecompl')
   echohl NONE
-  call operator#sandwich#quench(place)
+  call operator#sandwich#quench()
   if funcname ==# ''
     throw 'OperatorSandwichCancel'
   endif
