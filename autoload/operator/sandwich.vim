@@ -16,6 +16,8 @@ endif
 " Others
 " NOTE: This would be updated in each operator functions (operator#sandwich#{add/delete/replce})
 let s:is_in_cmdline_window = 0
+" Current set operator
+let s:operator = ''
 "}}}
 
 """ Public functions
@@ -60,6 +62,7 @@ function! operator#sandwich#prerequisite(kind, mode, ...) abort "{{{
   endif
 
   let &l:operatorfunc = 'operator#sandwich#' . a:kind
+  let s:operator = a:kind
   return
 endfunction
 "}}}
@@ -80,6 +83,7 @@ endfunction
 
 " Operator functions
 function! operator#sandwich#add(motionwise, ...) abort  "{{{
+  let s:operator = ''
   if exists('g:operator#sandwich#object')
     call s:update_is_in_cmdline_window()
     call s:doautocmd('OperatorSandwichAddPre')
@@ -90,6 +94,7 @@ function! operator#sandwich#add(motionwise, ...) abort  "{{{
 endfunction
 "}}}
 function! operator#sandwich#delete(motionwise, ...) abort  "{{{
+  let s:operator = ''
   if exists('g:operator#sandwich#object')
     call s:update_is_in_cmdline_window()
     call s:doautocmd('OperatorSandwichDeletePre')
@@ -100,6 +105,7 @@ function! operator#sandwich#delete(motionwise, ...) abort  "{{{
 endfunction
 "}}}
 function! operator#sandwich#replace(motionwise, ...) abort  "{{{
+  let s:operator = ''
   if exists('g:operator#sandwich#object')
     call s:update_is_in_cmdline_window()
     call s:doautocmd('OperatorSandwichReplacePre')
@@ -349,6 +355,12 @@ function! operator#sandwich#get_info(...) abort  "{{{
     echoerr printf('operator-sandwich: Identifier "%s" is not supported.', string(info))
     return 1
   endif
+endfunction
+"}}}
+function! operator#sandwich#kind() abort  "{{{
+  return exists('g:operator#sandwich#object') && g:operator#sandwich#object.at_work
+        \ ? g:operator#sandwich#object.kind
+        \ : s:operator
 endfunction
 "}}}
 

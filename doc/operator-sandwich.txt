@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:02-Aug-2016.
+						Last change:09-Aug-2016.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -1618,6 +1618,13 @@ operator#sandwich#get_info({info})	*operator#sandwich#get_info()*
 	    `count`: The given [count] for the operator.
 	    `mode` : A character represents the mode working in,
 	             "n" for normal mode, "x" for visual mode.
+
+operator#sandwich#kind()		*operator#sandwich#kind()*
+	If in |operator-pending-mode|, this function returns the name of a
+	|operator-sandwich| operator which is set currently, that is, "add",
+	"delete" or "replace". Otherwise returns empty string, it is same in
+	case that is set another operators also. This function might be
+	helpful in cooperation with |textobj-sandwich|.
 
 					*operator#sandwich#show()*
 operator#sandwich#show([{place}[, {group}]])
