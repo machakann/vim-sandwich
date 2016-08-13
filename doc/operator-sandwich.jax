@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:12-Aug-2016.
+						Last change:13-Aug-2016.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -855,8 +855,8 @@ cursor
 	  inner_tail: 囲みの内側の文字列の末尾
 	  head      : 前方の囲みの先頭
 	  tail      : 後方の囲みの末尾
-	  head      : 前方の囲みの末尾
-	  tail      : 後方の囲みの先頭
+	  headend   : 前方の囲みの末尾
+	  tailstart : 後方の囲みの先頭
 	  default   : inner_head とほぼ同じですがカーソルが行頭に来るときは最
 	              初の非空白文字まで送ります
 >
