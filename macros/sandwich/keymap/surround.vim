@@ -93,7 +93,7 @@ let g:sandwich#recipes = [
       \     'listexpr': 1,
       \     'kind': ['replace'],
       \     'action': ['add'],
-      \     'input': ['<'],
+      \     'input': ['T', '<'],
       \   },
       \
       \   {
@@ -110,7 +110,7 @@ let g:sandwich#recipes = [
       \     'kind' : ['delete', 'textobj'],
       \     'expr_filter': ['operator#sandwich#kind() !=# "replace"'],
       \     'synchro': 1,
-      \     'input': ['t', '<'],
+      \     'input': ['t', 'T', '<'],
       \   },
       \
       \   {
@@ -119,7 +119,7 @@ let g:sandwich#recipes = [
       \     'kind' : ['replace', 'query'],
       \     'expr_filter': ['operator#sandwich#kind() ==# "replace"'],
       \     'synchro': 1,
-      \     'input': ['<'],
+      \     'input': ['T', '<'],
       \   },
       \
       \   {

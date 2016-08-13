@@ -288,20 +288,20 @@ i~
 
 
 t~
-<~
-	The inputs `t` and `<` support to edit HTML style tags. `saiwt` ask
+T~
+	The inputs `t` and `T` support to edit HTML style tags. `saiwt` ask
 	user to input a name of element, then a textobject would be surrounded
-	by the tag. `saiw<` works as same.
+	by the tag. `saiwT` works as same.
 >
 	       word      -- saiwtp<CR> -->   <p>word</p>
 <
-	 `sdt` deletes the nearest tag surroundings. `sd<` works as same.
+	 `sdt` deletes the nearest tag surroundings. `sdT` works as same.
 >
 	    <p>word</p>  -- saiwtp<CR> -->      word
 <
-	`t` and `<` works differently only when replacing surroundings.
+	`t` and `T` works differently only when replacing surroundings.
 	`srtt` replaces only the name of element, does not touch attributes.
-	`sr<<` replaces the whole body of tags.
+	`srTT` replaces the whole body of tags.
 
 
 
