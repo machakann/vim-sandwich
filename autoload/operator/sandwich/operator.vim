@@ -93,6 +93,7 @@ function! s:operator.execute(motionwise) dict abort  "{{{
   finally
     call self.finalize()
     call s:restore_options(self.kind, self.mode, options)
+    redraw
     return self.message
   endtry
 endfunction
