@@ -2,7 +2,7 @@
 " NOTE: Because of the restriction of vim, if a operator to get the assigned
 "       region is employed for 'external' user-defined textobjects, it makes
 "       impossible to repeat by dot command. Thus, 'external' is checked by
-"       using visual selection (xmap) in any case.
+"       using visual selection xmap in any case.
 
 " variables "{{{
 " types

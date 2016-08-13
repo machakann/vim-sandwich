@@ -98,6 +98,7 @@ function! s:operator.execute(motionwise) dict abort  "{{{
 endfunction
 "}}}
 function! s:operator.initialize(motionwise) dict abort "{{{
+  let self.at_work = 1
   call self.recipes.integrate(self.kind, a:motionwise, self.mode)
   let region = s:get_assigned_region(self.kind, a:motionwise)
   let region_list = a:motionwise ==# 'block' ? self.split(region) : [region]
@@ -107,7 +108,6 @@ function! s:operator.initialize(motionwise) dict abort "{{{
   endif
 
   let self.n = len(region_list)  " Number of lines in the target region
-  let self.at_work = 1
   let self.cursor.inner_head = deepcopy(region.head)
   let self.cursor.inner_tail = deepcopy(region.tail)
   let option_dict = get(b:, 'operator_sandwich_options', g:operator#sandwich#options)

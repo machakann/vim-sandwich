@@ -1,4 +1,4 @@
-*sandwich.jax*	日本語ヘルプ		Last change:30-Apr-2016.
+*sandwich.jax*	日本語ヘルプ		Last change:13-Aug-2016.
 
 “挟まれた”テキストを編集するためのオペレータとテキストオブジェクトの詰め合わせ
 です。
@@ -19,6 +19,7 @@ QUICK START			|sandwich-quick-start|
 INTRODUCTION			|sandwich-introduction|
 KEYMAPPINGS			|sandwich-keymappings|
 CONFIGURATION			|sandwich-configuration|
+MAGICCHARACTER			|sandwich-magiccharacter|
 MISCELLANEOUS			|sandwich-miscellaneous|
   vim-surround のキ－マッピングを使う
 
@@ -252,6 +253,61 @@ g:sandwich#default_recipes		*g:sandwich#default_recipes*
 >
 	:let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
 <
+
+
+
+==============================================================================
+MAGICCHARACTER				*sandwich-magiccharacter*
+
+sandwich.vim は {addition}/{deletion} を決めるためにユーザーに入力を促します。
+これは例えば `(` が `()` のペアを、 `"` が `""` のペアを指しますが、より特殊な
+用途のための入力がいくつか存在します。
+
+f~
+F~
+	関数で囲みます。例えば `saiwf` と入力すると `f` キーの入力の後に関数名
+	の入力を求められます。関数名を入力し <CR> キーを押すと、その関数名付き
+	の丸括弧でテキストオブジェクトを囲みます。
+>
+	        arg      -- saiwffunc<CR> -->    func(arg)
+<
+	逆に `sdf` は関数囲みを削除します。
+>
+	     func(arg)       -- sdf -->             arg
+<
+	関数がネストしている場合、 `sdf` はカーソル下の関数囲みを削除し、
+	`sdF` は外側の関数囲みを削除します。
+>
+	cursor is on 'func2':
+	    func1(func2(arg))  -- sdf -->   func1(arg)
+	                       -- sdF -->   func2(arg)
+<
+
+i~
+	その時だけの (`I`nstant) 囲みを定義します。 `saiwi` はユーザーに前方囲
+	みと後方囲みの入力を求めます。例えば、 `saiwifoo<CR>bar<CR>` という
+	入力はカーソル下の単語を `foo` と `bar` で囲みます。反対に `sdi` は
+	任意の入力された囲みを削除します。つまり、 `sdifoo<CR>bar<CR>` は
+	`foowordbar` という文字列を `word` にします。これは |.| コマンドによっ
+	て繰り返すことができるので、編集対象の文字列が多く存在する場合に便利か
+	もしれません。
+
+
+t~
+<~
+	`t` および `<` は HTML 様のタグの編集を支援します。 `saiwt` はユーザー
+	にタグの要素名の入力を促し、そのタグで囲みます。 `saiw<` も同様に機能
+	します。
+>
+	       word      -- saiwtp<CR> -->   <p>word</p>
+<
+	`sdt` は直近のタグ囲みを削除します。 `sd<` も同様に機能します。
+>
+	    <p>word</p>  -- saiwtp<CR> -->      word
+<
+	`t` と `<` は囲みを置換するときに別のふるまいをします。
+	`srtt` はタグの要素名のみを置き換え、属性等は変更しません。
+	`sr<<` はタグ全体を置き換えます。
 
 
 

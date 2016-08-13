@@ -1,4 +1,4 @@
-*sandwich.txt*				Last change:30-Apr-2016.
+*sandwich.txt*				Last change:13-Aug-2016.
 
 The set of operator and textobject plugins to edit sandwiched textobjects.
 
@@ -18,6 +18,7 @@ QUICK START			|sandwich-quick-start|
 INTRODUCTION			|sandwich-introduction|
 KEYMAPPINGS			|sandwich-keymappings|
 CONFIGURATION			|sandwich-configuration|
+MAGICCHARACTER			|sandwich-magiccharacter|
 MISCELLANEOUS			|sandwich-miscellaneous|
   Introduce vim-surround keymappings
 
@@ -244,6 +245,64 @@ g:sandwich#default_recipes		*g:sandwich#default_recipes*
 >
 	:let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
 <
+
+
+
+==============================================================================
+MAGICCHARACTER				*sandwich-magiccharacter*
+
+Sandwich.vim requests user to input keys for determination of
+{addtion}/{deletion}. Usually it is something like `(` for `()` pair or
+`"` for `""` pair, but there is several functional inputs for cumbersome
+editings. It might be helpful for your work, give it a try!
+
+f~
+F~
+	Press `saiwf` to surround a word by function. After inputting `f` key,
+	user would be requested to input function name and press <CR>, then
+	the target textobject would be surrounded by parenthesis with the
+	function name.
+>
+	          arg      -- saiwffunc<CR> -->     func(arg)
+<
+	The key sequence `sdf`, conversely, deletes function surrounding.
+>
+	       func(arg)       -- sdf -->             arg
+<
+	In case of nested functions, `sdf` deletes the function under the
+	cursor while `sdF` deletes the function surrounding.
+>
+	cursor is on 'func2':
+	    func1(func2(arg))  -- sdf -->   func1(arg)
+	                       -- sdF -->   func2(arg)
+<
+
+i~
+	It realizes to define `I`nstant surroundings. `saiwi` ask user for
+	inputting former and latter surroundings. For example,
+	`saiwifoo<CR>bar<CR>` makes a word surrounded by `foo` and `bar`.
+	On the other hand `sdi` deletes arbitrary surroundings. For example,
+	`sdifoo<CR>bar<CR>` makes `foowordbar` to `word`. This is useful when
+	a lot of targets are there because the action could be repeated by |.|
+	command.
+
+
+t~
+<~
+	The inputs `t` and `<` support to edit HTML style tags. `saiwt` ask
+	user to input a name of element, then a textobject would be surrounded
+	by the tag. `saiw<` works as same.
+>
+	       word      -- saiwtp<CR> -->   <p>word</p>
+<
+	 `sdt` deletes the nearest tag surroundings. `sd<` works as same.
+>
+	    <p>word</p>  -- saiwtp<CR> -->      word
+<
+	`t` and `<` works differently only when replacing surroundings.
+	`srtt` replaces only the name of element, does not touch attributes.
+	`sr<<` replaces the whole body of tags.
+
 
 
 

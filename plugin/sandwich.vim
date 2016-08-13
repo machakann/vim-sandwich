@@ -1,5 +1,5 @@
 " The set of operator/textobj plugins to do well with 'sandwich' like structure
-" Last Change: 02-Aug-2016.
+" Last Change: 13-Aug-2016.
 " Maintainer : Masaaki Nakamura <mckn@outlook.jp>
 
 " License    : NYSL
@@ -18,10 +18,14 @@ nnoremap <Plug>(sandwich-O) O
 nnoremap <Plug>(sandwich-v) v
 nnoremap <Plug>(sandwich-V) V
 nnoremap <Plug>(sandwich-CTRL-v) <C-v>
-onoremap <silent> <Plug>(textobj-sandwich-function-i) :<C-u>call sandwich#magicchar#f#i()<CR>
-onoremap <silent> <Plug>(textobj-sandwich-function-a) :<C-u>call sandwich#magicchar#f#a()<CR>
-xnoremap <silent> <Plug>(textobj-sandwich-function-i) :<C-u>call sandwich#magicchar#f#i()<CR>
-xnoremap <silent> <Plug>(textobj-sandwich-function-a) :<C-u>call sandwich#magicchar#f#a()<CR>
+onoremap <silent> <Plug>(textobj-sandwich-function-ip) :<C-u>call sandwich#magicchar#f#ip()<CR>
+onoremap <silent> <Plug>(textobj-sandwich-function-i)  :<C-u>call sandwich#magicchar#f#i()<CR>
+xnoremap <silent> <Plug>(textobj-sandwich-function-ip) :<C-u>call sandwich#magicchar#f#ip()<CR>
+xnoremap <silent> <Plug>(textobj-sandwich-function-i)  :<C-u>call sandwich#magicchar#f#i()<CR>
+onoremap <silent> <Plug>(textobj-sandwich-function-ap) :<C-u>call sandwich#magicchar#f#ap()<CR>
+onoremap <silent> <Plug>(textobj-sandwich-function-a)  :<C-u>call sandwich#magicchar#f#a()<CR>
+xnoremap <silent> <Plug>(textobj-sandwich-function-ap) :<C-u>call sandwich#magicchar#f#ap()<CR>
+xnoremap <silent> <Plug>(textobj-sandwich-function-a)  :<C-u>call sandwich#magicchar#f#a()<CR>
 onoremap <silent> <Plug>(textobj-sandwich-tagname-i) :<C-u>call sandwich#magicchar#t#i()<CR>
 onoremap <silent> <Plug>(textobj-sandwich-tagname-a) :<C-u>call sandwich#magicchar#t#a()<CR>
 xnoremap <silent> <Plug>(textobj-sandwich-tagname-i) :<C-u>call sandwich#magicchar#t#i()<CR>

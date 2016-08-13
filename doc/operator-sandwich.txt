@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:09-Aug-2016.
+						Last change:12-Aug-2016.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -742,7 +742,7 @@ action
 
 
 expr_filter
-	A user can define filters by oneself. The items of the list are
+	User can define filters by oneself. The items of the list are
 	evaluated as |expression|, and if the value is true (1) then the
 	recipe is valid, if the value is false (0) then the recipe is invalid.
 >

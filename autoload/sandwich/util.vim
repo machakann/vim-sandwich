@@ -7,14 +7,6 @@ function! sandwich#util#echo(messages) abort  "{{{
   endfor
 endfunction
 "}}}
-function! sandwich#util#with_operator(name) abort "{{{
-  let operator = v:operator ==# 'g@'
-        \ ? matchstr(&operatorfunc, '^operator#sandwich#\zs\%(add\|delete\|replace\)$')
-        \ : ''
-  return a:name ==# operator
-endfunction
-"}}}
-
 
 " vim:set foldmethod=marker:
 " vim:set commentstring="%s:

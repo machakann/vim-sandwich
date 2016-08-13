@@ -103,7 +103,15 @@ endif
 " textobj-functioncall (bundle version)
 " NOTE: https://github.com/machakann/vim-textobj-functioncall
 
+function! sandwich#magicchar#f#ip() abort  "{{{
+  return s:prototype('ip')
+endfunction
+"}}}
 function! sandwich#magicchar#f#i() abort  "{{{
+  return s:prototype('i')
+endfunction
+"}}}
+function! sandwich#magicchar#f#ap() abort  "{{{
   return s:prototype('ap')
 endfunction
 "}}}

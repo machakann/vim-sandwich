@@ -20,14 +20,15 @@ let g:sandwich#default_recipes = [
       \   {'buns': ['{', '}'], 'nesting': 1, 'match_syntax': 1, 'skip_break': 1},
       \   {'buns': ['[', ']'], 'nesting': 1, 'match_syntax': 1},
       \   {'buns': ['(', ')'], 'nesting': 1, 'match_syntax': 1},
-      \   {'buns': 'sandwich#magicchar#t#tag()', 'listexpr': 1, 'kind': ['add'], 'action': ['add'], 'filetype': ['html', 'xhtml', 'xml'], 'input': ['t']},
-      \   {'buns': 'sandwich#magicchar#t#tag()', 'listexpr': 1, 'kind': ['replace'], 'action': ['add'], 'filetype': ['html', 'xhtml', 'xml'], 'input': ['<']},
-      \   {'buns': 'sandwich#magicchar#t#tagname()', 'listexpr': 1, 'kind': ['replace'], 'action': ['add'], 'filetype': ['html', 'xhtml', 'xml'], 'input': ['t']},
-      \   {'external': ['it', 'at'], 'noremap' : 1, 'kind' : ['delete', 'textobj'], 'expr_filter': ['!sandwich#util#with_operator("replace")'], 'synchro': 1, 'input': ['t']},
-      \   {'external': ['it', 'at'], 'noremap' : 1, 'kind' : ['replace', 'query'], 'expr_filter': ['sandwich#util#with_operator("replace")'], 'synchro': 1, 'input': ['<']},
-      \   {'external': ["\<Plug>(textobj-sandwich-tagname-i)", "\<Plug>(textobj-sandwich-tagname-a)"], 'noremap' : 0, 'kind' : ['replace', 'textobj'], 'expr_filter': ['sandwich#util#with_operator("replace")'], 'synchro': 1, 'input': ['t']},
+      \   {'buns': 'sandwich#magicchar#t#tag()', 'listexpr': 1, 'kind': ['add'], 'action': ['add'], 'input': ['t']},
+      \   {'buns': 'sandwich#magicchar#t#tag()', 'listexpr': 1, 'kind': ['replace'], 'action': ['add'], 'input': ['<']},
+      \   {'buns': 'sandwich#magicchar#t#tagname()', 'listexpr': 1, 'kind': ['replace'], 'action': ['add'], 'input': ['t']},
+      \   {'external': ['it', 'at'], 'noremap' : 1, 'kind' : ['delete', 'textobj'], 'expr_filter': ['operator#sandwich#kind() !=# "replace"'], 'synchro': 1, 'input': ['t', '<']},
+      \   {'external': ['it', 'at'], 'noremap' : 1, 'kind' : ['replace', 'query'], 'expr_filter': ['operator#sandwich#kind() ==# "replace"'], 'synchro': 1, 'input': ['<']},
+      \   {'external': ["\<Plug>(textobj-sandwich-tagname-i)", "\<Plug>(textobj-sandwich-tagname-a)"], 'noremap' : 0, 'kind' : ['replace', 'textobj'], 'expr_filter': ['operator#sandwich#kind() ==# "replace"'], 'synchro': 1, 'input': ['t']},
       \   {'buns': ['sandwich#magicchar#f#fname()', '")"'], 'kind': ['add', 'replace'], 'action': ['add'], 'expr': 1, 'cursor': 'inner_tail', 'input': ['f']},
-      \   {'external': ["\<Plug>(textobj-sandwich-function-i)", "\<Plug>(textobj-sandwich-function-a)"], 'noremap': 0, 'kind': ['delete', 'replace', 'query'], 'input': ['f']},
+      \   {'external': ["\<Plug>(textobj-sandwich-function-ip)", "\<Plug>(textobj-sandwich-function-i)"], 'noremap': 0, 'kind': ['delete', 'replace', 'query'], 'input': ['f']},
+      \   {'external': ["\<Plug>(textobj-sandwich-function-ap)", "\<Plug>(textobj-sandwich-function-a)"], 'noremap': 0, 'kind': ['delete', 'replace', 'query'], 'input': ['F']},
       \ ]
 lockvar! g:sandwich#default_recipes
 
