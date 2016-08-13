@@ -136,7 +136,6 @@ let g:sandwich#recipes = [
       \     'kind': ['add', 'replace'],
       \     'action': ['add'],
       \     'expr': 1,
-      \     'cursor': 'inner_tail',
       \     'input': ['f']
       \   },
       \
