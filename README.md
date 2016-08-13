@@ -23,6 +23,8 @@ For example, key sequences `srb"` or `sr("` makes **(foo)** to **"foo"**.
 
 That's all. Now you already know enough about `sandwich.vim`. If you are using [vim-surround](https://github.com/tpope/vim-surround), you can use a preset keymappings similar as it. See [here](https://github.com/machakann/vim-sandwich/wiki/Introduce-vim-surround-keymappings)
 
+`sandwich.vim` has some functional input for *{addition}*/*{deletion}*. Check [here](https://github.com/machakann/vim-sandwich/wiki/Magic-character)!
+
 # Design
 
 This plugin provides functions to add/delete/replace surroundings of a sandwiched text. These functions are implemented genuinely by utilizing operator/textobject framework. Thus their action can be repeated by `.` command without any dependency. It consists of two parts, **operator-sandwich** and **textobj-sandwich**.
