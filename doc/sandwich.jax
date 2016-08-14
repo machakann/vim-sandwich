@@ -1,4 +1,4 @@
-*sandwich.jax*	日本語ヘルプ		Last change:13-Aug-2016.
+*sandwich.jax*	日本語ヘルプ		Last change:14-Aug-2016.
 
 “挟まれた”テキストを編集するためのオペレータとテキストオブジェクトの詰め合わせ
 です。
@@ -19,7 +19,7 @@ QUICK START			|sandwich-quick-start|
 INTRODUCTION			|sandwich-introduction|
 KEYMAPPINGS			|sandwich-keymappings|
 CONFIGURATION			|sandwich-configuration|
-MAGICCHARACTER			|sandwich-magiccharacter|
+MAGICCHARACTERS			|sandwich-magiccharacters|
 MISCELLANEOUS			|sandwich-miscellaneous|
   vim-surround のキ－マッピングを使う
 
@@ -257,7 +257,7 @@ g:sandwich#default_recipes		*g:sandwich#default_recipes*
 
 
 ==============================================================================
-MAGICCHARACTER				*sandwich-magiccharacter*
+MAGICCHARACTERS				*sandwich-magiccharacters*
 
 sandwich.vim は {addition}/{deletion} を決めるためにユーザーに入力を促します。
 これは例えば `(` が `()` のペアを、 `"` が `""` のペアを指しますが、より特殊な
