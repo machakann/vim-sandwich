@@ -25,6 +25,11 @@ function! Count(...) abort
   return s:count
 endfunction
 
+function! ListCount(...) abort
+  let s:count += 1
+  return [s:count, s:count]
+endfunction
+
 
 
 """ operator-add
@@ -98,6 +103,26 @@ normal saiwc
 normal .
 call s:assert(getline('.'), '31foo24', 'operator-add:expr #3')
 call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-add:expr #4')
+
+unlet g:operator#sandwich#recipes
+%delete
+
+" listexpr
+let g:operator#sandwich#recipes = [{'buns': 'ListCount()', 'listexpr': 1, 'input': ['c']}]
+call setline('.', 'foo')
+let s:count = 0
+normal saiwc
+normal .
+call s:assert(getline('.'), '11foo11', 'operator-add:listexpr #1')
+call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-add:listexpr #2')
+
+let g:operator#sandwich#recipes = [{'buns': 'ListCount()', 'listexpr': 2, 'input': ['c']}]
+call setline('.', 'foo')
+let s:count = 0
+normal saiwc
+normal .
+call s:assert(getline('.'), '21foo12', 'operator-add:listexpr #3')
+call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-add:listexpr #4')
 
 unlet g:operator#sandwich#recipes
 %delete
@@ -323,6 +348,26 @@ normal ffsra(c
 normal .
 call s:assert(getline('.'), '31foo24', 'operator-replace:expr #3')
 call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-replace:expr #4')
+
+unlet g:operator#sandwich#recipes
+%delete
+
+" listexpr
+let g:operator#sandwich#recipes = [{'buns': 'ListCount()', 'listexpr': 1, 'input': ['c']}]
+call setline('.', '((foo))')
+let s:count = 0
+normal ffsra(c
+normal .
+call s:assert(getline('.'), '11foo11', 'operator-replace:listexpr #1')
+call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-replace:listexpr #2')
+
+let g:operator#sandwich#recipes = [{'buns': 'ListCount()', 'listexpr': 2, 'input': ['c']}]
+call setline('.', '((foo))')
+let s:count = 0
+normal ffsra(c
+normal .
+call s:assert(getline('.'), '21foo12', 'operator-replace:listexpr #3')
+call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-replace:listexpr #4')
 
 unlet g:operator#sandwich#recipes
 %delete

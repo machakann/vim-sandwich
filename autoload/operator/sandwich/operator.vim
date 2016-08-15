@@ -920,20 +920,17 @@ function! s:is_input_matched(candidate, input, opt, flag) abort "{{{
 endfunction
 "}}}
 function! s:get_buns(recipe, opt_expr, opt_listexpr, message) abort  "{{{
-  if a:opt_listexpr == 1 || a:opt_listexpr == 2
+  if a:opt_listexpr == 2
     let buns = eval(a:recipe.buns)
-    if a:opt_listexpr == 1
-      unlet a:recipe.buns
-      let a:recipe.buns = buns
-    endif
+  elseif a:opt_listexpr == 1 && !a:recipe.evaluated
+    let buns = eval(a:recipe.buns)
+    unlet a:recipe.buns
+    let a:recipe.buns = buns
+    let a:recipe.evaluated = 1
   elseif a:opt_expr == 2
-    let buns = deepcopy(a:recipe.buns)
-    let buns[0] = eval(buns[0])
-    let buns[1] = eval(buns[1])
+    let buns = map(copy(a:recipe.buns), 'eval(v:val)')
   elseif a:opt_expr == 1 && !a:recipe.evaluated
-    let buns = a:recipe.buns
-    let buns[0] = eval(buns[0])
-    let buns[1] = eval(buns[1])
+    let buns = map(a:recipe.buns, 'eval(v:val)')
     let a:recipe.evaluated = 1
   else
     let buns = a:recipe.buns
