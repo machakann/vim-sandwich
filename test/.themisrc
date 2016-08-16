@@ -36,6 +36,16 @@ function! SandwichExprBuns(is_head) abort
   endif
 endfunction
 
+function! SandwichListexprEmpty(which) abort
+  if a:which ==# 'former'
+    return ['', 'bar']
+  elseif a:which ==# 'latter'
+    return ['foo', '']
+  else
+    return ['', '']
+  endif
+endfunction
+
 function! SandwichListexprBuns(cancel) abort
   if a:cancel
     throw 'OperatorSandwichCancel'

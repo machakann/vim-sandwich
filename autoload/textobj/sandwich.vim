@@ -164,6 +164,7 @@ lockvar! g:textobj#sandwich#default_recipes
 let s:default_opt = {}
 let s:default_opt.auto = {
       \   'expr'           : 0,
+      \   'listexpr'       : 0,
       \   'regex'          : 0,
       \   'skip_regex'     : [],
       \   'skip_regex_head': [],
@@ -181,6 +182,7 @@ let s:default_opt.auto = {
       \ }
 let s:default_opt.query = {
       \   'expr'           : 0,
+      \   'listexpr'       : 0,
       \   'regex'          : 0,
       \   'skip_regex'     : [],
       \   'skip_regex_head': [],

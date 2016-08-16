@@ -917,6 +917,42 @@ function! s:suite.i_o_option_expr() abort "{{{
   call g:assert.equals(@@, 'aa', 'failed at #8')
 endfunction
 "}}}
+function! s:suite.i_o_option_listexpr() abort "{{{
+  let g:sandwich#recipes = []
+  let g:textobj#sandwich#recipes = [
+        \   {'buns': 'SandwichListexprBuns(0)', 'input': ['a']},
+        \   {'buns': 'SandwichListexprEmpty("former")', 'input': ['b']},
+        \   {'buns': 'SandwichListexprEmpty("latter")', 'input': ['c']},
+        \   {'buns': 'SandwichListexprEmpty("both")', 'input': ['d']},
+        \ ]
+
+  """ on
+  call textobj#sandwich#set('query', 'listexpr', 1)
+  " #1
+  call setline('.', 'foobarbaz')
+  let @@ = 'fail'
+  normal 0yisa
+  call g:assert.equals(@@, 'bar', 'failed at #1')
+
+  " #2
+  call setline('.', 'foobarbaz')
+  let @@ = 'fail'
+  normal 0yisb
+  call g:assert.equals(@@, '', 'failed at #2')
+
+  " #3
+  call setline('.', 'foobarbaz')
+  let @@ = 'fail'
+  normal 0yisc
+  call g:assert.equals(@@, '', 'failed at #3')
+
+  " #4
+  call setline('.', 'foobarbaz')
+  let @@ = 'fail'
+  normal 0yisd
+  call g:assert.equals(@@, '', 'failed at #4')
+endfunction
+"}}}
 function! s:suite.i_o_option_regex() abort "{{{
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [
@@ -2207,6 +2243,42 @@ function! s:suite.i_x_option_expr() abort "{{{
   call g:assert.equals(@@, 'aa', 'failed at #8')
 endfunction
 "}}}
+function! s:suite.i_x_option_listexpr() abort "{{{
+  let g:sandwich#recipes = []
+  let g:textobj#sandwich#recipes = [
+        \   {'buns': 'SandwichListexprBuns(0)', 'input': ['a']},
+        \   {'buns': 'SandwichListexprEmpty("former")', 'input': ['b']},
+        \   {'buns': 'SandwichListexprEmpty("latter")', 'input': ['c']},
+        \   {'buns': 'SandwichListexprEmpty("both")', 'input': ['d']},
+        \ ]
+
+  """ on
+  call textobj#sandwich#set('query', 'listexpr', 1)
+  " #1
+  call setline('.', 'foobarbaz')
+  let @@ = 'fail'
+  normal 0visay
+  call g:assert.equals(@@, 'bar', 'failed at #1')
+
+  " #2
+  call setline('.', 'foobarbaz')
+  let @@ = 'fail'
+  normal 0visby
+  call g:assert.equals(@@, 'f', 'failed at #2')
+
+  " #3
+  call setline('.', 'foobarbaz')
+  let @@ = 'fail'
+  normal 0viscy
+  call g:assert.equals(@@, 'f', 'failed at #3')
+
+  " #4
+  call setline('.', 'foobarbaz')
+  let @@ = 'fail'
+  normal 0visdy
+  call g:assert.equals(@@, 'f', 'failed at #4')
+endfunction
+"}}}
 function! s:suite.i_x_option_regex() abort "{{{
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [
@@ -3451,6 +3523,42 @@ function! s:suite.a_o_option_expr() abort "{{{
   let @@ = 'fail'
   normal 0yas0
   call g:assert.equals(@@, '1+1aa1+2', 'failed at #8')
+endfunction
+"}}}
+function! s:suite.a_o_option_listexpr() abort "{{{
+  let g:sandwich#recipes = []
+  let g:textobj#sandwich#recipes = [
+        \   {'buns': 'SandwichListexprBuns(0)', 'input': ['a']},
+        \   {'buns': 'SandwichListexprEmpty("former")', 'input': ['b']},
+        \   {'buns': 'SandwichListexprEmpty("latter")', 'input': ['c']},
+        \   {'buns': 'SandwichListexprEmpty("both")', 'input': ['d']},
+        \ ]
+
+  """ on
+  call textobj#sandwich#set('query', 'listexpr', 1)
+  " #1
+  call setline('.', 'foobarbaz')
+  let @@ = 'fail'
+  normal 0yasa
+  call g:assert.equals(@@, 'foobarbaz', 'failed at #1')
+
+  " #2
+  call setline('.', 'foobarbaz')
+  let @@ = 'fail'
+  normal 0yasb
+  call g:assert.equals(@@, '', 'failed at #2')
+
+  " #3
+  call setline('.', 'foobarbaz')
+  let @@ = 'fail'
+  normal 0yasc
+  call g:assert.equals(@@, '', 'failed at #3')
+
+  " #4
+  call setline('.', 'foobarbaz')
+  let @@ = 'fail'
+  normal 0yasd
+  call g:assert.equals(@@, '', 'failed at #4')
 endfunction
 "}}}
 function! s:suite.a_o_option_regex() abort "{{{
@@ -4767,6 +4875,42 @@ function! s:suite.a_x_option_expr() abort "{{{
   let @@ = 'fail'
   normal 0vas0y
   call g:assert.equals(@@, '1+1aa1+2', 'failed at #8')
+endfunction
+"}}}
+function! s:suite.a_x_option_listexpr() abort "{{{
+  let g:sandwich#recipes = []
+  let g:textobj#sandwich#recipes = [
+        \   {'buns': 'SandwichListexprBuns(0)', 'input': ['a']},
+        \   {'buns': 'SandwichListexprEmpty("former")', 'input': ['b']},
+        \   {'buns': 'SandwichListexprEmpty("latter")', 'input': ['c']},
+        \   {'buns': 'SandwichListexprEmpty("both")', 'input': ['d']},
+        \ ]
+
+  """ on
+  call textobj#sandwich#set('query', 'listexpr', 1)
+  " #1
+  call setline('.', 'foobarbaz')
+  let @@ = 'fail'
+  normal 0vasay
+  call g:assert.equals(@@, 'foobarbaz', 'failed at #1')
+
+  " #2
+  call setline('.', 'foobarbaz')
+  let @@ = 'fail'
+  normal 0vasby
+  call g:assert.equals(@@, 'f', 'failed at #2')
+
+  " #3
+  call setline('.', 'foobarbaz')
+  let @@ = 'fail'
+  normal 0vascy
+  call g:assert.equals(@@, 'f', 'failed at #3')
+
+  " #4
+  call setline('.', 'foobarbaz')
+  let @@ = 'fail'
+  normal 0vasdy
+  call g:assert.equals(@@, 'f', 'failed at #4')
 endfunction
 "}}}
 function! s:suite.a_x_option_regex() abort "{{{

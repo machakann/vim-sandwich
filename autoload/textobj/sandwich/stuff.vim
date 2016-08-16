@@ -11,6 +11,9 @@ let s:null_4coord = {
       \ }
 
 " types
+let s:type_num = type(0)
+let s:type_str = type('')
+let s:type_list = type([])
 let s:type_fref = type(function('tr'))
 "}}}
 
@@ -256,7 +259,8 @@ function! s:stuff._search_without_nest(candidates, clock, stimeoutlen) dict abor
   if self.is_valid_candidate(a:candidates)
     let candidate = deepcopy(self)
     " this is required for the case of 'expr' option is 2.
-    let candidate.buns[0:1] = buns
+    unlet candidate.buns
+    let candidate.buns = buns
     call add(a:candidates, candidate)
   endif
 
@@ -477,19 +481,38 @@ function! s:stuff.is_valid_candidate(candidates) dict abort "{{{
 endfunction
 "}}}
 function! s:stuff.get_buns(clock) dict abort  "{{{
-  let buns = self.buns
-  let opt_expr  = self.opt.of('expr')
+  let opt_listexpr = self.opt.of('listexpr')
+  let opt_expr = self.opt.of('expr')
   let opt_regex = self.opt.of('regex')
 
-  if (opt_expr && !self.evaluated) || opt_expr == 2
-    call a:clock.pause()
-    let buns = opt_expr == 2 ? deepcopy(buns) : buns
+  call a:clock.pause()
+  if opt_listexpr == 2
+    let buns = eval(self.buns)
+  elseif opt_listexpr == 1 && !self.evaluated
+    let buns = eval(self.buns)
+    unlet self.buns
+    let self.buns = buns
+    let self.evaluated = 1
+  elseif opt_expr == 2
+    let buns = ['', '']
+    let buns[0] = eval(self.buns[0])
+    if buns[0] !=# ''
+      let buns[1] = eval(self.buns[1])
+    endif
+  elseif opt_expr == 1 && !self.evaluated
+    let buns = self.buns
     let buns[0] = eval(buns[0])
     if buns[0] !=# ''
       let buns[1] = eval(buns[1])
     endif
     let self.evaluated = 1
-    call a:clock.start()
+  else
+    let buns = self.buns
+  endif
+  call a:clock.start()
+
+  if !s:valid_buns(buns)
+    return ['', '']
   endif
 
   if self.state && !opt_regex && !self.escaped
@@ -549,6 +572,15 @@ endfunction
 "}}}
 function! s:get_displaysyntax(coord) abort  "{{{
   return synIDattr(synIDtrans(synID(a:coord[0], a:coord[1], 1)), 'name')
+endfunction
+"}}}
+function! s:valid_buns(buns) abort  "{{{
+  return type(a:buns) == s:type_list && s:check_a_bun(a:buns[0]) && s:check_a_bun(a:buns[1])
+endfunction
+"}}}
+function! s:check_a_bun(bun) abort  "{{{
+  let type_bun = type(a:bun)
+  return type_bun ==# s:type_num || (type_bun ==# s:type_str && a:bun !=# '')
 endfunction
 "}}}
 function! s:is_matched_syntax(coord, syntaxID) abort  "{{{

@@ -482,6 +482,40 @@ call s:assert(getline('.'), '', 'textobj-query:expr #4')
 unlet g:textobj#sandwich#recipes
 %delete
 
+" listexpr
+let g:textobj#sandwich#recipes = [{'buns': 'ListCount()', 'listexpr': 1, 'input': ['c']}]
+call setline('.', '1foo1')
+let s:count = 0
+normal disc
+call setline('.', '1foo1')
+normal .
+call s:assert(getline('.'), '11', 'textobj-query:listexpr #1')
+
+call setline('.', '1foo1')
+let s:count = 0
+normal dasc
+call setline('.', '1foo1')
+normal .
+call s:assert(getline('.'), '', 'textobj-query:listexpr #2')
+
+let g:textobj#sandwich#recipes = [{'buns': 'ListCount()', 'listexpr': 2, 'input': ['c']}]
+call setline('.', '1foo1')
+let s:count = 0
+normal disc
+call setline('.', '2foo2')
+normal .
+call s:assert(getline('.'), '22', 'textobj-query:listexpr #3')
+
+call setline('.', '1foo1')
+let s:count = 0
+normal dasc
+call setline('.', '2foo2')
+normal .
+call s:assert(getline('.'), '', 'textobj-query:listexpr #4')
+
+unlet g:textobj#sandwich#recipes
+%delete
+
 " external textobjct
 let g:textobj#sandwich#recipes = [{'external': ['it', 'at'], 'noremap': 1, 'input': ['t']}]
 call append(0, ['<title>fooo</title>', '<body>bar</body>'])
@@ -583,6 +617,40 @@ normal dab
 call setline('.', '3foo4')
 normal .
 call s:assert(getline('.'), '', 'textobj-auto:expr #4')
+
+unlet g:textobj#sandwich#recipes
+%delete
+
+" listexpr
+let g:textobj#sandwich#recipes = [{'buns': 'ListCount()', 'listexpr': 1, 'input': ['c']}]
+call setline('.', '1foo1')
+let s:count = 0
+normal dib
+call setline('.', '1foo1')
+normal .
+call s:assert(getline('.'), '11', 'textobj-query:listexpr #1')
+
+call setline('.', '1foo1')
+let s:count = 0
+normal dab
+call setline('.', '1foo1')
+normal .
+call s:assert(getline('.'), '', 'textobj-query:listexpr #2')
+
+let g:textobj#sandwich#recipes = [{'buns': 'ListCount()', 'listexpr': 2, 'input': ['c']}]
+call setline('.', '1foo1')
+let s:count = 0
+normal dib
+call setline('.', '2foo2')
+normal .
+call s:assert(getline('.'), '22', 'textobj-query:listexpr #3')
+
+call setline('.', '1foo1')
+let s:count = 0
+normal dab
+call setline('.', '2foo2')
+normal .
+call s:assert(getline('.'), '', 'textobj-query:listexpr #4')
 
 unlet g:textobj#sandwich#recipes
 %delete
