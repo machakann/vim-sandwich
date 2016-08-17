@@ -152,4 +152,38 @@ let g:sandwich#recipes = [
       \     'kind': ['delete', 'replace', 'query'],
       \     'input': ['F']
       \   },
+      \
+      \   {
+      \     'buns': 'sandwich#magicchar#i#input("operator")',
+      \     'kind': ['add', 'replace'],
+      \     'action': ['add'],
+      \     'listexpr': 1,
+      \     'input': ['i'],
+      \   },
+      \
+      \   {
+      \     'buns': 'sandwich#magicchar#i#input("textobj", 1)',
+      \     'kind': ['delete', 'replace', 'query'],
+      \     'listexpr': 1,
+      \     'regex': 1,
+      \     'synchro': 1,
+      \     'input': ['i'],
+      \   },
+      \
+      \   {
+      \     'buns': 'sandwich#magicchar#i#lastinput("operator", 1)',
+      \     'kind': ['add', 'replace'],
+      \     'action': ['add'],
+      \     'listexpr': 1,
+      \     'input': ['I'],
+      \   },
+      \
+      \   {
+      \     'buns': 'sandwich#magicchar#i#lastinput("textobj")',
+      \     'kind': ['delete', 'replace', 'query'],
+      \     'listexpr': 1,
+      \     'regex': 1,
+      \     'synchro': 1,
+      \     'input': ['I'],
+      \   },
       \ ]

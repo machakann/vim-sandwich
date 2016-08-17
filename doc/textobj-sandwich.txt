@@ -1,5 +1,5 @@
 *textobj-sandwich.txt*	The textobject plugin to select sandwiched texts.
-						Last change:12-May-2016.
+						Last change:16-Aug-2016.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -1184,48 +1184,6 @@ g:textobj#sandwich#latest_jump		*g:textobj#sandwich#latest_jump*
 	position to the latest jump marker |``|. If the cursor moved
 	unexpectedly, |``| command will restore the cursor position quickly.
 	The default value is 1.
-
-
-
-------------------------------------------------------------------------------
-|g:textobj#sandwich#default_recipes| has a unique recipe:
->
-	  {
-	\    'buns': [
-	\        'input("textobj-sandwich:head: ")',
-	\        'input("textobj-sandwich:tail: ")'
-	\    ],
-	\    'kind': ['delete', 'replace', 'query'],
-	\    'expr': 1,
-	\    'regex': 1,
-	\    'synchro': 1,
-	\    'input': ['i']
-	\ },
-<
-The meanings of these options are explained already. The important thing is
-that this recipe can be called by f key press and realizes the instant
-definition of recipe. This recipe is used like this. First call this recipe,
-for example, press `disi` on foobarbaz.
->
-	foobarbaz
-<
-Then the cursor is moved to command line area and prompts to input a deletion
-at the head. For example, assume that foo is input and pressed enter key.
->
-	operator-sandwich:head: foo
-<
-Next you would be prompted to input a deletion at the tail. For example,
-assume that baz is input and pressed enter key.
->
-	operator-sandwich:tail: baz
-<
-Finally you will get foobaz.
->
-	foobaz
-<
-You may think there are too many steps, but it can be repeated by |.| command.
-If you take into account the fact, it might be able to find the case it is
-useful.
 
 
 

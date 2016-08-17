@@ -391,9 +391,7 @@ endfunction
 if exists('g:operator#sandwich#default_recipes')
   unlockvar! g:operator#sandwich#default_recipes
 endif
-let g:operator#sandwich#default_recipes = [
-      \   {'buns': ['input("operator-sandwich:head: ")', 'input("operator-sandwich:tail: ")'], 'kind': ['add', 'replace'], 'action': ['add'], 'expr': 1, 'input': ['i']},
-      \ ]
+let g:operator#sandwich#default_recipes = []
 lockvar! g:operator#sandwich#default_recipes
 "}}}
 

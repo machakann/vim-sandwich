@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:14-Aug-2016.
+						Last change:16-Aug-2016.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -1443,46 +1443,6 @@ g:operator#sandwich#persistent_highlight
 
 	NOTE: |g:operator#sandwich#highlight_duration| が小さい場合は二つの選
 	      択肢にほとんど違いは見られないでしょう。
-
-
-
-------------------------------------------------------------------------------
-|g:operator#sandwich#default_recipes| は一つのユニークなレシピを持っています。
->
-	  {
-	\    'buns': [
-	\        'input("operator-sandwich:head: ")',
-	\        'input("operator-sandwich:tail: ")'
-	\    ],
-	\    'kind'  : ['add', 'replace'],
-	\    'action': ['add']
-	\    'expr'  : 1,
-	\    'input' : ['i']
-	\ },
-<
-一つ一つの要素の意味は上で説明されています。重要なのはこのレシピが f という
-input によって発火することと、その機能によりインスタントなレシピが定義できるこ
-とです。このように使います。まず、このレシピを呼びましょう、例えばカーソルを
-bar という文字列に合わせ saiwi と入力します。
->
-	bar
-<
-するとカーソルがコマンドラインへ移動し、先頭へ挿入する文字列を入力するよう求め
-られます。 foo とでも入れて <Enter> を押しましょう。
->
-	operator-sandwich:head: foo
-<
-次に末尾へ挿入する文字列を求められます。 baz とでも入れて <Enter> を押しましょ
-う。
->
-	operator-sandwich:tail: baz
-<
-これで文字列 foobarbaz が得られます。
->
-	foobarbaz
-<
-あるいは手順が冗長に感じる方もいると思いますが、この動作が |.| コマンドで繰り
-返せると考えると役に立つ場面もあるのではないでしょうか。
 
 
 

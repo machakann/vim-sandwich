@@ -1,4 +1,4 @@
-*sandwich.txt*				Last change:14-Aug-2016.
+*sandwich.txt*				Last change:16-Aug-2016.
 
 The set of operator and textobject plugins to edit sandwiched textobjects.
 
@@ -278,13 +278,15 @@ F~
 <
 
 i~
+I~
 	It realizes to define `I`nstant surroundings. `saiwi` ask user for
 	inputting former and latter surroundings. For example,
 	`saiwifoo<CR>bar<CR>` makes a word surrounded by `foo` and `bar`.
 	On the other hand `sdi` deletes arbitrary surroundings. For example,
-	`sdifoo<CR>bar<CR>` makes `foowordbar` to `word`. This is useful when
-	a lot of targets are there because the action could be repeated by |.|
-	command.
+	`sdifoo<CR>bar<CR>` makes `foowordbar` to `word`, the inputs would be
+	interpreted as regular expressions. This is useful when a lot of
+	targets are there because the action could be repeated by |.| command.
+	`sd{textobj}I`, `sdI` reuse the last inputs.
 
 
 t~

@@ -1,5 +1,5 @@
 *textobj-sandwich.jax*	『挟まれた』テキストを選択する。
-						Last change:12-May-2016.
+						Last change:16-Aug-2016.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -1170,47 +1170,6 @@ g:textobj#sandwich#latest_jump		*g:textobj#sandwich#latest_jump*
 	ーソル位置をマーク |``| に記録します。 これにより |``| コマンドでカー
 	ソルをその位置に戻すことができます。意図しない広い範囲を選択してしまっ
 	た際にカーソル位置を戻すのに便利です。デフォルト値は 1 です。
-
-
-
-------------------------------------------------------------------------------
-|g:textobj#sandwich#default_recipes| は一つのユニークなレシピを持っています。
->
-	  {
-	\    'buns': [
-	\        'input("textobj-sandwich:head: ")',
-	\        'input("textobj-sandwich:tail: ")'
-	\    ],
-	\    'kind': ['delete', 'replace', 'query'],
-	\    'expr': 1,
-	\    'regex': 1,
-	\    'synchro': 1,
-	\    'input': ['i']
-	\ },
-<
-一つ一つの要素の意味は上で説明されています。重要なのはこのレシピが f という
-input によって発火することと、その機能によりインスタントなレシピが定義できるこ
-とです。このように使います。まず、このレシピを呼びましょう、例えばカーソルを
-foobarbaz という文字列に合わせ disi と入力します。
->
-	foobarbaz
-<
-するとカーソルがコマンドラインへ移動し、前方の囲みにマッチする正規表現の入力を
-求められます。 foo とでも入れて <Enter> を押しましょう。
->
-	operator-sandwich:head: foo
-<
-次に後方の囲みにマッチする正規表現の入力を求められます。 baz とでも入れて
-<Enter> を押しましょう。
->
-	operator-sandwich:tail: baz
-<
-これで文字列 foobaz が得られます。
->
-	foobaz
-<
-あるいは手順が冗長に感じる方もいるかと思いますが、この動作が |.| コマンドで繰
-り返せると考えると役に立つ場面もあるのではないでしょうか。
 
 
 

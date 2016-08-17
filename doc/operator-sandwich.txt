@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:12-Aug-2016.
+						Last change:16-Aug-2016.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -1469,47 +1469,6 @@ g:operator#sandwich#persistent_highlight
 
 	NOTE: If |g:operator#sandwich#highlight_duration| is small, the two
 	      options would look like same.
-
-
-
-------------------------------------------------------------------------------
-|g:operator#sandwich#default_recipes| has a unique recipe:
->
-	  {
-	\    'buns': [
-	\        'input("operator-sandwich:head: ")',
-	\        'input("operator-sandwich:tail: ")'
-	\    ],
-	\    'kind'  : ['add', 'replace'],
-	\    'action': ['add']
-	\    'expr'  : 1,
-	\    'input' : ['i']
-	\ },
-<
-The meanings of these options are explained already. The important thing is
-that this recipe can be called by f key press and realizes the instant
-definition of recipe. This recipe is used like this. First call this recipe,
-for example, press `saiwi` on bar.
->
-	bar
-<
-Then the cursor is moved to command line area and prompts to input a addition
-to the head. For example, assume that foo is input and pressed enter key.
->
-	operator-sandwich:head: foo
-<
-Next you would be prompted to input a addition to the tail. For example,
-assume that baz is input and pressed enter key.
->
-	operator-sandwich:tail: baz
-<
-Finally you will get foobarbaz.
->
-	foobarbaz
-<
-You may think there are too many steps, but it can be repeated by |.| command.
-If you take into account the fact, it might be able to find the case it is
-useful.
 
 
 
