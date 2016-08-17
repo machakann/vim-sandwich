@@ -16,7 +16,15 @@ function! s:assert(a1, a2, kind) abort
   call append(0, ['Got:', string(a:a1)])
   call append(0, [printf('Failured at "%s"', a:kind), '', 'Expect:', string(a:a2)])
   $delete
-  execute printf('1,%dprint', line('$'))
+  1,$print
+  cquit
+endfunction
+
+function! s:quit_by_error() abort
+  %delete
+  call append(0, [printf('Catched the following error at %s.', v:throwpoint), v:exception])
+  $delete
+  1,$print
   cquit
 endfunction
 
@@ -31,6 +39,8 @@ function! ListCount(...) abort
 endfunction
 
 
+
+try
 
 """ operator-add
 " normal use
@@ -694,6 +704,10 @@ call s:assert(getline(1), '', 'textobj-auto: synchro option #3')
 call s:assert(getline(2), ' ', 'textobj-auto: synchro option #4')
 
 %delete
+
+catch
+  call s:quit_by_error()
+endtry
 
 
 
