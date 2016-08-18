@@ -1,4 +1,4 @@
-*sandwich.txt*				Last change:16-Aug-2016.
+*sandwich.txt*				Last change:18-Aug-2016.
 
 The set of operator and textobject plugins to edit sandwiched textobjects.
 
@@ -261,7 +261,8 @@ F~
 	Press `saiwf` to surround a word by function. After inputting `f` key,
 	user would be requested to input function name and press <CR>, then
 	the target textobject would be surrounded by parenthesis with the
-	function name.
+	function name. <Tab> key completes function names from the current
+	buffer in input.
 >
 	          arg      -- saiwffunc<CR> -->     func(arg)
 <
@@ -282,6 +283,7 @@ I~
 	It realizes to define `I`nstant surroundings. `saiwi` ask user for
 	inputting former and latter surroundings. For example,
 	`saiwifoo<CR>bar<CR>` makes a word surrounded by `foo` and `bar`.
+	<Tab> key completes words from the current buffer, just simply.
 	On the other hand `sdi` deletes arbitrary surroundings. For example,
 	`sdifoo<CR>bar<CR>` makes `foowordbar` to `word`, the inputs would be
 	interpreted as regular expressions. This is useful when a lot of
