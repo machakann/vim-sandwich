@@ -279,7 +279,7 @@ function! s:select(range) abort  "{{{
     call cursor(tail)
 
     " counter measure for the 'selection' option being 'exclusive'
-    if &selection == 'exclusive'
+    if &selection ==# 'exclusive'
       normal! l
     endif
   endif
