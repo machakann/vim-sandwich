@@ -2413,6 +2413,18 @@ function! s:suite.charwise_x_breaking() abort "{{{
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #4')
   call g:assert.equals(getpos("']"), [0, 5, 3, 0], 'failed at #4')
 
+  %delete
+
+  " #5
+  call setline('.', 'foo')
+  execute "normal 0viwsa\n"
+  call g:assert.equals(getline(1),   '',           'failed at #5')
+  call g:assert.equals(getline(2),   'foo',        'failed at #5')
+  call g:assert.equals(getline(3),   '',           'failed at #5')
+  call g:assert.equals(getpos('.'),  [0, 2, 1, 0], 'failed at #5')
+  call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #5')
+  call g:assert.equals(getpos("']"), [0, 3, 1, 0], 'failed at #5')
+
   unlet! g:operator#sandwich#recipes
 endfunction
 "}}}

@@ -73,9 +73,9 @@ function! s:act.add_pair(buns, stuff, undojoin) dict abort "{{{
       call map(self.added, 's:shift_added("s:shift_for_add", v:val, target, a:buns, indent, is_linewise)')
       call add(self.added, {
             \   'head1': head1,
-            \   'tail1': s:get_left_pos(tail1),
+            \   'tail1': is_linewise[0] ? tail1 : s:get_left_pos(tail1),
             \   'head2': head2,
-            \   'tail2': s:get_left_pos(tail2),
+            \   'tail2': is_linewise[1] ? tail2 : s:get_left_pos(tail2),
             \   'linewise': is_linewise
             \ })
     endif
@@ -636,7 +636,7 @@ function! s:push2(shifted_pos, target, addition, indent, is_linewise) abort  "{{
 endfunction
 "}}}
 function! s:push(shift, shifted_pos, head, addition, indent, is_linewise) abort  "{{{
-  let addition = split(a:addition, '\n', 1)
+  let addition = split(a:addition, '\%(\n\|\r\|\r\n\)', 1)
 
   " lnum
   let a:shift[1] += len(addition) - 1
@@ -667,7 +667,7 @@ function! s:pull1(shifted_pos, target, deletion, is_linewise) abort "{{{
     " column
     if s:is_ahead(a:shifted_pos, head) && a:shifted_pos[1] <= tail[1]
       if s:is_ahead(a:shifted_pos, tail)
-        let shift[2] -= strlen(split(a:deletion[0], '\n', 1)[-1])
+        let shift[2] -= strlen(split(a:deletion[0], '\%(\n\|\r\|\r\n\)', 1)[-1])
         let shift[2] += head[1] != a:shifted_pos[1] ? head[2] - 1 : 0
       else
         let shift[2] -= a:shifted_pos[2]
@@ -718,7 +718,7 @@ function! s:pull2(shifted_pos, target, deletion, is_linewise) abort "{{{
     " column
     if s:is_equal_or_ahead(a:shifted_pos, head) && a:shifted_pos[1] <= tail[1]
       if s:is_ahead(a:shifted_pos, tail)
-        let shift[2] -= strlen(split(a:deletion[1], '\n', 1)[-1])
+        let shift[2] -= strlen(split(a:deletion[1], '\%(\n\|\r\|\r\n\)', 1)[-1])
         let shift[2] += head[1] != a:shifted_pos[1] ? head[2] - 1 : 0
       else
         let shift[2] -= a:shifted_pos[2] + 1
