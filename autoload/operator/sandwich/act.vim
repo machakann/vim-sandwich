@@ -73,10 +73,10 @@ function! s:act.add_pair(buns, stuff, undojoin) dict abort "{{{
       call map(self.added, 's:shift_added("s:shift_for_add", v:val, target, a:buns, indent, is_linewise)')
       call add(self.added, {
             \   'head1': head1,
-            \   'tail1': is_linewise[0] ? tail1 : s:get_left_pos(tail1),
+            \   'tail1': s:added_tail(head1, tail1, is_linewise[0]),
             \   'head2': head2,
-            \   'tail2': is_linewise[1] ? tail2 : s:get_left_pos(tail2),
-            \   'linewise': is_linewise
+            \   'tail2': s:added_tail(head2, tail2, is_linewise[1]),
+            \   'linewise': is_linewise,
             \ })
     endif
 
@@ -740,6 +740,19 @@ function! s:pull2(shifted_pos, target, deletion, is_linewise) abort "{{{
     endif
   endif
   return a:shifted_pos
+endfunction
+"}}}
+function! s:added_tail(head, tail, linewise) abort  "{{{
+  if a:tail[1] > 1 && a:tail[2] == 1
+    let lnum = a:tail[1] - 1
+    let col = col([lnum, '$'])
+    let tail = [a:tail[0], lnum, col, a:tail[3]]
+  elseif a:linewise
+    let tail = a:tail
+  else
+    let tail = s:get_left_pos(a:tail)
+  endif
+  return tail
 endfunction
 "}}}
 
