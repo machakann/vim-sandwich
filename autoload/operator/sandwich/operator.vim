@@ -246,7 +246,7 @@ function! s:operator.add_once(i, recipe) dict abort  "{{{
   let buns = s:get_buns(a:recipe, self.opt.of('expr'), self.opt.of('listexpr'), self.message)
   let undojoin = a:i == 0 || self.state == 0 ? 0 : 1
   let modified = 0
-  if buns[0] !=# '' || buns[1] !=# ''
+  if buns[0] !=# '' || buns[1] !=# '' || self.opt.of('linewise')
     for j in range(self.n)
       let stuff = self.basket[j]
       if stuff.active
