@@ -8,10 +8,10 @@ nmap <silent> yss <Plug>(operator-sandwich-add)<SID>line
 onoremap <SID>gul g_
 nmap yS ys<SID>gul
 
-nmap ds <Plug>(operator-sandwich-delete)<Plug>(textobj-sandwich-query-a)
-nmap dss <Plug>(operator-sandwich-delete)<Plug>(textobj-sandwich-auto-a)
-nmap cs <Plug>(operator-sandwich-replace)<Plug>(textobj-sandwich-query-a)
-nmap css <Plug>(operator-sandwich-replace)<Plug>(textobj-sandwich-auto-a)
+nmap ds <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-query-a)
+nmap dss <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-auto-a)
+nmap cs <Plug>(operator-sandwich-replace)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-query-a)
+nmap css <Plug>(operator-sandwich-replace)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-auto-a)
 
 xmap S <Plug>(operator-sandwich-add)
 
