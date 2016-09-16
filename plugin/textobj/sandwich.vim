@@ -1,5 +1,5 @@
 " The vim textobject plugin to search and select 'sandwich' like structure
-" Last Change: 28-Mar-2016.
+" Last Change: 16-Sep-2016.
 " Maintainer : Masaaki Nakamura <mckn@outlook.com>
 
 " License    : NYSL
@@ -39,13 +39,13 @@ noremap <Plug>(sandwich-nop) <Nop>
 " If g:textobj_sandwich_no_default_key_mappings has been defined, then quit immediately.
 if exists('g:textobj_sandwich_no_default_key_mappings') | finish | endif
 
-omap ib <Plug>(textobj-sandwich-auto-i)
-xmap ib <Plug>(textobj-sandwich-auto-i)
-omap ab <Plug>(textobj-sandwich-auto-a)
-xmap ab <Plug>(textobj-sandwich-auto-a)
+silent! omap <unique> ib <Plug>(textobj-sandwich-auto-i)
+silent! xmap <unique> ib <Plug>(textobj-sandwich-auto-i)
+silent! omap <unique> ab <Plug>(textobj-sandwich-auto-a)
+silent! xmap <unique> ab <Plug>(textobj-sandwich-auto-a)
 
-omap is <Plug>(textobj-sandwich-query-i)
-xmap is <Plug>(textobj-sandwich-query-i)
-omap as <Plug>(textobj-sandwich-query-a)
-xmap as <Plug>(textobj-sandwich-query-a)
+silent! omap <unique> is <Plug>(textobj-sandwich-query-i)
+silent! xmap <unique> is <Plug>(textobj-sandwich-query-i)
+silent! omap <unique> as <Plug>(textobj-sandwich-query-a)
+silent! xmap <unique> as <Plug>(textobj-sandwich-query-a)
 
