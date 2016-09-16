@@ -246,7 +246,7 @@ function! s:operator.add_once(i, recipe) dict abort  "{{{
   let buns = s:get_buns(a:recipe, self.opt.of('expr'), self.opt.of('listexpr'), self.message)
   let undojoin = a:i == 0 || self.state == 0 ? 0 : 1
   let modified = 0
-  if buns[0] !=# '' || buns[1] !=# ''
+  if buns[0] !=# '' || buns[1] !=# '' || self.opt.of('linewise')
     for j in range(self.n)
       let stuff = self.basket[j]
       if stuff.active
@@ -726,6 +726,7 @@ function! s:shift_options(kind, mode) abort "{{{
   let options = {}
   let options.virtualedit = &virtualedit
   let options.whichwrap   = &whichwrap
+  let options.cpoptions   = &cpoptions
 
   """ tweak appearance
   " hide_cursor
@@ -752,6 +753,8 @@ function! s:shift_options(kind, mode) abort "{{{
   """ shift options
   set virtualedit=onemore
   set whichwrap=h,l
+  set cpoptions-=l
+  set cpoptions-=\
   return options
 endfunction
 "}}}
@@ -769,6 +772,7 @@ function! s:restore_options(kind, mode, options) abort "{{{
 
   let &virtualedit = a:options.virtualedit
   let &whichwrap   = a:options.whichwrap
+  let &cpoptions   = a:options.cpoptions
 endfunction
 "}}}
 function! s:get_assigned_region(kind, motionwise) abort "{{{

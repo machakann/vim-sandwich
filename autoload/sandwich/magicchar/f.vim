@@ -9,8 +9,10 @@ let s:null_pos  = [0, 0]
 " patchs
 if v:version > 704 || (v:version == 704 && has('patch237'))
   let s:has_patch_7_4_1685 = has('patch-7.4.1685')
+  let s:has_patch_7_4_2011 = has('patch-7.4.2011')
 else
   let s:has_patch_7_4_1685 = v:version == 704 && has('patch1685')
+  let s:has_patch_7_4_2011 = v:version == 704 && has('patch2011')
 endif
 "}}}
 
@@ -47,7 +49,11 @@ let s:patterns['julia'] = [
 function! sandwich#magicchar#f#fname() abort  "{{{
   call operator#sandwich#show()
   echohl MoreMsg
-  let funcname = input('funcname: ', '', 'custom,sandwich#magicchar#f#fnamecompl')
+  if &filetype ==# 'vim'
+    let funcname = input('funcname: ', '', 'custom,sandwich#magicchar#f#fnamecompl_vim')
+  else
+    let funcname = input('funcname: ', '', 'custom,sandwich#magicchar#f#fnamecompl')
+  endif
   echohl NONE
   call operator#sandwich#quench()
   if funcname ==# ''
@@ -67,6 +73,15 @@ function! sandwich#magicchar#f#fnamecompl(ArgLead, CmdLine, CursorPos) abort  "{
     endfor
   endfor
   return join(uniq(sort(list)), "\n")
+endfunction
+"}}}
+function! sandwich#magicchar#f#fnamecompl_vim(ArgLead, CmdLine, CursorPos) abort  "{{{
+  let fnames = ''
+  if s:has_patch_7_4_2011
+    let fnames .= join(map(filter(getcompletion(a:ArgLead, 'function'), 'v:val =~# ''\C^[a-z][a-zA-Z0-9_]*($'''), 'matchstr(v:val, ''\C^[a-z][a-zA-Z0-9_]*'')'), "\n")
+  endif
+  let fnames .= sandwich#magicchar#f#fnamecompl(a:ArgLead, a:CmdLine, a:CursorPos)
+  return fnames
 endfunction
 "}}}
 function! s:extract_pattern(string, pat) abort "{{{
