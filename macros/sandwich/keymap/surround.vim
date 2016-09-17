@@ -25,6 +25,21 @@ endif
 " Default recipes
 let g:sandwich#recipes = [
       \   {
+      \     'buns':         ['', ''],
+      \     'action':       ['add'],
+      \     'motionwise':   ['line'],
+      \     'linewise':     1,
+      \     'input':        ["\<CR>"]
+      \   },
+      \
+      \   {
+      \     'buns':         ['^$', '^$'],
+      \     'regex':        1,
+      \     'linewise':     1,
+      \     'input':        ["\<CR>"]
+      \   },
+      \
+      \   {
       \     'buns':         ['<', '>'],
       \     'expand_range': 0,
       \     'match_syntax': 1,
