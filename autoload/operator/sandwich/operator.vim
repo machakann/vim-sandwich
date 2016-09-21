@@ -198,9 +198,9 @@ endfunction
 "}}}
 function! s:operator.add() dict abort "{{{
   let opt = self.opt
-  let opt_highlight = opt.of('highlight', '')
-  let hi_group = opt_highlight >= 2 ? 'OperatorSandwichStuff' : 'OperatorSandwichBuns'
+  let hi_group = opt.of('highlight', '') >= 2 ? 'OperatorSandwichStuff' : 'OperatorSandwichBuns'
 
+  let modified = 0
   for i in range(self.count)
     call self.set_target()
     if self.state
@@ -227,18 +227,15 @@ function! s:operator.add() dict abort "{{{
     endif
 
     call self.skip_space(i)
-    call self.add_once(i, recipe)
+    let modified = self.add_once(i, recipe) || modified
     call opt.clear('recipe_add')
   endfor
 
-  if opt_highlight >= 3 && !empty(self.last_succeeded())
-    let hi_method   = s:get('persistent_highlight', 'glow')
-    let hi_duration = opt.of('hi_duration', '')
-    if hi_method ==# 'glow' && s:has_timer
-      call self.glow('added', 'OperatorSandwichAdd', hi_duration)
-    else
-      call self.blink('added', 'OperatorSandwichAdd', hi_duration)
-    endif
+  if modified
+    call self.highlight_added(opt)
+
+    " visualrepeat.vim support
+    silent! call visualrepeat#set("\<Plug>(operator-sandwich-add-visualrepeat)", self.count)
   endif
 endfunction
 "}}}
@@ -263,6 +260,7 @@ function! s:operator.add_once(i, recipe) dict abort  "{{{
       let self.cursor.tail = s:get_left_pos(self.modmark.tail)
     endif
   endif
+  return modified
 endfunction
 "}}}
 function! s:operator.delete() dict abort  "{{{
@@ -270,6 +268,7 @@ function! s:operator.delete() dict abort  "{{{
   let opt_highlight = self.opt.of('highlight', '')
   let hi_duration   = self.opt.of('hi_duration', '')
   let hi_group = opt_highlight >= 2 ? 'OperatorSandwichDelete' : 'OperatorSandwichBuns'
+  let modified = 0
   for i in range(self.count)
     if !self.match(i)
       break
@@ -279,8 +278,13 @@ function! s:operator.delete() dict abort  "{{{
       let hi_exited = self.blink('target', hi_group, hi_duration, self.opt.of('linewise'))
     endif
 
-    call self.delete_once(i)
+    let modified = self.delete_once(i) || modified
   endfor
+
+  if modified
+    " visualrepeat.vim support
+    silent! call visualrepeat#set("\<Plug>(operator-sandwich-delete-visualrepeat)", self.count)
+  endif
 endfunction
 "}}}
 function! s:operator.delete_once(i) dict abort "{{{
@@ -298,15 +302,16 @@ function! s:operator.delete_once(i) dict abort "{{{
     let self.cursor.head = copy(self.modmark.head)
     let self.cursor.tail = s:get_left_pos(self.modmark.tail)
   endif
+  return modified
 endfunction
 "}}}
 function! s:operator.replace() dict abort  "{{{
   let opt = self.opt
-  let opt_highlight = opt.of('highlight', '')
-  let hi_group = opt_highlight >= 2 ? 'OperatorSandwichDelete' : 'OperatorSandwichBuns'
+  let hi_group = opt.of('highlight', '') >= 2 ? 'OperatorSandwichDelete' : 'OperatorSandwichBuns'
   let self.cursor.inner_head = copy(s:null_pos)
   let self.cursor.inner_tail = copy(s:null_pos)
 
+  let modified = 0
   for i in range(self.count)
     if !self.match(i)
       break
@@ -335,18 +340,15 @@ function! s:operator.replace() dict abort  "{{{
       break
     endif
 
-    call self.replace_once(i, recipe)
+    let modified = self.replace_once(i, recipe) || modified
     call opt.clear('recipe_add')
   endfor
 
-  if opt_highlight >= 3 && !empty(self.last_succeeded())
-    let hi_duration = opt.of('hi_duration', '')
-    let hi_method   = s:get('persistent_highlight', 'glow')
-    if hi_method ==# 'glow' && s:has_timer
-      call self.glow('added', 'OperatorSandwichAdd', hi_duration)
-    else
-      call self.blink('added', 'OperatorSandwichAdd', hi_duration)
-    endif
+  if modified
+    call self.highlight_added(opt)
+
+    " visualrepeat.vim support
+    silent! call visualrepeat#set("\<Plug>(operator-sandwich-replace-visualrepeat)", self.count)
   endif
 endfunction
 "}}}
@@ -369,6 +371,7 @@ function! s:operator.replace_once(i, recipe) dict abort  "{{{
     let self.cursor.head = copy(self.modmark.head)
     let self.cursor.tail = s:get_left_pos(self.modmark.tail)
   endif
+  return modified
 endfunction
 "}}}
 function! s:operator.set_target() dict abort  "{{{
@@ -563,6 +566,18 @@ function! s:operator.glow(place, hi_group, duration, ...) dict abort "{{{
       autocmd!
       execute printf('autocmd TextChanged <buffer> call s:queue_canceler(%s)', id)
     augroup END
+  endif
+endfunction
+"}}}
+function! s:operator.highlight_added(opt) dict abort  "{{{
+  if a:opt.of('highlight', '') >= 3
+    let hi_duration = a:opt.of('hi_duration', '')
+    let hi_method = s:get('persistent_highlight', 'glow')
+    if hi_method ==# 'glow' && s:has_timer
+      call self.glow('added', 'OperatorSandwichAdd', hi_duration)
+    else
+      call self.blink('added', 'OperatorSandwichAdd', hi_duration)
+    endif
   endif
 endfunction
 "}}}

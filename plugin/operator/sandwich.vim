@@ -1,5 +1,5 @@
 " The vim operator plugin to do well with 'sandwich' like structure
-" Last Change: 05-Apr-2016.
+" Last Change: 21-Sep-2016.
 " Maintainer : Masaaki Nakamura <mckn@outlook.jp>
 
 " License    : NYSL
@@ -30,6 +30,11 @@ onoremap <expr><silent> <Plug>(operator-sandwich-release-count) operator#sandwic
 onoremap <expr><silent> <Plug>(operator-sandwich-squash-count)  operator#sandwich#squash_count()
 nnoremap <expr><silent> <Plug>(operator-sandwich-predot) operator#sandwich#predot()
 nnoremap <expr><silent> <Plug>(operator-sandwich-dot)    operator#sandwich#dot()
+
+" visualrepeat.vim (vimscript #3848) support
+noremap <silent> <Plug>(operator-sandwich-add-visualrepeat)     :<C-u>call operator#sandwich#visualrepeat('add')<CR>
+noremap <silent> <Plug>(operator-sandwich-delete-visualrepeat)  :<C-u>call operator#sandwich#visualrepeat('delete')<CR>
+noremap <silent> <Plug>(operator-sandwich-replace-visualrepeat) :<C-u>call operator#sandwich#visualrepeat('replace')<CR>
 
 " highlight group
 function! s:default_highlight() abort

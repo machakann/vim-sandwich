@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:16-Aug-2016.
+						Last change:21-Sep-2016.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -9,6 +9,7 @@ License : NYSL license
  Requirement:	Vim 7.4 or higher
 		|+reltime| feature (optional)
 		|+float| feature (optional)
+		visualrepeat.vim (vimscript #3848) plugin (optional)
 
 ==============================================================================
 CONTENTS				*operator-sandwich-contents*
@@ -59,6 +60,7 @@ MISCELLANEOUS			|operator-sandwich-miscellaneous|
   What is special about the query1st series mappings?
   There is conflict with auto-complete plugins.
   About the handlings of recipe-local options in the replace operator.
+  About the visualrepeat.vim plugin support
 
 ==============================================================================
 TL;DR
@@ -1867,6 +1869,14 @@ About the handlings of recipe-local options in the replace operator.~
 
 	`indentkeys-`
 	The recipe for add action is used.
+
+
+
+About the visualrepeat.vim plugin support~
+	This plugin has the support for visualrepeat.vim plugin support. User
+	has nothing to do for use of it other than installing visualrepeat.vim
+	(vimscript #3848) plugin. If the plugin has been successfully
+	installed, |.| command works also in |Visual-mode|.
 
 
 

@@ -270,6 +270,26 @@ function! operator#sandwich#dot() abort  "{{{
 endfunction
 "}}}
 
+" visualrepeat.vim (vimscript #3848) support
+function! operator#sandwich#visualrepeat(kind) abort  "{{{
+  let operator = g:operator#sandwich#object
+  let original_mode = operator.mode
+  let operator.mode = 'x'
+  try
+    normal! gv
+    let operator.cursor.keepable = 1
+    let operator.cursor.keep[0:3] = getpos('.')[0:3]
+
+    let l:count = v:count ? v:count : ''
+    let &l:operatorfunc = 'operator#sandwich#' . a:kind
+    let cmd = printf("normal! %sg@", l:count)
+    execute cmd
+  finally
+    let operator.mode = original_mode
+  endtry
+endfunction
+"}}}
+
 " API
 function! operator#sandwich#show(...) abort  "{{{
   if !exists('g:operator#sandwich#object') || !g:operator#sandwich#object.at_work

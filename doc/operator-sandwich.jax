@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:16-Aug-2016.
+						Last change:21-Sep-2016.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -9,6 +9,7 @@
 必須要件:	Vim 7.4 かそれ以降のバージョン
 		|+reltime| 機能 (任意)
 		|+float| 機能 (任意)
+		visualrepeat.vim (vimscript #3848) プラグイン (任意)
 
 ==============================================================================
 CONTENTS				*operator-sandwich-contents*
@@ -59,6 +60,7 @@ MISCELLANEOUS			|operator-sandwich-miscellaneous|
   Query1st 系列のキーマッピングは何のためにある？
   自動補完プラグインと衝突する
   置換オペレータにおけるレシピに指定されたオプションの扱いについて
+  visualrepeat.vim プラグイン対応について
 
 ==============================================================================
 TL;DR
@@ -1832,6 +1834,14 @@ Query1st 系列のキーマッピングは何のためにある？~
 
 	`indentkeys-`
 	挿入文字列を指定したレシピが使われます。
+
+
+
+visualrepeat.vim プラグイン対応について
+	このプラグインは visualrepeat.vim プラグイン (vimscript #3848) に対応
+	しています。このプラグインを利用するうえでユーザーが特別な設定をする
+	必要はありません。上記のプラグインが正しくインストールされていれば、
+	ビジュアルモードにおいても |.| コマンドが機能するようになります。
 
 
 
