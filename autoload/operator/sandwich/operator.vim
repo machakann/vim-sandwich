@@ -31,6 +31,9 @@ endif
 " features
 let s:has_gui_running = has('gui_running')
 let s:has_timer       = has('timers')
+
+" visualrepeat.vim (vimscript #3848) support
+let s:visualrepeat_exists = -1
 "}}}
 
 function! operator#sandwich#operator#new() abort  "{{{
@@ -235,7 +238,7 @@ function! s:operator.add() dict abort "{{{
     call self.highlight_added(opt)
 
     " visualrepeat.vim support
-    silent! call visualrepeat#set("\<Plug>(operator-sandwich-add-visualrepeat)", self.count)
+    call s:visualrepeat_set('add', self.count)
   endif
 endfunction
 "}}}
@@ -283,7 +286,7 @@ function! s:operator.delete() dict abort  "{{{
 
   if modified
     " visualrepeat.vim support
-    silent! call visualrepeat#set("\<Plug>(operator-sandwich-delete-visualrepeat)", self.count)
+    call s:visualrepeat_set('delete', self.count)
   endif
 endfunction
 "}}}
@@ -348,7 +351,7 @@ function! s:operator.replace() dict abort  "{{{
     call self.highlight_added(opt)
 
     " visualrepeat.vim support
-    silent! call visualrepeat#set("\<Plug>(operator-sandwich-replace-visualrepeat)", self.count)
+    call s:visualrepeat_set('replace', self.count)
   endif
 endfunction
 "}}}
@@ -731,6 +734,15 @@ function! s:expr_filter(candidate) abort  "{{{
       endif
     endfor
     return 1
+  endif
+endfunction
+"}}}
+
+" visualrepeat.vim (vimscript #3848) support
+function! s:visualrepeat_set(kind, count) abort  "{{{
+  if !exists('g:operator_sandwich_no_visualrepeat')
+    let key = printf("\<Plug>(operator-sandwich-%s-visualrepeat)", a:kind)
+    silent! call visualrepeat#set(key, a:count)
   endif
 endfunction
 "}}}

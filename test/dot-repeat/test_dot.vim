@@ -6,6 +6,7 @@ source <sfile>:p:h:h:h/plugin/operator/sandwich.vim
 source <sfile>:p:h:h:h/plugin/textobj/sandwich.vim
 source <sfile>:p:h:h:h/plugin/sandwich.vim
 nnoremap <Plug>(test-dot) .
+let g:operator_sandwich_no_visualrepeat = 1
 
 function! s:assert(a1, a2, kind) abort
   if type(a:a1) == type(a:a2) && string(a:a1) ==# string(a:a2)

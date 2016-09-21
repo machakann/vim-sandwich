@@ -2,6 +2,7 @@ set encoding=utf-8
 execute 'set runtimepath+=' . expand('<sfile>:p:h:h')
 runtime! <sfile>:p:h:h/plugin/*.vim
 set noswapfile
+let g:operator_sandwich_no_visualrepeat = 1
 
 let g:assert = themis#helper('assert')
 
