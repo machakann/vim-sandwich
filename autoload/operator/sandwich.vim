@@ -41,25 +41,7 @@ function! operator#sandwich#prerequisite(kind, mode, ...) abort "{{{
   let operator.recipes.arg = get(a:000, 1, [])
   let operator.recipes.arg_given = a:0 > 1
 
-  if a:mode ==# 'x' && visualmode() ==# "\<C-v>"
-    " The case for blockwise selections in visual mode
-    " NOTE: 'is_extended' could be recorded safely only at here. Do not move.
-    let reg = ['"', getreg('"'), getregtype('"')]
-    try
-      normal! gv
-      let is_extended = winsaveview().curswant == s:constants('colmax')
-      silent normal! ""y
-      let regtype = getregtype('"')
-    finally
-      call call('setreg', reg)
-    endtry
-
-    let operator.extended   = is_extended
-    let operator.blockwidth = str2nr(regtype[1:])
-  else
-    let operator.extended   = 0
-    let operator.blockwidth = 0
-  endif
+  let [operator.extended, operator.blockwidth] = s:blockwisevisual_info(a:mode)
 
   let &l:operatorfunc = 'operator#sandwich#' . a:kind
   let s:operator = a:kind
@@ -78,6 +60,27 @@ function! operator#sandwich#keymap(kind, mode, ...) abort "{{{
   let cmd = a:mode ==# 'x' ? 'gvg@' : 'g@'
   call feedkeys(cmd, 'n')
   return
+endfunction
+"}}}
+function! s:blockwisevisual_info(mode) abort  "{{{
+  if a:mode ==# 'x' && visualmode() ==# "\<C-v>"
+    " The case for blockwise selections in visual mode
+    " NOTE: 'extended' could be recorded safely only at here. Do not move.
+    let reg = ['"', getreg('"'), getregtype('"')]
+    try
+      normal! gv
+      let extended = winsaveview().curswant == s:constants('colmax')
+      silent normal! ""y
+      let regtype = getregtype('"')
+    finally
+      call call('setreg', reg)
+    endtry
+    let blockwidth = str2nr(regtype[1:])
+  else
+    let extended   = 0
+    let blockwidth = 0
+  endif
+  return [extended, blockwidth]
 endfunction
 "}}}
 
@@ -273,8 +276,13 @@ endfunction
 " visualrepeat.vim (vimscript #3848) support
 function! operator#sandwich#visualrepeat(kind) abort  "{{{
   let operator = g:operator#sandwich#object
+
   let original_mode = operator.mode
+  let original_extended = operator.extended
+  let original_blockwidth = operator.blockwidth
+
   let operator.mode = 'x'
+  let [operator.extended, operator.blockwidth] = s:blockwisevisual_info('x')
   try
     normal! gv
     let operator.cursor.keepable = 1
@@ -286,6 +294,8 @@ function! operator#sandwich#visualrepeat(kind) abort  "{{{
     execute cmd
   finally
     let operator.mode = original_mode
+    let operator.extended = original_extended
+    let operator.blockwidth = original_blockwidth
   endtry
 endfunction
 "}}}
