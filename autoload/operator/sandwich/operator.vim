@@ -193,9 +193,7 @@ function! s:operator.fill() dict abort  "{{{
   let lack = self.n - len(self.basket)
   if lack > 0
     let fillings = map(range(lack), 'operator#sandwich#stuff#new()')
-    for stuff in fillings
-      call stuff.initialize(self.cursor, self.modmark, self.count)
-    endfor
+    call extend(self.basket, fillings)
   endif
 endfunction
 "}}}
