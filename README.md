@@ -23,7 +23,7 @@ For example, key sequences `srb"` or `sr("` makes **(foo)** to **"foo"**.
 
 That's all. Now you already know enough about `sandwich.vim`. If you are using [vim-surround](https://github.com/tpope/vim-surround), you can use a preset keymappings similar as it. See [here](https://github.com/machakann/vim-sandwich/wiki/Introduce-vim-surround-keymappings)
 
-`sandwich.vim` has some functional input for *{addition}*/*{deletion}*. Check [here](https://github.com/machakann/vim-sandwich/wiki/Magic-character)!
+`sandwich.vim` has some functional input for *{addition}*/*{deletion}*. Check [here](https://github.com/machakann/vim-sandwich/wiki/Magic-characters)!
 
 # Design
 
