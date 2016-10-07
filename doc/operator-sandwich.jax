@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:21-Sep-2016.
+						Last change:07-Oct-2016.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -1742,7 +1742,7 @@ Query1st 系列のキーマッピングは何のためにある？~
 	   キーマッピングを設定しなおすことで上書きできます。
 >
 	nmap <silent> <Plug>(operator-sandwich-add-query1st)
-	  \ operator#sandwich#query1st('add', 'n', {'query_once': 0})<CR>
+	  \ :<C-u>call operator#sandwich#query1st('add', 'n', {'query_once': 0})<CR>
 
 	nmap ssa <Plug>(operator-sandwich-add-query1st)
 <

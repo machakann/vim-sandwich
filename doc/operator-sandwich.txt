@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:21-Sep-2016.
+						Last change:07-Oct-2016.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -1777,7 +1777,7 @@ What is special about the query1st series mappings?~
 	   |operator#sandwich#query1st()| function to re-define keymapping.
 >
 	nmap <silent> <Plug>(operator-sandwich-add-query1st)
-	  \ operator#sandwich#query1st('add', 'n', {'query_once': 0})<CR>
+	  \ :<C-u>call operator#sandwich#query1st('add', 'n', {'query_once': 0})<CR>
 
 	nmap ssa <Plug>(operator-sandwich-add-query1st)
 <
