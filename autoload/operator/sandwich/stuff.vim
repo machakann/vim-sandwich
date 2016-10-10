@@ -70,16 +70,17 @@ function! s:stuff.set_target() dict abort  "{{{
   endif
 endfunction
 "}}}
-function! s:stuff.match(recipes, opt) dict abort "{{{
+function! s:stuff.match(recipes, opt, ...) dict abort "{{{
   if !self.active
     return 0
   endif
 
   let edges = self.edges
   let edges_saved = deepcopy(edges)
+  let match_edges = get(a:000, 0, 1)
   if s:is_valid_2pos(edges) && s:is_ahead(edges.tail, edges.head)
     let edge_chars = ['', '']
-    if self._match_recipes(a:recipes, a:opt) || self._match_edges(a:recipes, a:opt, edge_chars)
+    if self._match_recipes(a:recipes, a:opt) || (match_edges && self._match_edges(a:recipes, a:opt, edge_chars))
       " found!
       return 1
     else

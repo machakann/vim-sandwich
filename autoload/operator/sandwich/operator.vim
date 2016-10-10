@@ -56,9 +56,9 @@ let s:operator = {
       \   'basket'    : [],
       \   'recipes'   : {
       \     'arg'       : [],
-      \     'synchro'   : [],
       \     'integrated': [],
       \     'dog_ear'   : [],
+      \     'synchro': {'on': 0, 'kind': '', 'recipe': {}},
       \   },
       \   'cursor': {
       \     'head'      : copy(s:null_pos),
@@ -471,20 +471,24 @@ function! s:operator.match(i) dict abort  "{{{
   let opt = self.opt
   let default_expr     = opt.get('expr',     '', 0)
   let default_listexpr = opt.get('listexpr', '', 0)
+  let source = self.recipes.synchro.on && self.recipes.synchro.kind ==# 'query'
+           \ ? self.recipes.synchro.recipe
+           \ : self.recipes.integrated
   let filter = 's:has_action(v:val, "delete")
            \ && s:is_not_expr(v:val, default_expr, default_listexpr)
            \ && s:is_appropriate_patterns(v:val)'
-  let recipes = filter(deepcopy(self.recipes.integrated), filter)
+  let recipes = filter(deepcopy(source), filter)
 
   " uniq recipes
   call s:uniq_recipes(recipes, opt.of('regex'), opt.get('noremap', ''))
 
   let success = 0
+  let match_edges = !self.recipes.synchro.on
   for j in range(self.n)
     let stuff = self.basket[j]
     let act = stuff.acts[a:i]
     let act.opt = deepcopy(self.opt)
-    let success = stuff.match(recipes, act.opt) || success
+    let success = stuff.match(recipes, act.opt, match_edges) || success
   endfor
   return success
 endfunction
@@ -655,7 +659,9 @@ function! s:operator.recipes.integrate(kind, motionwise, mode) dict abort  "{{{
     let self.integrated += sandwich#get_recipes()
     let self.integrated += operator#sandwich#get_recipes()
   endif
-  let self.integrated += self.synchro
+  if self.synchro.on
+    let self.integrated += self.synchro.recipe
+  endif
   let filter = 's:has_filetype(v:val)
            \ && s:has_kind(v:val, a:kind)
            \ && s:has_motionwise(v:val, a:motionwise)

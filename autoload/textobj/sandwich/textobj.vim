@@ -281,7 +281,7 @@ function! s:textobj.select(target) dict abort  "{{{
       normal! l
     endif
 
-    call operator#sandwich#synchronize(a:target.synchronized_recipe())
+    call operator#sandwich#synchronize(self.kind, a:target.synchronized_recipe())
     let self.done = 1
   else
     if self.mode ==# 'x'

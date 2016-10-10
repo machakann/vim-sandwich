@@ -399,9 +399,11 @@ function! operator#sandwich#is_in_cmd_window() abort  "{{{
   return s:is_in_cmdline_window
 endfunction
 "}}}
-function! operator#sandwich#synchronize(recipe) abort "{{{
+function! operator#sandwich#synchronize(kind, recipe) abort "{{{
   if exists('g:operator#sandwich#object') && !empty(a:recipe)
-    let g:operator#sandwich#object.recipes.synchro = [a:recipe]
+    let g:operator#sandwich#object.recipes.synchro.on = 1
+    let g:operator#sandwich#object.recipes.synchro.kind = a:kind
+    let g:operator#sandwich#object.recipes.synchro.recipe = [a:recipe]
   endif
 endfunction
 "}}}

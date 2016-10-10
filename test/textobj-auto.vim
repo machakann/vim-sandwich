@@ -9,6 +9,7 @@ function! s:suite.before_each() abort "{{{
   set virtualedit&
   set whichwrap&
   call textobj#sandwich#set_default()
+  call operator#sandwich#set_default()
   unlet! g:sandwich#recipes
   unlet! g:textobj#sandwich#recipes
   silent! xunmap i{
@@ -17,6 +18,7 @@ function! s:suite.before_each() abort "{{{
   silent! ounmap aab
   silent! nunmap sd
   silent! xunmap sd
+  silent! nunmap sdb
 endfunction
 "}}}
 function! s:suite.after() abort "{{{
@@ -4096,7 +4098,7 @@ function! s:suite.a_o_option_synchro() abort  "{{{
   call g:assert.equals(getline('.'), 'foo', 'failed at #2')
 
   let g:textobj#sandwich#recipes = [{'buns': ['(', ')'], 'synchro': 1, 'nesting': 1}]
-  call textobj#sandwich#set('query', 'synchro', 0)
+  call textobj#sandwich#set('auto', 'synchro', 0)
 
   " #3
   call setline('.', '(foo)')
@@ -4111,6 +4113,7 @@ function! s:suite.a_o_option_synchro() abort  "{{{
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [{'external': ['it', 'at']}]
   let g:operator#sandwich#recipes = []
+  call textobj#sandwich#set('auto', 'synchro', 1)
 
   " #5
   call setline('.', '<bar>foo</bar>')
@@ -4123,7 +4126,7 @@ function! s:suite.a_o_option_synchro() abort  "{{{
   call g:assert.equals(getline('.'), 'foo', 'failed at #6')
 
   let g:textobj#sandwich#recipes = [{'external': ['it', 'at'], 'synchro': 1}]
-  call textobj#sandwich#set('query', 'synchro', 0)
+  call textobj#sandwich#set('auto', 'synchro', 0)
 
   " #7
   call setline('.', '<bar>foo</bar>')
@@ -4134,6 +4137,24 @@ function! s:suite.a_o_option_synchro() abort  "{{{
   call setline('.', '<baz><bar>foo</bar></baz>')
   normal 0ff2sd2ab
   call g:assert.equals(getline('.'), 'foo', 'failed at #8')
+
+  let g:sandwich#recipes = [{'buns': ['(', ')'], 'nesting': 1}, {'buns': ["'", "'"], 'nesting': 0}]
+  let g:textobj#sandwich#recipes = []
+  let g:operator#sandwich#recipes = []
+  call textobj#sandwich#set('auto', 'synchro', 1)
+  nmap sdb <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-synchro-count)<Plug>(textobj-sandwich-auto-a)
+
+  " #9
+  call setline('.', "(a'b((c))b'a)")
+  normal 0fc3sdb
+  call g:assert.equals(getline('.'), '(ab((c))ba)', 'failed at #9')
+
+  call operator#sandwich#set('all', 'all', 'skip_char', 1)
+
+  " #10
+  call setline('.', "(a'b((c))b'a)")
+  normal 0fc3sdb
+  call g:assert.equals(getline('.'), '(abcba)', 'failed at #10')
 endfunction
 "}}}
 function! s:suite.a_o_option_skip_expr() abort  "{{{

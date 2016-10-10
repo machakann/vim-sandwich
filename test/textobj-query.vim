@@ -9,6 +9,7 @@ function! s:suite.before_each() abort "{{{
   set virtualedit&
   set whichwrap&
   call textobj#sandwich#set_default()
+  call operator#sandwich#set_default()
   unlet! g:sandwich#recipes
   unlet! g:textobj#sandwich#recipes
   silent! xunmap i{
@@ -4168,6 +4169,24 @@ function! s:suite.a_o_option_synchro() abort  "{{{
   call setline('.', '<baz><bar>foo</bar></baz>')
   normal 0ff2sd2ast
   call g:assert.equals(getline('.'), 'foo', 'failed at #8')
+
+  let g:sandwich#recipes = [{'buns': ['(', ')'], 'nesting': 1}, {'buns': ["'", "'"], 'nesting': 0}]
+  let g:textobj#sandwich#recipes = []
+  let g:operator#sandwich#recipes = []
+  call textobj#sandwich#set('query', 'synchro', 1)
+  nmap sd <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-synchro-count)<Plug>(textobj-sandwich-query-a)
+
+  " #9
+  call setline('.', "(a'b((c))b'a)")
+  normal 0fc3sd(
+  call g:assert.equals(getline('.'), "a'b((c))b'a", 'failed at #9')
+
+  call operator#sandwich#set('all', 'all', 'skip_char', 1)
+
+  " #10
+  call setline('.', "(a'b((c))b'a)")
+  normal 0fc3sd(
+  call g:assert.equals(getline('.'), "a'bcb'a", 'failed at #10')
 endfunction
 "}}}
 function! s:suite.a_o_option_skip_expr() abort  "{{{
