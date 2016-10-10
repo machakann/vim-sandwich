@@ -123,6 +123,7 @@ function! s:highlight.quench() dict abort "{{{
   if succeeded
     let self.status = 0
     let self.group = ''
+    call filter(self.order_list, 0)
   endif
   return succeeded
 endfunction
