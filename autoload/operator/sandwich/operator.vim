@@ -495,12 +495,12 @@ endfunction
 "}}}
 function! s:operator.show(place, hi_group, ...) dict abort "{{{
   let force = get(a:000, 1, 0)
-  let success = 0
+  let success = 1
   if self.opt.of('highlight') || force
     let linewise = get(a:000, 0, 0)
     for i in range(self.n)
       let stuff = self.basket[i]
-      let success = stuff.show(a:place, a:hi_group, linewise) || success
+      let success = stuff.show(a:place, a:hi_group, linewise) && success
     endfor
     call winrestview(self.view)
     redraw
@@ -510,11 +510,11 @@ endfunction
 "}}}
 function! s:operator.quench(place, ...) dict abort "{{{
   let force = get(a:000, 0, 0)
-  let success = 0
+  let success = 1
   if self.opt.of('highlight') || force
     for i in range(self.n)
       let stuff = self.basket[i]
-      let success = stuff.quench(a:place) || success
+      let success = stuff.quench(a:place) && success
     endfor
   endif
   return !success
