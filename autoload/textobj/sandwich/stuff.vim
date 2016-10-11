@@ -118,6 +118,7 @@ let s:stuff = {
       \   'escaped'  : 0,
       \   'evaluated': 0,
       \   'syntax_on': 0,
+      \   'synchro_buns': [],
       \ }
 "}}}
 function! s:stuff._search_with_nest(candidates, clock, stimeoutlen) dict abort  "{{{
@@ -515,11 +516,15 @@ function! s:stuff.get_buns(clock) dict abort  "{{{
     return ['', '']
   endif
 
-  if self.state && !opt_regex && !self.escaped
-    call map(buns, 's:escape(v:val)')
-    let self.escaped = 1
+  if !self.escaped
+    let self.synchro_buns = copy(buns)
+    if self.state && !opt_regex
+      call map(buns, 's:escape(v:val)')
+      if buns is self.buns
+        let self.escaped = 1
+      endif
+    endif
   endif
-
   return buns
 endfunction
 "}}}
@@ -532,7 +537,7 @@ function! s:stuff.synchronized_recipe() dict abort  "{{{
         \ && &operatorfunc =~# '^operator#sandwich#\%(delete\|replace\)'
     let recipe = self.recipe
     if self.searchby ==# 'buns'
-      call extend(recipe, {'buns': self.buns}, 'force')
+      call extend(recipe, {'buns': self.synchro_buns}, 'force')
       call extend(recipe, {'expr': 0}, 'force')
     elseif self.searchby ==# 'external'
       let excursus = {
