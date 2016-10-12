@@ -224,7 +224,7 @@ function! operator#sandwich#query1st(kind, mode, ...) abort "{{{
   if filter(copy(operator.recipes.dog_ear), 'has_key(v:val, "buns")') != []
     let operator.state = 0
     let cmd = a:mode ==# 'x' ? 'gvg@' : 'g@'
-    call feedkeys(cmd, 'inx')
+    call feedkeys(cmd, 'in')
   else
     unlet g:operator#sandwich#object
   endif
