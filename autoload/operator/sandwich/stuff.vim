@@ -300,13 +300,11 @@ endfunction
 function! s:check_textobj_diff(head, tail, candidate, opt_noremap) abort  "{{{
   let target = deepcopy(s:null_4pos)
   if has_key(a:candidate, 'excursus')
-    let options = s:shift_options()
     let coord = a:candidate.excursus.coord
     let target.head1 = s:c2p(coord.head)
     let target.tail1 = s:get_left_pos(s:c2p(coord.inner_head))
     let target.head2 = s:get_right_pos(s:c2p(coord.inner_tail))
     let target.tail2 = s:c2p(coord.tail)
-    call s:restore_options(options)
 
     if target.head1 == a:head && target.tail2 == a:tail
           \ && target.tail1 != s:null_pos && target.head2 != s:null_pos
@@ -333,7 +331,6 @@ function! s:check_textobj_diff(head, tail, candidate, opt_noremap) abort  "{{{
   endif
 
   let found = 0
-  let options = s:shift_options()
   for [l:count, cursor] in order_list
     " get outer positions
     call setpos('.', cursor)
@@ -385,7 +382,6 @@ function! s:check_textobj_diff(head, tail, candidate, opt_noremap) abort  "{{{
       break
     endif
   endfor
-  call s:restore_options(options)
 
   " restore visualmode
   execute 'normal! ' . visualmode . "\<Esc>"
@@ -509,16 +505,6 @@ function! s:skip_space(head, tail) abort  "{{{
     let a:head[0:3] = head[0:3]
     let a:tail[0:3] = tail[0:3]
   endif
-endfunction
-"}}}
-function! s:shift_options() abort "{{{
-  let  virtualedit = &virtualedit
-  let &virtualedit = ''
-  return {'virtualedit': virtualedit}
-endfunction
-"}}}
-function! s:restore_options(options) abort "{{{
-  let &virtualedit = a:options.virtualedit
 endfunction
 "}}}
 
