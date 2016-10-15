@@ -121,17 +121,18 @@ let g:sandwich#recipes = [
       \
       \   {
       \     'external': ['it', 'at'],
-      \     'noremap' : 1,
-      \     'kind' : ['delete', 'textobj'],
+      \     'noremap': 1,
+      \     'kind': ['delete', 'textobj'],
       \     'expr_filter': ['operator#sandwich#kind() !=# "replace"'],
       \     'synchro': 1,
+      \     'linewise': 1,
       \     'input': ['t', 'T', '<'],
       \   },
       \
       \   {
       \     'external': ['it', 'at'],
-      \     'noremap' : 1,
-      \     'kind' : ['replace', 'query'],
+      \     'noremap': 1,
+      \     'kind': ['replace', 'query'],
       \     'expr_filter': ['operator#sandwich#kind() ==# "replace"'],
       \     'synchro': 1,
       \     'input': ['T', '<'],
@@ -139,8 +140,8 @@ let g:sandwich#recipes = [
       \
       \   {
       \     'external': ["\<Plug>(textobj-sandwich-tagname-i)", "\<Plug>(textobj-sandwich-tagname-a)"],
-      \     'noremap' : 0,
-      \     'kind' : ['replace', 'textobj'],
+      \     'noremap': 0,
+      \     'kind': ['replace', 'textobj'],
       \     'expr_filter': ['operator#sandwich#kind() ==# "replace"'],
       \     'synchro': 1,
       \     'input': ['t'],
