@@ -88,33 +88,36 @@ endfunction
 function! operator#sandwich#add(motionwise, ...) abort  "{{{
   let s:operator = ''
   if exists('g:operator#sandwich#object')
+    let messenger = sandwich#messenger#new()
     call s:update_is_in_cmdline_window()
     call s:doautocmd('OperatorSandwichAddPre')
-    let message = g:operator#sandwich#object.execute(a:motionwise)
+    call g:operator#sandwich#object.execute(a:motionwise)
     call s:doautocmd('OperatorSandwichAddPost')
-    call message.notify('operator-sandwich: ')
+    call messenger.notify('operator-sandwich: ')
   endif
 endfunction
 "}}}
 function! operator#sandwich#delete(motionwise, ...) abort  "{{{
   let s:operator = ''
   if exists('g:operator#sandwich#object')
+    let messenger = sandwich#messenger#new()
     call s:update_is_in_cmdline_window()
     call s:doautocmd('OperatorSandwichDeletePre')
-    let message = g:operator#sandwich#object.execute(a:motionwise)
+    call g:operator#sandwich#object.execute(a:motionwise)
     call s:doautocmd('OperatorSandwichDeletePost')
-    call message.notify('operator-sandwich: ')
+    call messenger.notify('operator-sandwich: ')
   endif
 endfunction
 "}}}
 function! operator#sandwich#replace(motionwise, ...) abort  "{{{
   let s:operator = ''
   if exists('g:operator#sandwich#object')
+    let messenger = sandwich#messenger#new()
     call s:update_is_in_cmdline_window()
     call s:doautocmd('OperatorSandwichReplacePre')
-    let message = g:operator#sandwich#object.execute(a:motionwise)
+    call g:operator#sandwich#object.execute(a:motionwise)
     call s:doautocmd('OperatorSandwichReplacePost')
-    call message.notify('operator-sandwich: ')
+    call messenger.notify('operator-sandwich: ')
   endif
 endfunction
 "}}}
@@ -201,7 +204,7 @@ function! operator#sandwich#query1st(kind, mode, ...) abort "{{{
   let operator.recipes.arg_given = a:0 > 1
 
   let stuff = operator#sandwich#stuff#new()
-  call stuff.initialize(operator.count, operator.cursor, operator.modmark, operator.message)
+  call stuff.initialize(operator.count, operator.cursor, operator.modmark)
   let operator.basket = [stuff]
 
   " pick 'recipe' up and query prefered buns

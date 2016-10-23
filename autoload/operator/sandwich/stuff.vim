@@ -40,7 +40,6 @@ let s:stuff = {
       \   'target'   : copy(s:null_4pos),
       \   'acts'     : [],
       \   'added'    : [],
-      \   'message'  : {},
       \   'highlight': {
       \     'target': {},
       \     'added' : {},
@@ -48,14 +47,13 @@ let s:stuff = {
       \   },
       \ }
 "}}}
-function! s:stuff.initialize(count, cursor, modmark, message) dict abort  "{{{
+function! s:stuff.initialize(count, cursor, modmark) dict abort  "{{{
   let self.active = 1
   let self.acts = map(range(a:count), 'operator#sandwich#act#new()')
   let self.added = []
-  let self.message = a:message
   call map(self.highlight, 'sandwich#highlight#new()')
   for act in self.acts
-    call act.initialize(a:cursor, a:modmark, self.added, a:message)
+    call act.initialize(a:cursor, a:modmark, self.added)
   endfor
 endfunction
 "}}}

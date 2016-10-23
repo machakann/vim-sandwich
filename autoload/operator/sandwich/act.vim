@@ -33,13 +33,12 @@ let s:act = {
       \   'added'  : [],
       \ }
 "}}}
-function! s:act.initialize(cursor, modmark, added, message) dict abort  "{{{
+function! s:act.initialize(cursor, modmark, added) dict abort  "{{{
   let self.cursor  = a:cursor
   let self.modmark = a:modmark
   let self.opt     = {}
   let self.added   = a:added
   let self.success = 0
-  let self.message = a:message
 endfunction
 "}}}
 function! s:act.add_pair(buns, stuff, undojoin) dict abort "{{{
@@ -56,13 +55,14 @@ function! s:act.add_pair(buns, stuff, undojoin) dict abort "{{{
     endif
 
     let indentopt = s:set_indent(opt)
+    let messenger = sandwich#messenger#get()
     try
       let pos = target.head1
       let [is_linewise[0], indent[0], head1, tail1] = s:add_former(a:buns, pos, opt, a:undojoin)
       let pos = s:push1(copy(target.head2), target, a:buns, indent, is_linewise)
       let [is_linewise[1], indent[1], head2, tail2] = s:add_latter(a:buns, pos, opt)
     catch /^Vim\%((\a\+)\)\=:E21/
-      call self.message.notice.queue(['Cannot make changes to read-only buffer.', 'WarningMsg'])
+      call messenger.notice.queue(['Cannot make changes to read-only buffer.', 'WarningMsg'])
       throw 'OperatorSandwichError:ReadOnly'
     finally
       call s:restore_indent(indentopt)
@@ -117,6 +117,7 @@ function! s:act.delete_pair(stuff, modified) dict abort  "{{{
     let reg = ['"', getreg('"'), getregtype('"')]
     let deletion = ['', '']
     let is_linewise = [0, 0]
+    let messenger = sandwich#messenger#get()
     try
       let former_head = target.head1
       let former_tail = target.tail1
@@ -127,7 +128,7 @@ function! s:act.delete_pair(stuff, modified) dict abort  "{{{
       let latter_tail = s:pull1(copy(target.tail2), target, deletion, is_linewise)
       let [deletion[1], is_linewise[1], tail] = s:delete_latter(latter_head, latter_tail, former_head, opt)
     catch /^Vim\%((\a\+)\)\=:E21/
-      call self.message.notice.queue(['Cannot make changes to read-only buffer.', 'WarningMsg'])
+      call messenger.notice.queue(['Cannot make changes to read-only buffer.', 'WarningMsg'])
       throw 'OperatorSandwichError:ReadOnly'
     finally
       call call('setreg', reg)
@@ -176,11 +177,12 @@ function! s:act.replace_pair(buns, stuff, undojoin, modified) dict abort "{{{
     let next_tail = s:get_left_pos(target.head2)
     set virtualedit=onemore
 
-    let reg         = ['"', getreg('"'), getregtype('"')]
-    let deletion    = ['', '']
-    let indent      = [0, 0]
+    let reg = ['"', getreg('"'), getregtype('"')]
+    let deletion = ['', '']
+    let indent = [0, 0]
     let is_linewise = [0, 0]
-    let indentopt   = s:set_indent(opt)
+    let indentopt = s:set_indent(opt)
+    let messenger = sandwich#messenger#get()
     try
       let within_a_line = target.tail1[1] == target.head2[1]
       let former_head = target.head1
@@ -195,7 +197,7 @@ function! s:act.replace_pair(buns, stuff, undojoin, modified) dict abort "{{{
       call s:push1(latter_tail, target, a:buns, indent, is_linewise)
       let [deletion[1], is_linewise[1], indent[1], head2, tail2] = s:replace_latter(a:buns, latter_head, latter_tail, within_a_line, opt)
     catch /^Vim\%((\a\+)\)\=:E21/
-      call self.message.notice.queue(['Cannot make changes to read-only buffer.', 'WarningMsg'])
+      call messenger.notice.queue(['Cannot make changes to read-only buffer.', 'WarningMsg'])
       throw 'OperatorSandwichError:ReadOnly'
     finally
       call call('setreg', reg)

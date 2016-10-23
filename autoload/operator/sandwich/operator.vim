@@ -72,11 +72,11 @@ let s:operator = {
       \     'keepable'  : 0,
       \   },
       \   'modmark': copy(s:null_2pos),
-      \   'message': sandwich#message#new(),
       \ }
 "}}}
 function! s:operator.execute(motionwise) dict abort  "{{{
   let options = s:shift_options(self.kind, self.mode)
+  let messenger = sandwich#messenger#get()
   try
     call self.initialize(a:motionwise)
     if self.state >= 0
@@ -91,13 +91,12 @@ function! s:operator.execute(motionwise) dict abort  "{{{
     " cancelled by <C-c>
     unlet! g:operator#sandwich#object
   catch
-    call self.message.error.set(printf('Unanticipated error. [%s] %s', v:throwpoint, v:exception))
+    call messenger.error.set(printf('Unanticipated error. [%s] %s', v:throwpoint, v:exception))
     unlet! g:operator#sandwich#object
   finally
     call self.finalize()
     call s:restore_options(self.kind, self.mode, options)
     redraw
-    return self.message
   endtry
 endfunction
 "}}}
@@ -124,10 +123,9 @@ function! s:operator.initialize(motionwise) dict abort "{{{
     let self.modmark.head = copy(s:null_pos)
     let self.modmark.tail = copy(s:null_pos)
     call self.fill()
-    call self.message.initialize()
   endif
   for stuff in self.basket
-    call stuff.initialize(self.count, self.cursor, self.modmark, self.message)
+    call stuff.initialize(self.count, self.cursor, self.modmark)
   endfor
 
   " set initial values
@@ -241,7 +239,7 @@ function! s:operator.add() dict abort "{{{
 endfunction
 "}}}
 function! s:operator.add_once(i, recipe) dict abort  "{{{
-  let buns = s:get_buns(a:recipe, self.opt.of('expr'), self.opt.of('listexpr'), self.message)
+  let buns = s:get_buns(a:recipe, self.opt.of('expr'), self.opt.of('listexpr'))
   let undojoin = a:i == 0 || self.state == 0 ? 0 : 1
   let modified = 0
   if buns[0] !=# '' || buns[1] !=# '' || self.opt.of('linewise')
@@ -354,7 +352,7 @@ function! s:operator.replace() dict abort  "{{{
 endfunction
 "}}}
 function! s:operator.replace_once(i, recipe) dict abort  "{{{
-  let buns = s:get_buns(a:recipe, self.opt.of('expr'), self.opt.of('listexpr'), self.message)
+  let buns = s:get_buns(a:recipe, self.opt.of('expr'), self.opt.of('listexpr'))
   let undojoin = a:i == 0 || self.state == 0 ? 0 : 1
   let modified = 0
   for j in range(self.n)
@@ -954,7 +952,7 @@ function! s:is_input_matched(candidate, input, opt, flag) abort "{{{
   endif
 endfunction
 "}}}
-function! s:get_buns(recipe, opt_expr, opt_listexpr, message) abort  "{{{
+function! s:get_buns(recipe, opt_expr, opt_listexpr) abort  "{{{
   if a:opt_listexpr == 2
     let buns = eval(a:recipe.buns)
   elseif a:opt_listexpr == 1 && !a:recipe.evaluated
@@ -970,21 +968,22 @@ function! s:get_buns(recipe, opt_expr, opt_listexpr, message) abort  "{{{
   else
     let buns = a:recipe.buns
   endif
-  call s:check_buns(buns, a:message)
+  call s:check_buns(buns)
   return buns
 endfunction
 "}}}
-function! s:check_buns(buns, message) abort  "{{{
+function! s:check_buns(buns) abort  "{{{
+  let messenger = sandwich#messenger#get()
   let error = 'OperatorSandwichError:IncorrectBuns'
   if type(a:buns) != s:type_list
-    call a:message.error.set('Incorrect buns. : not a list -> ' . string(a:buns))
+    call messenger.error.set('Incorrect buns. : not a list -> ' . string(a:buns))
     throw error
   elseif len(a:buns) < 2
-    call a:message.error.set('Incorrect buns. : list too short -> ' . string(a:buns))
+    call messenger.error.set('Incorrect buns. : list too short -> ' . string(a:buns))
     throw error
   elseif !(type(a:buns[0]) == s:type_str || type(a:buns[0]) == s:type_num)
     \ || !(type(a:buns[1]) == s:type_str || type(a:buns[1]) == s:type_num)
-    call a:message.error.set('Incorrect buns. : not string buns -> ' . string(a:buns))
+    call messenger.error.set('Incorrect buns. : not string buns -> ' . string(a:buns))
     throw error
   endif
 endfunction

@@ -1,24 +1,29 @@
-" message object - managing messages and errors.
+" messenger object - managing messages and errors.
 
-function! sandwich#message#new() abort  "{{{
-  return deepcopy(s:message)
+function! sandwich#messenger#new() abort  "{{{
+  let s:messenger = deepcopy(s:messenger_prototype)
+  return s:messenger
+endfunction
+"}}}
+function! sandwich#messenger#get() abort  "{{{
+  return s:messenger
 endfunction
 "}}}
 
-" s:message "{{{
-let s:message = {
+" s:messenger_prototype "{{{
+let s:messenger_prototype = {
       \   'error' : {'flag': 0, 'string': ''},
       \   'notice': {'flag': 0, 'list': []},
       \ }
 "}}}
-function! s:message.initialize() dict abort  "{{{
+function! s:messenger_prototype.initialize() dict abort  "{{{
   let self.error.flag   = 0
   let self.error.string = ''
   let self.notice.flag  = 0
   let self.notice.list  = []
 endfunction
 "}}}
-function! s:message.notify(prefix) dict abort "{{{
+function! s:messenger_prototype.notify(prefix) dict abort "{{{
   if self.error.flag
     call self.error.echoerr(a:prefix)
   elseif self.notice.flag
@@ -26,11 +31,11 @@ function! s:message.notify(prefix) dict abort "{{{
   endif
 endfunction
 "}}}
-function! s:message.error.echoerr(prefix) dict abort  "{{{
+function! s:messenger_prototype.error.echoerr(prefix) dict abort  "{{{
   echoerr a:prefix . self.string
 endfunction
 "}}}
-function! s:message.notice.echo(prefix) dict abort "{{{
+function! s:messenger_prototype.notice.echo(prefix) dict abort "{{{
   let queue = []
   if self.list != []
     for line in self.list
@@ -43,16 +48,18 @@ function! s:message.notice.echo(prefix) dict abort "{{{
   call sandwich#util#echo(queue)
 endfunction
 "}}}
-function! s:message.error.set(errmes) dict abort  "{{{
+function! s:messenger_prototype.error.set(errmes) dict abort  "{{{
   let self.flag = 1
   let self.string = a:errmes
 endfunction
 "}}}
-function! s:message.notice.queue(line) dict abort "{{{
+function! s:messenger_prototype.notice.queue(line) dict abort "{{{
   let self.flag = 1
   call add(self.list, a:line)
 endfunction
 "}}}
+
+call sandwich#messenger#new()
 
 
 " vim:set foldmethod=marker:
