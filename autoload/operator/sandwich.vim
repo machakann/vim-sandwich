@@ -86,37 +86,25 @@ endfunction
 
 " Operator functions
 function! operator#sandwich#add(motionwise, ...) abort  "{{{
-  let s:operator = ''
-  if exists('g:operator#sandwich#object')
-    let messenger = sandwich#messenger#new()
-    call s:update_is_in_cmdline_window()
-    call s:doautocmd('OperatorSandwichAddPre')
-    call g:operator#sandwich#object.execute(a:motionwise)
-    call s:doautocmd('OperatorSandwichAddPost')
-    call messenger.notify('operator-sandwich: ')
-  endif
+  call s:do(a:motionwise, 'OperatorSandwichAddPre', 'OperatorSandwichAddPost')
 endfunction
 "}}}
 function! operator#sandwich#delete(motionwise, ...) abort  "{{{
-  let s:operator = ''
-  if exists('g:operator#sandwich#object')
-    let messenger = sandwich#messenger#new()
-    call s:update_is_in_cmdline_window()
-    call s:doautocmd('OperatorSandwichDeletePre')
-    call g:operator#sandwich#object.execute(a:motionwise)
-    call s:doautocmd('OperatorSandwichDeletePost')
-    call messenger.notify('operator-sandwich: ')
-  endif
+  call s:do(a:motionwise, 'OperatorSandwichDeletePre', 'OperatorSandwichDeletePost')
 endfunction
 "}}}
 function! operator#sandwich#replace(motionwise, ...) abort  "{{{
+  call s:do(a:motionwise, 'OperatorSandwichReplacePre', 'OperatorSandwichReplacePost')
+endfunction
+"}}}
+function! s:do(motionwise, AutocmdPre, AutocmdPost) abort "{{{
   let s:operator = ''
   if exists('g:operator#sandwich#object')
     let messenger = sandwich#messenger#new()
     call s:update_is_in_cmdline_window()
-    call s:doautocmd('OperatorSandwichReplacePre')
+    call s:doautocmd(a:AutocmdPre)
     call g:operator#sandwich#object.execute(a:motionwise)
-    call s:doautocmd('OperatorSandwichReplacePost')
+    call s:doautocmd(a:AutocmdPost)
     call messenger.notify('operator-sandwich: ')
   endif
 endfunction
