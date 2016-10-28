@@ -7,7 +7,8 @@ function! sandwich#magicchar#t#tag() abort "{{{
   if tag ==# ''
     throw 'OperatorSandwichCancel'
   endif
-  return [printf('<%s>', tag), printf('</%s>', matchstr(tag, '^\a[^[:blank:]>/]*'))]
+  let [open, close] = s:expand(tag)
+  return [printf('<%s>', open), printf('</%s>', close)]
 endfunction
 "}}}
 function! sandwich#magicchar#t#tagname() abort "{{{
@@ -19,7 +20,52 @@ function! sandwich#magicchar#t#tagname() abort "{{{
   if tagname ==# ''
     throw 'OperatorSandwichCancel'
   endif
-  return [tagname, tagname]
+  return s:expand(tagname)
+endfunction
+"}}}
+function! s:tokenize(text) abort  "{{{
+  return matchlist(a:text, '^\([[:alnum:]_-]*\)\([#.][^#.[:blank:]]*\)\?\([#.][^#.[:blank:]]*\)\?\(.*\)')[1:4]
+endfunction
+"}}}
+function! s:parse(tokenlist) abort  "{{{
+  let itemlist = []
+
+  if a:tokenlist[0] !=# ''
+    let itemlist += [{'kind': 'element', 'string': a:tokenlist[0]}]
+  else
+    let itemlist += [{'kind': 'element', 'string': 'div'}]
+  endif
+
+  for i in [1, 2]
+    if a:tokenlist[i][0] ==# '#'
+      let itemlist += [{'kind': 'id', 'string': a:tokenlist[i][1:]}]
+    elseif a:tokenlist[i][0] ==# '.'
+      let itemlist += [{'kind': 'class', 'string': a:tokenlist[i][1:]}]
+    endif
+  endfor
+
+  if a:tokenlist[3] !=# ''
+    let string = a:tokenlist[3][0] =~# '\s' ? a:tokenlist[3][1:] : a:tokenlist[3]
+    let itemlist += [{'kind': 'unclassified', 'string': string}]
+  endif
+
+  return itemlist
+endfunction
+"}}}
+function! s:convert(item) abort "{{{
+  if a:item.kind ==# 'element' || a:item.kind ==# 'unclassified'
+    let string = a:item.string
+  else
+    let string = printf('%s="%s"', a:item.kind, a:item.string)
+  endif
+  return string
+endfunction
+"}}}
+function! s:expand(text) abort  "{{{
+  let tokenlist = s:tokenize(a:text)
+  let itemlist = s:parse(tokenlist)
+  let elementname = itemlist[0]['string']
+  return [join(map(itemlist, 's:convert(v:val)')), elementname]
 endfunction
 "}}}
 
