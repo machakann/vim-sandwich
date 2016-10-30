@@ -266,8 +266,8 @@ endfunction
 function! s:expand(text) abort  "{{{
   let tokenlist = s:tokenize(a:text)
   let itemlist = s:parse(tokenlist)
-  let elementname = itemlist[0]['name']
-  return [s:build(itemlist), elementname]
+  let element = itemlist[0]['value']
+  return [s:build(itemlist), element]
 endfunction
 "}}}
 
