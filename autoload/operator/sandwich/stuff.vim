@@ -331,29 +331,10 @@ function! s:check_textobj_diff(head, tail, candidate, opt_noremap) abort  "{{{
   let found = 0
   for [l:count, cursor] in order_list
     " get outer positions
-    call setpos('.', cursor)
-    execute printf('%s %s%d%s', cmd, v, l:count, textobj_a)
-    execute "normal! \<Esc>"
-    let motionwise_a = visualmode()
-    let [target.head1, target.tail2] = [getpos("'<"), getpos("'>")]
-    if target.head1 == cursor && target.tail2 == cursor
-      let [target.head1, target.tail2] = [copy(s:null_coord), copy(s:null_coord)]
-    elseif motionwise_a ==# 'V'
-      let target.tail2[2] = col([target.tail2[1], '$'])
-    endif
+    let [target.head1, target.tail2, motionwise_a] = s:get_textobj_region(cursor, cmd, v, l:count, textobj_a)
 
     " get inner positions
-    call setpos('.', cursor)
-    execute printf('%s %s%d%s', cmd, v, l:count, textobj_i)
-    execute "normal! \<Esc>"
-    let motionwise_i = visualmode()
-    " FIXME: How should I treat a line breaking?
-    let [target.tail1, target.head2] = [getpos("'<"), getpos("'>")]
-    if target.tail1 == cursor && target.head2 == cursor
-      let [target.tail1, target.head2] = [copy(s:null_coord), copy(s:null_coord)]
-    elseif motionwise_i ==# 'V'
-      let target.head2[2] = col([target.head2[1], '$'])
-    endif
+    let [target.tail1, target.head2, motionwise_i] = s:get_textobj_region(cursor, cmd, v, l:count, textobj_i)
     if motionwise_i ==# "\<C-v>"
       normal! gv
       if getpos('.')[1] == target.head2[1]
@@ -392,6 +373,34 @@ function! s:check_textobj_diff(head, tail, candidate, opt_noremap) abort  "{{{
   else
     return s:null_4pos
   endif
+endfunction
+"}}}
+function! s:get_textobj_region(cursor, cmd, visualmode, count, key_seq) abort "{{{
+  call setpos('.', a:cursor)
+  if a:cmd ==# 'normal!' && a:key_seq =~# '[ia]t'
+    " workaround for {E33, E55} from textobjects it/at
+    try
+      execute printf('%s %s%d%s', a:cmd, a:visualmode, a:count, a:key_seq)
+    catch /^Vim\%((\a\+)\)\=:E\%(33\|55\)/
+      if mode() ==? 'v' || mode() ==# "\<C-v>"
+        execute "normal! \<Esc>"
+      endif
+      return [copy(s:null_pos), copy(s:null_pos), a:visualmode]
+    endtry
+  else
+    execute printf('%s %s%d%s', a:cmd, a:visualmode, a:count, a:key_seq)
+  endif
+  execute "normal! \<Esc>"
+  let visualmode = visualmode()
+  let [head, tail] = [getpos("'<"), getpos("'>")]
+  " NOTE: V never comes for v. Thus if head == tail == self.cursor, then
+  "       it is failed.
+  if head == a:cursor && tail == a:cursor
+    let [head, tail] = [copy(s:null_pos), copy(s:null_pos)]
+  elseif visualmode ==# 'V'
+    let tail[2] = col([tail[1], '$'])
+  endif
+  return [head, tail, visualmode]
 endfunction
 "}}}
 function! s:get_patterns(candidate, opt_regex) abort "{{{
