@@ -138,7 +138,7 @@ function! s:parse(tokenlist) abort  "{{{
         throw 'SandwichMagiccharTIncorrectSyntax'
       endif
     else
-      " successive operand is not allowed here
+      " successive operand is not allowed here (should not reach here)
       throw 'SandwichMagiccharTIncorrectSyntax'
     endif
   endwhile
@@ -264,8 +264,12 @@ function! s:build(itemlist) abort "{{{
 endfunction
 "}}}
 function! s:expand(text) abort  "{{{
-  let tokenlist = s:tokenize(a:text)
-  let itemlist = s:parse(tokenlist)
+  try
+    let tokenlist = s:tokenize(a:text)
+    let itemlist = s:parse(tokenlist)
+  catch /^SandwichMagiccharTIncorrectSyntax$/
+    return [a:text, matchstr(a:text, '^\s*\zs\a[^[:blank:]>/]*')]
+  endtry
   let element = itemlist[0]['value']
   return [s:build(itemlist), element]
 endfunction
