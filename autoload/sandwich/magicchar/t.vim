@@ -38,7 +38,7 @@ function! s:tokenize(text) abort  "{{{
     let i = j
     let j = match(a:text, '\m[[[:blank:]#.]', i)
     if i < j
-      let tokenlist += [a:text[i:j-1]]
+      let tokenlist += [a:text[i : j-1]]
     elseif i == j
       let char = a:text[i]
       if char =~# '\m\s'
@@ -58,7 +58,7 @@ function! s:tokenize(text) abort  "{{{
 
   let i = j >= 0 ? j : i
   if i < n
-    let tokenlist += [a:text[i:]]
+    let tokenlist += [a:text[i :]]
   endif
   return tokenlist
 endfunction
@@ -72,7 +72,7 @@ function! s:tokenize_custom_attributes(text, j) abort "{{{
     let i = j
     let j = match(a:text, '\m[][:blank:]="'']', i)
     if i < j
-      let string = a:text[i:j-1]
+      let string = a:text[i : j-1]
       let tokenlist += [string]
     elseif i == j
       let char = a:text[i]
@@ -80,13 +80,13 @@ function! s:tokenize_custom_attributes(text, j) abort "{{{
         " skip space
         let j = matchend(a:text, '\m\s\+', i)
         if j > i
-          let tokenlist += [a:text[i:j-1]]
+          let tokenlist += [a:text[i : j-1]]
         endif
       elseif char =~# '\m["'']'
         " skip string literal
         let j = match(a:text, char, i+1)
         if j > 0
-          let tokenlist += [a:text[i:j]]
+          let tokenlist += [a:text[i : j]]
           let j += 1
         else
           " unclosed string literal
