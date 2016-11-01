@@ -111,11 +111,10 @@ function! s:highlight.quench() dict abort "{{{
       if s:search_highlighted_windows(self.id, tabnr) != [0, 0]
         call map(self.id, 'matchdelete(v:val)')
         call filter(self.id, 'v:val > 0')
-        let succeeded = 1
       else
         call filter(self.id, 0)
-        let succeeded = 0
       endif
+      let succeeded = 1
       call s:goto_window(winnr, tabnr, view)
     endif
   endif
