@@ -127,6 +127,14 @@ function! s:highlight.quench() dict abort "{{{
   return succeeded
 endfunction
 "}}}
+function! s:highlight.is_text_identical() dict abort "{{{
+  return s:get_surround_text(self.region, self.linewise) ==# self.text
+endfunction
+"}}}
+
+" only when "timers" feature is available
+if has('timers')
+
 function! s:highlight.scheduled_quench(time, ...) dict abort  "{{{
   let id = get(a:000, 0, -1)
   if id < 0
@@ -140,11 +148,6 @@ function! s:highlight.scheduled_quench(time, ...) dict abort  "{{{
   return id
 endfunction
 "}}}
-function! s:highlight.is_text_identical() dict abort "{{{
-  return s:get_surround_text(self.region, self.linewise) ==# self.text
-endfunction
-"}}}
-
 " for scheduled-quench "{{{
 let s:quench_table = {}
 let s:obsolete_augroup = []
@@ -154,9 +157,16 @@ function! s:scheduled_quench(id) abort  "{{{
     for highlight in get(s:quench_table, a:id, [])
       call highlight.quench()
     endfor
+  catch /^Vim\%((\a\+)\)\=:E523/
+    " NOTE: For "textlock"
+    for highlight in s:quench_table[a:id]
+      call highlight.scheduled_quench(1)
+    endfor
+    return 1
+  finally
     unlet s:quench_table[a:id]
     call s:metabolize_augroup(a:id)
-  finally
+    call timer_stop(a:id)
     call s:restore_options(options)
     redraw
   endtry
@@ -171,7 +181,6 @@ function! sandwich#highlight#cancel(...) abort "{{{
 
   for id in id_list
     call s:scheduled_quench(id)
-    call timer_stop(id)
   endfor
 endfunction
 "}}}
@@ -221,6 +230,8 @@ function! s:exodus_from_cmdwindow() abort "{{{
 endfunction
 "}}}
 "}}}
+
+endif
 
 " private functions
 function! s:highlight_order_charwise(order_list, order, head, tail) abort  "{{{
@@ -300,7 +311,7 @@ function! s:goto_window(winnr, ...) abort "{{{
 
   try
     if a:winnr != winnr()
-      execute a:winnr . 'wincmd w'
+      execute printf('noautocmd %swincmd w', a:winnr)
     endif
   catch /^Vim\%((\a\+)\)\=:E16/
     return 0
@@ -315,7 +326,7 @@ endfunction
 "}}}
 function! s:goto_tab(tabnr) abort  "{{{
   if a:tabnr != tabpagenr()
-    execute 'tabnext ' . a:tabnr
+    execute 'noautocmd tabnext ' . a:tabnr
   endif
   return tabpagenr() == a:tabnr ? 1 : 0
 endfunction
