@@ -131,10 +131,6 @@ function! s:highlight.is_text_identical() dict abort "{{{
   return s:get_surround_text(self.region, self.linewise) ==# self.text
 endfunction
 "}}}
-
-" only when "timers" feature is available
-if has('timers')
-
 function! s:highlight.scheduled_quench(time, ...) dict abort  "{{{
   let id = get(a:000, 0, -1)
   if id < 0
@@ -148,6 +144,7 @@ function! s:highlight.scheduled_quench(time, ...) dict abort  "{{{
   return id
 endfunction
 "}}}
+
 " for scheduled-quench "{{{
 let s:quench_table = {}
 let s:obsolete_augroup = []
@@ -230,8 +227,6 @@ function! s:exodus_from_cmdwindow() abort "{{{
 endfunction
 "}}}
 "}}}
-
-endif
 
 " private functions
 function! s:highlight_order_charwise(order_list, order, head, tail) abort  "{{{
