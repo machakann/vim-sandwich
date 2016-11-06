@@ -295,7 +295,11 @@ function! s:stuff._get_region(candidates, clock, stimeoutlen) dict abort "{{{
       let [head, tail, visualmode_a] = s:get_textobj_region(self.cursor, cmd, v, range.count, self.external[1])
 
       " get inner positions
-      let [inner_head, inner_tail, visualmode_i] = s:get_textobj_region(self.cursor, cmd, v, range.count, self.external[0])
+      if head != s:null_coord && tail != s:null_coord
+        let [inner_head, inner_tail, visualmode_i] = s:get_textobj_region(self.cursor, cmd, v, range.count, self.external[0])
+      else
+        let [inner_head, inner_tail, visualmode_i] = [copy(s:null_coord), copy(s:null_coord), 'v']
+      endif
 
       if (self.a_or_i ==# 'i' && s:is_valid_region(inner_head, inner_tail, prev_inner_head, prev_inner_tail, range.count))
        \ || (self.a_or_i ==# 'a' && s:is_valid_region(head, tail, prev_head, prev_tail, range.count))
