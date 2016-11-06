@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:07-Oct-2016.
+						Last change:05-Nov-2016.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -58,7 +58,6 @@ MISCELLANEOUS			|operator-sandwich-miscellaneous|
   なぜ囲みを外す/置換するオペレータのキーマッピングはデフォルトで提供されない?
   ドットコマンドでもカーソル位置を保存・復元したい
   Query1st 系列のキーマッピングは何のためにある？
-  自動補完プラグインと衝突する
   置換オペレータにおけるレシピに指定されたオプションの扱いについて
   visualrepeat.vim プラグイン対応について
 
@@ -1753,39 +1752,6 @@ Query1st 系列のキーマッピングは何のためにある？~
 	xmap s( <Plug>(operator-sandwich-add)(
 	xmap s[ <Plug>(operator-sandwich-add)[
 	xmap s{ <Plug>(operator-sandwich-add){
-<
-
-
-自動補完プラグインと衝突する~
-	|operator-sandwich| はユーザーがタイプするように囲みを挿入するので、自
-	動補完プラグインが割り込むことがあります。その場合は自動コマンドを使っ
-	て一時的に自動補完プラグインを無効化するとよいでしょう。
->
- " autocomplpop
- autocmd User OperatorSandwichAddPre,OperatorSandwichReplacePre AcpLock
- autocmd User OperatorSandwichAddPost,OperatorSandwichReplacePost AcpUnlock
-< >
- " neocomplcache
- autocmd User OperatorSandwichAddPre,OperatorSandwichReplacePre NeoComplCacheLock
- autocmd User OperatorSandwichAddPost,OperatorSandwichReplacePost NeoComplCacheUnlock
-< >
- " YouCompleteMe
- function! s:YouCompleteMeLock() abort
-   let s:ycm_auto_trigger = get(g:, 'ycm_auto_trigger', 1)
-   let g:ycm_auto_trigger = 0
- endfunction
- function! s:YouCompleteMeUnLock() abort
-   let g:ycm_auto_trigger = s:ycm_auto_trigger
- endfunction
- command! YouCompleteMeLock call s:YouCompleteMeLock()<CR>
- command! YouCompleteMeUnLock call s:YouCompleteMeUnLock()<CR>
-
- autocmd User OperatorSandwichAddPre,OperatorSandwichReplacePre YouCompleteMeLock
- autocmd User OperatorSandwichAddPost,OperatorSandwichReplacePost YouCompleteMeUnLock
-< >
- " neocomplete
- autocmd User OperatorSandwichAddPre,OperatorSandwichReplacePre NeoCompleteLock
- autocmd User OperatorSandwichAddPost,OperatorSandwichReplacePost NeoCompleteUnLock
 <
 
 

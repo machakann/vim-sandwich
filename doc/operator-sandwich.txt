@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:07-Oct-2016.
+						Last change:05-Nov-2016.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -58,7 +58,6 @@ MISCELLANEOUS			|operator-sandwich-miscellaneous|
   Why the default mappings for the delete/replace operators were not defined?
   I want to keep cursor position even after dot repeating.
   What is special about the query1st series mappings?
-  There is conflict with auto-complete plugins.
   About the handlings of recipe-local options in the replace operator.
   About the visualrepeat.vim plugin support
 
@@ -1788,39 +1787,6 @@ What is special about the query1st series mappings?~
 	xmap s( <Plug>(operator-sandwich-add)(
 	xmap s[ <Plug>(operator-sandwich-add)[
 	xmap s{ <Plug>(operator-sandwich-add){
-<
-
-
-There is conflict with auto-complete plugins.~
-	Because |operator-sandwich| inserts text as if user typed, some
-	auto-complete plugins could interrupt. If in that case, use
-	autocommand to disable them temporary.
->
- " autocomplpop
- autocmd User OperatorSandwichAddPre,OperatorSandwichReplacePre AcpLock
- autocmd User OperatorSandwichAddPost,OperatorSandwichReplacePost AcpUnlock
-< >
- " neocomplcache
- autocmd User OperatorSandwichAddPre,OperatorSandwichReplacePre NeoComplCacheLock
- autocmd User OperatorSandwichAddPost,OperatorSandwichReplacePost NeoComplCacheUnlock
-< >
- " YouCompleteMe
- function! s:YouCompleteMeLock() abort
-   let s:ycm_auto_trigger = get(g:, 'ycm_auto_trigger', 1)
-   let g:ycm_auto_trigger = 0
- endfunction
- function! s:YouCompleteMeUnLock() abort
-   let g:ycm_auto_trigger = s:ycm_auto_trigger
- endfunction
- command! YouCompleteMeLock call s:YouCompleteMeLock()<CR>
- command! YouCompleteMeUnLock call s:YouCompleteMeUnLock()<CR>
-
- autocmd User OperatorSandwichAddPre,OperatorSandwichReplacePre YouCompleteMeLock
- autocmd User OperatorSandwichAddPost,OperatorSandwichReplacePost YouCompleteMeUnLock
-< >
- " neocomplete
- autocmd User OperatorSandwichAddPre,OperatorSandwichReplacePre NeoCompleteLock
- autocmd User OperatorSandwichAddPost,OperatorSandwichReplacePost NeoCompleteUnLock
 <
 
 

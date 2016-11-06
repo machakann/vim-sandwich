@@ -365,7 +365,7 @@ function! s:add_portion(bun, pos, undojoin_cmd, startinsert) abort "{{{
     " workaround for a bug in cmdline-window
     call s:paste(a:bun, a:undojoin_cmd)
   else
-    execute a:undojoin_cmd . 'silent ' . a:startinsert . a:bun
+    execute a:undojoin_cmd . 'silent noautocmd ' . a:startinsert . a:bun
   endif
 endfunction
 "}}}
@@ -427,18 +427,18 @@ function! s:replace_former(buns, head, tail, within_a_line, opt, ...) abort "{{{
     if opt_linewise == 1 && getline('.') =~# '^\s*$'
       .delete
       let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! O' : "normal \<Plug>(sandwich-O)"
-      execute 'silent ' . startinsert . a:buns[0]
+      execute 'silent noautocmd ' . startinsert . a:buns[0]
       let is_linewise = 1
     elseif opt_linewise == 2
       if !a:within_a_line
         .delete
       endif
       let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! O' : "normal \<Plug>(sandwich-O)"
-      execute 'silent ' . startinsert . a:buns[0]
+      execute 'silent noautocmd ' . startinsert . a:buns[0]
       let is_linewise = 1
     else
       let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! i' : "normal \<Plug>(sandwich-i)"
-      execute 'silent ' . startinsert . a:buns[0]
+      execute 'silent noautocmd ' . startinsert . a:buns[0]
     endif
   endif
   let indent = s:diff_indent(initial_indent, a:head, a:buns[0])
@@ -466,7 +466,7 @@ function! s:replace_latter(buns, head, tail, within_a_line, opt) abort "{{{
       if current != fileend
         normal! k
       endif
-      execute 'silent ' . startinsert . a:buns[1]
+      execute 'silent noautocmd ' . startinsert . a:buns[1]
       let head = getpos("'[")
       let tail = getpos("']")
       let is_linewise = 1
@@ -475,7 +475,7 @@ function! s:replace_latter(buns, head, tail, within_a_line, opt) abort "{{{
       if a:within_a_line
         " exceptional behavior
         let lnum = line('.')
-        execute 'silent ' . startinsert . a:buns[1]
+        execute 'silent noautocmd ' . startinsert . a:buns[1]
         let head = getpos("'[")
         let tail = getpos("']")
         execute lnum . 'delete'
@@ -489,14 +489,14 @@ function! s:replace_latter(buns, head, tail, within_a_line, opt) abort "{{{
         if current != fileend
           normal! k
         endif
-        execute 'silent ' . startinsert . a:buns[1]
+        execute 'silent noautocmd ' . startinsert . a:buns[1]
         let head = getpos("'[")
         let tail = getpos("']")
       endif
       let is_linewise = 1
     else
       let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! i' : "normal \<Plug>(sandwich-i)"
-      execute 'silent ' . startinsert . a:buns[1]
+      execute 'silent noautocmd ' . startinsert . a:buns[1]
       let head = getpos("'[")
       let tail = getpos("']")
     endif
