@@ -1,4 +1,6 @@
 " variables "{{{
+let s:null_coord = [0, 0]
+
 " types
 let s:type_num  = type(0)
 let s:type_str  = type('')
@@ -300,6 +302,28 @@ function! s:prototype(kind) abort "{{{
     call winrestview(view)
     call setpos("'<", visualhead)
     call setpos("'>", visualtail)
+  endif
+endfunction
+"}}}
+function! sandwich#magicchar#t#it() abort "{{{
+  call s:textobj('i')
+endfunction
+"}}}
+function! sandwich#magicchar#t#at() abort "{{{
+  call s:textobj('a')
+endfunction
+"}}}
+function! s:textobj(a_or_i) abort "{{{
+  let head = searchpos('<\a[^[:blank:]>/]*>', 'bcn', 0, 50)
+  if head != s:null_coord
+    let tagname = matchstr(getline(head[0])[head[1]-1 :], '^<\zs\a[^[:blank:]>/]*')
+    if search(printf('</%s>', tagname), 'cn', 0, 50)
+      if a:a_or_i ==# 'i'
+        normal! vit
+      else
+        normal! vat
+      endif
+    endif
   endif
 endfunction
 "}}}
