@@ -10,7 +10,10 @@ let s:type_list = type([])
 function! sandwich#magicchar#t#tag() abort "{{{
   call operator#sandwich#show()
   echohl MoreMsg
+  let old_imsearch = &l:imsearch
+  let &l:imsearch = 0
   let tag = input('Input tag: ')
+  let &l:imsearch = old_imsearch
   echohl NONE
   call operator#sandwich#quench()
   if tag ==# ''
@@ -23,7 +26,10 @@ endfunction
 function! sandwich#magicchar#t#tagname() abort "{{{
   call operator#sandwich#show()
   echohl MoreMsg
+  let old_imsearch = &l:imsearch
+  let &l:imsearch = 0
   let tagname = input('Input tag name: ')
+  let &l:imsearch = old_imsearch
   echohl NONE
   call operator#sandwich#quench()
   if tagname ==# ''
