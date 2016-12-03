@@ -543,6 +543,7 @@ function! s:stuff.synchronized_recipe() dict abort  "{{{
     if self.searchby ==# 'buns'
       call extend(recipe, {'buns': self.synchro_buns}, 'force')
       call extend(recipe, {'expr': 0}, 'force')
+      call extend(recipe, {'listexpr': 0}, 'force')
     elseif self.searchby ==# 'external'
       let excursus = {
             \   'count' : self.range.count,
