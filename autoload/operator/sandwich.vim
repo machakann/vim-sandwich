@@ -70,7 +70,7 @@ function! s:blockwisevisual_info(mode) abort  "{{{
     try
       normal! gv
       let extended = winsaveview().curswant == s:constants('colmax')
-      silent normal! ""y
+      silent noautocmd normal! ""y
       let regtype = getregtype('"')
     finally
       call call('setreg', reg)

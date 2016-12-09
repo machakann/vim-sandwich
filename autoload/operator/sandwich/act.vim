@@ -406,7 +406,7 @@ function! s:delete_latter(head, tail, former_head, opt) abort  "{{{
 endfunction
 "}}}
 function! s:delete_portion(head, tail, undojoin_cmd) abort  "{{{
-  let cmd = "%ssilent normal! \"\"dv:call setpos('\.', %s)\<CR>"
+  let cmd = "%ssilent noautocmd normal! \"\"dv:call setpos('\.', %s)\<CR>"
   call setpos('.', a:head)
   let @@ = ''
   execute printf(cmd, a:undojoin_cmd, 'a:tail')

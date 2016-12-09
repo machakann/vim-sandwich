@@ -363,7 +363,8 @@ function! s:check_textobj_diff(head, tail, candidate, opt_noremap) abort  "{{{
   endfor
 
   " restore visualmode
-  execute 'normal! ' . visualmode . "\<Esc>"
+  execute 'normal! ' . visualmode
+  execute 'normal! ' . "\<Esc>"
   " restore marks
   call setpos("'<", visual_head)
   call setpos("'>", visual_tail)
@@ -438,7 +439,7 @@ function! s:get_cursorchar(pos) abort "{{{
   let reg = ['"', getreg('"'), getregtype('"')]
   try
     call setpos('.', a:pos)
-    normal! yl
+    silent noautocmd normal! yl
     let c = @@
   finally
     call call('setreg', reg)
