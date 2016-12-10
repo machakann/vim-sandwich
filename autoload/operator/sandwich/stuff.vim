@@ -40,18 +40,12 @@ let s:stuff = {
       \   'target'   : copy(s:null_4pos),
       \   'acts'     : [],
       \   'added'    : [],
-      \   'highlight': {
-      \     'target': {},
-      \     'added' : {},
-      \     'stuff' : {},
-      \   },
       \ }
 "}}}
 function! s:stuff.initialize(count, cursor, modmark) dict abort  "{{{
   let self.active = 1
   let self.acts = map(range(a:count), 'operator#sandwich#act#new()')
   let self.added = []
-  call map(self.highlight, 'sandwich#highlight#new()')
   for act in self.acts
     call act.initialize(a:cursor, a:modmark, self.added)
   endfor
@@ -195,40 +189,23 @@ function! s:stuff.skip_space() dict abort  "{{{
   endif
 endfunction
 "}}}
-function! s:stuff.show(place, hi_group, linewise) dict abort "{{{
-  let highlight = get(self.highlight, a:place, {})
-  let success = 0
-  if self.active && highlight != {}
-    if a:place ==# 'target'
-      call highlight.order(self.target, [a:linewise, a:linewise])
-    elseif a:place ==# 'added'
-      for added in self.added
-        call highlight.order(added, added.linewise)
-      endfor
-    elseif a:place ==# 'stuff'
-      let stuff = {'head1': self.edges.head, 'tail1': self.edges.tail, 'head2': copy(s:null_pos), 'tail2': copy(s:null_pos)}
-      call highlight.order(stuff, [a:linewise, a:linewise])
-    endif
-    let success = highlight.show(a:hi_group)
+function! s:stuff.hi_list(place, linewise) dict abort "{{{
+  if !self.active
+    return [[deepcopy(s:null_4pos), [0, 0]]]
   endif
-  return success
-endfunction
-"}}}
-function! s:stuff.quench(place) dict abort "{{{
-  let highlight = get(self.highlight, a:place, {})
-  let success = 0
-  if self.active && highlight != {}
-    let success = highlight.quench()
+
+  let orderlist = []
+  if a:place ==# 'target'
+    let orderlist += [[self.target, [a:linewise, a:linewise]]]
+  elseif a:place ==# 'added'
+    for added in self.added
+      let orderlist += [[added, added.linewise]]
+    endfor
+  elseif a:place ==# 'stuff'
+    let stuff = {'head1': self.edges.head, 'tail1': self.edges.tail, 'head2': copy(s:null_pos), 'tail2': copy(s:null_pos)}
+    let orderlist += [[stuff, [0, 0]]]
   endif
-  return success
-endfunction
-"}}}
-function! s:stuff.scheduled_quench(place, time, id) dict abort "{{{
-  let highlight = get(self.highlight, a:place, {})
-  if self.active && highlight != {}
-    return highlight.scheduled_quench(a:time, a:id)
-  endif
-  return -1
+  return orderlist
 endfunction
 "}}}
 

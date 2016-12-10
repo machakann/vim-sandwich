@@ -18,6 +18,7 @@ endif
 
 " features
 let s:has_gui_running = has('gui_running')
+let s:has_window_ID = exists('*win_getid')
 
 " SID
 function! s:SID() abort
@@ -39,10 +40,22 @@ let s:highlight = {
       \   'id'    : [],
       \   'order_list': [],
       \   'region': {},
-      \   'linewise': '',
+      \   'linewise': 0,
       \   'bufnr': 0,
-      \   'text': ''
+      \   'winid': 0,
       \ }
+"}}}
+function! s:highlight.initialize() dict abort "{{{
+  call self.quench()
+  let self.status = 0
+  let self.group = ''
+  let self.id = []
+  let self.order_list = []
+  let self.region = {}
+  let self.linewise = 0
+  let self.bufnr = 0
+  let self.winid = 0
+endfunction
 "}}}
 function! s:highlight.order(target, linewise) dict abort  "{{{
   let order = []
@@ -61,29 +74,41 @@ function! s:highlight.order(target, linewise) dict abort  "{{{
   let self.order_list += order_list
   let self.region = deepcopy(a:target)
   let self.linewise = a:linewise
-  let self.text = s:get_surround_text(self.region, self.linewise)
 endfunction
 "}}}
-function! s:highlight.show(hi_group) dict abort "{{{
+function! s:highlight.show(...) dict abort "{{{
   if self.order_list == []
     return 0
   endif
 
-  if self.status && a:hi_group !=# self.group
-    call self.quench()
+  if a:0 < 1
+    if self.group ==# ''
+      return 0
+    else
+      let hi_group = self.group
+    endif
+  else
+    let hi_group = a:1
   endif
 
   if self.status
-    return 0
+    if hi_group ==# self.group
+      return 0
+    else
+      call self.quench()
+    endif
   endif
 
   for order in self.order_list
-    let self.id += s:matchaddpos(a:hi_group, order)
+    let self.id += s:matchaddpos(hi_group, order)
   endfor
   call filter(self.id, 'v:val > 0')
   let self.status = 1
-  let self.group = a:hi_group
+  let self.group = hi_group
   let self.bufnr = bufnr('%')
+  if s:has_window_ID
+    let self.winid = win_getid()
+  endif
   return 1
 endfunction
 "}}}
@@ -95,7 +120,7 @@ function! s:highlight.quench() dict abort "{{{
   let tabnr = tabpagenr()
   let winnr = winnr()
   let view = winsaveview()
-  if s:is_highlight_exists(self.id)
+  if self.highlighted_window()
     call map(self.id, 'matchdelete(v:val)')
     call filter(self.id, 'v:val > 0')
     let succeeded = 1
@@ -108,7 +133,7 @@ function! s:highlight.quench() dict abort "{{{
       augroup END
       let succeeded = 0
     else
-      if s:search_highlighted_windows(self.id, tabnr) != [0, 0]
+      if self.goto_highlighted_window()
         call map(self.id, 'matchdelete(v:val)')
         call filter(self.id, 'v:val > 0')
       else
@@ -121,28 +146,47 @@ function! s:highlight.quench() dict abort "{{{
 
   if succeeded
     let self.status = 0
-    let self.group = ''
-    call filter(self.order_list, 0)
   endif
   return succeeded
 endfunction
 "}}}
-function! s:highlight.is_text_identical() dict abort "{{{
-  return s:get_surround_text(self.region, self.linewise) ==# self.text
-endfunction
-"}}}
-function! s:highlight.scheduled_quench(time, ...) dict abort  "{{{
-  let id = get(a:000, 0, -1)
-  if id < 0
-    let id = timer_start(a:time, s:SID . 'scheduled_quench')
-  endif
+function! s:highlight.quench_timer(time) dict abort "{{{
+  let id = timer_start(a:time, s:SID . 'scheduled_quench')
+  let s:quench_table[id] = self
 
-  if !has_key(s:quench_table, id)
-    let s:quench_table[id] = []
-  endif
-  let s:quench_table[id] += [self]
+  execute 'augroup sandwich-highlight-' . id
+    autocmd!
+    execute printf('autocmd TextChanged <buffer> call s:set_autocmds(%s)', id)
+  augroup END
   return id
 endfunction
+"}}}
+" function! s:highlight.highlighted_window() dict abort "{{{
+if s:has_window_ID
+  function! s:highlight.highlighted_window() dict abort
+    return self.winid == win_getid()
+  endfunction
+else
+  function! s:highlight.highlighted_window() dict abort
+    if self.id == []
+      return 0
+    endif
+
+    let id = self.id[0]
+    return filter(getmatches(), 'v:val.id == id') != [] ? 1 : 0
+  endfunction
+endif
+"}}}
+" function! s:highlight.goto_highlighted_window() dict abort "{{{
+if s:has_window_ID
+  function! s:highlight.goto_highlighted_window() dict abort
+    return win_gotoid(self.winid)
+  endfunction
+else
+  function! s:highlight.goto_highlighted_window() dict abort
+    return s:search_highlighted_windows(self.id, tabpagenr()) != [0, 0]
+  endfunction
+endif
 "}}}
 
 " for scheduled-quench "{{{
@@ -151,14 +195,12 @@ let s:obsolete_augroup = []
 function! s:scheduled_quench(id) abort  "{{{
   let options = s:shift_options()
   try
-    for highlight in get(s:quench_table, a:id, [])
-      call highlight.quench()
-    endfor
+    let highlight = s:quench_table[a:id]
+    call highlight.quench()
   catch /^Vim\%((\a\+)\)\=:E523/
     " NOTE: For "textlock"
-    for highlight in s:quench_table[a:id]
-      call highlight.scheduled_quench(1)
-    endfor
+    let highlight = s:quench_table[a:id]
+    call highlight.quench_timer(50)
     return 1
   finally
     unlet s:quench_table[a:id]
@@ -181,20 +223,16 @@ function! sandwich#highlight#cancel(...) abort "{{{
   endfor
 endfunction
 "}}}
-function! sandwich#highlight#get(id) abort "{{{
-  return get(s:quench_table, a:id, [])
-endfunction
-"}}}
 function! s:metabolize_augroup(id) abort  "{{{
   " clean up autocommands in the current augroup
-  execute 'augroup sandwich-highlight-cancel-' . a:id
+  execute 'augroup sandwich-highlight-' . a:id
     autocmd!
   augroup END
 
   " clean up obsolete augroup
   call filter(s:obsolete_augroup, 'v:val != a:id')
   for id in s:obsolete_augroup
-    execute 'augroup! sandwich-highlight-cancel-' . id
+    execute 'augroup! sandwich-highlight-' . id
   endfor
   call filter(s:obsolete_augroup, 0)
 
@@ -292,38 +330,12 @@ else
   endfunction
 endif
 "}}}
+function! s:is_ahead(pos1, pos2) abort  "{{{
+  return a:pos1[1] > a:pos2[1] || (a:pos1[1] == a:pos2[1] && a:pos1[2] > a:pos2[2])
+endfunction
+"}}}
 function! s:is_equal_or_ahead(pos1, pos2) abort  "{{{
   return a:pos1[1] > a:pos2[1] || (a:pos1[1] == a:pos2[1] && a:pos1[2] >= a:pos2[2])
-endfunction
-"}}}
-function! s:goto_window(winnr, ...) abort "{{{
-  if a:0 > 0
-    if !s:goto_tab(a:1)
-      return 0
-    endif
-  endif
-
-
-  try
-    if a:winnr != winnr()
-      execute printf('noautocmd %swincmd w', a:winnr)
-    endif
-  catch /^Vim\%((\a\+)\)\=:E16/
-    return 0
-  endtry
-
-  if a:0 > 1
-    call winrestview(a:2)
-  endif
-
-  return 1
-endfunction
-"}}}
-function! s:goto_tab(tabnr) abort  "{{{
-  if a:tabnr != tabpagenr()
-    execute 'noautocmd tabnext ' . a:tabnr
-  endif
-  return tabpagenr() == a:tabnr ? 1 : 0
 endfunction
 "}}}
 " function! s:is_in_cmdline_window() abort  "{{{
@@ -371,26 +383,28 @@ function! s:restore_options(options) abort "{{{
 endfunction
 "}}}
 function! s:search_highlighted_windows(id, ...) abort  "{{{
+  if a:id == []
+    return 0
+  endif
+
   let original_winnr = winnr()
   let original_tabnr = tabpagenr()
-  if a:id != []
-    let tablist = range(1, tabpagenr('$'))
-    if a:0 > 0
-      let tabnr = a:1
-      let [tabnr, winnr] = s:scan_windows(a:id, tabnr)
-      if tabnr != 0
-        return [tabnr, winnr]
-      endif
-      call filter(tablist, 'v:val != tabnr')
+  let tablist = range(1, tabpagenr('$'))
+  if a:0 > 0
+    let tabnr = a:1
+    let [tabnr, winnr] = s:scan_windows(a:id, tabnr)
+    if tabnr != 0
+      return [tabnr, winnr]
     endif
-
-    for tabnr in tablist
-      let [tabnr, winnr] = s:scan_windows(a:id, tabnr)
-      if tabnr != 0
-        return [tabnr, winnr]
-      endif
-    endfor
+    call filter(tablist, 'v:val != tabnr')
   endif
+
+  for tabnr in tablist
+    let [tabnr, winnr] = s:scan_windows(a:id, tabnr)
+    if tabnr != 0
+      return [tabnr, winnr]
+    endif
+  endfor
   execute 'tabnext ' . original_tabnr
   execute original_winnr . 'wincmd w'
   return [0, 0]
@@ -399,7 +413,7 @@ endfunction
 function! s:scan_windows(id, tabnr) abort "{{{
   if s:goto_tab(a:tabnr)
     for winnr in range(1, winnr('$'))
-      if s:goto_window(winnr) && s:is_highlight_exists(a:id)
+      if s:goto_window(winnr) && s:is_highlighted_window(a:id)
         return [a:tabnr, winnr]
       endif
     endfor
@@ -407,7 +421,7 @@ function! s:scan_windows(id, tabnr) abort "{{{
   return [0, 0]
 endfunction
 "}}}
-function! s:is_highlight_exists(id) abort "{{{
+function! s:is_highlighted_window(id) abort "{{{
   if a:id != []
     let id = a:id[0]
     if filter(getmatches(), 'v:val.id == id') != []
@@ -417,41 +431,64 @@ function! s:is_highlight_exists(id) abort "{{{
   return 0
 endfunction
 "}}}
-function! s:get_surround_text(region, linewise) abort  "{{{
-  let head = a:region.head1
-  if a:linewise[0]
-    let head[2] = 1
+function! s:goto_window(winnr, ...) abort "{{{
+  if a:0 > 0
+    if !s:goto_tab(a:1)
+      return 0
+    endif
   endif
 
-  if a:region.tail2 == s:null_pos
-    let tail = a:region.tail1
-  else
-    let tail = a:region.tail2
-  endif
-  if a:linewise[1]
-    let tail[2] = col([tail[1], '$']) - 1
-  endif
-  return s:get_buf_text(head, tail)
-endfunction
-"}}}
-function! s:get_buf_text(head, tail) abort  "{{{
-  let endline = line('$')
-  if a:head == s:null_pos || a:tail == s:null_pos || s:is_ahead(a:head, a:tail) || a:head[1] > endline || a:tail[1] > endline
-    return ''
+
+  try
+    if a:winnr != winnr()
+      execute printf('noautocmd %swincmd w', a:winnr)
+    endif
+  catch /^Vim\%((\a\+)\)\=:E16/
+    return 0
+  endtry
+
+  if a:0 > 1
+    call winrestview(a:2)
   endif
 
-  let lines = getline(a:head[1], a:tail[1])
-  if a:head[1] == a:tail[1]
-    let lines[0] = lines[0][a:head[2]-1 : a:tail[2]-1]
-  else
-    let lines[0] = lines[0][a:head[2]-1 :]
-    let lines[-1] = lines[-1][: a:tail[2]-1]
-  endif
-  return join(lines, "\n")
+  return 1
 endfunction
 "}}}
-function! s:is_ahead(pos1, pos2) abort  "{{{
-  return a:pos1[1] > a:pos2[1] || (a:pos1[1] == a:pos2[1] && a:pos1[2] > a:pos2[2])
+function! s:goto_tab(tabnr) abort  "{{{
+  if a:tabnr != tabpagenr()
+    execute 'noautocmd tabnext ' . a:tabnr
+  endif
+  return tabpagenr() == a:tabnr ? 1 : 0
+endfunction
+"}}}
+function! s:set_autocmds(id) abort "{{{
+  execute 'augroup sandwich-highlight-' . a:id
+    autocmd!
+    execute printf('autocmd TextChanged <buffer> call s:cancel_highlight(%s, "TextChanged")', a:id)
+    execute printf('autocmd InsertEnter <buffer> call s:cancel_highlight(%s, "InsertEnter")', a:id)
+    execute printf('autocmd BufUnload <buffer> call s:cancel_highlight(%s, "BufUnload")', a:id)
+    execute printf('autocmd BufEnter * call s:switch_highlight(%s)', a:id)
+  augroup END
+endfunction
+"}}}
+function! s:cancel_highlight(id, event) abort  "{{{
+  let highlight = get(s:quench_table, a:id, {})
+  if highlight != {}
+    call s:scheduled_quench(a:id)
+  endif
+endfunction
+"}}}
+function! s:switch_highlight(id) abort "{{{
+  let highlight = get(s:quench_table, a:id, {})
+  if highlight == {} || !highlight.highlighted_window()
+    return
+  endif
+
+  if highlight.bufnr == bufnr('%')
+    call highlight.show()
+  else
+    call highlight.quench()
+  endif
 endfunction
 "}}}
 

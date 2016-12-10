@@ -338,7 +338,7 @@ function! operator#sandwich#show(...) abort  "{{{
   else
     return 1
   endif
-  return operator.show(place, hi_group, opt.of('linewise'), 1)
+  return operator._show(place, hi_group)
 endfunction
 "}}}
 function! operator#sandwich#quench(...) abort  "{{{
@@ -357,7 +357,7 @@ function! operator#sandwich#quench(...) abort  "{{{
         return 1
       endif
     endif
-    return operator.quench(place, 1)
+    return operator._quench(place)
   endif
 endfunction
 "}}}

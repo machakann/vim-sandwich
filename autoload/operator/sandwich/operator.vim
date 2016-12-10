@@ -72,6 +72,11 @@ let s:operator = {
       \     'keepable'  : 0,
       \   },
       \   'modmark': copy(s:null_2pos),
+      \   'highlight': {
+      \     'target': sandwich#highlight#new(),
+      \     'added': sandwich#highlight#new(),
+      \     'stuff': sandwich#highlight#new(),
+      \   },
       \ }
 "}}}
 function! s:operator.execute(motionwise) dict abort  "{{{
@@ -274,7 +279,7 @@ function! s:operator.delete() dict abort  "{{{
     endif
 
     if opt_highlight && !hi_exited && hi_duration > 0
-      let hi_exited = self.blink('target', hi_group, hi_duration, self.opt.of('linewise'))
+      let hi_exited = self.blink('target', hi_group, hi_duration)
     endif
 
     let modified = self.delete_once(i) || modified
@@ -492,95 +497,107 @@ function! s:operator.match(i) dict abort  "{{{
 endfunction
 "}}}
 function! s:operator.show(place, hi_group, ...) dict abort "{{{
-  let force = get(a:000, 1, 0)
-  let success = 1
-  if self.opt.of('highlight') || force
-    let linewise = get(a:000, 0, 0)
-    for i in range(self.n)
-      let stuff = self.basket[i]
-      let success = stuff.show(a:place, a:hi_group, linewise) && success
-    endfor
-    call winrestview(self.view)
-    redraw
+  if !self.opt.of('highlight')
+    return 1
+  endif
+
+  if a:0
+    let success = self._show(a:place, a:hi_group, a:1)
+  else
+    let success = self._show(a:place, a:hi_group)
   endif
   return !success
 endfunction
 "}}}
-function! s:operator.quench(place, ...) dict abort "{{{
-  let force = get(a:000, 0, 0)
-  let success = 1
-  if self.opt.of('highlight') || force
-    for i in range(self.n)
-      let stuff = self.basket[i]
-      let success = stuff.quench(a:place) && success
+function! s:operator._show(place, hi_group, ...) dict abort "{{{
+  let highlight = self.highlight[a:place]
+  call highlight.initialize()
+  for i in range(self.n)
+    let stuff = self.basket[i]
+    for [order, linewise] in stuff.hi_list(a:place, self.opt.of('linewise'))
+      call highlight.order(order, linewise)
     endfor
+  endfor
+  let success = highlight.show(a:hi_group)
+  if a:0
+    let duration = a:1
+    call highlight.quench_timer(duration)
   endif
+  call winrestview(self.view)
+  redraw
   return !success
 endfunction
 "}}}
-function! s:operator.blink(place, hi_group, duration, ...) dict abort "{{{
+function! s:operator.quench(place) dict abort "{{{
+  if !self.opt.of('highlight')
+    return 1
+  endif
+
+  return self._quench(a:place)
+endfunction
+"}}}
+function! s:operator._quench(place) dict abort "{{{
+  let highlight = self.highlight[a:place]
+  return highlight.quench()
+endfunction
+"}}}
+function! s:operator.blink(place, hi_group, duration) dict abort "{{{
+  if !self.opt.of('highlight') || a:duration <= 0
+    return 1
+  endif
+
+  " highlight off: limit the number of highlighting region to one explicitly
+  call sandwich#highlight#cancel()
+
+  let clock = sandwich#clock#new()
   let hi_exited = 0
-  if self.opt.of('highlight')
-    " highlight off: limit the number of highlighting region to one explicitly
-    call sandwich#highlight#cancel()
-
-    let clock = sandwich#clock#new()
-    let hi_exited = 0
-    let linewise = get(a:000, 0, 0)
-    call self.show(a:place, a:hi_group, linewise)
-    try
-      let c = 0
-      call clock.start()
-      while empty(c)
-        let c = getchar(0)
-        if clock.started && clock.elapsed() > a:duration
-          break
-        endif
-        sleep 20m
-      endwhile
-
-      if c != 0
-        let c = type(c) == s:type_num ? nr2char(c) : c
-        let hi_exited = 1
-        call feedkeys(c, 't')
+  let linewise = get(a:000, 0, 0)
+  call self._show(a:place, a:hi_group)
+  try
+    let c = 0
+    call clock.start()
+    while empty(c)
+      let c = getchar(0)
+      if clock.started && clock.elapsed() > a:duration
+        break
       endif
-    finally
-      call self.quench(a:place)
-      call clock.stop()
-    endtry
-  endif
+      sleep 20m
+    endwhile
+
+    if c != 0
+      let c = type(c) == s:type_num ? nr2char(c) : c
+      let hi_exited = 1
+      call feedkeys(c, 't')
+    endif
+  finally
+    call self.quench(a:place)
+    call clock.stop()
+  endtry
   return hi_exited
 endfunction
 "}}}
-function! s:operator.glow(place, hi_group, duration, ...) dict abort "{{{
-  if self.opt.of('highlight')
-    " highlight off: limit the number of highlighting region to one explicitly
-    call sandwich#highlight#cancel()
-
-    let linewise = get(a:000, 0, 0)
-    call self.show(a:place, a:hi_group, linewise)
-
-    let id = -1
-    for i in range(self.n)
-      let stuff = self.basket[i]
-      let id = stuff.scheduled_quench(a:place, a:duration, id)
-    endfor
-    execute 'augroup sandwich-highlight-cancel-' . id
-      autocmd!
-      execute printf('autocmd TextChanged <buffer> call s:queue_canceler(%s)', id)
-    augroup END
+function! s:operator.glow(place, hi_group, duration) dict abort "{{{
+  if !self.opt.of('highlight') || a:duration <= 0
+    return
   endif
+
+  " highlight off: limit the number of highlighting region to one explicitly
+  call sandwich#highlight#cancel()
+
+  call self._show(a:place, a:hi_group, a:duration)
 endfunction
 "}}}
 function! s:operator.highlight_added(opt) dict abort  "{{{
-  if a:opt.of('highlight', '') >= 3
-    let hi_duration = a:opt.of('hi_duration', '')
-    let hi_method = s:get('persistent_highlight', 'glow')
-    if hi_method ==# 'glow' && s:has_timer
-      call self.glow('added', 'OperatorSandwichAdd', hi_duration)
-    else
-      call self.blink('added', 'OperatorSandwichAdd', hi_duration)
-    endif
+  if a:opt.of('highlight', '') < 3
+    return
+  endif
+
+  let hi_duration = a:opt.of('hi_duration', '')
+  let hi_method = s:get('persistent_highlight', 'glow')
+  if hi_method ==# 'glow' && s:has_timer
+    call self.glow('added', 'OperatorSandwichAdd', hi_duration)
+  else
+    call self.blink('added', 'OperatorSandwichAdd', hi_duration)
   endif
 endfunction
 "}}}
@@ -1008,39 +1025,6 @@ function! s:get_tailstart_cursor_pos(tail, inner_tail) abort  "{{{
     let tailstart = copy(a:tail)
   endif
   return tailstart
-endfunction
-"}}}
-function! s:queue_canceler(id) abort  "{{{
-  execute 'augroup sandwich-highlight-cancel-' . a:id
-    autocmd!
-    execute printf('autocmd TextChanged <buffer> call s:highlight_cancel(%s, "TextChanged")', a:id)
-    execute printf('autocmd InsertEnter <buffer> call s:highlight_cancel(%s, "InsertEnter")', a:id)
-  augroup END
-endfunction
-"}}}
-function! s:highlight_cancel(id, event) abort  "{{{
-  let highlightlist = sandwich#highlight#get(a:id)
-  let bufnrlist = map(deepcopy(highlightlist), 'v:val.bufnr')
-  let currentbuf = bufnr('%')
-  if filter(bufnrlist, 'v:val == currentbuf') != []
-    for highlight in highlightlist
-      if s:highlight_off_by_{a:event}(highlight)
-        call sandwich#highlight#cancel(a:id)
-        execute 'augroup sandwich-highlight-cancel-' . a:id
-          autocmd!
-        augroup END
-        break
-      endif
-    endfor
-  endif
-endfunction
-"}}}
-function! s:highlight_off_by_InsertEnter(highlight) abort "{{{
-  return 1
-endfunction
-"}}}
-function! s:highlight_off_by_TextChanged(highlight) abort "{{{
-  return !a:highlight.is_text_identical()
 endfunction
 "}}}
 
