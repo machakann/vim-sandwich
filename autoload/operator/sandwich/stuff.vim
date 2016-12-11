@@ -191,7 +191,7 @@ endfunction
 "}}}
 function! s:stuff.hi_list(place, linewise) dict abort "{{{
   if !self.active
-    return [[deepcopy(s:null_4pos), [0, 0]]]
+    return []
   endif
 
   let orderlist = []
