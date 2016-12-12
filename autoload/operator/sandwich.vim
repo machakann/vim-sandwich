@@ -66,14 +66,14 @@ function! s:blockwisevisual_info(mode) abort  "{{{
   if a:mode ==# 'x' && visualmode() ==# "\<C-v>"
     " The case for blockwise selections in visual mode
     " NOTE: 'extended' could be recorded safely only at here. Do not move.
-    let reg = ['"', getreg('"'), getregtype('"')]
+    let registers = s:saveregisters()
     try
       normal! gv
       let extended = winsaveview().curswant == s:constants('colmax')
       silent noautocmd normal! ""y
       let regtype = getregtype('"')
     finally
-      call call('setreg', reg)
+      call s:restoreregisters(registers)
     endtry
     let blockwidth = str2nr(regtype[1:])
   else
@@ -81,6 +81,43 @@ function! s:blockwisevisual_info(mode) abort  "{{{
     let blockwidth = 0
   endif
   return [extended, blockwidth]
+endfunction
+"}}}
+function! s:saveregisters() abort "{{{
+  let registers = {}
+  let registers['0'] = s:getregister('0')
+  let registers['1'] = s:getregister('1')
+  let registers['2'] = s:getregister('2')
+  let registers['3'] = s:getregister('3')
+  let registers['4'] = s:getregister('4')
+  let registers['5'] = s:getregister('5')
+  let registers['6'] = s:getregister('6')
+  let registers['7'] = s:getregister('7')
+  let registers['8'] = s:getregister('8')
+  let registers['9'] = s:getregister('9')
+  let registers['"'] = s:getregister('"')
+  if &clipboard =~# 'unnamed'
+    let registers['*'] = s:getregister('*')
+  endif
+  if &clipboard =~# 'unnamedplus'
+    let registers['+'] = s:getregister('+')
+  endif
+  return registers
+endfunction
+"}}}
+function! s:restoreregisters(registers) abort "{{{
+  for [register, contains] in items(a:registers)
+    call s:setregister(register, contains)
+  endfor
+endfunction
+"}}}
+function! s:getregister(register) abort "{{{
+  return [getreg(a:register), getregtype(a:register)]
+endfunction
+"}}}
+function! s:setregister(register, contains) abort "{{{
+  let [value, options] = a:contains
+  return setreg(a:register, value, options)
 endfunction
 "}}}
 
