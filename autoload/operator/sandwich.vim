@@ -67,12 +67,17 @@ function! s:blockwisevisual_info(mode) abort  "{{{
     " The case for blockwise selections in visual mode
     " NOTE: 'extended' could be recorded safely only at here. Do not move.
     let registers = s:saveregisters()
+    let lazyredraw = &lazyredraw
+    set lazyredraw
+    let view = winsaveview()
     try
       normal! gv
       let extended = winsaveview().curswant == s:constants('colmax')
       silent noautocmd normal! ""y
       let regtype = getregtype('"')
     finally
+      call winrestview(view)
+      let &lazyredraw = lazyredraw
       call s:restoreregisters(registers)
     endtry
     let blockwidth = str2nr(regtype[1:])
