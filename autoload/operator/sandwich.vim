@@ -171,7 +171,9 @@ endif
 function! s:doautocmd(name) abort "{{{
   let view = s:saveview()
   try
-    execute 'silent doautocmd <nomodeline> User ' . a:name
+    if exists('#User#' . a:name)
+      execute 'doautocmd <nomodeline> User ' . a:name
+    endif
   catch
     let errormsg = printf('operator-sandwich: An error occurred in autocmd %s. [%s]', a:name, v:exception)
     echoerr errormsg
