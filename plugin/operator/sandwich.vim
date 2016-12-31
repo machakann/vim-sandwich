@@ -1,5 +1,5 @@
 " The vim operator plugin to do well with 'sandwich' like structure
-" Last Change: 21-Sep-2016.
+" Last Change: 17-Dec-2016.
 " Maintainer : Masaaki Nakamura <mckn@outlook.jp>
 
 " License    : NYSL
@@ -49,6 +49,13 @@ augroup sandwich-highlight
   autocmd!
   autocmd ColorScheme * call s:default_highlight()
 augroup END
+
+" use of vim-event-DotCommandPre
+if !hasmapto('<Plug>(operator-sandwich-predot)') && !hasmapto('<Plug>(operator-sandwich-dot)') && (hasmapto('<Plug>(event-DotCommandPre)') || hasmapto('<Plug>(event-DotCommandPre+Dot)'))
+  augroup sandwich-predot
+    autocmd User DotCommandPre call operator#sandwich#predot()
+  augroup END
+endif
 
 """ default keymappings
 " If g:operator_sandwich_no_default_key_mappings has been defined, then quit immediately.

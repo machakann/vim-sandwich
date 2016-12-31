@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:05-Nov-2016.
+						Last change:31-Dec-2016.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -359,6 +359,8 @@ need, these keymappings realize it. Note that it is possible to conflict with
 other plugins, please use either one which is appropriate for your
 environment. See a topic of a local option "cursor" in
 |operator-sandwich-configuration|.
+vim-event-DotCommandPre <https://github.com/machakann/vim-event-DotCommandPre>
+could be an alternative of the following key mappings.
 
 				*<Plug>(operator-sandwich-predot)*
 <Plug>(operator-sandwich-predot)

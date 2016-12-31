@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:05-Nov-2016.
+						Last change:31-Dec-2016.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -349,6 +349,8 @@ option の "cursor" に関係しており、このオプションの選択肢 "k
 のプラグインとキーマッピングが衝突する恐れがあるので、環境によって適切なほうを
 使用してください。 |operator-sandwich-configuration| の local option 中 cursor
 オプションの項もご覧ください。
+vim-event-DotCommandPre <https://github.com/machakann/vim-event-DotCommandPre>
+を使用している場合は、以下のキーマッピングを使用する必要はありません。
 
 				*<Plug>(operator-sandwich-predot)*
 <Plug>(operator-sandwich-predot)
