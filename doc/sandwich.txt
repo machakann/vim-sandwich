@@ -1,4 +1,4 @@
-*sandwich.txt*				Last change:18-Aug-2016.
+*sandwich.txt*				Last change:24-Jan-2017.
 
 The set of operator and textobject plugins to edit sandwiched textobjects.
 
@@ -19,6 +19,7 @@ INTRODUCTION			|sandwich-introduction|
 KEYMAPPINGS			|sandwich-keymappings|
 CONFIGURATION			|sandwich-configuration|
 MAGICCHARACTERS			|sandwich-magiccharacters|
+FILETYPE RECIPES		|sandwich-filetype-recipes|
 MISCELLANEOUS			|sandwich-miscellaneous|
   Introduce vim-surround keymappings
 
@@ -309,6 +310,75 @@ T~
 
 
 
+
+==============================================================================
+FILETYPE RECIPES			*sandwich-filetype-recipes*
+
+Sandwich.vim has filetype specific settings. They will be available when
+'filetype' option was set to a certain value. User settings are not
+overwrittern by them, use only the recipes helpful for you. These recipes are
+written in ftplugin/{filetype}/sandwich.vim.
+
+If you don't want vim to load these files, set
+`g:sandwich_no_{filetype}_ftplugin` as true in advance. For example, add the
+following line to your vimrc in case you don't need tex specific recipes.
+>
+	let g:sandwich_no_tex_ftplugin = 1
+<
+
+------------------------------------------------------------------------------
+plaintex~
+tex~
+>
+ Surroundings		Input
+ “{text}”		u"
+ „{text}“		U"
+ 			ug
+ 			u,
+ «{text}»		u<
+ 			uf
+ `{text}'		l'
+ 			l`
+ ``{text}''		l"
+ "`{text}"'		L"
+ ,,{text}``		l,
+ <<{text}>>		l<
+ \{{text}\}		\{
+ \[{text}\]		\[
+
+ \left({text}\right)				m(
+ \left[{text}\right]				m[
+ \left|{text}\right|				m|
+ \left\{{text}\right\}				m{
+ \left\langle {text}\right\rangle		m<
+<	The surroundings its input starting from 'm' could be removed/replaced
+	by a input `ma`, for example press `sdma`.
+>
+ \bigleft({text}\bigright)			M(
+ \bigleft[{text}\bigright]			M[
+ \bigleft|{text}\bigright|			M|
+ \bigleft\{{text}\bigright\}			M{
+ \bigleft\langle {text}\bigright\rangle 	M<
+
+ \begingroup{text}\endgroup			gr
+ 						\gr
+ \toprule{text}\bottomrule			tr
+ 						br
+ 						\tr
+ 						\br
+
+ \{input}{{text}}				c
+<	This recipe asks user to input a string and then {input} is
+	substituted by the input string.
+>
+ \begin{{input}}{text}\end{{input}}		e
+<	This recipe asks user to input a string and then {input} is
+	substituted by the input string.
+	Use <Tab> to complete {input}, the completion items are loaded from
+	`g:sandwich#filetype#tex#environments`
+	(or `b:sandwich#filetype#tex#environments` if exists).
+
+------------------------------------------------------------------------------
 
 ==============================================================================
 MISCELLANEOUS				*sandwich-miscellaneous*

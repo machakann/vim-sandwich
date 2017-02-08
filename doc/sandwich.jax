@@ -1,4 +1,4 @@
-*sandwich.jax*	日本語ヘルプ		Last change:18-Aug-2016.
+*sandwich.jax*	日本語ヘルプ		Last change:24-Jan-2017.
 
 “挟まれた”テキストを編集するためのオペレータとテキストオブジェクトの詰め合わせ
 です。
@@ -20,6 +20,7 @@ INTRODUCTION			|sandwich-introduction|
 KEYMAPPINGS			|sandwich-keymappings|
 CONFIGURATION			|sandwich-configuration|
 MAGICCHARACTERS			|sandwich-magiccharacters|
+FILETYPE RECIPES		|sandwich-filetype-recipes|
 MISCELLANEOUS			|sandwich-miscellaneous|
   vim-surround のキ－マッピングを使う
 
@@ -314,6 +315,76 @@ T~
 	`srTT` はタグ全体を置き換えます。
 
 
+
+==============================================================================
+FILETYPE RECIPES			*sandwich-filetype-recipes*
+
+Sandwich.vim にはファイルタイプに固有のレシピもあります。これらは 'filetype'
+オプションが特定の値のときのみ読み込まれ、有効になります。またこれらはユーザー
+設定を上書きしないので、必要なものだけ残して使うとよいでしょう。設定の本体は
+ftplugin/{filetype}/sandwich.vim に記述されています。
+
+もし、それらのファイルを読み込んでほしくない場合は
+`g:sandwich_no_{filetype}_ftplugin` に真値を設定しておいてください。例えば、
+tex 固有のレシピが必要ない場合、次の一行を vimrc に加えます。
+>
+	let g:sandwich_no_tex_ftplugin = 1
+<
+
+------------------------------------------------------------------------------
+plaintex~
+tex~
+>
+ 囲み			入力
+ `{text}'		u'
+ “{text}”		u"
+ „{text}“		U"
+ 			ug
+ 			u,
+ «{text}»		u<
+ 			uf
+ `{text}'		l'
+ 			l`
+ ``{text}''		l"
+ "`{text}"'		L"
+ ,,{text}``		l,
+ <<{text}>>		l<
+ \{{text}\}		\{
+ \[{text}\]		\[
+
+ \left({text}\right)				m(
+ \left[{text}\right]				m[
+ \left|{text}\right|				m|
+ \left\{{text}\right\}				m{
+ \left\langle {text}\right\rangle		m<
+<	'm' 始まりの入力で挿入される囲みはすべて `ma` という入力で削除すること
+	ができます。例えば `sdma` のように使います。
+>
+ \bigleft({text}\bigright)			M(
+ \bigleft[{text}\bigright]			M[
+ \bigleft|{text}\bigright|			M|
+ \bigleft\{{text}\bigright\}			M{
+ \bigleft\langle {text}\bigright\rangle 	M<
+
+ \begingroup{text}\endgroup			gr
+ 						\gr
+ \toprule{text}\bottomrule			tr
+ 						br
+ 						\tr
+ 						\br
+
+ \{input}{{text}}				c
+<	このレシピはユーザーに入力を求め、入力されたテキストで {input} を置き
+	換えます。
+>
+ \begin{{input}}{text}\end{{input}}		e
+<	このレシピはユーザーに入力を求め、入力されたテキストで {input} を置き
+	換えます。<Tab> キーにより {input} の入力を補完することができます。
+	この時、補完候補は `g:sandwich#filetype#tex#environments`
+	(あるいは存在すれば `b:sandwich#filetype#tex#environments`) から読み込
+	まれます。
+
+------------------------------------------------------------------------------
 
 ==============================================================================
 MISCELLANEOUS				*sandwich-miscellaneous*
