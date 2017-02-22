@@ -27,7 +27,7 @@ if !exists('s:local_recipes')
         \   {'__filetype__': 'initex', 'buns': ['\left\langle ', '\right\rangle '], 'nesting': 1, 'input': [ 'm<' ], 'filetype': ['initex', 'plaintex', 'tex']},
         \   {'__filetype__': 'initex', 'buns': ['\big(',         '\big)'],          'nesting': 1, 'input': [ 'M(' ], 'filetype': ['initex', 'plaintex', 'tex'], 'indentkeys-': '(,)'},
         \   {'__filetype__': 'initex', 'buns': ['\big[',         '\big]'],          'nesting': 1, 'input': [ 'M[' ], 'filetype': ['initex', 'plaintex', 'tex'], 'indentkeys-': '[,]'},
-        \   {'__filetype__': 'initex', 'buns': ['\big|',         '\big|'],          'nesting': 1, 'input': [ 'M|' ], 'filetype': ['initex', 'plaintex', 'tex']},
+        \   {'__filetype__': 'initex', 'buns': ['\bigl|',        '\bigr|'],         'nesting': 1, 'input': [ 'M|' ], 'filetype': ['initex', 'plaintex', 'tex']},
         \   {'__filetype__': 'initex', 'buns': ['\big\{',        '\big\}'],         'nesting': 1, 'input': [ 'M{' ], 'filetype': ['initex', 'plaintex', 'tex'], 'indentkeys-': '{,},0{,0}'},
         \   {'__filetype__': 'initex', 'buns': ['\big\langle ',  '\big\rangle '],   'nesting': 1, 'input': [ 'M<' ], 'filetype': ['initex', 'plaintex', 'tex']},
         \   {
@@ -94,11 +94,11 @@ if !exists('s:local_recipes')
         \   },
         \   {
         \     '__filetype__': 'initex',
-        \     'buns'    : ['\m\C\%(\\left\|\\[Bb]igg\?l\?\)\?\%([[(|.]\|\\{\|\\langle\|\\lVert\|\\lvert\|\\lceil\|\\lfloor\)', '\m\C\%(\\right\|\\[Bb]igg\?r\?\)\?\%([])|.]\|\\}\|\\rangle\|\\rVert\|\\rvert\|\\rceil\|\\rfloor\)'],
+        \     'buns'    : ['\m\C\%(\%(\\left\|\\[Bb]igg\?l\?\)\%([[(|.]\|\\{\|\\langle\|\\lVert\|\\lvert\|\\lceil\|\\lfloor\)\|\\langle\|\\lVert\|\\lvert\|\\lceil\|\\lfloor\)', '\m\C\%(\%(\\right\|\\[Bb]igg\?r\?\)\%([])|.]\|\\}\|\\rangle\|\\rVert\|\\rvert\|\\rceil\|\\rfloor\)\|\\rangle\|\\rVert\|\\rvert\|\\rceil\|\\rfloor\)'],
         \     'filetype': ['initex', 'plaintex', 'tex'],
         \     'kind'    : ['delete', 'replace', 'auto', 'query'],
         \     'regex'   : 1,
-        \     'nesting' : 0,
+        \     'nesting' : 1,
         \     'input'   : ['ma'],
         \     'indentkeys-' : '{,},0{,0}',
         \     'autoindent' : 0,
