@@ -1,4 +1,4 @@
-*sandwich.txt*				Last change:24-Jan-2017.
+*sandwich.txt*				Last change:22-Feb-2017.
 
 The set of operator and textobject plugins to edit sandwiched textobjects.
 
@@ -354,11 +354,11 @@ tex~
 <	The surroundings its input starting from 'm' could be removed/replaced
 	by a input `ma`, for example press `sdma`.
 >
- \bigleft({text}\bigright)			M(
- \bigleft[{text}\bigright]			M[
- \bigleft|{text}\bigright|			M|
- \bigleft\{{text}\bigright\}			M{
- \bigleft\langle {text}\bigright\rangle 	M<
+ \big({text}\big)				M(
+ \big[{text}\big]				M[
+ \big|{text}\big|				M|
+ \big\{{text}\big\}				M{
+ \big\langle {text}\big\rangle			M<
 
  \begingroup{text}\endgroup			gr
  						\gr

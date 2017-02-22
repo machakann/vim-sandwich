@@ -1,4 +1,4 @@
-*sandwich.jax*	日本語ヘルプ		Last change:24-Jan-2017.
+*sandwich.jax*	日本語ヘルプ		Last change:22-Feb-2017.
 
 “挟まれた”テキストを編集するためのオペレータとテキストオブジェクトの詰め合わせ
 です。
@@ -360,11 +360,11 @@ tex~
 <	'm' 始まりの入力で挿入される囲みはすべて `ma` という入力で削除すること
 	ができます。例えば `sdma` のように使います。
 >
- \bigleft({text}\bigright)			M(
- \bigleft[{text}\bigright]			M[
- \bigleft|{text}\bigright|			M|
- \bigleft\{{text}\bigright\}			M{
- \bigleft\langle {text}\bigright\rangle 	M<
+ \big({text}\big)				M(
+ \big[{text}\big]				M[
+ \big|{text}\big|				M|
+ \big\{{text}\big\}				M{
+ \big\langle {text}\big\rangle			M<
 
  \begingroup{text}\endgroup			gr
  						\gr
