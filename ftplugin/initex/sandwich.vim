@@ -94,11 +94,11 @@ if !exists('s:local_recipes')
         \   },
         \   {
         \     '__filetype__': 'initex',
-        \     'buns'    : ['\(\\left\((\|\[\||\|\\{\|\\langle\|\\lvert\)\|\\left\.\)', '\(\\right\()\|]\||\|\\}\|\\rangle\|\\rvert\)\|\\right\.\)'],
+        \     'buns'    : ['\m\C\%(\\left\|\\[Bb]igg\?l\?\)\?\%([[(|.]\|\\{\|\\langle\|\\lVert\|\\lvert\|\\lceil\|\\lfloor\)', '\m\C\%(\\right\|\\[Bb]igg\?r\?\)\?\%([])|.]\|\\}\|\\rangle\|\\rVert\|\\rvert\|\\rceil\|\\rfloor\)'],
         \     'filetype': ['initex', 'plaintex', 'tex'],
         \     'kind'    : ['delete', 'replace', 'auto', 'query'],
         \     'regex'   : 1,
-        \     'nesting' : 1,
+        \     'nesting' : 0,
         \     'input'   : ['ma'],
         \     'indentkeys-' : '{,},0{,0}',
         \     'autoindent' : 0,
