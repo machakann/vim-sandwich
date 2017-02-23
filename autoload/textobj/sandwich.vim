@@ -75,7 +75,9 @@ function! textobj#sandwich#query(mode, a_or_i, ...) abort  "{{{
 endfunction
 "}}}
 function! textobj#sandwich#select() abort  "{{{
-  call g:textobj#sandwich#object.start()
+  let textobj = g:textobj#sandwich#object
+  call textobj.start()
+  let g:textobj#sandwich#object = textobj " This is required in case that textobj-sandwich call textobj-sandwich itself in its recipe.
 endfunction
 "}}}
 function! s:default_options(kind) abort "{{{
