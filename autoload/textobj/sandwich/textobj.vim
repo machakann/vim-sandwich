@@ -390,14 +390,14 @@ function! s:is_input_matched(candidate, input, opt, flag) abort "{{{
       return 0
     endif
 
-    let inputs = get(candidate, 'input', candidate['buns'])
+    let inputs = copy(get(candidate, 'input', candidate['buns']))
   elseif has_ext
     " 'input' is necessary for 'external' textobjects assignment
     if !has_key(candidate, 'input')
       return 0
     endif
 
-    let inputs = a:candidate['input']
+    let inputs = copy(a:candidate['input'])
   endif
 
   " If a:flag == 0, check forward match. Otherwise, check complete match.
