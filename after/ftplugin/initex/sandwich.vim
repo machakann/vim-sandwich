@@ -104,6 +104,22 @@ if !exists('s:local_recipes')
   let s:marks_recipes = []
   let s:marks_recipes += [
         \   {
+        \     'buns': ['(', ')'],
+        \     'nesting': 1,
+        \   },
+        \   {
+        \     'buns': ['[', ']'],
+        \     'nesting': 1,
+        \   },
+        \   {
+        \     'buns': ['\{', '\}'],
+        \     'nesting': 1,
+        \   },
+        \   {
+        \     'buns': ['|', '|'],
+        \     'nesting': 1,
+        \   },
+        \   {
         \     'buns': ['\m\C\\[Bb]igg\?l|', '\m\C\\[Bb]igg\?r|'],
         \     'regex': 1,
         \     'nesting': 1,
