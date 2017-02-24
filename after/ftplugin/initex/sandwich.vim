@@ -3,11 +3,6 @@ if &compatible || exists('b:did_sandwich_initex_ftplugin') || get(g:, 'sandwich_
 endif
 scriptencoding utf-8
 
-if !exists('b:undo_ftplugin')
-  " Make sure that 'b:undo_ftplugin' exists.
-  runtime ftplugin/initex.vim
-endif
-
 if !exists('s:local_recipes')
   let s:local_recipes = [
         \   {'__filetype__': 'initex', 'buns': ['“', '”'],    'nesting': 1, 'input': [ 'u"' ], 'filetype': ['initex', 'plaintex', 'tex']},
@@ -181,7 +176,6 @@ let b:sandwich_tex_marks_recipes = deepcopy(s:marks_recipes)
 
 let b:did_sandwich_initex_ftplugin = 1
 if !exists('b:undo_ftplugin')
-  " A case that ftplugin/initex.vim is disabled
   let b:undo_ftplugin = ''
 endif
 let b:undo_ftplugin .= ' | unlet b:did_sandwich_initex_ftplugin | call sandwich#util#ftrevert("initex")'
