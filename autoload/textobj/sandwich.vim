@@ -23,7 +23,7 @@ function! textobj#sandwich#auto(mode, a_or_i, ...) abort  "{{{
   let textobj.count  = v:count1
   let textobj.cursor = getpos('.')[1:2]
   let textobj.view   = winsaveview()
-  let textobj.recipes.arg = get(a:000, 1, [])
+  let textobj.recipes.arg = deepcopy(get(a:000, 1, []))
   let textobj.recipes.arg_given = a:0 > 1
   let textobj.opt = sandwich#opt#new('textobj')
   let textobj.opt.filter = s:default_opt.filter
@@ -56,7 +56,7 @@ function! textobj#sandwich#query(mode, a_or_i, ...) abort  "{{{
   let textobj.count  = v:count1
   let textobj.cursor = getpos('.')[1:2]
   let textobj.view   = winsaveview()
-  let textobj.recipes.arg = get(a:000, 1, [])
+  let textobj.recipes.arg = deepcopy(get(a:000, 1, []))
   let textobj.recipes.arg_given = a:0 > 1
   let textobj.opt = sandwich#opt#new('textobj')
   let textobj.opt.filter = s:default_opt.filter
