@@ -63,6 +63,21 @@ function! sandwich#magicchar#f#fname() abort  "{{{
 endfunction
 "}}}
 function! sandwich#magicchar#f#fnamecompl(ArgLead, CmdLine, CursorPos) abort  "{{{
+  return join(uniq(sort(s:buffer_completion())), "\n")
+endfunction
+"}}}
+function! sandwich#magicchar#f#fnamecompl_vim(ArgLead, CmdLine, CursorPos) abort  "{{{
+  if s:has_patch_7_4_2011
+    let getcomp = map(filter(getcompletion(a:ArgLead, 'function'), 'v:val =~# ''\C^[a-z][a-zA-Z0-9_]*($'''), 'matchstr(v:val, ''\C^[a-z][a-zA-Z0-9_]*'')')
+  else
+    let getcomp = []
+  endif
+  let buffer = s:buffer_completion()
+  return join(uniq(sort(getcomp + buffer)), "\n")
+endfunction
+"}}}
+function! s:buffer_completion() abort "{{{
+  " NOTE: This func does neither sort nor uniq.
   let list = []
   let lines = getline(1, '$')
   let pattern_list = s:resolve_patterns()
@@ -72,16 +87,7 @@ function! sandwich#magicchar#f#fnamecompl(ArgLead, CmdLine, CursorPos) abort  "{
       let list += s:extract_pattern(line, pat)
     endfor
   endfor
-  return join(uniq(sort(list)), "\n")
-endfunction
-"}}}
-function! sandwich#magicchar#f#fnamecompl_vim(ArgLead, CmdLine, CursorPos) abort  "{{{
-  let fnames = ''
-  if s:has_patch_7_4_2011
-    let fnames .= join(map(filter(getcompletion(a:ArgLead, 'function'), 'v:val =~# ''\C^[a-z][a-zA-Z0-9_]*($'''), 'matchstr(v:val, ''\C^[a-z][a-zA-Z0-9_]*'')'), "\n")
-  endif
-  let fnames .= sandwich#magicchar#f#fnamecompl(a:ArgLead, a:CmdLine, a:CursorPos)
-  return fnames
+  return list
 endfunction
 "}}}
 function! s:extract_pattern(string, pat) abort "{{{
