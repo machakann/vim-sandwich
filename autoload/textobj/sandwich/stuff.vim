@@ -287,16 +287,21 @@ function! s:stuff._get_region(candidates, clock, stimeoutlen) dict abort "{{{
 
   let visualmode = self.visualmode
   let [visual_head, visual_tail] = [getpos("'<"), getpos("'>")]
+  if self.mode ==# 'x'
+    let initpos = [visual_head[1:2], visual_tail[1:2]]
+  else
+    let initpos = [self.cursor, self.cursor]
+  endif
   try
     while 1
       let [prev_head, prev_tail] = [coord.head, coord.tail]
       let [prev_inner_head, prev_inner_tail] = [coord.inner_head, coord.inner_tail]
       " get outer positions
-      let [head, tail, visualmode_a] = s:get_textobj_region(self.cursor, cmd, v, range.count, self.external[1])
+      let [head, tail, visualmode_a] = s:get_textobj_region(initpos, cmd, v, range.count, self.external[1])
 
       " get inner positions
       if head != s:null_coord && tail != s:null_coord
-        let [inner_head, inner_tail, visualmode_i] = s:get_textobj_region(self.cursor, cmd, v, range.count, self.external[0])
+        let [inner_head, inner_tail, visualmode_i] = s:get_textobj_region(initpos, cmd, v, range.count, self.external[0])
       else
         let [inner_head, inner_tail, visualmode_i] = [copy(s:null_coord), copy(s:null_coord), 'v']
       endif
@@ -564,12 +569,14 @@ function! s:is_valid_region(head, tail, prev_head, prev_tail, count) abort  "{{{
   return a:head != s:null_coord && a:tail != s:null_coord && (a:count == 1 || s:is_ahead(a:prev_head, a:head) || s:is_ahead(a:tail, a:prev_tail))
 endfunction
 "}}}
-function! s:get_textobj_region(cursor, cmd, visualmode, count, key_seq) abort "{{{
-  call cursor(a:cursor)
+function! s:get_textobj_region(initpos, cmd, visualmode, count, key_seq) abort "{{{
+  call cursor(a:initpos[0])
+  execute printf('%s %s', a:cmd, a:visualmode)
+  call cursor(a:initpos[1])
   if a:cmd ==# 'normal!' && a:key_seq =~# '[ia]t'
     " workaround for {E33, E55} from textobjects it/at
     try
-      execute printf('%s %s%d%s', a:cmd, a:visualmode, a:count, a:key_seq)
+      execute printf('%s %d%s', a:cmd, a:count, a:key_seq)
     catch /^Vim\%((\a\+)\)\=:E\%(33\|55\)/
       if mode() ==? 'v' || mode() ==# "\<C-v>"
         execute "normal! \<Esc>"
@@ -577,14 +584,14 @@ function! s:get_textobj_region(cursor, cmd, visualmode, count, key_seq) abort "{
       return [copy(s:null_coord), copy(s:null_coord), a:visualmode]
     endtry
   else
-    execute printf('%s %s%d%s', a:cmd, a:visualmode, a:count, a:key_seq)
+    execute printf('%s %d%s', a:cmd, a:count, a:key_seq)
   endif
   execute "normal! \<Esc>"
   let visualmode = visualmode()
   let [head, tail] = [getpos("'<")[1:2], getpos("'>")[1:2]]
   " NOTE: V never comes for v. Thus if head == tail == self.cursor, then
   "       it is failed.
-  if head == a:cursor && tail == a:cursor
+  if head == a:initpos[0] && tail == a:initpos[1]
     let [head, tail] = [copy(s:null_coord), copy(s:null_coord)]
   elseif visualmode ==# 'V'
     let tail[2] = col([tail[1], '$'])
