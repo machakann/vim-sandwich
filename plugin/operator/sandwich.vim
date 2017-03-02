@@ -1,5 +1,5 @@
 " The vim operator plugin to do well with 'sandwich' like structure
-" Last Change: 17-Dec-2016.
+" Last Change: 02-Mar-2017.
 " Maintainer : Masaaki Nakamura <mckn@outlook.jp>
 
 " License    : NYSL
@@ -39,9 +39,15 @@ noremap <silent> <Plug>(operator-sandwich-replace-visualrepeat) :<C-u>call opera
 " highlight group
 function! s:default_highlight() abort
   highlight default link OperatorSandwichBuns   IncSearch
-  highlight default link OperatorSandwichStuff  DiffChange
   highlight default link OperatorSandwichAdd    DiffAdd
   highlight default link OperatorSandwichDelete DiffDelete
+
+  if hlexists('OperatorSandwichStuff')
+    highlight default link OperatorSandwichChange OperatorSandwichStuff
+  else
+    " obsolete
+    highlight default link OperatorSandwichChange DiffChange
+  endif
 endfunction
 call s:default_highlight()
 

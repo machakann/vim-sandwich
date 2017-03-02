@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:31-Dec-2016.
+						Last change:02-Mar-2017.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -1462,7 +1462,7 @@ OperatorSandwichBuns			*hl-OperatorSandwichBuns*
 	デフォルトでは IncSearch |hl-IncSearch| グループにリンクしています。
 
 
-OperatorSandwichStuff			*hl-OperatorSandwichStuff*
+OperatorSandwichChange			*hl-OperatorSandwichChange*
 	このハイライトグループによってオペレータのハイライト色を宣言します。
 	このグループは "highlight" オプションが 2 以上のときに、囲みを追加する
 	オペレーターで囲まれる文字列に使われます。

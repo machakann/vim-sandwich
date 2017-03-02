@@ -202,7 +202,7 @@ endfunction
 "}}}
 function! s:operator.add() dict abort "{{{
   let opt = self.opt
-  let hi_group = opt.of('highlight', '') >= 2 ? 'OperatorSandwichStuff' : 'OperatorSandwichBuns'
+  let hi_group = opt.of('highlight', '') >= 2 ? 'OperatorSandwichChange' : 'OperatorSandwichBuns'
 
   let modified = 0
   for i in range(self.count)

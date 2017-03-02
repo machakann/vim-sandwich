@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:31-Dec-2016.
+						Last change:02-Mar-2017.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -1489,7 +1489,7 @@ OperatorSandwichBuns			*hl-OperatorSandwichBuns*
 	default.
 
 
-OperatorSandwichStuff			*hl-OperatorSandwichStuff*
+OperatorSandwichChange			*hl-OperatorSandwichChange*
 	The highlight group to declare the highlight feature of the operators.
 	This group is used for a text which is surrounded by add operator when
 	"highlight" option is 2 or larger.
