@@ -354,7 +354,7 @@ function! operator#sandwich#show(...) abort  "{{{
       let hi_group = get(a:000, 1, 'OperatorSandwichAdd')
     else
       let hi_group = opt.of('highlight') >= 2
-                  \ ? get(a:000, 1, 'OperatorSandwichStuff')
+                  \ ? get(a:000, 1, 'OperatorSandwichChange')
                   \ : get(a:000, 1, 'OperatorSandwichBuns')
     endif
   elseif kind ==# 'delete'
@@ -376,7 +376,7 @@ function! operator#sandwich#show(...) abort  "{{{
                   \ : get(a:000, 1, 'OperatorSandwichBuns')
     else
       let hi_group = opt.of('highlight') >= 2
-                  \ ? get(a:000, 1, 'OperatorSandwichStuff')
+                  \ ? get(a:000, 1, 'OperatorSandwichChange')
                   \ : get(a:000, 1, 'OperatorSandwichBuns')
     endif
   else
