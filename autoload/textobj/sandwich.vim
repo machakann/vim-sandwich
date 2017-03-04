@@ -6,36 +6,27 @@
 
 " variables "{{{
 " types
-let s:type_str  = type('')
+let s:type_str = type('')
+let s:type_num = type(0)
 "}}}
 
 """ Public functions
 function! textobj#sandwich#auto(mode, a_or_i, ...) abort  "{{{
-  " make new textobj object
-  let g:textobj#sandwich#object = textobj#sandwich#textobj#new()
-  let textobj = g:textobj#sandwich#object
+  let kind = 'auto'
+  let opt = sandwich#opt#new('textobj')
+  let opt.filter = s:default_opt.filter
+  call opt.update('arg', get(a:000, 0, {}))
+  call opt.update('default', s:default_options(kind))
+  if a:0 > 1
+    let recipes = textobj#sandwich#recipes#new(kind, a:mode, a:2)
+  else
+    let recipes = textobj#sandwich#recipes#new(kind, a:mode)
+  endif
+  let textobj = textobj#sandwich#textobj#new(kind, a:a_or_i, a:mode, v:count1, recipes, opt)
 
-  " set prerequisite initial values
-  let textobj.state  = 1
-  let textobj.kind   = 'auto'
-  let textobj.mode   = a:mode
-  let textobj.a_or_i = a:a_or_i
-  let textobj.count  = v:count1
-  let textobj.cursor = getpos('.')[1:2]
-  let textobj.view   = winsaveview()
-  let textobj.recipes.arg = deepcopy(get(a:000, 1, []))
-  let textobj.recipes.arg_given = a:0 > 1
-  let textobj.opt = sandwich#opt#new('textobj')
-  let textobj.opt.filter = s:default_opt.filter
-  call textobj.opt.update('arg', get(a:000, 0, {}))
-  call textobj.opt.update('default', s:default_options(textobj.kind))
-  call textobj.recipes.integrate(textobj.kind, textobj.mode, textobj.opt)
-
-  " uniq recipes
-  let opt = textobj.opt
   call s:uniq_recipes(textobj.recipes.integrated, opt.of('regex'), opt.of('expr'), opt.of('noremap'))
-
   if textobj.recipes.integrated != []
+    let g:textobj#sandwich#object = textobj
     let cmd = ":\<C-u>call textobj#sandwich#select()\<CR>"
   else
     let cmd = a:mode ==# 'o' ? "\<Esc>" : "\<Plug>(sandwich-nop)"
@@ -44,29 +35,22 @@ function! textobj#sandwich#auto(mode, a_or_i, ...) abort  "{{{
 endfunction
 "}}}
 function! textobj#sandwich#query(mode, a_or_i, ...) abort  "{{{
-  " make new textobj object
-  let g:textobj#sandwich#object = textobj#sandwich#textobj#new()
-  let textobj = g:textobj#sandwich#object
+  let kind = 'query'
+  let opt = sandwich#opt#new('textobj')
+  let opt.filter = s:default_opt.filter
+  call opt.update('arg', get(a:000, 0, {}))
+  call opt.update('default', s:default_options(kind))
+  if a:0 > 1
+    let recipes = textobj#sandwich#recipes#new(kind, a:mode, a:2)
+  else
+    let recipes = textobj#sandwich#recipes#new(kind, a:mode)
+  endif
+  let textobj = textobj#sandwich#textobj#new(kind, a:a_or_i, a:mode, v:count1, recipes, opt)
 
-  " set prerequisite initial values
-  let textobj.state  = 1
-  let textobj.kind   = 'query'
-  let textobj.mode   = a:mode
-  let textobj.a_or_i = a:a_or_i
-  let textobj.count  = v:count1
-  let textobj.cursor = getpos('.')[1:2]
-  let textobj.view   = winsaveview()
-  let textobj.recipes.arg = deepcopy(get(a:000, 1, []))
-  let textobj.recipes.arg_given = a:0 > 1
-  let textobj.opt = sandwich#opt#new('textobj')
-  let textobj.opt.filter = s:default_opt.filter
-  call textobj.opt.update('arg', get(a:000, 0, {}))
-  call textobj.opt.update('default', s:default_options(textobj.kind))
-  call textobj.recipes.integrate(textobj.kind, textobj.mode, textobj.opt)
-
-  call textobj.query()
-
-  if textobj.recipes.integrated != []
+  let recipe = s:query(textobj.recipes.integrated, textobj.opt)
+  if recipe != {}
+    let textobj.recipes.integrated = [recipe]
+    let g:textobj#sandwich#object = textobj
     let cmd = ":\<C-u>call textobj#sandwich#select()\<CR>"
   else
     let cmd = a:mode ==# 'o' ? "\<Esc>" : "\<Plug>(sandwich-nop)"
@@ -75,8 +59,30 @@ function! textobj#sandwich#query(mode, a_or_i, ...) abort  "{{{
 endfunction
 "}}}
 function! textobj#sandwich#select() abort  "{{{
+  if !exists('g:textobj#sandwich#object')
+    return
+  endif
+
+  let view = winsaveview()
   let textobj = g:textobj#sandwich#object
-  call textobj.start()
+  call textobj.initialize()
+  let stimeoutlen = max([0, s:get('stimeoutlen', 500)])
+  let [virtualedit, whichwrap]   = [&virtualedit, &whichwrap]
+  let [&virtualedit, &whichwrap] = ['onemore', 'h,l']
+  try
+    let candidates = textobj.list(stimeoutlen)
+    let elected = textobj.elect(candidates)
+    call winrestview(view)
+    call textobj.select(elected)
+  finally
+    let mark_latestjump = s:get('latest_jump', 1)
+    call textobj.finalize(mark_latestjump)
+    if !textobj.done
+      call winrestview(view)
+    endif
+    let [&virtualedit, &whichwrap] = [virtualedit, whichwrap]
+  endtry
+
   let g:textobj#sandwich#object = textobj " This is required in case that textobj-sandwich call textobj-sandwich itself in its recipe.
 endfunction
 "}}}
@@ -87,6 +93,108 @@ endfunction
 
 
 " private functions
+function! s:query(recipes, opt) abort  "{{{
+  let recipes = deepcopy(a:recipes)
+  let clock   = sandwich#clock#new()
+  let timeoutlen = max([0, s:get('timeoutlen', &timeoutlen)])
+
+  let input   = ''
+  let last_compl_match = ['', []]
+  while 1
+    let c = getchar(0)
+    if empty(c)
+      if clock.started && timeoutlen > 0 && clock.elapsed() > timeoutlen
+        let [input, recipes] = last_compl_match
+        break
+      else
+        sleep 20m
+        continue
+      endif
+    endif
+
+    let c = type(c) == s:type_num ? nr2char(c) : c
+    let input .= c
+
+    " check forward match
+    let n_fwd = len(filter(recipes, 's:is_input_matched(v:val, input, a:opt, 0)'))
+
+    " check complete match
+    let n_comp = len(filter(copy(recipes), 's:is_input_matched(v:val, input, a:opt, 1)'))
+    if n_comp
+      if len(recipes) == n_comp
+        break
+      else
+        call clock.stop()
+        call clock.start()
+        let last_compl_match = [input, copy(recipes)]
+      endif
+    else
+      if clock.started && !n_fwd
+        let [input, recipes] = last_compl_match
+        " FIXME: Additional keypress, 'c', is ignored now, but it should be pressed.
+        "        The problem is feedkeys() cannot be used for here...
+        break
+      endif
+    endif
+    if recipes == [] | break | endif
+  endwhile
+  call clock.stop()
+
+  if filter(recipes, 's:is_input_matched(v:val, input, a:opt, 1)') != []
+    let recipe = recipes[0]
+    if !has_key(recipe, 'buns') && !has_key(recipe, 'external')
+      let recipe = {}
+    endif
+  else
+    if input ==# "\<Esc>" || input ==# "\<C-c>" || input ==# ''
+      let recipe = {}
+    else
+      let c = split(input, '\zs')[0]
+      let recipe = {'buns': [c, c], 'expr': 0, 'regex': 0}
+    endif
+  endif
+
+  return recipe
+endfunction
+"}}}
+function! s:is_input_matched(candidate, input, opt, flag) abort "{{{
+  let has_buns = has_key(a:candidate, 'buns')
+  let has_ext  = has_key(a:candidate, 'external') && has_key(a:candidate, 'input')
+  if !(has_buns || has_ext)
+    return 0
+  elseif !a:flag && a:input ==# ''
+    return 1
+  endif
+
+  let candidate = deepcopy(a:candidate)
+
+  if has_buns
+    call a:opt.update('recipe', candidate)
+
+    " 'input' is necessary for 'expr' or 'regex' buns
+    if (a:opt.of('expr') || a:opt.of('regex')) && !has_key(candidate, 'input')
+      return 0
+    endif
+
+    let inputs = copy(get(candidate, 'input', candidate['buns']))
+  elseif has_ext
+    " 'input' is necessary for 'external' textobjects assignment
+    if !has_key(candidate, 'input')
+      return 0
+    endif
+
+    let inputs = copy(a:candidate['input'])
+  endif
+
+  " If a:flag == 0, check forward match. Otherwise, check complete match.
+  if a:flag
+    return filter(inputs, 'v:val ==# a:input') != []
+  else
+    let idx = strlen(a:input) - 1
+    return filter(inputs, 'v:val[: idx] ==# a:input') != []
+  endif
+endfunction
+"}}}
 function! s:uniq_recipes(recipes, opt_regex, opt_expr, opt_noremap) abort "{{{
   let recipes = copy(a:recipes)
   call filter(a:recipes, 0)
@@ -139,7 +247,10 @@ function! s:is_duplicated_external(item, ref, opt_noremap) abort "{{{
   return 0
 endfunction
 "}}}
-let [s:get] = textobj#sandwich#lib#funcref(['get'])
+function! s:get(name, default) abort  "{{{
+  return get(g:, 'textobj#sandwich#' . a:name, a:default)
+endfunction
+"}}}
 
 " recipe  "{{{
 function! textobj#sandwich#get_recipes() abort  "{{{
