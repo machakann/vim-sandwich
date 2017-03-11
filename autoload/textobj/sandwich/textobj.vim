@@ -352,8 +352,7 @@ endfunction
 "}}}
 function! s:textobj.is_valid_candidate(sandwich, is_syntax_on) dict abort "{{{
   let visual = self.visual
-  let coord  = a:sandwich.coord
-  let opt    = a:sandwich.opt
+  let coord = a:sandwich.coord
 
   if self.a_or_i ==# 'i'
     let [head, tail] = [coord.inner_head, coord.inner_tail]
@@ -365,57 +364,13 @@ function! s:textobj.is_valid_candidate(sandwich, is_syntax_on) dict abort "{{{
   if self.mode !=# 'x'
     let visual_mode_affair = 1
   else
-    " self.visual.mode ==# 'V' never comes.
-    if self.visual.mode ==# 'v'
-      " character-wise
-      if self.a_or_i ==# 'i'
-        let visual_mode_affair = s:is_ahead(visual.head, head)
-                            \ || s:is_ahead(tail, visual.tail)
-      else
-        let visual_mode_affair = (s:is_ahead(visual.head, head) && s:is_equal_or_ahead(tail, visual.tail))
-                            \ || (s:is_equal_or_ahead(visual.head, head) && s:is_ahead(tail, visual.tail))
-      endif
-    else
-      " block-wise
-      let orig_pos = getpos('.')
-      let visual_head = s:lib.get_displaycoord(visual.head)
-      let visual_tail = s:lib.get_displaycoord(visual.tail)
-      call s:lib.set_displaycoord([self.cursor[0], visual_head[1]])
-      let thr_head = getpos('.')
-      call s:lib.set_displaycoord([self.cursor[0], visual_tail[1]])
-      let thr_tail = getpos('.')
-      let visual_mode_affair = s:is_ahead(thr_head, head)
-                          \ || s:is_ahead(tail, thr_tail)
-      call setpos('.', orig_pos)
-    endif
+    let visual_mode_affair = s:visual_mode_affair(
+          \ head, tail, self.a_or_i, self.cursor, self.visual)
   endif
 
   " specific condition for the option 'matched_syntax' and 'inner_syntax'
   if a:is_syntax_on
-    if opt.of('match_syntax') == 2
-      let opt_syntax_affair = s:is_included_syntax(coord.inner_head, a:sandwich.syntax)
-                         \ && s:is_included_syntax(coord.inner_tail, a:sandwich.syntax)
-    elseif opt.of('match_syntax') == 3
-      " check inner syntax independently
-      if opt.of('inner_syntax') == []
-        let syntax = [s:get_displaysyntax(coord.inner_head)]
-        let opt_syntax_affair = s:is_included_syntax(coord.inner_tail, syntax)
-      else
-        if s:is_included_syntax(coord.inner_head, opt.of('inner_syntax'))
-          let syntax = [s:get_displaysyntax(coord.inner_head)]
-          let opt_syntax_affair = s:is_included_syntax(coord.inner_tail, syntax)
-        else
-          let opt_syntax_affair = 0
-        endif
-      endif
-    else
-      if opt.of('inner_syntax') == []
-        let opt_syntax_affair = 1
-      else
-        let opt_syntax_affair = s:is_included_syntax(coord.inner_head, opt.of('inner_syntax'))
-                           \ && s:is_included_syntax(coord.inner_tail, opt.of('inner_syntax'))
-      endif
-    endif
+    let opt_syntax_affair = s:opt_syntax_affair(a:sandwich)
   else
     let opt_syntax_affair = 1
   endif
@@ -620,6 +575,63 @@ function! s:uniq_candidates(candidates, a_or_i) abort "{{{
     let i += 1
   endwhile
   return a:candidates
+endfunction
+"}}}
+function! s:visual_mode_affair(head, tail, a_or_i, cursor, visual) abort "{{{
+  " a:visual.mode ==# 'V' never comes.
+  if a:visual.mode ==# 'v'
+    " character-wise
+    if a:a_or_i ==# 'i'
+      let visual_mode_affair = s:is_ahead(a:visual.head, a:head)
+                          \ || s:is_ahead(a:tail, a:visual.tail)
+    else
+      let visual_mode_affair = (s:is_ahead(a:visual.head, a:head) && s:is_equal_or_ahead(a:tail, a:visual.tail))
+                          \ || (s:is_equal_or_ahead(a:visual.head, a:head) && s:is_ahead(a:tail, a:visual.tail))
+    endif
+  else
+    " block-wise
+    let orig_pos = getpos('.')
+    let visual_head = s:lib.get_displaycoord(a:visual.head)
+    let visual_tail = s:lib.get_displaycoord(a:visual.tail)
+    call s:lib.set_displaycoord([a:cursor[0], visual_head[1]])
+    let thr_head = getpos('.')
+    call s:lib.set_displaycoord([a:cursor[0], visual_tail[1]])
+    let thr_tail = getpos('.')
+    let visual_mode_affair = s:is_ahead(thr_head, a:head)
+                        \ || s:is_ahead(a:tail, thr_tail)
+    call setpos('.', orig_pos)
+  endif
+  return visual_mode_affair
+endfunction
+"}}}
+function! s:opt_syntax_affair(sandwich) abort "{{{
+  let coord = a:sandwich.coord
+  let opt = a:sandwich.opt
+  if opt.of('match_syntax') == 2
+    let opt_syntax_affair = s:is_included_syntax(coord.inner_head, a:sandwich.syntax)
+                        \ && s:is_included_syntax(coord.inner_tail, a:sandwich.syntax)
+  elseif opt.of('match_syntax') == 3
+    " check inner syntax independently
+    if opt.of('inner_syntax') == []
+      let syntax = [s:get_displaysyntax(coord.inner_head)]
+      let opt_syntax_affair = s:is_included_syntax(coord.inner_tail, syntax)
+    else
+      if s:is_included_syntax(coord.inner_head, opt.of('inner_syntax'))
+        let syntax = [s:get_displaysyntax(coord.inner_head)]
+        let opt_syntax_affair = s:is_included_syntax(coord.inner_tail, syntax)
+      else
+        let opt_syntax_affair = 0
+      endif
+    endif
+  else
+    if opt.of('inner_syntax') == []
+      let opt_syntax_affair = 1
+    else
+      let opt_syntax_affair = s:is_included_syntax(coord.inner_head, opt.of('inner_syntax'))
+                          \ && s:is_included_syntax(coord.inner_tail, opt.of('inner_syntax'))
+    endif
+  endif
+  return opt_syntax_affair
 endfunction
 "}}}
 function! s:get_displaysyntax(coord) abort  "{{{
