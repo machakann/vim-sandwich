@@ -29,15 +29,13 @@ function! operator#sandwich#prerequisite(kind, mode, ...) abort "{{{
   " prerequisite
   let operator = g:operator#sandwich#object
   let operator.state = 1
-  let operator.kind  = a:kind
+  let operator.kind = a:kind
   let operator.count = a:mode ==# 'x' ? max([1, v:prevcount]) : v:count1
-  let operator.mode  = a:mode
-  let operator.view  = winsaveview()
+  let operator.mode = a:mode
+  let operator.view = winsaveview()
   let operator.cursor.keepable = 1
   let operator.cursor.keep[0:3] = getpos('.')[0:3]
-  let operator.opt = sandwich#opt#new(a:kind)
-  let operator.opt.filter = s:default_opt[a:kind]['filter']
-  call operator.opt.update('arg', get(a:000, 0, {}))
+  let operator.opt = sandwich#opt#new(a:kind, {}, get(a:000, 0, {}))
   let operator.recipes.arg = get(a:000, 1, [])
   let operator.recipes.arg_given = a:0 > 1
 
@@ -128,24 +126,27 @@ endfunction
 
 " Operator functions
 function! operator#sandwich#add(motionwise, ...) abort  "{{{
-  call s:do(a:motionwise, 'OperatorSandwichAddPre', 'OperatorSandwichAddPost')
+  call s:do('add', a:motionwise, 'OperatorSandwichAddPre', 'OperatorSandwichAddPost')
 endfunction
 "}}}
 function! operator#sandwich#delete(motionwise, ...) abort  "{{{
-  call s:do(a:motionwise, 'OperatorSandwichDeletePre', 'OperatorSandwichDeletePost')
+  call s:do('delete', a:motionwise, 'OperatorSandwichDeletePre', 'OperatorSandwichDeletePost')
 endfunction
 "}}}
 function! operator#sandwich#replace(motionwise, ...) abort  "{{{
-  call s:do(a:motionwise, 'OperatorSandwichReplacePre', 'OperatorSandwichReplacePost')
+  call s:do('replace', a:motionwise, 'OperatorSandwichReplacePre', 'OperatorSandwichReplacePost')
 endfunction
 "}}}
-function! s:do(motionwise, AutocmdPre, AutocmdPost) abort "{{{
+function! s:do(kind, motionwise, AutocmdPre, AutocmdPost) abort "{{{
   let s:operator = ''
   if exists('g:operator#sandwich#object')
+    let textobj = g:operator#sandwich#object
     let messenger = sandwich#messenger#new()
+    let defaultopt = s:default_options(a:kind, a:motionwise)
+    call textobj.opt.update('default', defaultopt)
     call s:update_is_in_cmdline_window()
     call s:doautocmd(a:AutocmdPre)
-    call g:operator#sandwich#object.execute(a:motionwise)
+    call textobj.execute(a:motionwise)
     call s:doautocmd(a:AutocmdPost)
     call messenger.notify('operator-sandwich: ')
   endif
@@ -463,153 +464,11 @@ lockvar! g:operator#sandwich#default_recipes
 "}}}
 
 " options "{{{
-let s:default_opt = {}
-
-let s:default_opt.add = {}
-let s:default_opt.add.char = {
-      \   'cursor'     : 'default',
-      \   'query_once' : 0,
-      \   'expr'       : 0,
-      \   'listexpr'   : 0,
-      \   'noremap'    : 1,
-      \   'skip_space' : 0,
-      \   'highlight'  : 3,
-      \   'hi_duration': 200,
-      \   'command'    : [],
-      \   'linewise'   : 0,
-      \   'autoindent' : -1,
-      \   'indentkeys' : 0,
-      \   'indentkeys+': 0,
-      \   'indentkeys-': 0,
-      \ }
-let s:default_opt.add.line = {
-      \   'cursor'     : 'default',
-      \   'query_once' : 0,
-      \   'expr'       : 0,
-      \   'listexpr'   : 0,
-      \   'noremap'    : 1,
-      \   'skip_space' : 1,
-      \   'highlight'  : 3,
-      \   'hi_duration': 200,
-      \   'command'    : [],
-      \   'linewise'   : 1,
-      \   'autoindent' : -1,
-      \   'indentkeys' : 0,
-      \   'indentkeys+': 0,
-      \   'indentkeys-': 0,
-      \ }
-let s:default_opt.add.block = {
-      \   'cursor'     : 'default',
-      \   'query_once' : 0,
-      \   'expr'       : 0,
-      \   'listexpr'   : 0,
-      \   'noremap'    : 1,
-      \   'skip_space' : 1,
-      \   'highlight'  : 3,
-      \   'hi_duration': 200,
-      \   'command'    : [],
-      \   'linewise'   : 0,
-      \   'autoindent' : -1,
-      \   'indentkeys' : 0,
-      \   'indentkeys+': 0,
-      \   'indentkeys-': 0,
-      \ }
-let s:default_opt.add.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:default_opt['add']['char']), '\|'))
-
-let s:default_opt.delete = {}
-let s:default_opt.delete.char = {
-      \   'cursor'     : 'default',
-      \   'noremap'    : 1,
-      \   'regex'      : 0,
-      \   'skip_space' : 1,
-      \   'skip_char'  : 0,
-      \   'highlight'  : 3,
-      \   'hi_duration': 200,
-      \   'command'    : [],
-      \   'linewise'   : 0,
-      \ }
-let s:default_opt.delete.line = {
-      \   'cursor'     : 'default',
-      \   'noremap'    : 1,
-      \   'regex'      : 0,
-      \   'skip_space' : 2,
-      \   'skip_char'  : 0,
-      \   'highlight'  : 3,
-      \   'hi_duration': 200,
-      \   'command'    : [],
-      \   'linewise'   : 1,
-      \ }
-let s:default_opt.delete.block = {
-      \   'cursor'     : 'default',
-      \   'noremap'    : 1,
-      \   'regex'      : 0,
-      \   'skip_space' : 1,
-      \   'skip_char'  : 0,
-      \   'highlight'  : 3,
-      \   'hi_duration': 200,
-      \   'command'    : [],
-      \   'linewise'   : 0,
-      \ }
-let s:default_opt.delete.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:default_opt['delete']['char']), '\|'))
-
-let s:default_opt.replace = {}
-let s:default_opt.replace.char = {
-      \   'cursor'     : 'default',
-      \   'query_once' : 0,
-      \   'regex'      : 0,
-      \   'expr'       : 0,
-      \   'listexpr'   : 0,
-      \   'noremap'    : 1,
-      \   'skip_space' : 1,
-      \   'skip_char'  : 0,
-      \   'highlight'  : 3,
-      \   'hi_duration': 200,
-      \   'command'    : [],
-      \   'linewise'   : 0,
-      \   'autoindent' : -1,
-      \   'indentkeys' : 0,
-      \   'indentkeys+': 0,
-      \   'indentkeys-': 0,
-      \ }
-let s:default_opt.replace.line = {
-      \   'cursor'     : 'default',
-      \   'query_once' : 0,
-      \   'regex'      : 0,
-      \   'expr'       : 0,
-      \   'listexpr'   : 0,
-      \   'noremap'    : 1,
-      \   'skip_space' : 2,
-      \   'skip_char'  : 0,
-      \   'highlight'  : 3,
-      \   'hi_duration': 200,
-      \   'command'    : [],
-      \   'linewise'   : 0,
-      \   'autoindent' : -1,
-      \   'indentkeys' : 0,
-      \   'indentkeys+': 0,
-      \   'indentkeys-': 0,
-      \ }
-let s:default_opt.replace.block = {
-      \   'cursor'     : 'default',
-      \   'query_once' : 0,
-      \   'regex'      : 0,
-      \   'expr'       : 0,
-      \   'listexpr'   : 0,
-      \   'noremap'    : 1,
-      \   'skip_space' : 1,
-      \   'skip_char'  : 0,
-      \   'highlight'  : 3,
-      \   'hi_duration': 200,
-      \   'command'    : [],
-      \   'linewise'   : 0,
-      \   'autoindent' : -1,
-      \   'indentkeys' : 0,
-      \   'indentkeys+': 0,
-      \   'indentkeys-': 0,
-      \ }
-let s:default_opt.replace.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:default_opt['replace']['char']), '\|'))
-
 let [s:get] = operator#sandwich#lib#funcref(['get'])
+function! s:default_options(kind, motionwise) abort "{{{
+  return get(b:, 'operator_sandwich_options', g:operator#sandwich#options)[a:kind][a:motionwise]
+endfunction
+"}}}
 function! s:initialize_options(...) abort  "{{{
   let manner = a:0 ? a:1 : 'keep'
   let g:operator#sandwich#options = s:get('options', {})
@@ -622,7 +481,7 @@ function! s:initialize_options(...) abort  "{{{
         let g:operator#sandwich#options[kind][motionwise] = {}
       endif
       call extend(g:operator#sandwich#options[kind][motionwise],
-            \ deepcopy(s:default_opt[kind][motionwise]), manner)
+            \ sandwich#opt#defaults(kind, motionwise), manner)
     endfor
   endfor
 endfunction
@@ -692,14 +551,15 @@ function! s:argument_error(kind, motionwise, option, value) abort "{{{
   endif
 
   if a:kind !=# 'all' && a:motionwise !=# 'all'
-    if filter(keys(s:default_opt[a:kind][a:motionwise]), 'v:val ==# a:option') == []
+    let defaults = sandwich#opt#defaults(a:kind, a:motionwise)
+    if filter(keys(defaults), 'v:val ==# a:option') == []
       echohl WarningMsg
       echomsg 'Invalid option name "' . a:option . '".'
       echohl NONE
       return 1
     endif
 
-    if a:option !~# 'indentkeys[-+]\?' && type(a:value) != type(s:default_opt[a:kind][a:motionwise][a:option])
+    if a:option !~# 'indentkeys[-+]\?' && type(a:value) != type(defaults[a:option])
       echohl WarningMsg
       echomsg 'Invalid type of value. ' . string(a:value)
       echohl NONE
@@ -712,8 +572,9 @@ endfunction
 function! s:set_option_value(dest, kinds, motionwises, option, value) abort  "{{{
   for kind in a:kinds
     for motionwise in a:motionwises
-      if filter(keys(s:default_opt[kind][motionwise]), 'v:val ==# a:option') != []
-        if a:option =~# 'indentkeys[-+]\?' || type(a:value) == type(s:default_opt[kind][motionwise][a:option])
+      let defaults = sandwich#opt#defaults(kind, motionwise)
+      if filter(keys(defaults), 'v:val ==# a:option') != []
+        if a:option =~# 'indentkeys[-+]\?' || type(a:value) == type(defaults[a:option])
           let a:dest[kind][motionwise][a:option] = a:value
         endif
       endif

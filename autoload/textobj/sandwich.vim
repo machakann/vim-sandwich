@@ -10,13 +10,11 @@ let s:type_str = type('')
 let s:type_num = type(0)
 "}}}
 
-""" Public functions
 function! textobj#sandwich#auto(mode, a_or_i, ...) abort  "{{{
   let kind = 'auto'
-  let opt = sandwich#opt#new('textobj')
-  let opt.filter = s:default_opt.filter
-  call opt.update('arg', get(a:000, 0, {}))
-  call opt.update('default', s:default_options(kind))
+  let defaultopt = s:default_options(kind)
+  let argopt = get(a:000, 0, {})
+  let opt = sandwich#opt#new(kind, defaultopt, argopt)
   if a:0 > 1
     let recipes = textobj#sandwich#recipes#new(kind, a:mode, a:2)
   else
@@ -36,10 +34,9 @@ endfunction
 "}}}
 function! textobj#sandwich#query(mode, a_or_i, ...) abort  "{{{
   let kind = 'query'
-  let opt = sandwich#opt#new('textobj')
-  let opt.filter = s:default_opt.filter
-  call opt.update('arg', get(a:000, 0, {}))
-  call opt.update('default', s:default_options(kind))
+  let defaultopt = s:default_options(kind)
+  let argopt = get(a:000, 0, {})
+  let opt = sandwich#opt#new(kind, defaultopt, argopt)
   if a:0 > 1
     let recipes = textobj#sandwich#recipes#new(kind, a:mode, a:2)
   else
@@ -86,13 +83,7 @@ function! textobj#sandwich#select() abort  "{{{
   let g:textobj#sandwich#object = textobj " This is required in case that textobj-sandwich call textobj-sandwich itself in its recipe.
 endfunction
 "}}}
-function! s:default_options(kind) abort "{{{
-  return get(b:, 'textobj_sandwich_options', g:textobj#sandwich#options)[a:kind]
-endfunction
-"}}}
 
-
-" private functions
 function! s:query(recipes, opt) abort  "{{{
   let recipes = deepcopy(a:recipes)
   let clock   = sandwich#clock#new()
@@ -271,47 +262,11 @@ let g:textobj#sandwich#default_recipes = []
 lockvar! g:textobj#sandwich#default_recipes
 "}}}
 
-" options "{{{
-let s:default_opt = {}
-let s:default_opt.auto = {
-      \   'expr'           : 0,
-      \   'listexpr'       : 0,
-      \   'regex'          : 0,
-      \   'skip_regex'     : [],
-      \   'skip_regex_head': [],
-      \   'skip_regex_tail': [],
-      \   'quoteescape'    : 0,
-      \   'expand_range'   : -1,
-      \   'nesting'        : 0,
-      \   'synchro'        : 1,
-      \   'noremap'        : 1,
-      \   'syntax'         : [],
-      \   'inner_syntax'   : [],
-      \   'match_syntax'   : 0,
-      \   'skip_break'     : 0,
-      \   'skip_expr'      : [],
-      \ }
-let s:default_opt.query = {
-      \   'expr'           : 0,
-      \   'listexpr'       : 0,
-      \   'regex'          : 0,
-      \   'skip_regex'     : [],
-      \   'skip_regex_head': [],
-      \   'skip_regex_tail': [],
-      \   'quoteescape'    : 0,
-      \   'expand_range'   : -1,
-      \   'nesting'        : 0,
-      \   'synchro'        : 1,
-      \   'noremap'        : 1,
-      \   'syntax'         : [],
-      \   'inner_syntax'   : [],
-      \   'match_syntax'   : 0,
-      \   'skip_break'     : 0,
-      \   'skip_expr'      : [],
-      \ }
-let s:default_opt.filter = printf('v:key =~# ''\%%(%s\)''', join(keys(s:default_opt['auto']), '\|'))
-
-
+" option "{{{
+function! s:default_options(kind) abort "{{{
+  return get(b:, 'textobj_sandwich_options', g:textobj#sandwich#options)[a:kind]
+endfunction
+"}}}
 function! s:initialize_options(...) abort  "{{{
   let manner = a:0 ? a:1 : 'keep'
   let g:textobj#sandwich#options = s:get('options', {})
@@ -320,7 +275,7 @@ function! s:initialize_options(...) abort  "{{{
       let g:textobj#sandwich#options[kind] = {}
     endif
     call extend(g:textobj#sandwich#options[kind],
-          \ deepcopy(s:default_opt[kind]), manner)
+          \ sandwich#opt#defaults(kind), manner)
   endfor
 endfunction
 call s:initialize_options()
@@ -373,16 +328,17 @@ function! s:argument_error(kind, option, value) abort "{{{
     return 1
   endif
 
-  " NOTE: Regaardless of a:kind, keys(s:default_opt[a:kind]) is fixed since
+  " NOTE: Regaardless of a:kind, keys(defaults) is fixed since
   "       the two textobjects have same kinds of options.
-  if filter(keys(s:default_opt['auto']), 'v:val ==# a:option') == []
+  let defaults = sandwich#opt#defaults('auto')
+  if filter(keys(defaults), 'v:val ==# a:option') == []
     echohl WarningMsg
     echomsg 'Invalid option name "' . a:kind . '".'
     echohl NONE
     return 1
   endif
 
-  if type(a:value) != type(s:default_opt['auto'][a:option])
+  if type(a:value) != type(defaults[a:option])
     echohl WarningMsg
     echomsg 'Invalid type of value. ' . string(a:value)
     echohl NONE

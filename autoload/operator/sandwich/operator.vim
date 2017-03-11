@@ -118,8 +118,6 @@ function! s:operator.initialize(motionwise) dict abort "{{{
   let self.n = len(region_list)  " Number of lines in the target region
   let self.cursor.inner_head = deepcopy(region.head)
   let self.cursor.inner_tail = deepcopy(region.tail)
-  let option_dict = get(b:, 'operator_sandwich_options', g:operator#sandwich#options)
-  call self.opt.update('default', option_dict[self.kind][a:motionwise])
 
   if self.state
     let self.basket = map(range(self.n), 'operator#sandwich#stuff#new()')
