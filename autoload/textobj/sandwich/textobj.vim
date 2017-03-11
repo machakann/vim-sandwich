@@ -2,11 +2,7 @@
 
 " variables "{{{
 " null valiables
-let s:null_coord  = [0, 0]
-let s:null_2coord = {
-      \   'head': copy(s:null_coord),
-      \   'tail': copy(s:null_coord),
-      \ }
+let s:null_coord = [0, 0]
 
 " types
 let s:type_fref = type(function('tr'))
@@ -84,6 +80,7 @@ function! s:textobj.list(stimeoutlen) dict abort  "{{{
 
   " gather candidates
   let candidates = []
+  call clock.stop()
   call clock.start()
   while filter(copy(self.basket), 'v:val.range.valid') != []
     for stuff in self.basket
@@ -277,6 +274,10 @@ function! s:textobj._search_without_nest(stuff, stimeoutlen) dict abort  "{{{
 endfunction
 "}}}
 function! s:textobj._get_region(stuff, stimeoutlen) dict abort "{{{
+  " NOTE: Because of the restriction of vim, if a operator to get the assigned
+  "       region is employed for 'external' user-defined textobjects, it makes
+  "       impossible to repeat by dot command. Thus, 'external' is checked by
+  "       using visual selection xmap in any case.
   let range = a:stuff.range
   let coord = a:stuff.coord
   let opt   = a:stuff.opt
@@ -495,7 +496,6 @@ function! s:textobj.finalize(mark_latestjump) dict abort "{{{
 endfunction
 "}}}
 
-" private functions
 function! s:searchpos(pattern, stuff, flag, stopline, timeout, is_head, is_syntax_on) abort "{{{
   let flag = a:flag
   if a:pattern !=# ''

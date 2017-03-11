@@ -14,7 +14,6 @@ let s:null_4coord = {
 let s:type_num = type(0)
 let s:type_str = type('')
 let s:type_list = type([])
-let s:type_fref = type(function('tr'))
 
 " common functions
 let s:lib = textobj#sandwich#lib#get()
