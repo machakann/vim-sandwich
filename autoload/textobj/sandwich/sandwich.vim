@@ -1,4 +1,4 @@
-" stuff object
+" sandwich object - manage recipe and positions of a sandwiched text
 
 " variables "{{{
 " null valiables
@@ -19,24 +19,24 @@ let s:type_list = type([])
 let s:lib = textobj#sandwich#lib#get()
 "}}}
 
-function! textobj#sandwich#stuff#new(recipe, opt) abort  "{{{
-  let stuff = deepcopy(s:stuff)
-  let stuff.opt = copy(a:opt)
-  let stuff.opt.recipe = {}
-  call stuff.opt.update('recipe', a:recipe)
-  let opt = stuff.opt
+function! textobj#sandwich#sandwich#new(recipe, opt) abort  "{{{
+  let sandwich = deepcopy(s:sandwich)
+  let sandwich.opt = copy(a:opt)
+  let sandwich.opt.recipe = {}
+  call sandwich.opt.update('recipe', a:recipe)
+  let opt = sandwich.opt
 
   if has_key(a:recipe, 'buns')
-    let stuff.searchby = 'buns'
-    let stuff.buns = deepcopy(a:recipe.buns)
+    let sandwich.searchby = 'buns'
+    let sandwich.buns = deepcopy(a:recipe.buns)
   elseif has_key(a:recipe, 'external')
-    let stuff.searchby = 'external'
-    let stuff.external = deepcopy(a:recipe.external)
+    let sandwich.searchby = 'external'
+    let sandwich.external = deepcopy(a:recipe.external)
   else
     return {}
   endif
-  let stuff.recipe = a:recipe
-  return stuff
+  let sandwich.recipe = a:recipe
+  return sandwich
 endfunction
 "}}}
 
@@ -124,8 +124,8 @@ endfunction
 "}}}
 "}}}
 
-" s:stuff "{{{
-let s:stuff = {
+" s:sandwich "{{{
+let s:sandwich = {
       \   'buns'      : [],
       \   'recipe'    : {},
       \   'external'  : [],
@@ -140,12 +140,12 @@ let s:stuff = {
       \   'synchro_buns': [],
       \ }
 "}}}
-function! s:stuff.startpos(cursor) dict abort "{{{
+function! s:sandwich.startpos(cursor) dict abort "{{{
   call self.coord.startpos(a:cursor)
   call self.range.initialize(a:cursor, self.opt.of('expand_range'))
 endfunction
 "}}}
-function! s:stuff.get_buns(state, clock) dict abort  "{{{
+function! s:sandwich.get_buns(state, clock) dict abort  "{{{
   let opt_listexpr = self.opt.of('listexpr')
   let opt_expr = self.opt.of('expr')
   let opt_regex = self.opt.of('regex')
@@ -192,7 +192,7 @@ function! s:stuff.get_buns(state, clock) dict abort  "{{{
   return buns
 endfunction
 "}}}
-function! s:stuff.export(cursor) dict abort  "{{{
+function! s:sandwich.export_recipe(cursor) dict abort  "{{{
   " For the cooperation with operator-sandwich
   " NOTE: After visual selection by a user-defined textobject, v:operator is set as ':'
   " NOTE: 'synchro' option is not valid for visual mode, because there is no guarantee that g:operator#sandwich#object exists.

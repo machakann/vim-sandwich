@@ -1,4 +1,4 @@
-" textobj object
+" textobj object - search & select a sandwiched text
 
 " variables "{{{
 " null valiables
@@ -58,7 +58,7 @@ function! s:textobj.initialize() dict abort  "{{{
   let self.count = !self.state && self.count != v:count1 ? v:count1 : self.count
   let self.syntax_on = exists('g:syntax_on') || exists('g:syntax_manual')
   if self.state
-    let self.basket = map(copy(self.recipes.integrated), 'textobj#sandwich#stuff#new(v:val, self.opt)')
+    let self.basket = map(copy(self.recipes.integrated), 'textobj#sandwich#sandwich#new(v:val, self.opt)')
     call filter(self.basket, 'v:val != {}')
   else
     let self.cursor = getpos('.')[1:2]
@@ -70,8 +70,8 @@ function! s:textobj.initialize() dict abort  "{{{
   else
     let self.visual.mode = 'v'
   endif
-  for stuff in self.basket
-    call stuff.startpos(self.cursor)
+  for sandwich in self.basket
+    call sandwich.startpos(self.cursor)
   endfor
 endfunction
 "}}}
@@ -83,8 +83,8 @@ function! s:textobj.list(stimeoutlen) dict abort  "{{{
   call clock.stop()
   call clock.start()
   while filter(copy(self.basket), 'v:val.range.valid') != []
-    for stuff in self.basket
-      let candidates += self.search(stuff, a:stimeoutlen)
+    for sandwich in self.basket
+      let candidates += self.search(sandwich, a:stimeoutlen)
     endfor
     call s:uniq_candidates(candidates, self.a_or_i)
     if len(candidates) >= self.count
@@ -105,27 +105,27 @@ function! s:textobj.list(stimeoutlen) dict abort  "{{{
   return candidates
 endfunction
 "}}}
-function! s:textobj.search(stuff, stimeoutlen) dict abort "{{{
-  if a:stuff.searchby ==# 'buns'
-    if a:stuff.opt.of('nesting')
-      let candidates = self._search_with_nest(a:stuff, a:stimeoutlen)
+function! s:textobj.search(sandwich, stimeoutlen) dict abort "{{{
+  if a:sandwich.searchby ==# 'buns'
+    if a:sandwich.opt.of('nesting')
+      let candidates = self._search_with_nest(a:sandwich, a:stimeoutlen)
     else
-      let candidates = self._search_without_nest(a:stuff, a:stimeoutlen)
+      let candidates = self._search_without_nest(a:sandwich, a:stimeoutlen)
     endif
-  elseif a:stuff.searchby ==# 'external'
-    let candidates = self._get_region(a:stuff, a:stimeoutlen)
+  elseif a:sandwich.searchby ==# 'external'
+    let candidates = self._get_region(a:sandwich, a:stimeoutlen)
   else
     let candidates = []
   endif
   return candidates
 endfunction
 "}}}
-function! s:textobj._search_with_nest(stuff, stimeoutlen) dict abort  "{{{
+function! s:textobj._search_with_nest(sandwich, stimeoutlen) dict abort  "{{{
   let clock = self.clock
-  let buns  = a:stuff.get_buns(self.state, clock)
-  let range = a:stuff.range
-  let coord = a:stuff.coord
-  let opt   = a:stuff.opt
+  let buns  = a:sandwich.get_buns(self.state, clock)
+  let range = a:sandwich.range
+  let coord = a:sandwich.coord
+  let opt   = a:sandwich.opt
   let candidates = []
 
   if buns[0] ==# '' || buns[1] ==# ''
@@ -148,14 +148,14 @@ function! s:textobj._search_with_nest(stuff, stimeoutlen) dict abort  "{{{
     " search head
     let flag = searchpos(buns[1], 'cn', range.bottom, a:stimeoutlen) == getpos('.')[1:2]
           \ ? 'b' : 'bc'
-    let head = searchpairpos(buns[0], '', buns[1], flag, 's:skip(1, self.syntax_on, a:stuff.opt, a:stuff.syntax)', range.top, a:stimeoutlen)
+    let head = searchpairpos(buns[0], '', buns[1], flag, 's:skip(1, self.syntax_on, a:sandwich.opt, a:sandwich.syntax)', range.top, a:stimeoutlen)
     if head == s:null_coord | break | endif
     let coord.head = head
 
-    let a:stuff.syntax = self.syntax_on && opt.of('match_syntax') ? [s:get_displaysyntax(head)] : []
+    let a:sandwich.syntax = self.syntax_on && opt.of('match_syntax') ? [s:get_displaysyntax(head)] : []
 
     " search tail
-    let tail = searchpairpos(buns[0], '', buns[1], '', 's:skip(0, self.syntax_on, a:stuff.opt, a:stuff.syntax)', range.bottom, a:stimeoutlen)
+    let tail = searchpairpos(buns[0], '', buns[1], '', 's:skip(0, self.syntax_on, a:sandwich.opt, a:sandwich.syntax)', range.bottom, a:stimeoutlen)
     if tail == s:null_coord | break | endif
     let tail = searchpos(buns[1], 'ce', range.bottom, a:stimeoutlen)
     if tail == s:null_coord | break | endif
@@ -164,8 +164,8 @@ function! s:textobj._search_with_nest(stuff, stimeoutlen) dict abort  "{{{
     call coord.get_inner(buns, opt.of('skip_break'))
 
     " add to candidates
-    if self.is_valid_candidate(a:stuff, self.syntax_on)
-      let candidate = deepcopy(a:stuff)
+    if self.is_valid_candidate(a:sandwich, self.syntax_on)
+      let candidate = deepcopy(a:sandwich)
       " this is required for the case of 'expr' option is 2.
       let candidate.buns[0:1] = buns
       let candidate.visualmode = self.visual.mode
@@ -184,12 +184,12 @@ function! s:textobj._search_with_nest(stuff, stimeoutlen) dict abort  "{{{
   return candidates
 endfunction
 "}}}
-function! s:textobj._search_without_nest(stuff, stimeoutlen) dict abort  "{{{
+function! s:textobj._search_without_nest(sandwich, stimeoutlen) dict abort  "{{{
   let clock = self.clock
-  let buns  = a:stuff.get_buns(self.state, clock)
-  let range = a:stuff.range
-  let coord = a:stuff.coord
-  let opt   = a:stuff.opt
+  let buns  = a:sandwich.get_buns(self.state, clock)
+  let range = a:sandwich.range
+  let coord = a:sandwich.coord
+  let opt   = a:sandwich.opt
   let candidates = []
 
   if buns[0] ==# '' || buns[1] ==# ''
@@ -200,18 +200,18 @@ function! s:textobj._search_without_nest(stuff, stimeoutlen) dict abort  "{{{
 
   " search nearest head
   call cursor(coord.head)
-  let head = s:searchpos(buns[0], a:stuff, 'bc', range.top, a:stimeoutlen, 1, self.syntax_on)
+  let head = s:searchpos(buns[0], a:sandwich, 'bc', range.top, a:stimeoutlen, 1, self.syntax_on)
   if head == s:null_coord
     call range.next()
     return candidates
   endif
   let _tail = searchpos(buns[0], 'ce', range.bottom, a:stimeoutlen)
 
-  let a:stuff.syntax = self.syntax_on && opt.of('match_syntax') ? [s:get_displaysyntax(head)] : []
+  let a:sandwich.syntax = self.syntax_on && opt.of('match_syntax') ? [s:get_displaysyntax(head)] : []
 
   " search nearest tail
   call cursor(coord.tail)
-  let tail = s:searchpos(buns[1], a:stuff, 'ce',  range.bottom, a:stimeoutlen, 0, self.syntax_on)
+  let tail = s:searchpos(buns[1], a:sandwich, 'ce',  range.bottom, a:stimeoutlen, 0, self.syntax_on)
   if tail == s:null_coord
     call range.next()
     return candidates
@@ -232,11 +232,11 @@ function! s:textobj._search_without_nest(stuff, stimeoutlen) dict abort  "{{{
       " pos is head
       let head = pos
 
-      let a:stuff.syntax = self.syntax_on && opt.of('match_syntax') ? [s:get_displaysyntax(head)] : []
+      let a:sandwich.syntax = self.syntax_on && opt.of('match_syntax') ? [s:get_displaysyntax(head)] : []
 
       " search tail
       call search(buns[0], 'ce', range.bottom, a:stimeoutlen)
-      let tail = s:searchpos(buns[1], a:stuff, 'e',  range.bottom, a:stimeoutlen, 0, self.syntax_on)
+      let tail = s:searchpos(buns[1], a:sandwich, 'e',  range.bottom, a:stimeoutlen, 0, self.syntax_on)
       if tail == s:null_coord
         call range.next()
         return candidates
@@ -244,13 +244,13 @@ function! s:textobj._search_without_nest(stuff, stimeoutlen) dict abort  "{{{
     else
       " pos is tail
       call cursor(pos)
-      let tail = s:searchpos(buns[1], a:stuff, 'ce',  range.bottom, a:stimeoutlen, 1, self.syntax_on)
+      let tail = s:searchpos(buns[1], a:sandwich, 'ce',  range.bottom, a:stimeoutlen, 1, self.syntax_on)
 
-      let a:stuff.syntax = self.syntax_on && opt.of('match_syntax') ? [s:get_displaysyntax(tail)] : []
+      let a:sandwich.syntax = self.syntax_on && opt.of('match_syntax') ? [s:get_displaysyntax(tail)] : []
 
       " search head
       call search(buns[1], 'bc', range.top, a:stimeoutlen)
-      let head = s:searchpos(buns[0], a:stuff, 'b',  range.top, a:stimeoutlen, 0, self.syntax_on)
+      let head = s:searchpos(buns[0], a:sandwich, 'b',  range.top, a:stimeoutlen, 0, self.syntax_on)
       if head == s:null_coord
         call range.next()
         return candidates
@@ -259,10 +259,10 @@ function! s:textobj._search_without_nest(stuff, stimeoutlen) dict abort  "{{{
   endif
   let coord.head = head
   let coord.tail = tail
-  call coord.get_inner(buns, a:stuff.opt.of('skip_break'))
+  call coord.get_inner(buns, a:sandwich.opt.of('skip_break'))
 
-  if self.is_valid_candidate(a:stuff, self.syntax_on)
-    let candidate = deepcopy(a:stuff)
+  if self.is_valid_candidate(a:sandwich, self.syntax_on)
+    let candidate = deepcopy(a:sandwich)
     " this is required for the case of 'expr' option is 2.
     unlet candidate.buns
     let candidate.buns = buns
@@ -273,14 +273,14 @@ function! s:textobj._search_without_nest(stuff, stimeoutlen) dict abort  "{{{
   return candidates
 endfunction
 "}}}
-function! s:textobj._get_region(stuff, stimeoutlen) dict abort "{{{
+function! s:textobj._get_region(sandwich, stimeoutlen) dict abort "{{{
   " NOTE: Because of the restriction of vim, if a operator to get the assigned
   "       region is employed for 'external' user-defined textobjects, it makes
   "       impossible to repeat by dot command. Thus, 'external' is checked by
   "       using visual selection xmap in any case.
-  let range = a:stuff.range
-  let coord = a:stuff.coord
-  let opt   = a:stuff.opt
+  let range = a:sandwich.range
+  let coord = a:sandwich.coord
+  let opt   = a:sandwich.opt
   let candidates = []
 
   if !range.valid | return candidates | endif
@@ -305,11 +305,11 @@ function! s:textobj._get_region(stuff, stimeoutlen) dict abort "{{{
       let [prev_head, prev_tail] = [coord.head, coord.tail]
       let [prev_inner_head, prev_inner_tail] = [coord.inner_head, coord.inner_tail]
       " get outer positions
-      let [head, tail, visualmode_a] = s:get_textobj_region(initpos, cmd, v, range.count, a:stuff.external[1])
+      let [head, tail, visualmode_a] = s:get_textobj_region(initpos, cmd, v, range.count, a:sandwich.external[1])
 
       " get inner positions
       if head != s:null_coord && tail != s:null_coord
-        let [inner_head, inner_tail, visualmode_i] = s:get_textobj_region(initpos, cmd, v, range.count, a:stuff.external[0])
+        let [inner_head, inner_tail, visualmode_i] = s:get_textobj_region(initpos, cmd, v, range.count, a:sandwich.external[0])
       else
         let [inner_head, inner_tail, visualmode_i] = [copy(s:null_coord), copy(s:null_coord), 'v']
       endif
@@ -322,8 +322,8 @@ function! s:textobj._get_region(stuff, stimeoutlen) dict abort "{{{
           let coord.inner_head = inner_head
           let coord.inner_tail = inner_tail
 
-          if self.is_valid_candidate(a:stuff, self.syntax_on)
-            let candidate = deepcopy(a:stuff)
+          if self.is_valid_candidate(a:sandwich, self.syntax_on)
+            let candidate = deepcopy(a:sandwich)
             let candidate.visualmode = self.a_or_i ==# 'a' ? visualmode_a : visualmode_i
             let candidates += [candidate]
           endif
@@ -350,10 +350,10 @@ function! s:textobj._get_region(stuff, stimeoutlen) dict abort "{{{
   return candidates
 endfunction
 "}}}
-function! s:textobj.is_valid_candidate(stuff, is_syntax_on) dict abort "{{{
+function! s:textobj.is_valid_candidate(sandwich, is_syntax_on) dict abort "{{{
   let visual = self.visual
-  let coord  = a:stuff.coord
-  let opt    = a:stuff.opt
+  let coord  = a:sandwich.coord
+  let opt    = a:sandwich.opt
 
   if self.a_or_i ==# 'i'
     let [head, tail] = [coord.inner_head, coord.inner_tail]
@@ -393,8 +393,8 @@ function! s:textobj.is_valid_candidate(stuff, is_syntax_on) dict abort "{{{
   " specific condition for the option 'matched_syntax' and 'inner_syntax'
   if a:is_syntax_on
     if opt.of('match_syntax') == 2
-      let opt_syntax_affair = s:is_included_syntax(coord.inner_head, a:stuff.syntax)
-                         \ && s:is_included_syntax(coord.inner_tail, a:stuff.syntax)
+      let opt_syntax_affair = s:is_included_syntax(coord.inner_head, a:sandwich.syntax)
+                         \ && s:is_included_syntax(coord.inner_tail, a:sandwich.syntax)
     elseif opt.of('match_syntax') == 3
       " check inner syntax independently
       if opt.of('inner_syntax') == []
@@ -443,16 +443,16 @@ function! s:textobj.elect(candidates) dict abort "{{{
   return elected
 endfunction
 "}}}
-function! s:textobj.select(target) dict abort  "{{{
-  if a:target == {}
+function! s:textobj.select(sandwich) dict abort  "{{{
+  if a:sandwich == {}
     if self.mode ==# 'x'
       normal! gv
     endif
     return
   endif
 
-  let head = self.a_or_i ==# 'i' ? a:target.coord.inner_head : a:target.coord.head
-  let tail = self.a_or_i ==# 'i' ? a:target.coord.inner_tail : a:target.coord.tail
+  let head = self.a_or_i ==# 'i' ? a:sandwich.coord.inner_head : a:sandwich.coord.head
+  let tail = self.a_or_i ==# 'i' ? a:sandwich.coord.inner_tail : a:sandwich.coord.tail
   if self.mode ==# 'x' && self.visual.mode ==# "\<C-v>"
     " trick for the blockwise visual mode
     if self.cursor[0] == self.visual.tail[0]
@@ -468,7 +468,7 @@ function! s:textobj.select(target) dict abort  "{{{
     endif
   endif
 
-  execute 'normal! ' . a:target.visualmode
+  execute 'normal! ' . a:sandwich.visualmode
   call cursor(head)
   normal! o
   call cursor(tail)
@@ -478,7 +478,7 @@ function! s:textobj.select(target) dict abort  "{{{
     normal! l
   endif
 
-  call operator#sandwich#synchronize(self.kind, a:target.export(self.cursor))
+  call operator#sandwich#synchronize(self.kind, a:sandwich.export_recipe(self.cursor))
   let self.done = 1
 endfunction
 "}}}
@@ -496,12 +496,12 @@ function! s:textobj.finalize(mark_latestjump) dict abort "{{{
 endfunction
 "}}}
 
-function! s:searchpos(pattern, stuff, flag, stopline, timeout, is_head, is_syntax_on) abort "{{{
+function! s:searchpos(pattern, sandwich, flag, stopline, timeout, is_head, is_syntax_on) abort "{{{
   let flag = a:flag
   if a:pattern !=# ''
     let coord = searchpos(a:pattern, flag, a:stopline, a:timeout)
     let flag = substitute(flag, '\Cc', '', 'g')
-    while coord != s:null_coord && s:skip(a:is_head, a:is_syntax_on, a:stuff.opt, a:stuff.syntax, coord)
+    while coord != s:null_coord && s:skip(a:is_head, a:is_syntax_on, a:sandwich.opt, a:sandwich.syntax, coord)
       let coord = searchpos(a:pattern, flag, a:stopline, a:timeout)
     endwhile
   else
