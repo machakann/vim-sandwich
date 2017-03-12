@@ -42,9 +42,9 @@ endfunction
 
 " coord object"{{{
 let s:coord = deepcopy(s:null_4coord)
-function! s:coord.startpos(cursor) dict abort "{{{
-  let self.head = deepcopy(a:cursor)
-  let self.tail = deepcopy(a:cursor)
+function! s:coord.initialize() dict abort "{{{
+  let self.head = deepcopy(s:null_coord)
+  let self.tail = deepcopy(s:null_coord)
 endfunction
 "}}}
 function! s:coord.get_inner(buns, skip_break) dict abort "{{{
@@ -140,8 +140,8 @@ let s:sandwich = {
       \   'synchro_buns': [],
       \ }
 "}}}
-function! s:sandwich.startpos(cursor) dict abort "{{{
-  call self.coord.startpos(a:cursor)
+function! s:sandwich.initialize(cursor) dict abort "{{{
+  call self.coord.initialize()
   call self.range.initialize(a:cursor, self.opt.of('expand_range'))
 endfunction
 "}}}

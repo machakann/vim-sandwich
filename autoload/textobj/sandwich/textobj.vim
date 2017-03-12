@@ -71,7 +71,7 @@ function! s:textobj.initialize() dict abort  "{{{
     let self.visual.mode = 'v'
   endif
   for sandwich in self.basket
-    call sandwich.startpos(self.cursor)
+    call sandwich.initialize(self.cursor)
   endfor
 endfunction
 "}}}
@@ -134,14 +134,13 @@ function! s:textobj._search_with_nest(sandwich, stimeoutlen) dict abort  "{{{
   if !range.valid | return candidates | endif
 
   " check whether the cursor is on the buns[1] or not
-  let cursorpos = coord.head
-  call cursor(cursorpos)
+  call cursor(self.cursor)
   let _head = searchpos(buns[1], 'bcW', range.top, a:stimeoutlen)
   let _tail = searchpos(buns[1], 'cenW', range.bottom, a:stimeoutlen)
-  if _head != s:null_coord && _tail != s:null_coord && s:is_in_between(cursorpos, _head, _tail)
+  if _head != s:null_coord && _tail != s:null_coord && s:is_in_between(self.cursor, _head, _tail)
     call cursor(_head)
   else
-    call cursor(cursorpos)
+    call cursor(self.cursor)
   endif
 
   while 1
@@ -199,7 +198,7 @@ function! s:textobj._search_without_nest(sandwich, stimeoutlen) dict abort  "{{{
   if !range.valid | return candidates | endif
 
   " search nearest head
-  call cursor(coord.head)
+  call cursor(self.cursor)
   let head = s:searchpos(buns[0], a:sandwich, 'bc', range.top, a:stimeoutlen, 1, self.syntax_on)
   if head == s:null_coord
     call range.next()
@@ -210,7 +209,7 @@ function! s:textobj._search_without_nest(sandwich, stimeoutlen) dict abort  "{{{
   let a:sandwich.syntax = self.syntax_on && opt.of('match_syntax') ? [s:get_displaysyntax(head)] : []
 
   " search nearest tail
-  call cursor(coord.tail)
+  call cursor(self.cursor)
   let tail = s:searchpos(buns[1], a:sandwich, 'ce',  range.bottom, a:stimeoutlen, 0, self.syntax_on)
   if tail == s:null_coord
     call range.next()
