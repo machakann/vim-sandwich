@@ -14,6 +14,7 @@ let s:null_4coord = {
 let s:type_num = type(0)
 let s:type_str = type('')
 let s:type_list = type([])
+let s:type_fref = type(function('tr'))
 
 " common functions
 let s:lib = textobj#sandwich#lib#get()
@@ -24,11 +25,11 @@ function! textobj#sandwich#sandwich#new(recipe, opt) abort  "{{{
   let sandwich.opt = copy(a:opt)
   let sandwich.opt.recipe = {}
   call sandwich.opt.update('recipe', a:recipe)
-  let opt = sandwich.opt
 
   if has_key(a:recipe, 'buns')
     let sandwich.searchby = 'buns'
-    let sandwich.buns = deepcopy(a:recipe.buns)
+    unlet sandwich.dough
+    let sandwich.dough = deepcopy(a:recipe.buns)
   elseif has_key(a:recipe, 'external')
     let sandwich.searchby = 'external'
     let sandwich.external = deepcopy(a:recipe.external)
@@ -127,69 +128,156 @@ endfunction
 " s:sandwich "{{{
 let s:sandwich = {
       \   'buns'      : [],
-      \   'recipe'    : {},
+      \   'dough'     : [],
       \   'external'  : [],
       \   'searchby'  : '',
+      \   'recipe'    : {},
       \   'coord'     : deepcopy(s:coord),
       \   'range'     : deepcopy(s:range),
       \   'visualmode': '',
+      \   'syntax_on' : 1,
       \   'syntax'    : [],
       \   'opt'       : {},
       \   'escaped'   : 0,
-      \   'evaluated' : 0,
-      \   'synchro_buns': [],
       \ }
 "}}}
-function! s:sandwich.initialize(cursor) dict abort "{{{
+function! s:sandwich.initialize(cursor, is_syntax_on) dict abort "{{{
+  let self.syntax_on = a:is_syntax_on
   call self.coord.initialize()
   call self.range.initialize(a:cursor, self.opt.of('expand_range'))
+  return self
 endfunction
 "}}}
-function! s:sandwich.get_buns(state, clock) dict abort  "{{{
+function! s:sandwich.bake_buns(state, clock) dict abort  "{{{
   let opt_listexpr = self.opt.of('listexpr')
   let opt_expr = self.opt.of('expr')
   let opt_regex = self.opt.of('regex')
 
   call a:clock.pause()
-  if opt_listexpr == 2
-    let buns = eval(self.buns)
-  elseif opt_listexpr == 1 && !self.evaluated
-    let buns = eval(self.buns)
-    unlet self.buns
-    let self.buns = buns
-    let self.evaluated = 1
-  elseif opt_expr == 2
-    let buns = ['', '']
-    let buns[0] = eval(self.buns[0])
-    if buns[0] !=# ''
-      let buns[1] = eval(self.buns[1])
+  if a:state
+    if opt_listexpr
+      let self.buns = eval(self.dough)
+    elseif opt_expr
+      let self.buns = s:evalexpr(self.dough)
+    else
+      let self.buns = self.dough
     endif
-  elseif opt_expr == 1 && !self.evaluated
-    let buns = self.buns
-    let buns[0] = eval(buns[0])
-    if buns[0] !=# ''
-      let buns[1] = eval(buns[1])
-    endif
-    let self.evaluated = 1
   else
-    let buns = self.buns
+    if opt_listexpr >= 2
+      let self.buns = eval(self.dough)
+      let self.escaped = 0
+    elseif opt_expr >= 2
+      let self.buns = s:evalexpr(self.dough)
+      let self.escaped = 0
+    endif
   endif
   call a:clock.start()
 
-  if !s:valid_buns(buns)
+  if !s:valid_buns(self.buns)
     return ['', '']
   endif
 
-  if !self.escaped
-    let self.synchro_buns = copy(buns)
-    if a:state && !opt_regex
-      call map(buns, 's:lib.escape(v:val)')
-      if buns is self.buns
-        let self.escaped = 1
+  if !self.escaped && !opt_regex
+    call map(self.buns, 's:lib.escape(v:val)')
+    let self.escaped = 1
+  endif
+  return copy(self.buns)
+endfunction
+"}}}
+function! s:sandwich.searchpair_head(stimeoutlen) dict abort "{{{
+  let tailpos = searchpos(self.buns[1], 'cn', self.range.bottom, a:stimeoutlen)
+  let flag = tailpos == getpos('.')[1:2] ? 'b' : 'bc'
+  let stopline = self.range.top
+  return searchpairpos(self.buns[0], '', self.buns[1], flag, 'self.skip(1)', stopline, a:stimeoutlen)
+endfunction
+"}}}
+function! s:sandwich.searchpair_tail(stimeoutlen) dict abort "{{{
+  let stopline = self.range.bottom
+  return searchpairpos(self.buns[0], '', self.buns[1], '', 'self.skip(0)', stopline, a:stimeoutlen)
+endfunction
+"}}}
+function! s:sandwich.search_head(flag, stimeoutlen) dict abort "{{{
+  return self._searchpos(self.buns[0], a:flag, 1, self.range.top, a:stimeoutlen)
+endfunction
+"}}}
+function! s:sandwich.search_tail(flag, stimeoutlen) dict abort "{{{
+  return self._searchpos(self.buns[1], a:flag, 0, self.range.bottom, a:stimeoutlen)
+endfunction
+"}}}
+function! s:sandwich._searchpos(pattern, flag, is_head, stopline, stimeoutlen) dict abort "{{{
+  let coord = searchpos(a:pattern, a:flag, a:stopline, a:stimeoutlen)
+  let flag = substitute(a:flag, '\m\Cc', '', 'g')
+  while coord != s:null_coord && self.skip(a:is_head, coord)
+    let coord = searchpos(a:pattern, flag, a:stopline, a:stimeoutlen)
+  endwhile
+  return coord
+endfunction
+"}}}
+function! s:sandwich.skip(is_head, ...) dict abort "{{{
+  " NOTE: for sandwich.searchpairpos()/sandwich.searchpos() functions.
+  let opt = self.opt
+  let checkpos = get(a:000, 0, getpos('.')[1:2])
+
+  if checkpos == s:null_coord
+    return 1
+  endif
+
+  " quoteescape option
+  let skip_patterns = []
+  if opt.of('quoteescape') && &quoteescape !=# ''
+    for c in split(&quoteescape, '\zs')
+      let c = s:lib.escape(c)
+      let pattern = printf('[^%s]%s\%%(%s%s\)*\zs\%%#', c, c, c, c)
+      let skip_patterns += [pattern]
+    endfor
+  endif
+
+  " skip_regex option
+  let skip_patterns += opt.of('skip_regex')
+  let skip_patterns += a:is_head ? opt.of('skip_regex_head') : opt.of('skip_regex_tail')
+  if skip_patterns != []
+    call cursor(checkpos)
+    for pattern in skip_patterns
+      let skip = searchpos(pattern, 'cn', checkpos[0]) == checkpos
+      if skip
+        return 1
+      endif
+    endfor
+  endif
+
+  " syntax, match_syntax option
+  if self.syntax_on
+    if a:is_head || !opt.of('match_syntax')
+      let opt_syntax = opt.of('syntax')
+      if opt_syntax != [] && !s:lib.is_included_syntax(checkpos, opt_syntax)
+        return 1
+      endif
+    else
+      if !s:lib.is_matched_syntax(checkpos, self.syntax)
+        return 1
       endif
     endif
   endif
-  return buns
+
+  " skip_expr option
+  for Expr in opt.of('skip_expr')
+    if s:eval(Expr, a:is_head, s:lib.c2p(checkpos))
+      return 1
+    endif
+  endfor
+
+  return 0
+endfunction
+"}}}
+function! s:sandwich.check_syntax(coord) dict abort "{{{
+  if !self.syntax_on || !self.opt.of('match_syntax')
+    return
+  endif
+
+  let synitem = s:lib.get_displaysyntax(a:coord)
+  if synitem !=# ''
+    let self.syntax = [synitem]
+  endif
 endfunction
 "}}}
 function! s:sandwich.export_recipe(cursor) dict abort  "{{{
@@ -201,7 +289,7 @@ function! s:sandwich.export_recipe(cursor) dict abort  "{{{
         \ && &operatorfunc =~# '^operator#sandwich#\%(delete\|replace\)'
     let recipe = self.recipe
     if self.searchby ==# 'buns'
-      call extend(recipe, {'buns': self.synchro_buns}, 'force')
+      call extend(recipe, {'buns': self.buns}, 'force')
       call extend(recipe, {'expr': 0}, 'force')
       call extend(recipe, {'listexpr': 0}, 'force')
     elseif self.searchby ==# 'external'
@@ -220,13 +308,26 @@ function! s:sandwich.export_recipe(cursor) dict abort  "{{{
 endfunction
 "}}}
 
+function! s:evalexpr(dough) abort "{{{
+  let buns = []
+  let buns += [eval(a:dough[0])]
+  if buns[0] !=# ''
+    let buns += [eval(a:dough[1])]
+  endif
+  return buns
+endfunction
+"}}}
 function! s:valid_buns(buns) abort  "{{{
-  return type(a:buns) == s:type_list && s:check_a_bun(a:buns[0]) && s:check_a_bun(a:buns[1])
+  return type(a:buns) == s:type_list && len(a:buns) >= 2 && s:check_a_bun(a:buns[0]) && s:check_a_bun(a:buns[1])
 endfunction
 "}}}
 function! s:check_a_bun(bun) abort  "{{{
   let type_bun = type(a:bun)
-  return type_bun ==# s:type_num || (type_bun ==# s:type_str && a:bun !=# '')
+  return (type_bun ==# s:type_str && a:bun !=# '') || type_bun ==# s:type_num
+endfunction
+"}}}
+function! s:eval(expr, ...) abort "{{{
+  return type(a:expr) == s:type_fref ? call(a:expr, a:000) : eval(a:expr)
 endfunction
 "}}}
 

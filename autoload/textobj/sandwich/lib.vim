@@ -72,6 +72,37 @@ function! s:lib.set_displaycoord(disp_coord) abort "{{{
   endif
 endfunction
 "}}}
+function! s:lib.get_displaysyntax(coord) abort  "{{{
+  return synIDattr(synIDtrans(synID(a:coord[0], a:coord[1], 1)), 'name')
+endfunction
+"}}}
+function! s:lib.is_matched_syntax(coord, syntaxID) abort  "{{{
+  if a:coord == s:null_coord
+    return 0
+  elseif a:syntaxID == []
+    return 1
+  else
+    return s:lib.get_displaysyntax(a:coord) ==? a:syntaxID[0]
+  endif
+endfunction
+"}}}
+function! s:lib.is_included_syntax(coord, syntaxID) abort  "{{{
+  let synstack = map(synstack(a:coord[0], a:coord[1]),
+        \ 'synIDattr(synIDtrans(v:val), "name")')
+
+  if a:syntaxID == []
+    return 1
+  elseif synstack == []
+    if a:syntaxID == ['']
+      return 1
+    else
+      return 0
+    endif
+  else
+    return filter(map(copy(a:syntaxID), '''\c'' . v:val'), 'match(synstack, v:val) > -1') != []
+  endif
+endfunction
+"}}}
 
 
 
