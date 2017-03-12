@@ -409,7 +409,7 @@ function! s:textobj.select(sandwich) dict abort  "{{{
     normal! l
   endif
 
-  call operator#sandwich#synchronize(self.kind, a:sandwich.export_recipe(self.cursor))
+  call operator#sandwich#synchronize(self.kind, a:sandwich.export_recipe())
   let self.done = 1
 endfunction
 "}}}

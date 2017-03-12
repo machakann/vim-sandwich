@@ -132,6 +132,7 @@ let s:sandwich = {
       \   'external'  : [],
       \   'searchby'  : '',
       \   'recipe'    : {},
+      \   'cursor'    : copy(s:null_coord),
       \   'coord'     : deepcopy(s:coord),
       \   'range'     : deepcopy(s:range),
       \   'visualmode': '',
@@ -143,6 +144,7 @@ let s:sandwich = {
 "}}}
 function! s:sandwich.initialize(cursor, is_syntax_on) dict abort "{{{
   let self.syntax_on = a:is_syntax_on
+  let self.cursor = a:cursor
   call self.coord.initialize()
   call self.range.initialize(a:cursor, self.opt.of('expand_range'))
   return self
@@ -280,7 +282,7 @@ function! s:sandwich.check_syntax(coord) dict abort "{{{
   endif
 endfunction
 "}}}
-function! s:sandwich.export_recipe(cursor) dict abort  "{{{
+function! s:sandwich.export_recipe() dict abort  "{{{
   " For the cooperation with operator-sandwich
   " NOTE: After visual selection by a user-defined textobject, v:operator is set as ':'
   " NOTE: 'synchro' option is not valid for visual mode, because there is no guarantee that g:operator#sandwich#object exists.
@@ -295,7 +297,7 @@ function! s:sandwich.export_recipe(cursor) dict abort  "{{{
     elseif self.searchby ==# 'external'
       let excursus = {
             \   'count' : self.range.count,
-            \   'cursor': s:lib.c2p(a:cursor),
+            \   'cursor': s:lib.c2p(self.cursor),
             \   'coord' : self.coord,
             \ }
       call extend(recipe, {'excursus': excursus}, 'force')
