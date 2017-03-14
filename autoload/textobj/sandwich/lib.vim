@@ -12,26 +12,27 @@ else
 endif
 "}}}
 
-function! textobj#sandwich#lib#funcref(list) abort "{{{
-  return map(copy(a:list), 'function("s:" . v:val)')
+function! textobj#sandwich#lib#get() abort "{{{
+  return s:lib
 endfunction
 "}}}
 
-function! s:c2p(coord) abort  "{{{
+let s:lib = {}
+function! s:lib.c2p(coord) abort  "{{{
   return [0] + a:coord + [0]
 endfunction
 "}}}
-function! s:escape(string) abort  "{{{
+function! s:lib.escape(string) abort  "{{{
   return escape(a:string, '~"\.^$[]*')
 endfunction
 "}}}
-" function! s:sort(list, func, count) abort  "{{{
+" function! s:lib.sort(list, func, count) abort  "{{{
 if s:has_patch_7_4_358
-  function! s:sort(list, func, count) abort
+  function! s:lib.sort(list, func, count) abort
     return sort(a:list, a:func)
   endfunction
 else
-  function! s:sort(list, func, count) abort
+  function! s:lib.sort(list, func, count) abort
     " NOTE: len(a:list) is always larger than count or same.
     " FIXME: The number of item in a:list would not be large, but if there was
     "        any efficient argorithm, I would rewrite here.
@@ -40,7 +41,7 @@ else
       if len - 2 >= i
         let min = len - 1
         for j in range(len - 2, i, -1)
-          if a:list[min]['len'] >= a:list[j]['len']
+          if call(a:func, [a:list[min], a:list[j]]) >= 0
             let min = j
           endif
         endfor
@@ -54,11 +55,7 @@ else
   endfunction
 endif
 "}}}
-function! s:get(name, default) abort  "{{{
-  return get(g:, 'textobj#sandwich#' . a:name, a:default)
-endfunction
-"}}}
-function! s:get_displaycoord(coord) abort "{{{
+function! s:lib.get_displaycoord(coord) abort "{{{
   let [lnum, col] = a:coord
 
   if [lnum, col] != s:null_coord
@@ -69,17 +66,44 @@ function! s:get_displaycoord(coord) abort "{{{
   return [lnum, disp_col]
 endfunction
 "}}}
-function! s:set_displaycoord(disp_coord) abort "{{{
+function! s:lib.set_displaycoord(disp_coord) abort "{{{
   if a:disp_coord != s:null_coord
     execute 'normal! ' . a:disp_coord[0] . 'G' . a:disp_coord[1] . '|'
   endif
 endfunction
 "}}}
-
-function! s:compare_buf_length(i1, i2) abort  "{{{
-  return a:i1.len - a:i2.len
+function! s:lib.get_displaysyntax(coord) abort  "{{{
+  return synIDattr(synIDtrans(synID(a:coord[0], a:coord[1], 1)), 'name')
 endfunction
 "}}}
+function! s:lib.is_matched_syntax(coord, syntaxID) abort  "{{{
+  if a:coord == s:null_coord
+    return 0
+  elseif a:syntaxID == []
+    return 1
+  else
+    return s:lib.get_displaysyntax(a:coord) ==? a:syntaxID[0]
+  endif
+endfunction
+"}}}
+function! s:lib.is_included_syntax(coord, syntaxID) abort  "{{{
+  let synstack = map(synstack(a:coord[0], a:coord[1]),
+        \ 'synIDattr(synIDtrans(v:val), "name")')
+
+  if a:syntaxID == []
+    return 1
+  elseif synstack == []
+    if a:syntaxID == ['']
+      return 1
+    else
+      return 0
+    endif
+  else
+    return filter(map(copy(a:syntaxID), '''\c'' . v:val'), 'match(synstack, v:val) > -1') != []
+  endif
+endfunction
+"}}}
+
 
 
 " vim:set foldmethod=marker:

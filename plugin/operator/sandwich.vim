@@ -1,5 +1,5 @@
 " The vim operator plugin to do well with 'sandwich' like structure
-" Last Change: 02-Mar-2017.
+" Last Change: 10-Mar-2017.
 " Maintainer : Masaaki Nakamura <mckn@outlook.jp>
 
 " License    : NYSL
@@ -51,7 +51,7 @@ function! s:default_highlight() abort
 endfunction
 call s:default_highlight()
 
-augroup sandwich-highlight
+augroup sandwich-event-ColorScheme
   autocmd!
   autocmd ColorScheme * call s:default_highlight()
 augroup END
