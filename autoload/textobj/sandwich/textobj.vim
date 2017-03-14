@@ -334,10 +334,17 @@ endfunction
 "}}}
 function! s:textobj.is_valid_candidate(sandwich) dict abort "{{{
   let coord = a:sandwich.coord
+  if !s:is_in_between(self.cursor, coord.head, coord.tail)
+    return 0
+  endif
+
   if self.a_or_i ==# 'i'
     let [head, tail] = [coord.inner_head, coord.inner_tail]
   else
     let [head, tail] = [coord.head, coord.tail]
+  endif
+  if head == s:null_coord || tail == s:null_coord || s:is_ahead(head, tail)
+    return 0
   endif
 
   " specific condition in visual mode
@@ -347,15 +354,17 @@ function! s:textobj.is_valid_candidate(sandwich) dict abort "{{{
     let visual_mode_affair = s:visual_mode_affair(
           \ head, tail, self.a_or_i, self.cursor, self.visual)
   endif
+  if !visual_mode_affair
+    return 0
+  endif
 
   " specific condition for the option 'matched_syntax' and 'inner_syntax'
   let opt_syntax_affair = s:opt_syntax_affair(a:sandwich)
+  if !opt_syntax_affair
+    return 0
+  endif
 
-  return head != s:null_coord && tail != s:null_coord
-        \ && s:is_equal_or_ahead(tail, head)
-        \ && s:is_in_between(self.cursor, coord.head, coord.tail)
-        \ && visual_mode_affair
-        \ && opt_syntax_affair
+  return 1
 endfunction
 "}}}
 function! s:textobj.elect(candidates) dict abort "{{{
