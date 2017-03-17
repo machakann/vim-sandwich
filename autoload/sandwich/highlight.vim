@@ -126,10 +126,10 @@ function! s:highlight.quench() dict abort "{{{
     let succeeded = 1
   else
     if s:is_in_cmdline_window()
-      let s:quenching_queue += [self]
-      augroup sandwich-quech-queue
+      let s:paused += [self]
+      augroup sandwich-pause-quenching
         autocmd!
-        autocmd CmdWinLeave * call s:exodus_from_cmdwindow()
+        autocmd CmdWinLeave * call s:got_out_of_cmdwindow()
       augroup END
       let succeeded = 0
     else
@@ -151,12 +151,13 @@ function! s:highlight.quench() dict abort "{{{
 endfunction
 "}}}
 function! s:highlight.quench_timer(time) dict abort "{{{
-  let id = timer_start(a:time, s:SID . 'scheduled_quench')
-  let s:quench_table[id] = self
+  let id = timer_start(a:time, s:SID . 'quench')
+  let s:quench_table[string(id)] = self
 
-  execute 'augroup sandwich-highlight-' . id
+  augroup sandwich-highlight
     autocmd!
-    execute printf('autocmd TextChanged <buffer> call s:set_autocmds(%s)', id)
+    execute printf('autocmd TextChanged  <buffer> call s:set_autocmds(%s)', id)
+    execute printf('autocmd TextChangedI <buffer> call s:cancel_highlight(%s)', id)
   augroup END
   return id
 endfunction
@@ -189,26 +190,33 @@ else
 endif
 "}}}
 
-" for scheduled-quench "{{{
+" for delayed quenching "{{{
 let s:quench_table = {}
-let s:obsolete_augroup = []
-function! s:scheduled_quench(id) abort  "{{{
+let s:paused = []
+function! s:quench(id) abort  "{{{
   let options = s:shift_options()
+  let highlight = s:get(a:id)
   try
-    let highlight = s:quench_table[a:id]
-    call highlight.quench()
+    if highlight != {}
+      call highlight.quench()
+    endif
   catch /^Vim\%((\a\+)\)\=:E523/
     " NOTE: For "textlock"
-    let highlight = s:quench_table[a:id]
-    call highlight.quench_timer(50)
+    if highlight != {}
+      call highlight.quench_timer(50)
+    endif
     return 1
   finally
     unlet s:quench_table[a:id]
-    call s:metabolize_augroup(a:id)
     call timer_stop(a:id)
+    call s:clear_autocmds()
     call s:restore_options(options)
     redraw
   endtry
+endfunction
+"}}}
+function! s:get(id) abort "{{{
+  return get(s:quench_table, string(a:id), {})
 endfunction
 "}}}
 function! sandwich#highlight#cancel(...) abort "{{{
@@ -219,49 +227,61 @@ function! sandwich#highlight#cancel(...) abort "{{{
   endif
 
   for id in id_list
-    call s:scheduled_quench(id)
+    call s:quench(id)
   endfor
 endfunction
 "}}}
-function! s:metabolize_augroup(id) abort  "{{{
-  " clean up autocommands in the current augroup
-  execute 'augroup sandwich-highlight-' . a:id
-    autocmd!
-  augroup END
-
-  " clean up obsolete augroup
-  call filter(s:obsolete_augroup, 'v:val != a:id')
-  for id in s:obsolete_augroup
-    execute 'augroup! sandwich-highlight-' . id
-  endfor
-  call filter(s:obsolete_augroup, 0)
-
-  " queue the current augroup
-  call add(s:obsolete_augroup, a:id)
-endfunction
-"}}}
-let s:quenching_queue = []
-function! s:quench_queued(...) abort "{{{
+function! s:quench_paused(...) abort "{{{
   if s:is_in_cmdline_window()
     return
   endif
 
-  augroup sandwich-quech-queue
+  augroup sandwich-pause-quenching
     autocmd!
   augroup END
 
-  let list = copy(s:quenching_queue)
-  let s:quenching_queue = []
-  for highlight in list
+  for highlight in s:paused
     call highlight.quench()
   endfor
+  let s:paused = []
 endfunction
 "}}}
-function! s:exodus_from_cmdwindow() abort "{{{
-  augroup sandwich-quech-queue
+function! s:got_out_of_cmdwindow() abort "{{{
+  augroup sandwich-pause-quenching
     autocmd!
-    autocmd CursorMoved * call s:quench_queued()
+    autocmd CursorMoved * call s:quench_paused()
   augroup END
+endfunction
+"}}}
+function! s:set_autocmds(id) abort "{{{
+  augroup sandwich-highlight
+    autocmd!
+    execute printf('autocmd TextChanged,InsertEnter,BufUnload <buffer> call s:cancel_highlight(%s)', a:id)
+    execute printf('autocmd BufEnter * call s:switch_highlight(%s)', a:id)
+  augroup END
+endfunction
+"}}}
+function! s:clear_autocmds() abort "{{{
+  augroup sandwich-highlight
+    autocmd!
+  augroup END
+endfunction
+"}}}
+function! s:cancel_highlight(id) abort  "{{{
+  call s:quench(a:id)
+endfunction
+"}}}
+function! s:switch_highlight(id) abort "{{{
+  let highlight = s:get(a:id)
+  if highlight == {} || !highlight.highlighted_window()
+    return
+  endif
+
+  if highlight.bufnr == bufnr('%')
+    call highlight.show()
+  else
+    call highlight.quench()
+  endif
 endfunction
 "}}}
 "}}}
@@ -459,36 +479,6 @@ function! s:goto_tab(tabnr) abort  "{{{
     execute 'noautocmd tabnext ' . a:tabnr
   endif
   return tabpagenr() == a:tabnr ? 1 : 0
-endfunction
-"}}}
-function! s:set_autocmds(id) abort "{{{
-  execute 'augroup sandwich-highlight-' . a:id
-    autocmd!
-    execute printf('autocmd TextChanged <buffer> call s:cancel_highlight(%s, "TextChanged")', a:id)
-    execute printf('autocmd InsertEnter <buffer> call s:cancel_highlight(%s, "InsertEnter")', a:id)
-    execute printf('autocmd BufUnload <buffer> call s:cancel_highlight(%s, "BufUnload")', a:id)
-    execute printf('autocmd BufEnter * call s:switch_highlight(%s)', a:id)
-  augroup END
-endfunction
-"}}}
-function! s:cancel_highlight(id, event) abort  "{{{
-  let highlight = get(s:quench_table, a:id, {})
-  if highlight != {}
-    call s:scheduled_quench(a:id)
-  endif
-endfunction
-"}}}
-function! s:switch_highlight(id) abort "{{{
-  let highlight = get(s:quench_table, a:id, {})
-  if highlight == {} || !highlight.highlighted_window()
-    return
-  endif
-
-  if highlight.bufnr == bufnr('%')
-    call highlight.show()
-  else
-    call highlight.quench()
-  endif
 endfunction
 "}}}
 
