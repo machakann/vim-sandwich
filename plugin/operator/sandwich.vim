@@ -1,5 +1,5 @@
 " The vim operator plugin to do well with 'sandwich' like structure
-" Last Change: 10-Mar-2017.
+" Last Change: 17-Mar-2017.
 " Maintainer : Masaaki Nakamura <mckn@outlook.jp>
 
 " License    : NYSL
@@ -12,12 +12,19 @@ endif
 let g:loaded_operator_sandwich = 1
 
 " keymappings
-nnoremap <silent> <Plug>(operator-sandwich-add)     :<C-u>call operator#sandwich#prerequisite('add', 'n')<CR>g@
-xnoremap <silent> <Plug>(operator-sandwich-add)     <Esc>:call operator#sandwich#prerequisite('add', 'x')<CR>gvg@
-nnoremap <silent> <Plug>(operator-sandwich-delete)  :<C-u>call operator#sandwich#prerequisite('delete', 'n')<CR>g@
-xnoremap <silent> <Plug>(operator-sandwich-delete)  <Esc>:call operator#sandwich#prerequisite('delete', 'x')<CR>gvg@
-nnoremap <silent> <Plug>(operator-sandwich-replace) :<C-u>call operator#sandwich#prerequisite('replace', 'n')<CR>g@
-xnoremap <silent> <Plug>(operator-sandwich-replace) <Esc>:call operator#sandwich#prerequisite('replace', 'x')<CR>gvg@
+nmap <silent> <Plug>(operator-sandwich-add)     <Plug>(operator-sandwich-add-pre)<Plug>(operator-sandwich-g@)
+xmap <silent> <Plug>(operator-sandwich-add)     <Plug>(operator-sandwich-add-pre)<Plug>(operator-sandwich-gv)<Plug>(operator-sandwich-g@)
+nmap <silent> <Plug>(operator-sandwich-delete)  <Plug>(operator-sandwich-delete-pre)<Plug>(operator-sandwich-g@)
+xmap <silent> <Plug>(operator-sandwich-delete)  <Plug>(operator-sandwich-delete-pre)<Plug>(operator-sandwich-gv)<Plug>(operator-sandwich-g@)
+nmap <silent> <Plug>(operator-sandwich-replace) <Plug>(operator-sandwich-replace-pre)<Plug>(operator-sandwich-g@)
+xmap <silent> <Plug>(operator-sandwich-replace) <Plug>(operator-sandwich-replace-pre)<Plug>(operator-sandwich-gv)<Plug>(operator-sandwich-g@)
+
+nnoremap <silent> <Plug>(operator-sandwich-add-pre)     :<C-u>call operator#sandwich#prerequisite('add', 'n')<CR>
+xnoremap <silent> <Plug>(operator-sandwich-add-pre)     <Esc>:call operator#sandwich#prerequisite('add', 'x')<CR>
+nnoremap <silent> <Plug>(operator-sandwich-delete-pre)  :<C-u>call operator#sandwich#prerequisite('delete', 'n')<CR>
+xnoremap <silent> <Plug>(operator-sandwich-delete-pre)  <Esc>:call operator#sandwich#prerequisite('delete', 'x')<CR>
+nnoremap <silent> <Plug>(operator-sandwich-replace-pre) :<C-u>call operator#sandwich#prerequisite('replace', 'n')<CR>
+xnoremap <silent> <Plug>(operator-sandwich-replace-pre) <Esc>:call operator#sandwich#prerequisite('replace', 'x')<CR>
 
 nnoremap <silent> <Plug>(operator-sandwich-add-query1st)     :<C-u>call operator#sandwich#query1st('add', 'n')<CR>
 xnoremap <silent> <Plug>(operator-sandwich-add-query1st)     <Esc>:call operator#sandwich#query1st('add', 'x')<CR>
@@ -35,6 +42,12 @@ nnoremap <expr><silent> <Plug>(operator-sandwich-dot)    operator#sandwich#dot()
 noremap <silent> <Plug>(operator-sandwich-add-visualrepeat)     :<C-u>call operator#sandwich#visualrepeat('add')<CR>
 noremap <silent> <Plug>(operator-sandwich-delete-visualrepeat)  :<C-u>call operator#sandwich#visualrepeat('delete')<CR>
 noremap <silent> <Plug>(operator-sandwich-replace-visualrepeat) :<C-u>call operator#sandwich#visualrepeat('replace')<CR>
+
+" intrinsic keymappings
+noremap  <Plug>(operator-sandwich-g@) g@
+inoremap <Plug>(operator-sandwich-g@) <C-o>g@
+nnoremap <Plug>(operator-sandwich-gv) gv
+inoremap <Plug>(operator-sandwich-gv) <C-o>gv
 
 " highlight group
 function! s:default_highlight() abort
