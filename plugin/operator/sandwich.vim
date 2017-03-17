@@ -83,6 +83,7 @@ if exists('g:operator_sandwich_no_default_key_mappings') | finish | endif
 " add
 silent! nmap <unique> sa <Plug>(operator-sandwich-add)
 silent! xmap <unique> sa <Plug>(operator-sandwich-add)
+silent! omap <unique> sa <Plug>(operator-sandwich-g@)
 
 " delete
 silent! xmap <unique> sd <Plug>(operator-sandwich-delete)
