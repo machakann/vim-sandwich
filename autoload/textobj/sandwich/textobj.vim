@@ -375,10 +375,6 @@ function! s:textobj.elect(candidates) dict abort "{{{
     call map(a:candidates, map_rule)
     call s:lib.sort(a:candidates, function('s:compare_buf_length'), self.count)
     let elected = a:candidates[self.count - 1]
-  else
-    if self.mode ==# 'x'
-      normal! gv
-    endif
   endif
   return elected
 endfunction
@@ -388,6 +384,7 @@ function! s:textobj.select(sandwich) dict abort  "{{{
     if self.mode ==# 'x'
       normal! gv
     endif
+    let self.done = 1
     return
   endif
 
