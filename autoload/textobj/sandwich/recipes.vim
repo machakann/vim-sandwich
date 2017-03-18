@@ -90,12 +90,16 @@ function! s:recipes.query(opt, timeoutlen) dict abort "{{{
     let recipe = recipes[0]
     if has_key(recipe, 'buns') || has_key(recipe, 'external')
       let self.integrated = [recipe]
+    else
+      let self.integrated = []
     endif
   else
     if !(input ==# "\<Esc>" || input ==# "\<C-c>" || input ==# '')
       let c = split(input, '\zs')[0]
       let recipe = {'buns': [c, c], 'expr': 0, 'regex': 0}
       let self.integrated = [recipe]
+    else
+      let self.integrated = []
     endif
   endif
 endfunction

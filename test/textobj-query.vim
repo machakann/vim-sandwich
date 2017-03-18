@@ -52,6 +52,11 @@ function! s:suite.input() abort "{{{
   normal 0dis(
   call g:assert.equals(getline('.'), '(foo)', 'failed at #4')
 
+  " #5
+  call setline('.', '(foo)')
+  execute "normal 0dis\<Esc>"
+  call g:assert.equals(getline('.'), '(foo)', 'failed at #5')
+
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [
         \   {'buns': ['`', '`']},
@@ -59,60 +64,60 @@ function! s:suite.input() abort "{{{
         \   {'buns': ['```', '```']},
         \ ]
 
-  " #5
-  call setline('.', '```baz``bar`foo`bar``baz```')
-  normal 0ffdis`
-  call g:assert.equals(getline('.'), '```baz``bar``bar``baz```', 'failed at #5')
-
   " #6
   call setline('.', '```baz``bar`foo`bar``baz```')
-  normal 0ffdis`h
+  normal 0ffdis`
   call g:assert.equals(getline('.'), '```baz``bar``bar``baz```', 'failed at #6')
 
   " #7
   call setline('.', '```baz``bar`foo`bar``baz```')
-  normal 0ffdis``
-  call g:assert.equals(getline('.'), '```baz````baz```', 'failed at #7')
+  normal 0ffdis`h
+  call g:assert.equals(getline('.'), '```baz``bar``bar``baz```', 'failed at #7')
 
   " #8
   call setline('.', '```baz``bar`foo`bar``baz```')
-  normal 0ffdis``h
+  normal 0ffdis``
   call g:assert.equals(getline('.'), '```baz````baz```', 'failed at #8')
 
   " #9
   call setline('.', '```baz``bar`foo`bar``baz```')
+  normal 0ffdis``h
+  call g:assert.equals(getline('.'), '```baz````baz```', 'failed at #9')
+
+  " #10
+  call setline('.', '```baz``bar`foo`bar``baz```')
   normal 0ffdis```
-  call g:assert.equals(getline('.'), '``````', 'failed at #9')
+  call g:assert.equals(getline('.'), '``````', 'failed at #10')
 
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [
         \   {'buns': ['```', '```']},
         \ ]
 
-  " #10
-  call setline('.', '```baz``bar`foo`bar``baz```')
-  normal 0ffdis`
-  call g:assert.equals(getline('.'), '```baz``bar``bar``baz```', 'failed at #10')
-
   " #11
   call setline('.', '```baz``bar`foo`bar``baz```')
-  normal 0ffdis`h
+  normal 0ffdis`
   call g:assert.equals(getline('.'), '```baz``bar``bar``baz```', 'failed at #11')
 
   " #12
   call setline('.', '```baz``bar`foo`bar``baz```')
-  normal 0ffdis``
+  normal 0ffdis`h
   call g:assert.equals(getline('.'), '```baz``bar``bar``baz```', 'failed at #12')
 
   " #13
   call setline('.', '```baz``bar`foo`bar``baz```')
-  normal 0ffdis``h
+  normal 0ffdis``
   call g:assert.equals(getline('.'), '```baz``bar``bar``baz```', 'failed at #13')
 
   " #14
   call setline('.', '```baz``bar`foo`bar``baz```')
+  normal 0ffdis``h
+  call g:assert.equals(getline('.'), '```baz``bar``bar``baz```', 'failed at #14')
+
+  " #15
+  call setline('.', '```baz``bar`foo`bar``baz```')
   normal 0ffdis```
-  call g:assert.equals(getline('.'), '``````', 'failed at #14')
+  call g:assert.equals(getline('.'), '``````', 'failed at #15')
 
   let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [
@@ -120,30 +125,30 @@ function! s:suite.input() abort "{{{
         \   {'buns': ['```', '```']},
         \ ]
 
-  " #15
-  call setline('.', '```qux``baz`bar"foo"bar`baz``qux```')
-  normal 0ffdis`
-  call g:assert.equals(getline('.'), '```qux``baz`bar""bar`baz``qux```', 'failed at #15')
-
   " #16
   call setline('.', '```qux``baz`bar"foo"bar`baz``qux```')
-  normal 0ffdis`h
+  normal 0ffdis`
   call g:assert.equals(getline('.'), '```qux``baz`bar""bar`baz``qux```', 'failed at #16')
 
   " #17
   call setline('.', '```qux``baz`bar"foo"bar`baz``qux```')
-  normal 0ffdis``
+  normal 0ffdis`h
   call g:assert.equals(getline('.'), '```qux``baz`bar""bar`baz``qux```', 'failed at #17')
 
   " #18
   call setline('.', '```qux``baz`bar"foo"bar`baz``qux```')
-  normal 0ffdis``h
+  normal 0ffdis``
   call g:assert.equals(getline('.'), '```qux``baz`bar""bar`baz``qux```', 'failed at #18')
 
   " #19
   call setline('.', '```qux``baz`bar"foo"bar`baz``qux```')
+  normal 0ffdis``h
+  call g:assert.equals(getline('.'), '```qux``baz`bar""bar`baz``qux```', 'failed at #19')
+
+  " #20
+  call setline('.', '```qux``baz`bar"foo"bar`baz``qux```')
   normal 0ffdis```
-  call g:assert.equals(getline('.'), '``````', 'failed at #19')
+  call g:assert.equals(getline('.'), '``````', 'failed at #20')
 endfunction
 "}}}
 
