@@ -140,6 +140,7 @@ let s:sandwich = {
       \   'syntax'    : [],
       \   'opt'       : {},
       \   'escaped'   : 0,
+      \   'not_escaped': [],
       \ }
 "}}}
 function! s:sandwich.initialize(cursor, is_syntax_on) dict abort "{{{
@@ -179,11 +180,14 @@ function! s:sandwich.bake_buns(state, clock) dict abort  "{{{
     return ['', '']
   endif
 
-  if !self.escaped && !opt_regex
-    call map(self.buns, 's:lib.escape(v:val)')
-    let self.escaped = 1
+  if !self.escaped
+    let self.not_escaped = copy(self.buns)
+    if !opt_regex
+      call map(self.buns, 's:lib.escape(v:val)')
+      let self.escaped = 1
+    endif
   endif
-  return copy(self.buns)
+  return self.buns
 endfunction
 "}}}
 function! s:sandwich.searchpair_head(stimeoutlen) dict abort "{{{
@@ -291,7 +295,7 @@ function! s:sandwich.export_recipe() dict abort  "{{{
         \ && &operatorfunc =~# '^operator#sandwich#\%(delete\|replace\)'
     let recipe = self.recipe
     if self.searchby ==# 'buns'
-      call extend(recipe, {'buns': self.buns}, 'force')
+      call extend(recipe, {'buns': self.not_escaped}, 'force')
       call extend(recipe, {'expr': 0}, 'force')
       call extend(recipe, {'listexpr': 0}, 'force')
     elseif self.searchby ==# 'external'

@@ -153,8 +153,6 @@ function! s:textobj._search_with_nest(sandwich, stimeoutlen) dict abort  "{{{
     call coord.get_inner(buns, opt.of('skip_break'))
     if self.is_valid_candidate(a:sandwich)
       let candidate = deepcopy(a:sandwich)
-      " this is required for the case of 'expr' option is 2.
-      let candidate.buns[0:1] = buns
       let candidate.visualmode = self.visual.mode
       let candidates += [candidate]
     endif
@@ -245,9 +243,6 @@ function! s:textobj._search_without_nest(sandwich, stimeoutlen) dict abort  "{{{
 
   if self.is_valid_candidate(a:sandwich)
     let candidate = deepcopy(a:sandwich)
-    " this is required for the case of 'expr' option is 2.
-    unlet candidate.buns
-    let candidate.buns = buns
     let candidate.visualmode = self.visual.mode
     let candidates += [candidate]
   endif
