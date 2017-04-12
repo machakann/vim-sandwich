@@ -55,6 +55,8 @@ function! sandwich#magicchar#f#fname() abort  "{{{
     let funcname = input('funcname: ', '', 'custom,sandwich#magicchar#f#fnamecompl')
   endif
   echohl NONE
+  " flash prompt
+  echo ''
   call operator#sandwich#quench()
   if funcname ==# ''
     throw 'OperatorSandwichCancel'

@@ -53,6 +53,8 @@ function! s:input(mes) abort "{{{
   echohl MoreMsg
   let input = input(a:mes, '', 'custom,sandwich#magicchar#i#compl')
   echohl NONE
+  " flash prompt
+  echo ''
   return input
 endfunction
 "}}}

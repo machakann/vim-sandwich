@@ -15,6 +15,8 @@ function! sandwich#magicchar#t#tag() abort "{{{
   let tag = input('Input tag: ')
   let &l:imsearch = old_imsearch
   echohl NONE
+  " flash prompt
+  echo ''
   call operator#sandwich#quench()
   if tag ==# ''
     throw 'OperatorSandwichCancel'
@@ -31,6 +33,8 @@ function! sandwich#magicchar#t#tagname() abort "{{{
   let tagname = input('Input tag name: ')
   let &l:imsearch = old_imsearch
   echohl NONE
+  " flash prompt
+  echo ''
   call operator#sandwich#quench()
   if tagname ==# ''
     throw 'OperatorSandwichCancel'
