@@ -299,7 +299,11 @@ function! s:prototype(kind) abort "{{{
   let view = winsaveview()
   let visualhead = getpos("'<")
   let visualtail = getpos("'>")
-  execute printf('normal! v%dat', v:count1)
+  try
+    execute printf('normal! v%dat', v:count1)
+  catch /^Vim\%((\a\+)\)\=:E\%(33\|55\)/
+    return
+  endtry
   execute "normal! \<Esc>"
   if getpos("'<") != getpos("'>")
     normal! gv
