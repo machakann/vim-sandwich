@@ -331,7 +331,7 @@ function! s:textobj(a_or_i) abort "{{{
   let head = searchpos('<\a[^[:blank:]>/]*>', 'bcn', 0, 50)
   if head != s:null_coord
     let tagname = matchstr(getline(head[0])[head[1]-1 :], '^<\zs\a[^[:blank:]>/]*')
-    if search(printf('</%s>', tagname), 'cn', 0, 50)
+    if search(printf('</%s>', s:escape(tagname)), 'cn', 0, 50)
       if a:a_or_i ==# 'i'
         normal! vit
       else
@@ -339,6 +339,10 @@ function! s:textobj(a_or_i) abort "{{{
       endif
     endif
   endif
+endfunction
+"}}}
+function! s:escape(string) abort  "{{{
+  return escape(a:string, '~"\.^$[]*')
 endfunction
 "}}}
 
