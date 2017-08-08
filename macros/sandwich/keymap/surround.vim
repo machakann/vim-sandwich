@@ -43,7 +43,7 @@ let g:sandwich#recipes = [
       \     'buns':         ['<', '>'],
       \     'expand_range': 0,
       \     'match_syntax': 1,
-      \     'input':        ['>', 'a'],
+      \     'input':        ['<', '>', 'a'],
       \   },
       \
       \   {
