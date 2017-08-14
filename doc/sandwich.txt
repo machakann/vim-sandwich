@@ -1,4 +1,4 @@
-*sandwich.txt*				Last change:22-Feb-2017.
+*sandwich.txt*				Last change:14-Aug-2017.
 
 The set of operator and textobject plugins to edit sandwiched textobjects.
 
@@ -389,6 +389,36 @@ Introduce vim-surround keymappings~
 >
 	runtime macros/sandwich/keymap/surround.vim
 <
+	NOTE: Unlike surround.vim, the inputs `(` and `)` behave as same.
+	      If you want the spaces inside braces with `(` input, add the
+	      lines.
+>
+	runtime macros/sandwich/keymap/surround.vim
+	let g:sandwich#recipes += [
+	\   {'buns': ['{ ', ' }'], 'nesting': 1, 'match_syntax': 1,
+	\    'kind': ['add', 'replace'], 'action': ['add'], 'input': ['{']},
+	\
+	\   {'buns': ['[ ', ' ]'], 'nesting': 1, 'match_syntax': 1,
+	\    'kind': ['add', 'replace'], 'action': ['add'], 'input': ['[']},
+	\
+	\   {'buns': ['( ', ' )'], 'nesting': 1, 'match_syntax': 1,
+	\    'kind': ['add', 'replace'], 'action': ['add'], 'input': ['(']},
+	\
+	\   {'buns': ['{\s*', '\s*}'],   'nesting': 1, 'regex': 1,
+	\    'match_syntax': 1, 'kind': ['delete', 'replace', 'textobj'],
+	\    'action': ['delete'], 'input': ['{']},
+	\
+	\   {'buns': ['\[\s*', '\s*\]'], 'nesting': 1, 'regex': 1,
+	\    'match_syntax': 1, 'kind': ['delete', 'replace', 'textobj'],
+	\    'action': ['delete'], 'input': ['[']},
+	\
+	\   {'buns': ['(\s*', '\s*)'],   'nesting': 1, 'regex': 1,
+	\    'match_syntax': 1, 'kind': ['delete', 'replace', 'textobj'],
+	\    'action': ['delete'], 'input': ['(']},
+	\ ]
+<
+
+
 	`ys`, `yss`, `yS`, `ds`, `cs` in normal mode and `S` in visual mode
 	are available. Not in vim-surround but `dss` and `css` are also
 	available, these are similar as `ds` and `cs` but determine

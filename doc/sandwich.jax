@@ -1,4 +1,4 @@
-*sandwich.jax*	日本語ヘルプ		Last change:22-Feb-2017.
+*sandwich.jax*	日本語ヘルプ		Last change:14-Aug-2017.
 
 “挟まれた”テキストを編集するためのオペレータとテキストオブジェクトの詰め合わせ
 です。
@@ -395,6 +395,36 @@ vim-surround のキーマッピングを使う~
 >
 	runtime macros/sandwich/keymap/surround.vim
 <
+	NOTE: surround.vim とは違い、 `(` と `)` の入力は同じように機能しま
+	      す。もし、オリジナルの surround.vim のように `(` の入力により、
+	      空白を含んだ括弧で囲みたい場合は次のように書きます。
+>
+	runtime macros/sandwich/keymap/surround.vim
+	let g:sandwich#recipes += [
+	\   {'buns': ['{ ', ' }'], 'nesting': 1, 'match_syntax': 1,
+	\    'kind': ['add', 'replace'], 'action': ['add'], 'input': ['{']},
+	\
+	\   {'buns': ['[ ', ' ]'], 'nesting': 1, 'match_syntax': 1,
+	\    'kind': ['add', 'replace'], 'action': ['add'], 'input': ['[']},
+	\
+	\   {'buns': ['( ', ' )'], 'nesting': 1, 'match_syntax': 1,
+	\    'kind': ['add', 'replace'], 'action': ['add'], 'input': ['(']},
+	\
+	\   {'buns': ['{\s*', '\s*}'],   'nesting': 1, 'regex': 1,
+	\    'match_syntax': 1, 'kind': ['delete', 'replace', 'textobj'],
+	\    'action': ['delete'], 'input': ['{']},
+	\
+	\   {'buns': ['\[\s*', '\s*\]'], 'nesting': 1, 'regex': 1,
+	\    'match_syntax': 1, 'kind': ['delete', 'replace', 'textobj'],
+	\    'action': ['delete'], 'input': ['[']},
+	\
+	\   {'buns': ['(\s*', '\s*)'],   'nesting': 1, 'regex': 1,
+	\    'match_syntax': 1, 'kind': ['delete', 'replace', 'textobj'],
+	\    'action': ['delete'], 'input': ['(']},
+	\ ]
+<
+
+
 	ノーマルモードにおける `ys`, `yss`, `yS`, `ds`, `cs` 及び、ビジュアル
 	モードにおける `S` が使用できます。また、 vim-surround にはありません
 	が `dss` と `css` も使用できます。これらは `ds` と `cs` に似ていますが
