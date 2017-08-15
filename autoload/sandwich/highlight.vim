@@ -181,7 +181,8 @@ endif
 " function! s:highlight.goto_highlighted_window() dict abort "{{{
 if s:has_window_ID
   function! s:highlight.goto_highlighted_window() dict abort
-    return win_gotoid(self.winid)
+    noautocmd let reached = win_gotoid(self.winid)
+    return reached
   endfunction
 else
   function! s:highlight.goto_highlighted_window() dict abort
@@ -409,6 +410,7 @@ function! s:search_highlighted_windows(id, ...) abort  "{{{
 
   let original_winnr = winnr()
   let original_tabnr = tabpagenr()
+  let original_view = winsaveview()
   let tablist = range(1, tabpagenr('$'))
   if a:0 > 0
     let tabnr = a:1
@@ -425,8 +427,7 @@ function! s:search_highlighted_windows(id, ...) abort  "{{{
       return [tabnr, winnr]
     endif
   endfor
-  execute 'tabnext ' . original_tabnr
-  execute original_winnr . 'wincmd w'
+  call s:goto_window(original_winnr, original_tabnr, original_view)
   return [0, 0]
 endfunction
 "}}}
@@ -468,7 +469,7 @@ function! s:goto_window(winnr, ...) abort "{{{
   endtry
 
   if a:0 > 1
-    call winrestview(a:2)
+    noautocmd call winrestview(a:2)
   endif
 
   return 1
