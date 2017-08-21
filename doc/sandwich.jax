@@ -1,4 +1,4 @@
-*sandwich.jax*	日本語ヘルプ		Last change:14-Aug-2017.
+*sandwich.jax*	日本語ヘルプ		Last change:21-Aug-2017.
 
 “挟まれた”テキストを編集するためのオペレータとテキストオブジェクトの詰め合わせ
 です。
@@ -223,37 +223,46 @@ g:sandwich#recipes			*g:sandwich#recipes*
 g:sandwich#default_recipes		*g:sandwich#default_recipes*
 	デフォルトで用意されたレシピのリストです。 |g:sandwich#recipes| が存在
 	すれば、そちらがかわりにつかわれます。
->
-  let g:sandwich#default_recipes = [
-    \   {'buns': ['<', '>'], 'expand_range': 0, 'match_syntax': 1},
-    \
-    \   {
-    \     'buns': ['"', '"'],
-    \     'quoteescape': 1, 'expand_range': 0,'nesting': 0,
-    \     'linewise': 0, 'match_syntax': 1,
-    \   },
-    \
-    \   {
-    \     'buns': ["'", "'"],
-    \     'quoteescape': 1, 'expand_range': 0,'nesting': 0,
-    \     'linewise': 0, 'match_syntax': 1,
-    \   },
-    \
-    \   {
-    \     'buns': ['{', '}'],
-    \     'nesting': 1, 'match_syntax': 1, 'skip_break': 1
-    \   },
-    \
-    \   {'buns': ['[', ']'], 'nesting': 1, 'match_syntax': 1},
-    \
-    \   {'buns': ['(', ')'], 'nesting': 1, 'match_syntax': 1},
-    \ ]
-<
-この変数は変更を禁止されていますが、 |g:sandwich#recipes| を宣言する際に必要な
-らコピーすることはできます。
+
+	この変数は変更を禁止されていますが、 |g:sandwich#recipes| を宣言する際
+	に必要ならコピーすることができます。
 >
 	:let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
 <
+
+デフォルトレシピについて~
+`(`, `)`
+`[`, `]`
+`{`, `}`
+`<`, `>`
+	開き/閉じ括弧は同様に機能します。例えば、 `sa(iw` と `sa)iw` は同様の
+	結果を与えます。
+>
+		foo -> (foo)
+<
+	`sd(` と `sd)` はこの反対のことをします。ただし、両端の括弧のシンタッ
+	クスが一致していなければいけません。
+
+------------------------------------------------------------------------------
+`'`
+`"`
+	クオーテーションで文字列を囲みます。
+>
+		foo -> 'foo'
+<
+	クオーテーションによる囲みを消す場合 `quoteescape` オプションが考慮さ
+	れます。また、両端が同じ行の中にあり、シンタックスが一致している必要が
+	あります。
+
+------------------------------------------------------------------------------
+`<Space>`
+	スペース囲みを消す場合、連続するスペースを一度に消します。
+
+------------------------------------------------------------------------------
+`t`, `T`
+`f`, `F`
+`i`, `I`
+	|sandwich-magiccharacters| をご覧ください。
 
 
 

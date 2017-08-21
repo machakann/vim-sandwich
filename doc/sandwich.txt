@@ -1,4 +1,4 @@
-*sandwich.txt*				Last change:14-Aug-2017.
+*sandwich.txt*				Last change:21-Aug-2017.
 
 The set of operator and textobject plugins to edit sandwiched textobjects.
 
@@ -213,39 +213,49 @@ g:sandwich#recipes			*g:sandwich#recipes*
 
 
 g:sandwich#default_recipes		*g:sandwich#default_recipes*
-	This is one of the lists of recipes which is prepared in default. If
-	|g:sandwich#recipes| exists, it will be used alternatively.
->
-  let g:sandwich#default_recipes = [
-    \   {'buns': ['<', '>'], 'expand_range': 0, 'match_syntax': 1},
-    \
-    \   {
-    \     'buns': ['"', '"'],
-    \     'quoteescape': 1, 'expand_range': 0,'nesting': 0,
-    \     'linewise': 0, 'match_syntax': 1,
-    \   },
-    \
-    \   {
-    \     'buns': ["'", "'"],
-    \     'quoteescape': 1, 'expand_range': 0,'nesting': 0,
-    \     'linewise': 0, 'match_syntax': 1,
-    \   },
-    \
-    \   {
-    \     'buns': ['{', '}'],
-    \     'nesting': 1, 'match_syntax': 1, 'skip_break': 1
-    \   },
-    \
-    \   {'buns': ['[', ']'], 'nesting': 1, 'match_syntax': 1},
-    \
-    \   {'buns': ['(', ')'], 'nesting': 1, 'match_syntax': 1},
-    \ ]
-<
+	This is a list of recipes which is prepared in default. If
+	|g:sandwich#recipes| exists, it will be used instead.
+
 	This variable is locked usually, but it can be copied when you declare
 	|g:sandwich#recipes| if you need.
 >
 	:let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
 <
+
+Notes on default recipes~
+`(`, `)`
+`[`, `]`
+`{`, `}`
+`<`, `>`
+	Both open/close braces behave as same. For example, `sa(iw` and `sa)iw`
+	result in the same text.
+>
+		foo -> (foo)
+<
+	`sd(` and `sd)` do the opposite, but it would be checked if their
+	syntax are matched.
+
+------------------------------------------------------------------------------
+`'`
+`"`
+	Wrap a text by quotes.
+>
+		foo -> 'foo'
+<
+	When deleting a pair of quotes, 'quoteescape' option is considered.
+	The pair of quotes are searched only in a same line. The target quotes
+	should have same syntax.
+
+------------------------------------------------------------------------------
+`<Space>`
+	When deleting a pair of spaces, successive spaces are deleted at a
+	time.
+
+------------------------------------------------------------------------------
+`t`, `T`
+`f`, `F`
+`i`, `I`
+	See |sandwich-magiccharacters|.
 
 
 
