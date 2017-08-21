@@ -14,6 +14,7 @@ if exists('g:sandwich#default_recipes')
   unlockvar! g:sandwich#default_recipes
 endif
 let g:sandwich#default_recipes = [
+      \   {'buns': ['\s\+', '\s\+'], 'regex': 1, 'input': [' ']},
       \   {'buns': ['', ''], 'action': ['add'], 'motionwise': ['line'], 'linewise': 1, 'input': ["\<CR>"]},
       \   {'buns': ['^$', '^$'], 'regex': 1, 'linewise': 1, 'input': ["\<CR>"]},
       \   {'buns': ['<', '>'], 'expand_range': 0, 'match_syntax': 1},

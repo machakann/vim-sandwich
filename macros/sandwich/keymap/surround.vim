@@ -25,6 +25,12 @@ endif
 " Default recipes
 let g:sandwich#recipes = [
       \   {
+      \     'buns': ['\s\+', '\s\+'],
+      \     'regex': 1,
+      \     'input': [' ']
+      \   },
+      \
+      \   {
       \     'buns':         ['', ''],
       \     'action':       ['add'],
       \     'motionwise':   ['line'],
