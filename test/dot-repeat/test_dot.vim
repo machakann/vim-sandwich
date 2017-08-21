@@ -99,6 +99,7 @@ call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-add:count #4')
 %delete
 
 " expr
+let g:sandwich#recipes = []
 let g:operator#sandwich#recipes = [{'buns': ['Count()', 'Count()'], 'expr': 1, 'input': ['c']}]
 call setline('.', 'foo')
 let s:count = 0
@@ -115,10 +116,12 @@ normal .
 call s:assert(getline('.'), '31foo24', 'operator-add:expr #3')
 call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-add:expr #4')
 
+unlet g:sandwich#recipes
 unlet g:operator#sandwich#recipes
 %delete
 
 " listexpr
+let g:sandwich#recipes = []
 let g:operator#sandwich#recipes = [{'buns': 'ListCount()', 'listexpr': 1, 'input': ['c']}]
 call setline('.', 'foo')
 let s:count = 0
@@ -135,6 +138,7 @@ normal .
 call s:assert(getline('.'), '21foo12', 'operator-add:listexpr #3')
 call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-add:listexpr #4')
 
+unlet g:sandwich#recipes
 unlet g:operator#sandwich#recipes
 %delete
 
@@ -232,6 +236,7 @@ call s:assert(getpos('.'), [0, 1, 1, 0], 'operator-delete:count #4')
 %delete
 
 " external textobjct
+let g:sandwich#recipes = []
 let g:operator#sandwich#recipes = [{'external': ['it', 'at'], 'noremap': 1}]
 call append(0, ['<title>fooo</title>', '<body>bar</body>'])
 normal ggsdat
@@ -240,6 +245,8 @@ call s:assert(getline(1), 'fooo', 'operator-delete:external textobject #1')
 call s:assert(getline(2), 'bar', 'operator-delete:external textobject #2')
 call s:assert(getpos('.'), [0, 2, 1, 0], 'operator-delete:external textobject #3')
 
+unlet g:sandwich#recipes
+unlet g:operator#sandwich#recipes
 %delete
 
 " cursor option 'keep'
@@ -344,7 +351,8 @@ call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-replace:count #2')
 %delete
 
 " expr
-let g:operator#sandwich#recipes = [{'buns': ['Count()', 'Count()'], 'expr': 1, 'input': ['c']}]
+let g:sandwich#recipes = []
+let g:operator#sandwich#recipes = [{'buns': ['Count()', 'Count()'], 'expr': 1, 'input': ['c']}, {'buns': ['(', ')']}]
 call setline('.', '((foo))')
 let s:count = 0
 normal ffsra(c
@@ -352,7 +360,7 @@ normal .
 call s:assert(getline('.'), '11foo22', 'operator-replace:expr #1')
 call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-replace:expr #2')
 
-let g:operator#sandwich#recipes = [{'buns': ['Count()', 'Count()'], 'expr': 2, 'input': ['c']}]
+let g:operator#sandwich#recipes = [{'buns': ['Count()', 'Count()'], 'expr': 2, 'input': ['c']}, {'buns': ['(', ')']}]
 call setline('.', '((foo))')
 let s:count = 0
 normal ffsra(c
@@ -360,11 +368,13 @@ normal .
 call s:assert(getline('.'), '31foo24', 'operator-replace:expr #3')
 call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-replace:expr #4')
 
+unlet g:sandwich#recipes
 unlet g:operator#sandwich#recipes
 %delete
 
 " listexpr
-let g:operator#sandwich#recipes = [{'buns': 'ListCount()', 'listexpr': 1, 'input': ['c']}]
+let g:sandwich#recipes = []
+let g:operator#sandwich#recipes = [{'buns': 'ListCount()', 'listexpr': 1, 'input': ['c']}, {'buns': ['(', ')']}]
 call setline('.', '((foo))')
 let s:count = 0
 normal ffsra(c
@@ -372,7 +382,7 @@ normal .
 call s:assert(getline('.'), '11foo11', 'operator-replace:listexpr #1')
 call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-replace:listexpr #2')
 
-let g:operator#sandwich#recipes = [{'buns': 'ListCount()', 'listexpr': 2, 'input': ['c']}]
+let g:operator#sandwich#recipes = [{'buns': 'ListCount()', 'listexpr': 2, 'input': ['c']}, {'buns': ['(', ')']}]
 call setline('.', '((foo))')
 let s:count = 0
 normal ffsra(c
@@ -380,11 +390,13 @@ normal .
 call s:assert(getline('.'), '21foo12', 'operator-replace:listexpr #3')
 call s:assert(getpos('.'), [0, 1, 2, 0], 'operator-replace:listexpr #4')
 
+unlet g:sandwich#recipes
 unlet g:operator#sandwich#recipes
 %delete
 
 " external textobjct
-let g:operator#sandwich#recipes = [{'external': ['it', 'at'], 'noremap': 1}]
+let g:sandwich#recipes = []
+let g:operator#sandwich#recipes = [{'external': ['it', 'at'], 'noremap': 1}, {'buns': ['(', ')']}]
 call append(0, ['<title>fooo</title>', '<body>bar</body>'])
 normal ggsrat(
 normal j.
@@ -392,6 +404,8 @@ call s:assert(getline(1), '(fooo)', 'operator-replace:external textobject #1')
 call s:assert(getline(2), '(bar)', 'operator-replace:external textobject #2')
 call s:assert(getpos('.'), [0, 2, 2, 0], 'operator-replace:external textobject #3')
 
+unlet g:sandwich#recipes
+unlet g:operator#sandwich#recipes
 %delete
 
 " cursor option 'keep'
@@ -460,6 +474,7 @@ call s:assert(getline('.'), '()', 'textobj-query:count #2')
 %delete
 
 " expr
+let g:sandwich#recipes = []
 let g:textobj#sandwich#recipes = [{'buns': ['Count()', 'Count()'], 'expr': 1, 'input': ['c']}]
 call setline('.', '1foo2')
 let s:count = 0
@@ -475,6 +490,7 @@ call setline('.', '1foo2')
 normal .
 call s:assert(getline('.'), '', 'textobj-query:expr #2')
 
+let g:sandwich#recipes = []
 let g:textobj#sandwich#recipes = [{'buns': ['Count()', 'Count()'], 'expr': 2, 'input': ['c']}]
 call setline('.', '1foo2')
 let s:count = 0
@@ -490,10 +506,12 @@ call setline('.', '3foo4')
 normal .
 call s:assert(getline('.'), '', 'textobj-query:expr #4')
 
+unlet g:sandwich#recipes
 unlet g:textobj#sandwich#recipes
 %delete
 
 " listexpr
+let g:sandwich#recipes = []
 let g:textobj#sandwich#recipes = [{'buns': 'ListCount()', 'listexpr': 1, 'input': ['c']}]
 call setline('.', '1foo1')
 let s:count = 0
@@ -509,6 +527,7 @@ call setline('.', '1foo1')
 normal .
 call s:assert(getline('.'), '', 'textobj-query:listexpr #2')
 
+let g:sandwich#recipes = []
 let g:textobj#sandwich#recipes = [{'buns': 'ListCount()', 'listexpr': 2, 'input': ['c']}]
 call setline('.', '1foo1')
 let s:count = 0
@@ -524,10 +543,12 @@ call setline('.', '2foo2')
 normal .
 call s:assert(getline('.'), '', 'textobj-query:listexpr #4')
 
+unlet g:sandwich#recipes
 unlet g:textobj#sandwich#recipes
 %delete
 
 " external textobjct
+let g:sandwich#recipes = []
 let g:textobj#sandwich#recipes = [{'external': ['it', 'at'], 'noremap': 1, 'input': ['t']}]
 call append(0, ['<title>fooo</title>', '<body>bar</body>'])
 $delete
@@ -545,9 +566,12 @@ normal j.
 call s:assert(getline(1), '', 'textobj-query:external textobject #3')
 call s:assert(getline(2), '', 'textobj-query:external textobject #4')
 
+unlet g:sandwich#recipes
+unlet g:textobj#sandwich#recipes
 %delete
 
 " synchro option
+let g:sandwich#recipes = []
 let g:textobj#sandwich#recipes = [{'buns': ['foo', 'baz'], 'synchro': 1, 'input': ['f']}]
 call append(0, ['foo bar baz', ' foo baaaaar baz'])
 $delete
@@ -565,6 +589,8 @@ normal jl.
 call s:assert(getline(1), '', 'textobj-query: synchro option #3')
 call s:assert(getline(2), ' ', 'textobj-query: synchro option #4')
 
+unlet g:sandwich#recipes
+unlet g:textobj#sandwich#recipes
 %delete
 
 
@@ -599,6 +625,7 @@ call s:assert(getline('.'), '()', 'textobj-auto:count #2')
 %delete
 
 " expr
+let g:sandwich#recipes = []
 let g:textobj#sandwich#recipes = [{'buns': ['Count()', 'Count()'], 'expr': 1, 'input': ['c']}]
 call setline('.', '1foo2')
 let s:count = 0
@@ -614,6 +641,7 @@ call setline('.', '1foo2')
 normal .
 call s:assert(getline('.'), '', 'textobj-auto:expr #2')
 
+let g:sandwich#recipes = []
 let g:textobj#sandwich#recipes = [{'buns': ['Count()', 'Count()'], 'expr': 2, 'input': ['c']}]
 call setline('.', '1foo2')
 let s:count = 0
@@ -629,10 +657,12 @@ call setline('.', '3foo4')
 normal .
 call s:assert(getline('.'), '', 'textobj-auto:expr #4')
 
+unlet g:sandwich#recipes
 unlet g:textobj#sandwich#recipes
 %delete
 
 " listexpr
+let g:sandwich#recipes = []
 let g:textobj#sandwich#recipes = [{'buns': 'ListCount()', 'listexpr': 1, 'input': ['c']}]
 call setline('.', '1foo1')
 let s:count = 0
@@ -648,6 +678,7 @@ call setline('.', '1foo1')
 normal .
 call s:assert(getline('.'), '', 'textobj-query:listexpr #2')
 
+let g:sandwich#recipes = []
 let g:textobj#sandwich#recipes = [{'buns': 'ListCount()', 'listexpr': 2, 'input': ['c']}]
 call setline('.', '1foo1')
 let s:count = 0
@@ -663,10 +694,12 @@ call setline('.', '2foo2')
 normal .
 call s:assert(getline('.'), '', 'textobj-query:listexpr #4')
 
+unlet g:sandwich#recipes
 unlet g:textobj#sandwich#recipes
 %delete
 
 " external textobjct
+let g:sandwich#recipes = []
 let g:textobj#sandwich#recipes = [{'external': ['it', 'at'], 'noremap': 1, 'input': ['t']}]
 call append(0, ['<title>fooo</title>', '<body>bar</body>'])
 $delete
@@ -684,9 +717,12 @@ normal j.
 call s:assert(getline(1), '', 'textobj-auto:external textobject #3')
 call s:assert(getline(2), '', 'textobj-auto:external textobject #4')
 
+unlet g:sandwich#recipes
+unlet g:textobj#sandwich#recipes
 %delete
 
 " synchro option
+let g:sandwich#recipes = []
 let g:textobj#sandwich#recipes = [{'buns': ['foo', 'baz'], 'synchro': 1, 'input': ['f']}]
 call append(0, ['foo bar baz', ' foo baaaaar baz'])
 $delete

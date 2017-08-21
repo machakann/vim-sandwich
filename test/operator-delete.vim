@@ -1230,6 +1230,9 @@ function! s:suite.charwise_n_option_regex() abort  "{{{
 endfunction
 "}}}
 function! s:suite.charwise_n_option_skip_space() abort  "{{{
+  let g:sandwich#recipes = []
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}]
+
   """ 1
   " #1
   call setline('.', '"foo"')
@@ -1259,7 +1262,7 @@ function! s:suite.charwise_n_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), ' "foo"', 'failed at #5')
 
   """ 2
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}]
   call operator#sandwich#set('delete', 'char', 'skip_space', 2)
 
   " #6
@@ -1289,7 +1292,7 @@ function! s:suite.charwise_n_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), ' "foo"', 'failed at #10')
 
   """ 0
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}]
   call operator#sandwich#set('delete', 'char', 'skip_space', 0)
 
   " #11
@@ -2079,6 +2082,9 @@ function! s:suite.charwise_x_option_regex() abort  "{{{
 endfunction
 "}}}
 function! s:suite.charwise_x_option_skip_space() abort  "{{{
+  let g:sandwich#recipes = []
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}]
+
   """ 1
   " #1
   call setline('.', '"foo"')
@@ -2108,7 +2114,7 @@ function! s:suite.charwise_x_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), ' "foo"', 'failed at #5')
 
   """ 2
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}]
   call operator#sandwich#set('delete', 'char', 'skip_space', 2)
 
   " #6
@@ -2138,7 +2144,7 @@ function! s:suite.charwise_x_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), ' "foo"', 'failed at #10')
 
   """ 0
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}]
   call operator#sandwich#set('delete', 'char', 'skip_space', 0)
 
   " #11
@@ -3079,6 +3085,9 @@ function! s:suite.linewise_n_option_regex() abort  "{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_option_skip_space() abort  "{{{
+  let g:sandwich#recipes = []
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}]
+
   """ 2
   " #1
   call setline('.', '"foo"')
@@ -3107,7 +3116,7 @@ function! s:suite.linewise_n_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), ' "foo"', 'failed at #5')
 
   """ 1
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}]
   call operator#sandwich#set('delete', 'line', 'skip_space', 1)
 
   " #6
@@ -3138,7 +3147,7 @@ function! s:suite.linewise_n_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), ' "foo"', 'failed at #10')
 
   """ 0
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}]
   call operator#sandwich#set('delete', 'line', 'skip_space', 0)
 
   " #11
@@ -4080,6 +4089,9 @@ function! s:suite.linewise_x_option_regex() abort  "{{{
 endfunction
 "}}}
 function! s:suite.linewise_x_option_skip_space() abort  "{{{
+  let g:sandwich#recipes = []
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}]
+
   """ 2
   " #1
   call setline('.', '"foo"')
@@ -4108,7 +4120,7 @@ function! s:suite.linewise_x_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), ' "foo"', 'failed at #5')
 
   """ 1
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}]
   call operator#sandwich#set('delete', 'line', 'skip_space', 1)
 
   " #6
@@ -4139,7 +4151,7 @@ function! s:suite.linewise_x_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), ' "foo"', 'failed at #10')
 
   """ 0
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}]
   call operator#sandwich#set('delete', 'line', 'skip_space', 0)
 
   " #11
@@ -5250,6 +5262,8 @@ function! s:suite.blockwise_n_option_regex() abort  "{{{
 endfunction
 "}}}
 function! s:suite.blockwise_n_option_skip_space() abort  "{{{
+  let g:sandwich#recipes = []
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}]
   set whichwrap=h,l
 
   """ 1
@@ -5301,7 +5315,7 @@ function! s:suite.blockwise_n_option_skip_space() abort  "{{{
   %delete
 
   """ 2
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}]
   call operator#sandwich#set('delete', 'block', 'skip_space', 2)
 
   " #6
@@ -5351,7 +5365,7 @@ function! s:suite.blockwise_n_option_skip_space() abort  "{{{
   %delete
 
   """ 0
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}]
   call operator#sandwich#set('delete', 'block', 'skip_space', 0)
 
   " #11
@@ -6376,6 +6390,9 @@ function! s:suite.blockwise_x_option_regex() abort  "{{{
 endfunction
 "}}}
 function! s:suite.blockwise_x_option_skip_space() abort  "{{{
+  let g:sandwich#recipes = []
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}]
+
   """ 1
   " #1
   call append(0, ['"foo"', '"bar"', '"baz"'])
@@ -6425,7 +6442,7 @@ function! s:suite.blockwise_x_option_skip_space() abort  "{{{
   %delete
 
   """ 2
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}]
   call operator#sandwich#set('delete', 'block', 'skip_space', 2)
 
   " #6
@@ -6476,7 +6493,7 @@ function! s:suite.blockwise_x_option_skip_space() abort  "{{{
   %delete
 
   """ 0
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}]
   call operator#sandwich#set('delete', 'block', 'skip_space', 0)
 
   " #11

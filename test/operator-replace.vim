@@ -2273,6 +2273,9 @@ function! s:suite.charwise_n_option_regex() abort  "{{{
 endfunction
 "}}}
 function! s:suite.charwise_n_option_skip_space() abort  "{{{
+  let g:sandwich#recipes = []
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
+
   """ 1
   " #1
   call setline('.', '"foo"')
@@ -2296,13 +2299,13 @@ function! s:suite.charwise_n_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), '("foo")', 'failed at #4')
 
   " #5
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}]
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}, {'buns': ['(', ')']}]
   call setline('.', ' "foo"')
   normal 0sr$(
   call g:assert.equals(getline('.'), ' "foo"', 'failed at #5')
 
   """ 2
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
   call operator#sandwich#set('replace', 'char', 'skip_space', 2)
 
   " #6
@@ -2326,13 +2329,13 @@ function! s:suite.charwise_n_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), ' (foo) ', 'failed at #9')
 
   " #10
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}]
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}, {'buns': ['(', ')']}]
   call setline('.', ' "foo"')
   normal 0sr$(
   call g:assert.equals(getline('.'), ' "foo"', 'failed at #10')
 
   """ 0
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
   call operator#sandwich#set('replace', 'char', 'skip_space', 0)
 
   " #11
@@ -2357,7 +2360,7 @@ function! s:suite.charwise_n_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), '("foo")', 'failed at #14')
 
   " #15
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 1}]
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 1}, {'buns': ['(', ')']}]
   call setline('.', ' "foo"')
   normal 0sr$(
   call g:assert.equals(getline('.'), ' (foo)', 'failed at #15')
@@ -4275,6 +4278,9 @@ function! s:suite.charwise_x_option_regex() abort  "{{{
 endfunction
 "}}}
 function! s:suite.charwise_x_option_skip_space() abort  "{{{
+  let g:sandwich#recipes = []
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
+
   """ 1
   " #1
   call setline('.', '"foo"')
@@ -4298,13 +4304,13 @@ function! s:suite.charwise_x_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), '("foo")', 'failed at #4')
 
   " #5
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}]
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}, {'buns': ['(', ')']}]
   call setline('.', ' "foo"')
   normal 0v$sr(
   call g:assert.equals(getline('.'), ' "foo"', 'failed at #5')
 
   """ 2
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
   call operator#sandwich#set('replace', 'char', 'skip_space', 2)
 
   " #6
@@ -4328,13 +4334,13 @@ function! s:suite.charwise_x_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), ' (foo) ', 'failed at #9')
 
   " #10
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}]
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}, {'buns': ['(', ')']}]
   call setline('.', ' "foo"')
   normal 0v$sr(
   call g:assert.equals(getline('.'), ' "foo"', 'failed at #10')
 
   """ 0
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
   call operator#sandwich#set('replace', 'char', 'skip_space', 0)
 
   " #11
@@ -4359,7 +4365,7 @@ function! s:suite.charwise_x_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), '("foo")', 'failed at #14')
 
   " #15
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 1}]
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 1}, {'buns': ['(', ')']}]
   call setline('.', ' "foo"')
   normal 0v$sr(
   call g:assert.equals(getline('.'), ' (foo)', 'failed at #15')
@@ -6368,6 +6374,8 @@ function! s:suite.linewise_n_option_regex() abort  "{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_option_skip_space() abort  "{{{
+  let g:sandwich#recipes = []
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
   call operator#sandwich#set('replace', 'line', 'linewise', 1)
 
   """ 2
@@ -6392,13 +6400,13 @@ function! s:suite.linewise_n_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), ' (foo) ', 'failed at #4')
 
   " #5
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}]
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}, {'buns': ['(', ')']}]
   call setline('.', ' "foo"')
   normal 0srVl(
   call g:assert.equals(getline('.'), ' "foo"', 'failed at #5')
 
   """ 1
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
   call operator#sandwich#set('replace', 'line', 'skip_space', 1)
 
   " #6
@@ -6423,13 +6431,13 @@ function! s:suite.linewise_n_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), '("foo")', 'failed at #9')
 
   " #10
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}]
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}, {'buns': ['(', ')']}]
   call setline('.', ' "foo"')
   normal 0srVl(
   call g:assert.equals(getline('.'), ' "foo"', 'failed at #10')
 
   """ 0
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
   call operator#sandwich#set('replace', 'line', 'skip_space', 0)
 
   " #11
@@ -6454,7 +6462,7 @@ function! s:suite.linewise_n_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), '("foo")', 'failed at #14')
 
   " #15
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 1}]
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 1}, {'buns': ['(', ')']}]
   call setline('.', ' "foo"')
   normal 0srVl(
   call g:assert.equals(getline('.'), ' (foo)', 'failed at #15')
@@ -8538,6 +8546,8 @@ function! s:suite.linewise_x_option_regex() abort  "{{{
 endfunction
 "}}}
 function! s:suite.linewise_x_option_skip_space() abort  "{{{
+  let g:sandwich#recipes = []
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
   call operator#sandwich#set('replace', 'line', 'linewise', 1)
 
   """ 2
@@ -8562,13 +8572,13 @@ function! s:suite.linewise_x_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), ' (foo) ', 'failed at #4')
 
   " #5
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}]
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}, {'buns': ['(', ')']}]
   call setline('.', ' "foo"')
   normal 0Vsr(
   call g:assert.equals(getline('.'), ' "foo"', 'failed at #5')
 
   """ 1
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
   call operator#sandwich#set('replace', 'line', 'skip_space', 1)
 
   " #6
@@ -8593,13 +8603,13 @@ function! s:suite.linewise_x_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), '("foo")', 'failed at #9')
 
   " #10
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}]
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}, {'buns': ['(', ')']}]
   call setline('.', ' "foo"')
   normal 0Vsr(
   call g:assert.equals(getline('.'), ' "foo"', 'failed at #10')
 
   """ 0
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
   call operator#sandwich#set('replace', 'line', 'skip_space', 0)
 
   " #11
@@ -8624,7 +8634,7 @@ function! s:suite.linewise_x_option_skip_space() abort  "{{{
   call g:assert.equals(getline('.'), '("foo")', 'failed at #14')
 
   " #15
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 1}]
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 1}, {'buns': ['(', ')']}]
   call setline('.', ' "foo"')
   normal 0Vsr(
   call g:assert.equals(getline('.'), ' (foo)', 'failed at #15')
@@ -10783,6 +10793,8 @@ function! s:suite.blockwise_n_option_regex() abort  "{{{
 endfunction
 "}}}
 function! s:suite.blockwise_n_option_skip_space() abort  "{{{
+  let g:sandwich#recipes = []
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
   set whichwrap=h,l
 
   """ 1
@@ -10824,7 +10836,7 @@ function! s:suite.blockwise_n_option_skip_space() abort  "{{{
   %delete
 
   " #5
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}]
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}, {'buns': ['(', ')']}]
   call append(0, [' "foo"', ' "bar"', ' "baz"'])
   execute "normal gg0sr\<C-v>20l("
   call g:assert.equals(getline(1), ' "foo"', 'failed at #5')
@@ -10834,7 +10846,7 @@ function! s:suite.blockwise_n_option_skip_space() abort  "{{{
   %delete
 
   """ 2
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
   call operator#sandwich#set('replace', 'block', 'skip_space', 2)
 
   " #6
@@ -10874,7 +10886,7 @@ function! s:suite.blockwise_n_option_skip_space() abort  "{{{
   %delete
 
   " #10
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}]
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}, {'buns': ['(', ')']}]
   call append(0, [' "foo"', ' "bar"', ' "baz"'])
   execute "normal gg0sr\<C-v>20l("
   call g:assert.equals(getline(1), ' "foo"', 'failed at #10')
@@ -10884,7 +10896,7 @@ function! s:suite.blockwise_n_option_skip_space() abort  "{{{
   %delete
 
   """ 0
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
   call operator#sandwich#set('replace', 'block', 'skip_space', 0)
 
   " #11
@@ -10923,7 +10935,7 @@ function! s:suite.blockwise_n_option_skip_space() abort  "{{{
   call g:assert.equals(getline(3), '("baz")', 'failed at #14')
 
   " #15
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 1}]
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 1}, {'buns': ['(', ')']}]
   call append(0, [' "foo"', ' "bar"', ' "baz"'])
   execute "normal gg0sr\<C-v>20l("
   call g:assert.equals(getline(1), ' (foo)', 'failed at #2')
@@ -12952,6 +12964,9 @@ function! s:suite.blockwise_x_option_regex() abort  "{{{
 endfunction
 "}}}
 function! s:suite.blockwise_x_option_skip_space() abort  "{{{
+  let g:sandwich#recipes = []
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
+
   """ 1
   " #1
   call append(0, ['"foo"', '"bar"', '"baz"'])
@@ -12991,7 +13006,7 @@ function! s:suite.blockwise_x_option_skip_space() abort  "{{{
   %delete
 
   " #5
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}]
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}, {'buns': ['(', ')']}]
   call append(0, [' "foo"', ' "bar"', ' "baz"'])
   execute "normal gg0\<C-v>2j6lsr("
   call g:assert.equals(getline(1), ' "foo"', 'failed at #5')
@@ -13001,7 +13016,7 @@ function! s:suite.blockwise_x_option_skip_space() abort  "{{{
   %delete
 
   """ 2
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
   call operator#sandwich#set('replace', 'block', 'skip_space', 2)
 
   " #6
@@ -13041,7 +13056,7 @@ function! s:suite.blockwise_x_option_skip_space() abort  "{{{
   %delete
 
   " #10
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}]
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 0}, {'buns': ['(', ')']}]
   call append(0, [' "foo"', ' "bar"', ' "baz"'])
   execute "normal gg0\<C-v>2j6lsr("
   call g:assert.equals(getline(1), ' "foo"', 'failed at #10')
@@ -13051,7 +13066,7 @@ function! s:suite.blockwise_x_option_skip_space() abort  "{{{
   %delete
 
   """ 0
-  unlet! g:operator#sandwich#recipes
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"']}, {'buns': ['(', ')']}]
   call operator#sandwich#set('replace', 'block', 'skip_space', 0)
 
   " #11
@@ -13090,7 +13105,7 @@ function! s:suite.blockwise_x_option_skip_space() abort  "{{{
   call g:assert.equals(getline(3), '("baz")', 'failed at #14')
 
   " #15
-  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 1}]
+  let g:operator#sandwich#recipes = [{'buns': ['"', '"'], 'skip_space': 1}, {'buns': ['(', ')']}]
   call append(0, [' "foo"', ' "bar"', ' "baz"'])
   execute "normal gg0\<C-v>2j6lsr("
   call g:assert.equals(getline(1), ' (foo)', 'failed at #2')

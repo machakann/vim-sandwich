@@ -2036,6 +2036,7 @@ function! s:suite.i_x_selected_area_extending() abort  "{{{
   %delete
 
   " #4
+  let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [
         \   {'buns': ['if', 'endif'], 'nesting': 1},
         \   {'buns': ['if', 'else'], 'nesting': 1},
@@ -4806,6 +4807,7 @@ function! s:suite.a_x_selected_area_extending() abort  "{{{
   %delete
 
   " #4
+  let g:sandwich#recipes = []
   let g:textobj#sandwich#recipes = [
         \   {'buns': ['if', 'endif'], 'nesting': 1},
         \   {'buns': ['if', 'else'], 'nesting': 1},
