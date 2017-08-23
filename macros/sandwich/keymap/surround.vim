@@ -27,6 +27,7 @@ let g:sandwich#recipes = [
       \   {
       \     'buns': ['\s\+', '\s\+'],
       \     'regex': 1,
+      \     'kind': ['delete', 'replace', 'query'],
       \     'input': [' ']
       \   },
       \
