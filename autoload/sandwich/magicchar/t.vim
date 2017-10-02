@@ -310,7 +310,7 @@ function! s:prototype(kind) abort "{{{
     let pat = a:kind ==# 'i' ? '</\ze\a[^[:blank:]>/]*' : '</\a[^[:blank:]>/]*\ze\s*>'
     call search(pat, 'be', line("'<"))
     normal! o
-    let pat = a:kind ==# 'i' ? '<\a[^[:blank:]>/]*\zs.' : '<\zs\a[^[:blank:]>/]*'
+    let pat = a:kind ==# 'i' ? '<\a[^[:blank:]>/]*\zs\_.' : '<\zs\a[^[:blank:]>/]*'
     call search(pat, '', line("'>"))
   else
     call winrestview(view)
@@ -328,7 +328,7 @@ function! sandwich#magicchar#t#at() abort "{{{
 endfunction
 "}}}
 function! s:textobj(a_or_i) abort "{{{
-  let head = searchpos('<\a[^[:blank:]>/]*>', 'bcn', 0, 50)
+  let head = searchpos('<\a[^[:blank:]>/]*', 'bcn', 0, 50)
   if head != s:null_coord
     let tagname = matchstr(getline(head[0])[head[1]-1 :], '^<\zs\a[^[:blank:]>/]*')
     if search(printf('</%s>', s:escape(tagname)), 'cn', 0, 50)
