@@ -9,7 +9,11 @@ endfunction
 "}}}
 function! sandwich#util#addlocal(recipes) abort "{{{
   if !exists('b:sandwich_recipes')
-    let b:sandwich_recipes = deepcopy(g:sandwich#recipes)
+    if exists('g:sandwich#recipes')
+      let b:sandwich_recipes = deepcopy(g:sandwich#recipes)
+    else
+      let b:sandwich_recipes = deepcopy(g:sandwich#default_recipes)
+    endif
   endif
   call extend(b:sandwich_recipes, copy(a:recipes), 0)
   return b:sandwich_recipes
