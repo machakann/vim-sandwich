@@ -565,7 +565,7 @@ function! s:operator.blink(place, hi_group, duration) dict abort "{{{
     if c != 0
       let c = type(c) == s:type_num ? nr2char(c) : c
       let hi_exited = 1
-      call feedkeys(c, 't')
+      call feedkeys(c, 'it')
     endif
   finally
     call self.quench(a:place)
