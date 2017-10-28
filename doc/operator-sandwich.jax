@@ -1559,7 +1559,7 @@ operator#sandwich#kind()		*operator#sandwich#kind()*
 	|textobj-sandwich| との連携に便利かもしれません。
 
 					*operator#sandwich#show()*
-operator#sandwich#show([{place}[, {group}]])
+operator#sandwich#show([{place}[, {group}[, {forcibly}]]])
 	この関数はテキストをハイライトするのに使います。ハイライトするテキスト
 	は {place} によって指定され、次の値が指定可能です。
 	    `target`: 置換オペレーターにより置換の対象となるテキスト
@@ -1573,6 +1573,8 @@ operator#sandwich#show([{place}[, {group}]])
 	されている場合は {group} が現在の値と違う場合のみ更新しますが、そうで
 	なければ何もせず終了します。ハイライトの追加あるいは更新に成功した
 	場合、関数は 0 を返します。それ以外の場合は 1 を返します。
+	もし、 {forcibly} が与えられ真の場合、この関数は "highlight"
+	オプションに関わらずテキストのハイライトを実行します。
 
 
 					*operator#sandwich#quench()*

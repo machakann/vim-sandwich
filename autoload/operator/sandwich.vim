@@ -354,38 +354,39 @@ function! operator#sandwich#show(...) abort  "{{{
       let place = 'stuff'
     endif
     if place ==# 'added'
-      let hi_group = get(a:000, 1, 'OperatorSandwichAdd')
+      let hi_group = s:get_ifnotempty(a:000, 1, 'OperatorSandwichAdd')
     else
       let hi_group = opt.of('highlight') >= 2
-                  \ ? get(a:000, 1, 'OperatorSandwichChange')
-                  \ : get(a:000, 1, 'OperatorSandwichBuns')
+                  \ ? s:get_ifnotempty(a:000, 1, 'OperatorSandwichChange')
+                  \ : s:get_ifnotempty(a:000, 1, 'OperatorSandwichBuns')
     endif
   elseif kind ==# 'delete'
     if place ==# ''
       let place = 'target'
     endif
     let hi_group = opt.of('highlight') >= 2
-                \ ? get(a:000, 1, 'OperatorSandwichDelete')
-                \ : get(a:000, 1, 'OperatorSandwichBuns')
+                \ ? s:get_ifnotempty(a:000, 1, 'OperatorSandwichDelete')
+                \ : s:get_ifnotempty(a:000, 1, 'OperatorSandwichBuns')
   elseif kind ==# 'replace'
     if place ==# ''
       let place = 'target'
     endif
     if place ==# 'added'
-      let hi_group = get(a:000, 1, 'OperatorSandwichAdd')
+      let hi_group = s:get_ifnotempty(a:000, 1, 'OperatorSandwichAdd')
     elseif place ==# 'target'
       let hi_group = opt.of('highlight') >= 2
-                  \ ? get(a:000, 1, 'OperatorSandwichDelete')
-                  \ : get(a:000, 1, 'OperatorSandwichBuns')
+                  \ ? s:get_ifnotempty(a:000, 1, 'OperatorSandwichDelete')
+                  \ : s:get_ifnotempty(a:000, 1, 'OperatorSandwichBuns')
     else
       let hi_group = opt.of('highlight') >= 2
-                  \ ? get(a:000, 1, 'OperatorSandwichChange')
-                  \ : get(a:000, 1, 'OperatorSandwichBuns')
+                  \ ? s:get_ifnotempty(a:000, 1, 'OperatorSandwichChange')
+                  \ : s:get_ifnotempty(a:000, 1, 'OperatorSandwichBuns')
     endif
   else
     return 1
   endif
-  return operator._show(place, hi_group)
+  let forcibly = get(a:000, 2, 0)
+  return operator.show(place, hi_group, forcibly)
 endfunction
 "}}}
 function! operator#sandwich#quench(...) abort  "{{{
@@ -404,7 +405,7 @@ function! operator#sandwich#quench(...) abort  "{{{
         return 1
       endif
     endif
-    return operator._quench(place)
+    return operator.quench(place)
   endif
 endfunction
 "}}}
@@ -429,6 +430,14 @@ function! operator#sandwich#kind() abort  "{{{
   return exists('g:operator#sandwich#object') && g:operator#sandwich#object.at_work
         \ ? g:operator#sandwich#object.kind
         \ : s:operator
+endfunction
+"}}}
+function! s:get_ifnotempty(list, idx, default) abort "{{{
+  let item = get(a:list, a:idx, '')
+  if item ==# ''
+    let item = a:default
+  endif
+  return item
 endfunction
 "}}}
 

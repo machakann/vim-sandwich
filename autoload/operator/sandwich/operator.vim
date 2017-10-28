@@ -497,19 +497,11 @@ function! s:operator.match(i) dict abort  "{{{
 endfunction
 "}}}
 function! s:operator.show(place, hi_group, ...) dict abort "{{{
-  if !self.opt.of('highlight')
+  let forcibly = get(a:000, 0, 0)
+  if !self.opt.of('highlight') && !forcibly
     return 1
   endif
 
-  if a:0
-    let success = self._show(a:place, a:hi_group, a:1)
-  else
-    let success = self._show(a:place, a:hi_group)
-  endif
-  return !success
-endfunction
-"}}}
-function! s:operator._show(place, hi_group, ...) dict abort "{{{
   let highlight = self.highlight[a:place]
   call highlight.initialize()
   for i in range(self.n)
@@ -519,26 +511,22 @@ function! s:operator._show(place, hi_group, ...) dict abort "{{{
     endfor
   endfor
   let success = highlight.show(a:hi_group)
-  if a:0
-    let duration = a:1
-    call highlight.quench_timer(duration)
-  endif
   call winrestview(self.view)
   redraw
   return !success
 endfunction
 "}}}
 function! s:operator.quench(place) dict abort "{{{
-  if !self.opt.of('highlight')
-    return 1
-  endif
-
-  return self._quench(a:place)
-endfunction
-"}}}
-function! s:operator._quench(place) dict abort "{{{
   let highlight = self.highlight[a:place]
   return highlight.quench()
+endfunction
+"}}}
+function! s:operator.quench_timer(place, duration) abort "{{{
+  if a:duration <= 0
+    call self.quench(a:place)
+  endif
+  let highlight = self.highlight[a:place]
+  call highlight.quench_timer(a:duration)
 endfunction
 "}}}
 function! s:operator.blink(place, hi_group, duration) dict abort "{{{
@@ -552,7 +540,7 @@ function! s:operator.blink(place, hi_group, duration) dict abort "{{{
   let clock = sandwich#clock#new()
   let hi_exited = 0
   let linewise = get(a:000, 0, 0)
-  call self._show(a:place, a:hi_group)
+  call self.show(a:place, a:hi_group)
   try
     let c = 0
     call clock.start()
@@ -584,7 +572,8 @@ function! s:operator.glow(place, hi_group, duration) dict abort "{{{
   " highlight off: limit the number of highlighting region to one explicitly
   call sandwich#highlight#cancel()
 
-  call self._show(a:place, a:hi_group, a:duration)
+  call self.show(a:place, a:hi_group)
+  call self.quench_timer(a:place, a:duration)
 endfunction
 "}}}
 function! s:operator.highlight_added(opt) dict abort  "{{{

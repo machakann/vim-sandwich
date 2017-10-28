@@ -1592,7 +1592,7 @@ operator#sandwich#kind()		*operator#sandwich#kind()*
 	helpful in cooperation with |textobj-sandwich|.
 
 					*operator#sandwich#show()*
-operator#sandwich#show([{place}[, {group}]])
+operator#sandwich#show([{place}[, {group}[, {forcibly}]]])
 	This function highlight texts. The kind of highlighted text is
 	assigned by {place}, and {place} should be:
 	    `target`: the text to be replaced in replace operators.
@@ -1600,6 +1600,8 @@ operator#sandwich#show([{place}[, {group}]])
 	    `added` : the added text in add/replace operators.
 	If {place} is not given, `stuff` is employed for add operator and
 	`target` for delete/replace operator.
+	If {forcibly} is true (1), this function ignore the "highlight" option
+	and highlight forcibly.
 
 	If user gives {group}, the text will be highlighted with {group} which
 	is defined by |:highlight| command. Default highlight groups are
