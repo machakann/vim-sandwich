@@ -765,13 +765,24 @@ function! s:added_tail(head, tail, linewise) abort  "{{{
 endfunction
 "}}}
 function! s:initial_indent(pos) abort "{{{
-  return s:is_linehead(a:pos) ? a:pos[2] : indent(a:pos[1])
+  " return indent in byte-length
+  if s:is_linehead(a:pos)
+    return a:pos[2] - 1
+  endif
+  let indent = indent(a:pos[1])
+  if !&expandtab
+    let indent = indent / &tabstop
+  endif
+  return indent
 endfunction
 "}}}
 function! s:diff_indent(initial_indent, pos, addition) abort "{{{
   let addition = split(a:addition, '\%(\n\|\r\|\r\n\)', 1)
   if len(addition) == 1
-    let indent = s:is_linehead(a:pos) ? a:pos[2] : indent("'[")
+    let indent = indent("'[") - strlen(matchstr(addition[0], '^\s*'))
+    if !&expandtab
+      let indent = indent / &tabstop
+    endif
     let diff = indent - a:initial_indent
   else
     let diff = indent("']") - strlen(matchstr(addition[-1], '^\s*'))

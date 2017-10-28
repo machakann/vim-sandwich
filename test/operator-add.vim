@@ -11004,5 +11004,17 @@ function! s:suite.undo() abort  "{{{
 endfunction
 "}}}
 
+" auto-indent
+function! s:suite.autoindent() abort "{{{
+  " #1
+  filetype indent on
+  set expandtab softtabstop=2 shiftwidth=2
+  set filetype=html
+  call append(0, ['<html>', 'foo', '</html>'])
+  call cursor(2, 1)
+  execute "normal saiwtbody\<CR>"
+  call g:assert.equals(getline('.'), '  <body>foo</body>', 'failed at #1')
+endfunction "}}}
+
 " vim:set foldmethod=marker:
 " vim:set commentstring="%s:
