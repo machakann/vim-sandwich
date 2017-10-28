@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:02-Mar-2017.
+						Last change:28-Oct-2017.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -1580,6 +1580,9 @@ operator#sandwich#get_info({info})	*operator#sandwich#get_info()*
 	    `count`: The given [count] for the operator.
 	    `mode` : A character represents the mode working in,
 	             "n" for normal mode, "x" for visual mode.
+	    `motionwise`:
+	             The type of target region. "char", "line", "block" or an
+	             empty string "".
 
 operator#sandwich#kind()		*operator#sandwich#kind()*
 	If in |operator-pending-mode|, this function returns the name of a

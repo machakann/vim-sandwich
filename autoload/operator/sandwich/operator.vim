@@ -45,6 +45,7 @@ endfunction
 let s:operator = {
       \   'state'     : 0,
       \   'kind'      : '',
+      \   'motionwise': '',
       \   'count'     : 1,
       \   'n'         : 0,
       \   'mode'      : 'n',
@@ -107,6 +108,7 @@ endfunction
 "}}}
 function! s:operator.initialize(motionwise) dict abort "{{{
   let self.at_work = 1
+  let self.motionwise = a:motionwise
   call self.recipes.integrate(self.kind, a:motionwise, self.mode)
   let region = s:get_assigned_region(self.kind, a:motionwise)
   let region_list = a:motionwise ==# 'block' ? self.split(region) : [region]

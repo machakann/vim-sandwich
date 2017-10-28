@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:02-Mar-2017.
+						Last change:28-Oct-2017.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -1547,6 +1547,9 @@ operator#sandwich#get_info({info})	*operator#sandwich#get_info()*
 	    `count`: オペレーターに与えられた [count] です。
 	    `mode` : オペレーターの使用されたモードを表す一文字です。ノーマル
 	             モードなら "n" が、ビジュアルモードなら "x" です。
+	    `motionwise`:
+	             編集する領域の種類。 "char", "line", "block" または空文字
+	             列 "" が返りうる。
 
 operator#sandwich#kind()		*operator#sandwich#kind()*
 	オペレーター待機モード |operator-pending-mode| において使用された場合

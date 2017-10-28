@@ -417,7 +417,7 @@ function! operator#sandwich#get_info(...) abort  "{{{
   let info = get(a:000, 0, '')
   if a:0 == 0 || info ==# ''
     return g:operator#sandwich#object
-  elseif info ==# 'state' || info ==# 'kind' || info ==# 'count' || info ==# 'mode'
+  elseif info ==# 'state' || info ==# 'kind' || info ==# 'count' || info ==# 'mode' || info ==# 'motionwise'
     return g:operator#sandwich#object[info]
   else
     echoerr printf('operator-sandwich: Identifier "%s" is not supported.', string(info))
