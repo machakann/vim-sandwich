@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:28-Oct-2017.
+						Last change:11-Nov-2017.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -208,9 +208,9 @@ KEYMAPPINGS				*operator-sandwich-keymappings*
 
 このプラグインは下記のキーマッピングを提供します。
 |<Plug>(operator-sandwich-add)|, |<Plug>(operator-sandwich-delete)| 及び
-|<Plug>(operator-sandwich-replace)| は基本的にノーマルモードとヴィジュアルモー
-ドで動作します。 |<Plug>(operator-sandwich-add)| はノーマルモードとビジュアル
-モードの両方で sa にマップされています。一方、
+|<Plug>(operator-sandwich-replace)| は基本的にノーマルモード、ヴィジュアルモー
+ド、オペレータ待機モードで動作します。 |<Plug>(operator-sandwich-add)| はノー
+マルモードとビジュアルモードの両方で sa にマップされています。一方、
 |<Plug>(operator-sandwich-delete)| と |<Plug>(operator-sandwich-replace)| はビ
 ジュアルモードでのみ sd および sr に単独のマッピングとして定義されます。ノーマ
 ルモードでは便利のため |textobj-sandwich| との複合マッピングとして定義されます
@@ -232,8 +232,7 @@ g:operator_sandwich_no_default_key_mappings を定義してください。
 <
 これでデフォルト設定は適用されません。お好みのキーに設定しなおしてください。
 >
-	nmap ys <Plug>(operator-sandwich-add)
-	xmap ys <Plug>(operator-sandwich-add)
+	map ys <Plug>(operator-sandwich-add)
 <
 
 NOTE: 誤操作を防ぐため以下の設定を vimrc に追加することを強く推奨します。

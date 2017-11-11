@@ -1,5 +1,5 @@
 " The vim operator plugin to do well with 'sandwich' like structure
-" Last Change: 17-Mar-2017.
+" Last Change: 09-Nov-2017.
 " Maintainer : Masaaki Nakamura <mckn@outlook.jp>
 
 " License    : NYSL
@@ -14,10 +14,13 @@ let g:loaded_operator_sandwich = 1
 " keymappings
 nmap <silent> <Plug>(operator-sandwich-add)     <Plug>(operator-sandwich-add-pre)<Plug>(operator-sandwich-g@)
 xmap <silent> <Plug>(operator-sandwich-add)     <Plug>(operator-sandwich-add-pre)<Plug>(operator-sandwich-gv)<Plug>(operator-sandwich-g@)
+omap <silent> <Plug>(operator-sandwich-add)     <Plug>(operator-sandwich-g@)
 nmap <silent> <Plug>(operator-sandwich-delete)  <Plug>(operator-sandwich-delete-pre)<Plug>(operator-sandwich-g@)
 xmap <silent> <Plug>(operator-sandwich-delete)  <Plug>(operator-sandwich-delete-pre)<Plug>(operator-sandwich-gv)<Plug>(operator-sandwich-g@)
+omap <silent> <Plug>(operator-sandwich-delete)  <Plug>(operator-sandwich-g@)
 nmap <silent> <Plug>(operator-sandwich-replace) <Plug>(operator-sandwich-replace-pre)<Plug>(operator-sandwich-g@)
 xmap <silent> <Plug>(operator-sandwich-replace) <Plug>(operator-sandwich-replace-pre)<Plug>(operator-sandwich-gv)<Plug>(operator-sandwich-g@)
+omap <silent> <Plug>(operator-sandwich-replace) <Plug>(operator-sandwich-g@)
 
 nnoremap <silent> <Plug>(operator-sandwich-add-pre)     :<C-u>call operator#sandwich#prerequisite('add', 'n')<CR>
 xnoremap <silent> <Plug>(operator-sandwich-add-pre)     <Esc>:call operator#sandwich#prerequisite('add', 'x')<CR>

@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:28-Oct-2017.
+						Last change:11-Nov-2017.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -215,12 +215,12 @@ KEYMAPPINGS				*operator-sandwich-keymappings*
 
 This plugin prepares following keymappings. |<Plug>(operator-sandwich-add)|,
 |<Plug>(operator-sandwich-delete)| and |<Plug>(operator-sandwich-replace)| are
-valid in normal and visual mode in principle. |<Plug>(operator-sandwich-add)|
-is mapped to the keysequences `sa` in default, while
-|<Plug>(operator-sandwich-delete)| and |<Plug>(operator-sandwich-replace)| are
-mappded to the key sequences `sd` and `sr` respectively only in visual mode.
-`sd` and `sr` are used by the compound mappings with |textobj-sandwich| in
-normal mode. See |sandwich-keymappings|.
+valid in normal, visual and operator-pending mode in principle.
+|<Plug>(operator-sandwich-add)| is mapped to the keysequences `sa` in default,
+while |<Plug>(operator-sandwich-delete)| and
+|<Plug>(operator-sandwich-replace)| are mappded to the key sequences `sd` and
+`sr` respectively only in visual mode. `sd` and `sr` are used by the compound
+mappings with |textobj-sandwich| in normal mode. See |sandwich-keymappings|.
 
 function	keymappings				default keymappings
 --------------------------------------------------------------------------
@@ -238,8 +238,7 @@ g:operator_sandwich_no_default_key_mappings in your vimrc.
 <
 Then default mappings are never applied. And map them again as you like.
 >
-	nmap ys <Plug>(operator-sandwich-add)
-	xmap ys <Plug>(operator-sandwich-add)
+	map ys <Plug>(operator-sandwich-add)
 <
 
 NOTE: To prevent unintended operation, the following setting is strongly
