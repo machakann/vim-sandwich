@@ -11016,6 +11016,17 @@ function! s:suite.autoindent() abort "{{{
   execute "normal saiwtbaz\<CR>"
   call g:assert.equals(getline('.'), '    <baz>bar</baz>', 'failed at #1')
 endfunction "}}}
+function! s:suite.insertspace() abort "{{{
+  " #1
+  call setline(1, 'foo')
+  execute "normal 0saiw\<Space>"
+  call g:assert.equals(getline('.'), ' foo ')
+
+  " #2
+  call setline(1, 'foo')
+  execute "normal 0lsal\<Space>"
+  call g:assert.equals(getline('.'), 'f o o')
+endfunction "}}}
 
 " vim:set foldmethod=marker:
 " vim:set commentstring="%s:

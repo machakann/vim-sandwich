@@ -779,9 +779,12 @@ endfunction
 function! s:diff_indent(initial_indent, pos, addition) abort "{{{
   let addition = split(a:addition, '\%(\n\|\r\|\r\n\)', 1)
   if len(addition) == 1
-    let indent = indent("'[") - strlen(matchstr(addition[0], '^\s*'))
+    let indent = indent("'[")
     if !&expandtab
       let indent = indent / &tabstop
+    endif
+    if s:is_linehead(a:pos)
+      let indent -= strlen(matchstr(addition[0], '^\s*'))
     endif
     let diff = indent - a:initial_indent
   else
