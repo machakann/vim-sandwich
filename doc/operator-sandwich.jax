@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:11-Nov-2017.
+						Last change:21-Nov-2017.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -1280,6 +1280,7 @@ autoindent
 	  *  1 : 'autoindent'
 	  *  2 : 'smartindent'
 	  *  3 : 'cindent'
+	  *  4 : 常にインデントを保持する
 >
 	let g:sandwich#recipes += [
 	  \   {'buns': ['{', '}'], 'motionwise': ['line'], 'autoindent': 3},
