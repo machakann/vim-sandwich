@@ -769,20 +769,14 @@ function! s:initial_indent(pos) abort "{{{
   if s:is_linehead(a:pos)
     return a:pos[2] - 1
   endif
-  let indent = indent(a:pos[1])
-  if !&expandtab
-    let indent = indent / &tabstop
-  endif
+  let indent = strlen(matchstr(getline(a:pos[1]), '^\s*'))
   return indent
 endfunction
 "}}}
 function! s:diff_indent(initial_indent, pos, addition) abort "{{{
   let addition = split(a:addition, '\%(\n\|\r\|\r\n\)', 1)
   if len(addition) == 1
-    let indent = indent("'[")
-    if !&expandtab
-      let indent = indent / &tabstop
-    endif
+    let indent = strlen(matchstr(getline("'["), '^\s*'))
     if s:is_linehead(a:pos)
       let indent -= strlen(matchstr(addition[0], '^\s*'))
     endif
