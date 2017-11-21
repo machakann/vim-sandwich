@@ -6827,8 +6827,6 @@ function! s:suite.linewise_n_option_listexpr() abort "{{{
 endfunction
 "}}}
 function! s:suite.linewise_n_option_autoindent() abort  "{{{
-  call operator#sandwich#set('replace', 'line', 'linewise', 1)
-
   set expandtab
   set shiftwidth=4
   set softtabstop=4
@@ -7442,6 +7440,23 @@ function! s:suite.linewise_n_option_autoindent() abort  "{{{
   call g:assert.equals(&l:smartindent, 1,          'failed at #26')
   call g:assert.equals(&l:cindent,     1,          'failed at #26')
   call g:assert.equals(&l:indentexpr,  'TestIndent()', 'failed at #26')
+
+  %delete
+
+  """ 4
+  call operator#sandwich#set('replace', 'line', 'autoindent', 4)
+
+  set cinkeys&
+  set indentkeys&
+  setlocal indentexpr=TestIndent()
+  let g:sandwich#recipes = [{'buns': ['bar', 'bar'], 'line': 1, 'autoindent': 4, 'input': ['a']}, {'buns': ['baz', 'baz'], 'line': 1, 'autoindent': 4, 'input': ['b']}]
+  let g:operator#sandwich#recipes = []
+  call append(0, ['        foo', '    bar', '    foo', '    bar'])
+  normal 2Gsr2jb
+  call g:assert.equals(getline(1), '        foo', 'failed at #27')
+  call g:assert.equals(getline(2), '    baz', 'failed at #27')
+  call g:assert.equals(getline(3), '    foo', 'failed at #27')
+  call g:assert.equals(getline(4), '    baz', 'failed at #27')
 endfunction
 "}}}
 function! s:suite.linewise_n_option_indentkeys() abort  "{{{
@@ -9615,6 +9630,19 @@ function! s:suite.linewise_x_option_autoindent() abort  "{{{
   call g:assert.equals(&l:smartindent, 1,          'failed at #26')
   call g:assert.equals(&l:cindent,     1,          'failed at #26')
   call g:assert.equals(&l:indentexpr,  'TestIndent()', 'failed at #26')
+
+  %delete
+
+  """ 4
+  setlocal indentexpr=TestIndent()
+  let g:sandwich#recipes = [{'buns': ['bar', 'bar'], 'line': 1, 'autoindent': 4, 'input': ['a']}, {'buns': ['baz', 'baz'], 'line': 1, 'autoindent': 4, 'input': ['b']}]
+  let g:operator#sandwich#recipes = []
+  call append(0, ['        foo', '    bar', '    foo', '    bar'])
+  normal 2GV2jsrb
+  call g:assert.equals(getline(1), '        foo', 'failed at #27')
+  call g:assert.equals(getline(2), '    baz', 'failed at #27')
+  call g:assert.equals(getline(3), '    foo', 'failed at #27')
+  call g:assert.equals(getline(4), '    baz', 'failed at #27')
 endfunction
 "}}}
 function! s:suite.linewise_x_option_indentkeys() abort  "{{{

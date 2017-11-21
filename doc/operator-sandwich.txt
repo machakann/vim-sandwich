@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:11-Nov-2017.
+						Last change:21-Nov-2017.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -1304,6 +1304,7 @@ autoindent
 	  *  1 : 'autoindent'
 	  *  2 : 'smartindent'
 	  *  3 : 'cindent'
+	  *  4 : Keep the indent level anyway
 >
 	let g:sandwich#recipes += [
 	  \   {'buns': ['{', '}'], 'motionwise': ['line'], 'autoindent': 3},

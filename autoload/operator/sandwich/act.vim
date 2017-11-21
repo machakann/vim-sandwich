@@ -272,7 +272,7 @@ function! s:set_indent(opt) abort "{{{
         \ }
 
   " set autoindent options
-  if a:opt.of('autoindent') == 0
+  if a:opt.of('autoindent') == 0 || a:opt.of('autoindent') == 4
     let [&l:autoindent, &l:smartindent, &l:cindent, &l:indentexpr] = [0, 0, 0, '']
     let indentopt.autoindent.restore = 1
   elseif a:opt.of('autoindent') == 1
@@ -415,26 +415,31 @@ endfunction
 "}}}
 function! s:replace_former(buns, head, tail, within_a_line, opt, ...) abort "{{{
   let is_linewise  = 0
+  let opt_linewise = a:opt.of('linewise')
   let undojoin_cmd = get(a:000, 0, 0) ? 'undojoin | ' : ''
   let initial_indent = s:initial_indent(a:head)
-  let deletion = s:delete_portion(a:head, a:tail, undojoin_cmd)
+  if opt_linewise && a:opt.of('autoindent') == 4
+    let saved_indentstr = matchstr(getline(a:head[1]), '^\s*')
+  else
+    let saved_indentstr = ''
+  endif
 
+  let deletion = s:delete_portion(a:head, a:tail, undojoin_cmd)
   if operator#sandwich#is_in_cmd_window()
     " workaround for a bug in cmdline-window
     call s:paste(a:buns[0])
   else
-    let opt_linewise = a:opt.of('linewise')
     if opt_linewise == 1 && getline('.') =~# '^\s*$'
       .delete
       let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! O' : "normal \<Plug>(sandwich-O)"
-      execute 'silent noautocmd ' . startinsert . a:buns[0]
+      execute 'silent noautocmd ' . startinsert . saved_indentstr . a:buns[0]
       let is_linewise = 1
     elseif opt_linewise == 2
       if !a:within_a_line
         .delete
       endif
       let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! O' : "normal \<Plug>(sandwich-O)"
-      execute 'silent noautocmd ' . startinsert . a:buns[0]
+      execute 'silent noautocmd ' . startinsert . saved_indentstr . a:buns[0]
       let is_linewise = 1
     else
       let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! i' : "normal \<Plug>(sandwich-i)"
@@ -451,6 +456,11 @@ function! s:replace_latter(buns, head, tail, within_a_line, opt) abort "{{{
   let undojoin_cmd = ''
   let initial_indent = s:initial_indent(a:head)
   let deletion = s:delete_portion(a:head, a:tail, undojoin_cmd)
+  if opt_linewise && a:opt.of('autoindent') == 4
+    let saved_indentstr = matchstr(getline(a:head[1]), '^\s*')
+  else
+    let saved_indentstr = ''
+  endif
 
   if operator#sandwich#is_in_cmd_window()
     " workaround for a bug in cmdline-window
@@ -466,7 +476,7 @@ function! s:replace_latter(buns, head, tail, within_a_line, opt) abort "{{{
       if current != fileend
         normal! k
       endif
-      execute 'silent noautocmd ' . startinsert . a:buns[1]
+      execute 'silent noautocmd ' . startinsert . saved_indentstr . a:buns[1]
       let head = getpos("'[")
       let tail = getpos("']")
       let is_linewise = 1
@@ -475,7 +485,7 @@ function! s:replace_latter(buns, head, tail, within_a_line, opt) abort "{{{
       if a:within_a_line
         " exceptional behavior
         let lnum = line('.')
-        execute 'silent noautocmd ' . startinsert . a:buns[1]
+        execute 'silent noautocmd ' . startinsert . saved_indentstr . a:buns[1]
         let head = getpos("'[")
         let tail = getpos("']")
         execute lnum . 'delete'
@@ -489,7 +499,7 @@ function! s:replace_latter(buns, head, tail, within_a_line, opt) abort "{{{
         if current != fileend
           normal! k
         endif
-        execute 'silent noautocmd ' . startinsert . a:buns[1]
+        execute 'silent noautocmd ' . startinsert . saved_indentstr . a:buns[1]
         let head = getpos("'[")
         let tail = getpos("']")
       endif
