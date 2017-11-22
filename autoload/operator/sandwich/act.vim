@@ -418,13 +418,13 @@ function! s:replace_former(buns, head, tail, within_a_line, opt, ...) abort "{{{
   let opt_linewise = a:opt.of('linewise')
   let undojoin_cmd = get(a:000, 0, 0) ? 'undojoin | ' : ''
   let initial_indent = s:initial_indent(a:head)
+  let deletion = s:delete_portion(a:head, a:tail, undojoin_cmd)
   if opt_linewise && a:opt.of('autoindent') == 4
     let saved_indentstr = matchstr(getline(a:head[1]), '^\s*')
   else
     let saved_indentstr = ''
   endif
 
-  let deletion = s:delete_portion(a:head, a:tail, undojoin_cmd)
   if operator#sandwich#is_in_cmd_window()
     " workaround for a bug in cmdline-window
     call s:paste(a:buns[0])
