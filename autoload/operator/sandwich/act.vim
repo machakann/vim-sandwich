@@ -2,6 +2,8 @@
 
 " variables "{{{
 let s:constants = function('sandwich#constants#get')
+let s:TRUE = 1
+let s:FALSE = 0
 
 " null valiables
 let s:null_pos   = [0, 0, 0, 0]
@@ -257,6 +259,54 @@ function! s:act.replace_pair(buns, stuff, undojoin, modified) dict abort "{{{
 endfunction
 "}}}
 
+" supplemental classes
+" Indent class {{{
+let s:Indent = {
+  \   'len': 0,
+  \   'str': '',
+  \   'savedstr': '',
+  \   'linehead': s:FALSE
+  \ }
+function! s:Indent(pos, opt) abort "{{{
+  let line = getline(a:pos[1])
+  let indent = deepcopy(s:Indent)
+  if a:pos[2] == 1
+    let indent.linehead = s:TRUE
+    return indent
+  endif
+
+  let indent.str = matchstr(line, '^\s*')
+  let indent.len = strlen(indent.str)
+  if a:pos[2] <= indent.len
+    " shorten if cursor is in indentation
+    let indent.str = indent.str[: a:pos[2] - 2]
+    let indent.len = strlen(indent.str)
+    let indent.linehead = s:TRUE
+  endif
+
+  if a:opt.of('linewise') && a:opt.of('autoindent') == 4
+    let indent.savedstr = indent.str
+  endif
+  return indent
+endfunction "}}}
+function! s:Indent.diff(addition) abort "{{{
+  let addition = split(a:addition, '\m\%(\n\|\r\|\r\n\)', 1)
+  if len(addition) == 1
+    let indentstr = matchstr(getline("'["), '\m^\s*')
+    let indentlen = strlen(indentstr)
+    if self.linehead
+      let indentlen -= strlen(matchstr(addition[0], '\m^\s*'))
+    endif
+    let diff = indentlen - self.len
+  else
+    let indentstr = matchstr(getline("']"), '\m^\s*')
+    let indentlen = strlen(indentstr)
+    let diff = indentlen - strlen(matchstr(addition[-1], '\m^\s*'))
+  endif
+  return diff
+endfunction "}}}
+"}}}
+
 " private functions
 function! s:set_indent(opt) abort "{{{
   let indentopt = {
@@ -333,30 +383,32 @@ endfunction
 "}}}
 function! s:add_former(buns, pos, opt, ...) abort  "{{{
   let undojoin_cmd = get(a:000, 0, 0) ? 'undojoin | ' : ''
+  let indent = s:Indent(a:pos, a:opt)
   let opt_linewise  = a:opt.of('linewise')
   if opt_linewise
     let startinsert = a:opt.of('noremap') ? 'normal! O' : "normal \<Plug>(sandwich-O)"
+    let insertion = indent.savedstr . a:buns[0]
   else
     let startinsert = a:opt.of('noremap') ? 'normal! i' : "normal \<Plug>(sandwich-i)"
+    let insertion = a:buns[0]
   endif
-  let initial_indent = s:initial_indent(a:pos)
-  call s:add_portion(a:buns[0], a:pos, undojoin_cmd, startinsert)
-  let indent = s:diff_indent(initial_indent, a:pos, a:buns[0])
-  return [opt_linewise, indent, getpos("'["), getpos("']")]
+  call s:add_portion(insertion, a:pos, undojoin_cmd, startinsert)
+  return [opt_linewise, indent.diff(a:buns[0]), getpos("'["), getpos("']")]
 endfunction
 "}}}
 function! s:add_latter(buns, pos, opt) abort  "{{{
   let undojoin_cmd = ''
+  let indent = s:Indent(a:pos, a:opt)
   let opt_linewise = a:opt.of('linewise')
   if opt_linewise
     let startinsert = a:opt.of('noremap') ? 'normal! o' : "normal \<Plug>(sandwich-o)"
+    let insertion = indent.savedstr . a:buns[1]
   else
     let startinsert = a:opt.of('noremap') ? 'normal! i' : "normal \<Plug>(sandwich-i)"
+    let insertion = a:buns[1]
   endif
-  let initial_indent = s:initial_indent(a:pos)
-  call s:add_portion(a:buns[1], a:pos, undojoin_cmd, startinsert)
-  let indent = s:diff_indent(initial_indent, a:pos, a:buns[1])
-  return [opt_linewise, indent, getpos("'["), getpos("']")]
+  call s:add_portion(insertion, a:pos, undojoin_cmd, startinsert)
+  return [opt_linewise, indent.diff(a:buns[1]), getpos("'["), getpos("']")]
 endfunction
 "}}}
 function! s:add_portion(bun, pos, undojoin_cmd, startinsert) abort "{{{
@@ -417,14 +469,9 @@ function! s:replace_former(buns, head, tail, within_a_line, opt, ...) abort "{{{
   let is_linewise  = 0
   let opt_linewise = a:opt.of('linewise')
   let undojoin_cmd = get(a:000, 0, 0) ? 'undojoin | ' : ''
-  let initial_indent = s:initial_indent(a:head)
-  if opt_linewise && a:opt.of('autoindent') == 4
-    let saved_indentstr = matchstr(getline(a:head[1]), '^\s*')
-  else
-    let saved_indentstr = ''
-  endif
-
   let deletion = s:delete_portion(a:head, a:tail, undojoin_cmd)
+  let indent = s:Indent(a:head, a:opt)
+
   if operator#sandwich#is_in_cmd_window()
     " workaround for a bug in cmdline-window
     call s:paste(a:buns[0])
@@ -432,35 +479,29 @@ function! s:replace_former(buns, head, tail, within_a_line, opt, ...) abort "{{{
     if opt_linewise == 1 && getline('.') =~# '^\s*$'
       .delete
       let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! O' : "normal \<Plug>(sandwich-O)"
-      execute 'silent noautocmd ' . startinsert . saved_indentstr . a:buns[0]
+      execute 'silent noautocmd ' . startinsert . indent.savedstr . a:buns[0]
       let is_linewise = 1
     elseif opt_linewise == 2
       if !a:within_a_line
         .delete
       endif
       let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! O' : "normal \<Plug>(sandwich-O)"
-      execute 'silent noautocmd ' . startinsert . saved_indentstr . a:buns[0]
+      execute 'silent noautocmd ' . startinsert . indent.savedstr . a:buns[0]
       let is_linewise = 1
     else
       let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! i' : "normal \<Plug>(sandwich-i)"
       execute 'silent noautocmd ' . startinsert . a:buns[0]
     endif
   endif
-  let indent = s:diff_indent(initial_indent, a:head, a:buns[0])
-  return [deletion, is_linewise, indent, getpos("'["), getpos("']")]
+  return [deletion, is_linewise, indent.diff(a:buns[0]), getpos("'["), getpos("']")]
 endfunction
 "}}}
 function! s:replace_latter(buns, head, tail, within_a_line, opt) abort "{{{
   let is_linewise  = 0
   let opt_linewise = a:opt.of('linewise')
   let undojoin_cmd = ''
-  let initial_indent = s:initial_indent(a:head)
   let deletion = s:delete_portion(a:head, a:tail, undojoin_cmd)
-  if opt_linewise && a:opt.of('autoindent') == 4
-    let saved_indentstr = matchstr(getline(a:head[1]), '^\s*')
-  else
-    let saved_indentstr = ''
-  endif
+  let indent = s:Indent(a:head, a:opt)
 
   if operator#sandwich#is_in_cmd_window()
     " workaround for a bug in cmdline-window
@@ -476,7 +517,7 @@ function! s:replace_latter(buns, head, tail, within_a_line, opt) abort "{{{
       if current != fileend
         normal! k
       endif
-      execute 'silent noautocmd ' . startinsert . saved_indentstr . a:buns[1]
+      execute 'silent noautocmd ' . startinsert . indent.savedstr . a:buns[1]
       let head = getpos("'[")
       let tail = getpos("']")
       let is_linewise = 1
@@ -485,7 +526,7 @@ function! s:replace_latter(buns, head, tail, within_a_line, opt) abort "{{{
       if a:within_a_line
         " exceptional behavior
         let lnum = line('.')
-        execute 'silent noautocmd ' . startinsert . saved_indentstr . a:buns[1]
+        execute 'silent noautocmd ' . startinsert . indent.savedstr . a:buns[1]
         let head = getpos("'[")
         let tail = getpos("']")
         execute lnum . 'delete'
@@ -499,7 +540,7 @@ function! s:replace_latter(buns, head, tail, within_a_line, opt) abort "{{{
         if current != fileend
           normal! k
         endif
-        execute 'silent noautocmd ' . startinsert . saved_indentstr . a:buns[1]
+        execute 'silent noautocmd ' . startinsert . indent.savedstr . a:buns[1]
         let head = getpos("'[")
         let tail = getpos("']")
       endif
@@ -511,8 +552,7 @@ function! s:replace_latter(buns, head, tail, within_a_line, opt) abort "{{{
       let tail = getpos("']")
     endif
   endif
-  let indent = s:diff_indent(initial_indent, a:head, a:buns[1])
-  return [deletion, is_linewise, indent, head, tail]
+  return [deletion, is_linewise, indent.diff(a:buns[1]), head, tail]
 endfunction
 "}}}
 function! s:paste(bun, ...) abort "{{{
@@ -772,35 +812,6 @@ function! s:added_tail(head, tail, linewise) abort  "{{{
     let tail = s:get_left_pos(a:tail)
   endif
   return tail
-endfunction
-"}}}
-function! s:initial_indent(pos) abort "{{{
-  " return indent in byte-length
-  if s:is_linehead(a:pos)
-    return a:pos[2] - 1
-  endif
-  let indent = strlen(matchstr(getline(a:pos[1]), '^\s*'))
-  return indent
-endfunction
-"}}}
-function! s:diff_indent(initial_indent, pos, addition) abort "{{{
-  let addition = split(a:addition, '\%(\n\|\r\|\r\n\)', 1)
-  if len(addition) == 1
-    let indent = strlen(matchstr(getline("'["), '^\s*'))
-    if s:is_linehead(a:pos)
-      let indent -= strlen(matchstr(addition[0], '^\s*'))
-    endif
-    let diff = indent - a:initial_indent
-  else
-    let diff = indent("']") - strlen(matchstr(addition[-1], '^\s*'))
-  endif
-  return diff
-endfunction
-"}}}
-function! s:is_linehead(pos) abort "{{{
-  return a:pos[1] < 1 || a:pos[2] < 1 ? 0
-        \ : a:pos[2] == 1 ? 1
-        \ : getline(a:pos[1])[: a:pos[2]-2] =~# '^\s*$'
 endfunction
 "}}}
 
