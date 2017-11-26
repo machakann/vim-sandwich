@@ -437,7 +437,7 @@ function! s:operator.query() dict abort  "{{{
 
     " check complete match
     let n_comp = len(filter(copy(recipes), 's:is_input_matched(v:val, input, opt, 1)'))
-    if n_comp
+    if n_comp || strchars(input) == 1
       if len(recipes) == n_comp
         break
       else
