@@ -13,6 +13,8 @@ if !exists('s:local_recipes')
         \   {'__filetype__': 'initex', 'buns': ['"`', "\"'"], 'nesting': 1, 'input': [ 'L"' ], 'filetype': ['initex', 'plaintex', 'tex']},
         \   {'__filetype__': 'initex', 'buns': [",,", "``"],  'nesting': 1, 'input': [ 'l,' ], 'filetype': ['initex', 'plaintex', 'tex']},
         \   {'__filetype__': 'initex', 'buns': ['<<', '>>'],  'nesting': 1, 'input': [ 'l<' ], 'filetype': ['initex', 'plaintex', 'tex']},
+        \   {'__filetype__': 'initex', 'buns': ['$', '$'],    'nesting': 0, 'filetype': ['initex', 'plaintex', 'tex']},
+        \   {'__filetype__': 'initex', 'buns': ['\(', '\)'],  'nesting': 1, 'input': [ '\(' ], 'filetype': ['initex', 'plaintex', 'tex'], 'indentkeys-': '{,},0{,0}'},
         \   {'__filetype__': 'initex', 'buns': ['\{', '\}'],  'nesting': 1, 'input': [ '\{' ], 'filetype': ['initex', 'plaintex', 'tex'], 'indentkeys-': '{,},0{,0}'},
         \   {'__filetype__': 'initex', 'buns': ['\[', '\]'],  'nesting': 1, 'input': [ '\[' ], 'filetype': ['initex', 'plaintex', 'tex'], 'indentkeys-': '{,},0{,0}'},
         \   {'__filetype__': 'initex', 'buns': ['\left(',        '\right)'],        'nesting': 1, 'input': [ 'm(' ], 'filetype': ['initex', 'plaintex', 'tex'], 'kind': ['add', 'replace'], 'action': ['add'], 'indentkeys-': '(,)'},
