@@ -79,7 +79,7 @@ if !exists('s:local_recipes')
         \   },
         \   {
         \     '__filetype__': 'initex',
-        \     'buns'    : ['\\begin{[^}]*}\(\[.*\]\)\?', '\\end{[^}]*}'],
+        \     'buns'    : ['\\begin{[^}]*}\%(\[.*\]\)\?', '\\end{[^}]*}'],
         \     'filetype': ['initex', 'plaintex', 'tex'],
         \     'kind'    : ['delete', 'replace', 'auto', 'query'],
         \     'regex'   : 1,
