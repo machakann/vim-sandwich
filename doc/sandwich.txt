@@ -312,7 +312,7 @@ T~
 <
 	 `sdt` deletes the nearest tag surroundings. `sdT` works as same.
 >
-	    <p>word</p>  -- saiwtp<CR> -->      word
+	    <p>word</p>  -- sdt -->             word
 <
 	`t` and `T` works differently only when replacing surroundings.
 	`srtt` replaces only the name of element, does not touch attributes.
