@@ -2,5 +2,5 @@ if &compatible || exists('b:did_sandwich_plaintex_ftplugin') || get(g:, 'sandwic
   finish
 endif
 
-runtime ftplugin/initex/sandwich.vim
+runtime after/ftplugin/initex/sandwich.vim
 let b:did_sandwich_plaintex_ftplugin = 1
