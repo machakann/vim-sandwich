@@ -2,5 +2,17 @@ if &compatible || exists('b:did_sandwich_plaintex_ftplugin') || get(g:, 'sandwic
   finish
 endif
 
-runtime after/ftplugin/initex/sandwich.vim
+runtime macros/sandwich/ftplugin/tex.vim
+
+augroup sandwich-event-FileType
+  autocmd!
+  execute 'autocmd FileType plaintex source ' . fnameescape(expand('<sfile>'))
+augroup END
+
 let b:did_sandwich_plaintex_ftplugin = 1
+if !exists('b:undo_ftplugin')
+  let b:undo_ftplugin = ''
+else
+  let b:undo_ftplugin .= ' | '
+endif
+let b:undo_ftplugin .= 'unlet b:did_sandwich_plaintex_ftplugin | call sandwich#util#ftrevert("tex")'
