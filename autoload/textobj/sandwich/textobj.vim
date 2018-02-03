@@ -434,22 +434,14 @@ endfunction
 "}}}
 function! s:get_textobj_region(initpos, cmd, visualmode, count, key_seq) abort "{{{
   call cursor(a:initpos[0])
-  execute printf('%s %s', a:cmd, a:visualmode)
+  execute printf('silent! %s %s', a:cmd, a:visualmode)
   call cursor(a:initpos[1])
-  if a:cmd ==# 'normal!' && a:key_seq =~# '[ia]t'
-    " workaround for {E33, E55} from textobjects it/at
-    try
-      execute printf('%s %d%s', a:cmd, a:count, a:key_seq)
-    catch /^Vim\%((\a\+)\)\=:E\%(33\|55\)/
-      if mode() ==? 'v' || mode() ==# "\<C-v>"
-        execute "normal! \<Esc>"
-      endif
-      return [copy(s:null_coord), copy(s:null_coord), a:visualmode]
-    endtry
+  execute printf('silent! %s %d%s', a:cmd, a:count, a:key_seq)
+  if mode() ==? 'v' || mode() ==# "\<C-v>"
+    execute "normal! \<Esc>"
   else
-    execute printf('%s %d%s', a:cmd, a:count, a:key_seq)
+    return [copy(s:null_coord), copy(s:null_coord), a:visualmode]
   endif
-  execute "normal! \<Esc>"
   let visualmode = visualmode()
   let [head, tail] = [getpos("'<")[1:2], getpos("'>")[1:2]]
   if head == a:initpos[0] && tail == a:initpos[1]

@@ -332,10 +332,11 @@ function! s:textobj(a_or_i) abort "{{{
   if head != s:null_coord
     let tagname = matchstr(getline(head[0])[head[1]-1 :], '^<\zs\a[^[:blank:]>/]*')
     if search(printf('</%s>', s:escape(tagname)), 'cn', 0, 50)
+      " add :silent! to suppress errorbell
       if a:a_or_i ==# 'i'
-        normal! vit
+        silent! normal! vit
       else
-        normal! vat
+        silent! normal! vat
       endif
     endif
   endif
