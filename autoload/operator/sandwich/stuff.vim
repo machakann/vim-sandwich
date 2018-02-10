@@ -293,10 +293,10 @@ function! s:check_textobj_diff(head, tail, candidate, opt_noremap) abort  "{{{
   let [visual_head, visual_tail] = [getpos("'<"), getpos("'>")]
   let visualmode = visualmode()
   if a:opt_noremap
-    let cmd = 'normal!'
+    let cmd = 'silent! normal!'
     let v   = 'v'
   else
-    let cmd = 'normal'
+    let cmd = 'silent! normal'
     let v   = "\<Plug>(sandwich-v)"
   endif
 
@@ -355,20 +355,12 @@ endfunction
 "}}}
 function! s:get_textobj_region(cursor, cmd, visualmode, count, key_seq) abort "{{{
   call setpos('.', a:cursor)
-  if a:cmd ==# 'normal!' && a:key_seq =~# '[ia]t'
-    " workaround for {E33, E55} from textobjects it/at
-    try
-      execute printf('%s %s%d%s', a:cmd, a:visualmode, a:count, a:key_seq)
-    catch /^Vim\%((\a\+)\)\=:E\%(33\|55\)/
-      if mode() ==? 'v' || mode() ==# "\<C-v>"
-        execute "normal! \<Esc>"
-      endif
-      return [copy(s:null_pos), copy(s:null_pos), a:visualmode]
-    endtry
+  execute printf('%s %s%d%s', a:cmd, a:visualmode, a:count, a:key_seq)
+  if mode() ==? 'v' || mode() ==# "\<C-v>"
+    execute "normal! \<Esc>"
   else
-    execute printf('%s %s%d%s', a:cmd, a:visualmode, a:count, a:key_seq)
+    return [copy(s:null_coord), copy(s:null_coord), a:visualmode]
   endif
-  execute "normal! \<Esc>"
   let visualmode = visualmode()
   let [head, tail] = [getpos("'<"), getpos("'>")]
   " NOTE: V never comes for v. Thus if head == tail == self.cursor, then
@@ -403,10 +395,10 @@ else
   " though searchpos(uc, 'bce') returns a correct value.
   function! s:searchpos_bce(curpos, pattern, stopline) abort
     if a:curpos[1] == line('$') && a:curpos[2] == col([line('$'), '$'])
-      normal! h
+      silent! normal! h
       return searchpos(a:pattern, 'e', a:stopline)
     else
-      normal! l
+      silent! normal! l
       return searchpos(a:pattern, 'be', a:stopline)
     endif
   endfunction
