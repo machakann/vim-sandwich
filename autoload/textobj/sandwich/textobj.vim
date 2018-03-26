@@ -199,6 +199,7 @@ function! s:textobj._search_without_nest(sandwich, stimeoutlen) dict abort  "{{{
     return candidates
   endif
 
+  " If the cursor is right on a bun
   if tail == _tail
     " check whether it is head or tail
     let odd = 1
