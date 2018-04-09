@@ -20,6 +20,7 @@ let g:sandwich#default_recipes = [
       \   {'buns': ['<', '>'], 'expand_range': 0, 'match_syntax': 1},
       \   {'buns': ['"', '"'], 'quoteescape': 1, 'expand_range': 0, 'nesting': 0, 'linewise': 0},
       \   {'buns': ["'", "'"], 'quoteescape': 1, 'expand_range': 0, 'nesting': 0, 'linewise': 0},
+      \   {'buns': ["`", "`"], 'quoteescape': 1, 'expand_range': 0, 'nesting': 0, 'linewise': 0},
       \   {'buns': ['{', '}'], 'nesting': 1, 'match_syntax': 1, 'skip_break': 1},
       \   {'buns': ['[', ']'], 'nesting': 1, 'match_syntax': 1},
       \   {'buns': ['(', ')'], 'nesting': 1, 'match_syntax': 1},
