@@ -9,15 +9,18 @@ let s:type_list = type([])
 
 function! sandwich#magicchar#t#tag() abort "{{{
   call operator#sandwich#show()
-  echohl MoreMsg
-  let old_imsearch = &l:imsearch
-  let &l:imsearch = 0
-  let tag = input('Input tag: ')
-  let &l:imsearch = old_imsearch
-  echohl NONE
-  " flash prompt
-  echo ''
-  call operator#sandwich#quench()
+  try
+    echohl MoreMsg
+    let old_imsearch = &l:imsearch
+    let &l:imsearch = 0
+    let tag = input('Input tag: ')
+    let &l:imsearch = old_imsearch
+    echohl NONE
+    " flash prompt
+    echo ''
+  finally
+    call operator#sandwich#quench()
+  endtry
   if tag ==# ''
     throw 'OperatorSandwichCancel'
   endif
@@ -27,15 +30,18 @@ endfunction
 "}}}
 function! sandwich#magicchar#t#tagname() abort "{{{
   call operator#sandwich#show()
-  echohl MoreMsg
-  let old_imsearch = &l:imsearch
-  let &l:imsearch = 0
-  let tagname = input('Input tag name: ')
-  let &l:imsearch = old_imsearch
-  echohl NONE
-  " flash prompt
-  echo ''
-  call operator#sandwich#quench()
+  try
+    echohl MoreMsg
+    let old_imsearch = &l:imsearch
+    let &l:imsearch = 0
+    let tagname = input('Input tag name: ')
+    let &l:imsearch = old_imsearch
+    echohl NONE
+    " flash prompt
+    echo ''
+  finally
+    call operator#sandwich#quench()
+  endtry
   if tagname ==# ''
     throw 'OperatorSandwichCancel'
   endif

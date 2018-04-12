@@ -48,16 +48,19 @@ let s:patterns['julia'] = [
 
 function! sandwich#magicchar#f#fname() abort  "{{{
   call operator#sandwich#show()
-  echohl MoreMsg
-  if &filetype ==# 'vim'
-    let funcname = input('funcname: ', '', 'custom,sandwich#magicchar#f#fnamecompl_vim')
-  else
-    let funcname = input('funcname: ', '', 'custom,sandwich#magicchar#f#fnamecompl')
-  endif
-  echohl NONE
-  " flash prompt
-  echo ''
-  call operator#sandwich#quench()
+  try
+    echohl MoreMsg
+    if &filetype ==# 'vim'
+      let funcname = input('funcname: ', '', 'custom,sandwich#magicchar#f#fnamecompl_vim')
+    else
+      let funcname = input('funcname: ', '', 'custom,sandwich#magicchar#f#fnamecompl')
+    endif
+    echohl NONE
+    " flash prompt
+    echo ''
+  finally
+    call operator#sandwich#quench()
+  endtry
   if funcname ==# ''
     throw 'OperatorSandwichCancel'
   endif
