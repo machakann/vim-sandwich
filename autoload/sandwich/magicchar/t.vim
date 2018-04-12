@@ -15,10 +15,10 @@ function! sandwich#magicchar#t#tag() abort "{{{
     let &l:imsearch = 0
     let tag = input('Input tag: ')
     let &l:imsearch = old_imsearch
-    echohl NONE
     " flash prompt
     echo ''
   finally
+    echohl NONE
     call operator#sandwich#quench()
   endtry
   if tag ==# ''
@@ -36,10 +36,10 @@ function! sandwich#magicchar#t#tagname() abort "{{{
     let &l:imsearch = 0
     let tagname = input('Input tag name: ')
     let &l:imsearch = old_imsearch
-    echohl NONE
     " flash prompt
     echo ''
   finally
+    echohl NONE
     call operator#sandwich#quench()
   endtry
   if tagname ==# ''

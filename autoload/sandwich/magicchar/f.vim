@@ -55,10 +55,10 @@ function! sandwich#magicchar#f#fname() abort  "{{{
     else
       let funcname = input('funcname: ', '', 'custom,sandwich#magicchar#f#fnamecompl')
     endif
-    echohl NONE
     " flash prompt
     echo ''
   finally
+    echohl NONE
     call operator#sandwich#quench()
   endtry
   if funcname ==# ''
