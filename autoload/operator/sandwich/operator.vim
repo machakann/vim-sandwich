@@ -834,8 +834,13 @@ function! s:get_assigned_region(kind, motionwise) abort "{{{
   if region.tail[2] != col([region.tail[1], '$']) && region.tail[3] == 0
     let cursor = getpos('.')
     call setpos('.', region.tail)
-    call search('.', 'bc')
-    let region.tail = getpos('.')
+    let letterhead = searchpos('\zs', 'bcn', line('.'))
+    if letterhead[1] > region.tail[2]
+      " try again without 'c' flag if letterhead is behind the original
+      " position. It may look strange but it happens with &enc ==# 'cp932'
+      let letterhead = searchpos('\zs', 'bn', line('.'))
+    endif
+    let region.tail = [0] + letterhead + [0]
     call setpos('.', cursor)
   endif
 

@@ -1091,6 +1091,11 @@ function! s:suite.charwise_n_multibyte() abort  "{{{
   call g:assert.equals(getpos('.'),  [0, 1, strlen('a“')+1, 0], 'failed at #16')
   call g:assert.equals(getpos("'["), [0, 1, 1, 0], 'failed at #16')
   call g:assert.equals(getpos("']"), [0, 1, strlen('a“a“a“')+1, 0], 'failed at #16')
+
+  " #17
+  call setline('.', 'a梵aa')
+  normal 0savl"
+  call g:assert.equals(getline('.'), '"a梵"aa',  'failed at #16')
 endfunction
 "}}}
 function! s:suite.charwise_n_option_cursor() abort  "{{{
