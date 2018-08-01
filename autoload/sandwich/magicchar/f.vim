@@ -283,7 +283,7 @@ function! s:get_range(mode, count, candidates) abort "{{{
     if len(sorted_candidates) > a:count - 1
       let [head_pos, bra_pos, ket_pos, tail_pos, _, _] = sorted_candidates[a:count - 1]
       if a:mode[1] ==# 'p'
-        if !(bra_pos == ket_pos || (bra_pos[0] == ket_pos[0] && bra_pos[1]+1 == ket_pos[1]-1))
+        if !(bra_pos == ket_pos || (bra_pos[0] == ket_pos[0] && bra_pos[1]+1 == ket_pos[1]))
           let [head, tail] = s:get_narrower_region(bra_pos, ket_pos)
         endif
       else
