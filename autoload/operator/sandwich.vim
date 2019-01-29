@@ -140,13 +140,13 @@ endfunction
 function! s:do(kind, motionwise, AutocmdPre, AutocmdPost) abort "{{{
   let s:operator = ''
   if exists('g:operator#sandwich#object')
-    let textobj = g:operator#sandwich#object
+    let operator = g:operator#sandwich#object
     let messenger = sandwich#messenger#new()
     let defaultopt = s:default_options(a:kind, a:motionwise)
-    call textobj.opt.update('default', defaultopt)
+    call operator.opt.update('default', defaultopt)
     call s:update_is_in_cmdline_window()
     call s:doautocmd(a:AutocmdPre)
-    call textobj.execute(a:motionwise)
+    call operator.execute(a:motionwise)
     call s:doautocmd(a:AutocmdPost)
     call messenger.notify('operator-sandwich: ')
   endif
