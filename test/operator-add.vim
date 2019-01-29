@@ -18,6 +18,8 @@ function! s:suite.before_each() abort "{{{
   set indentexpr&
   set cinkeys&
   set indentkeys&
+  set formatoptions&
+  set textwidth&
   silent! mapc!
   silent! ounmap ii
   silent! ounmap ssa
@@ -11032,6 +11034,17 @@ function! s:suite.insertspace() abort "{{{
   execute "normal 0lsal\<Space>"
   call g:assert.equals(getline('.'), 'f o o')
 endfunction "}}}
+
+" auto-formatting
+function! s:suite.autoformat() abort "{{{
+  " #1
+  setlocal formatoptions+=t textwidth=10
+  call setline(1, 'ab cd ef gh ij kl mn op')
+  call cursor(1, 17)
+  execute "normal saiw("
+  call g:assert.equals(getline('.'), 'ab cd ef gh ij (kl) mn op', 'failed at #1')
+endfunction "}}}
+
 
 " vim:set foldmethod=marker:
 " vim:set commentstring="%s:

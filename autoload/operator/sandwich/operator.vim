@@ -762,6 +762,7 @@ function! s:shift_options(kind, mode) abort "{{{
   let options.virtualedit = &virtualedit
   let options.whichwrap   = &whichwrap
   let options.cpoptions   = &cpoptions
+  let options.formatoptions = &formatoptions
 
   """ tweak appearance
   " hide_cursor
@@ -790,6 +791,7 @@ function! s:shift_options(kind, mode) abort "{{{
   set whichwrap=h,l
   set cpoptions-=l
   set cpoptions-=\
+  setlocal formatoptions=
   return options
 endfunction
 "}}}
@@ -808,6 +810,7 @@ function! s:restore_options(kind, mode, options) abort "{{{
   let &virtualedit = a:options.virtualedit
   let &whichwrap   = a:options.whichwrap
   let &cpoptions   = a:options.cpoptions
+  let &l:formatoptions = a:options.formatoptions
 endfunction
 "}}}
 function! s:get_assigned_region(kind, motionwise) abort "{{{
