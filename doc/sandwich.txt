@@ -1,4 +1,4 @@
-*sandwich.txt*				Last change:21-Aug-2017.
+*sandwich.txt*				Last change:02-Feb-2019.
 
 The set of operator and textobject plugins to edit sandwiched textobjects.
 
@@ -22,6 +22,7 @@ MAGICCHARACTERS			|sandwich-magiccharacters|
 FILETYPE RECIPES		|sandwich-filetype-recipes|
 MISCELLANEOUS			|sandwich-miscellaneous|
   Introduce vim-surround keymappings
+  Customize the behavior of magicchar-f
 
 ==============================================================================
 QUICK START				*sandwich-quick-start*
@@ -465,6 +466,59 @@ Introduce vim-surround keymappings~
 	omap im <Plug>(textobj-sandwich-literal-query-i)
 	omap am <Plug>(textobj-sandwich-literal-query-a)
 <
+
+------------------------------------------------------------------------------
+Customize the behavior of magicchar-f~
+
+`magicchar-f` can delete simple function-call like syntax:
+>
+	     func(arg)          -- sdf -->             arg
+<
+If you want to delete more advanced patterns, for example:
+>
+	     obj.method(arg)    -- sdf -->             arg
+<
+You can use `g:sandwich#magicchar#f#patterns` or
+`b:sandwich_magicchar_f_patterns` for the purpose. Each of those are a list of
+patterns like:
+>
+	let g:sandwich#magicchar#f#patterns = [
+	\   {
+	\     'header' : '\<\h\k*',
+	\     'bra'    : '(',
+	\     'ket'    : ')',
+	\     'footer' : '',
+	\   },
+	\ ]
+<
+Those four values are all regex patterns, which match with something before
+open parenthesis, open & close parentheses, something after close parenthesis.
+Therefore, you can delete a method with an object by the following setting.
+>
+	let g:sandwich#magicchar#f#patterns = [
+	\   {
+	\     'header' : '\<\%(\h\k*\.\)*\h\k*',
+	\     'bra'    : '(',
+	\     'ket'    : ')',
+	\     'footer' : '',
+	\   },
+	\ ]
+<
+`b:sandwich_magicchar_f_patterns` can be used to define filetype specific
+setting.
+>
+	augroup sandwich-ft-python
+	  autocmd Filetype python let b:sandwich_magicchar_f_patterns = [
+	                              \   {
+	                              \     'header' : '\<\%(\h\k*\.\)*\h\k*',
+	                              \     'bra'    : '(',
+	                              \     'ket'    : ')',
+	                              \     'footer' : '',
+	                              \   },
+	                              \ ]
+	augroup END
+<
+The default settings is in `g:sandwich#magicchar#f#default_patterns`.
 
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:noet:

@@ -17,29 +17,9 @@ endif
 "}}}
 
 " default patterns
-let s:patterns = {}
-let s:patterns['_'] = [
+let g:sandwich#magicchar#f#default_patterns = [
       \   {
       \     'header' : '\<\h\k*',
-      \     'bra'    : '(',
-      \     'ket'    : ')',
-      \     'footer' : '',
-      \   },
-      \ ]
-
-let s:patterns['vim'] = [
-      \   {
-      \     'header' : '\C\<\%(\h\|[sa]:\h\|g:[A-Z]\)\k*',
-      \     'bra'    : '(',
-      \     'ket'    : ')',
-      \     'footer' : '',
-      \   },
-      \ ]
-
-" To include multibyte characters
-let s:patterns['julia'] = [
-      \   {
-      \     'header' : '\%#=2\<[[:upper:][:lower:]_]\k*',
       \     'bra'    : '(',
       \     'ket'    : ')',
       \     'footer' : '',
@@ -339,8 +319,9 @@ function! s:is_continuous_syntax(bra_pos, ket_pos) abort  "{{{
 endfunction
 "}}}
 function! s:resolve_patterns() abort  "{{{
-  let pattern_dict = deepcopy(s:get('sandwich_function_patterns', s:patterns))
-  return has_key(pattern_dict, &filetype) ? pattern_dict[&filetype] : pattern_dict['_']
+  return deepcopy(get(g:, 'sandwich#magicchar#f#patterns',
+                \ get(b:, 'sandwich_magicchar_f_patterns',
+                \ g:sandwich#magicchar#f#default_patterns)))
 endfunction
 "}}}
 function! s:get_narrower_region(head_edge, tail_edge) abort "{{{

@@ -1,6 +1,7 @@
 set encoding=utf-8
 execute 'set runtimepath+=' . expand('<sfile>:p:h:h')
-runtime! <sfile>:p:h:h/plugin/*.vim
+runtime! plugin/*.vim
+runtime! plugin/**/*.vim
 set noswapfile
 let g:operator_sandwich_no_visualrepeat = 1
 

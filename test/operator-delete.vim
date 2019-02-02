@@ -19,9 +19,9 @@ function! s:suite.before_each() abort "{{{
   silent! ounmap ssd
   silent! xunmap i{
   silent! xunmap a{
-  call operator#sandwich#set_default()
   unlet! g:sandwich#recipes
   unlet! g:operator#sandwich#recipes
+  call operator#sandwich#set_default()
 endfunction
 "}}}
 function! s:suite.after() abort "{{{
