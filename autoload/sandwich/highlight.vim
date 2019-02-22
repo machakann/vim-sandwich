@@ -212,7 +212,6 @@ function! s:quench(id) abort  "{{{
     call timer_stop(a:id)
     call s:clear_autocmds()
     call s:restore_options(options)
-    redraw
   endtry
 endfunction
 "}}}
