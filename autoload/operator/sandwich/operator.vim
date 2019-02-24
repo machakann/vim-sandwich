@@ -726,10 +726,9 @@ endfunction
 function! s:has_action(candidate, action) abort "{{{
   if !has_key(a:candidate, 'action')
     return 1
-  else
-    let filter = 'v:val ==# a:action || v:val ==# "all"'
-    return filter(copy(a:candidate['action']), filter) != []
   endif
+  let filter = 'v:val ==# a:action || v:val ==# "all"'
+  return filter(copy(a:candidate['action']), filter) != []
 endfunction
 "}}}
 function! s:expr_filter(candidate) abort  "{{{

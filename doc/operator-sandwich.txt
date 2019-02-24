@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:21-Nov-2017.
+						Last change:02-Mar-2019.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -731,13 +731,23 @@ action
 	operator's action could be split into two kinds, "add" and "delete".
 	The add operator has "add" action and the delete operator has "delete"
 	action. The replace operator has both "delete" action phase and "add"
-	action phase to replace strings. This filter limits the chance to be
-	used in each action. Available item is "add", "delete" and "all". If a
+	action phase to replace strings. This filter limits the effectiveness
+	in each action. Available item is "add", "delete" and "all". If a
 	recipe does not have action key, the recipe is valid in both actions.
+	Note that "add" prohibits to take effect for |textobj-sandwich| while
+	"delete" and "all" allows it, because usually a delete action uses
+	those textobjects internally.
+	In short, a recipe with "add" affects add/replace operators while
+	"delete" affects delete/replace operators and textobjects.
 >
-	" The recipe is valid only in add actions
+	" The recipe is valid only for add actions
 	let g:sandwich#recipes += [
 	  \    {'buns': ['"""', '"""'], 'action': ['add'], 'input': ['"']}
+	  \  ]
+
+	" The recipe is valid for delete actions and textobjects
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"""', '"""'], 'action': ['delete'], 'input': ['"']}
 	  \  ]
 <
 
@@ -1212,7 +1222,6 @@ expr
 	        \     'buns'    : ['TagInput(1)', 'TagInput(0)'],
 	        \     'expr'    : 1,
 	        \     'filetype': ['html'],
-	        \     'kind'    : ['add', 'replace'],
 	        \     'action'  : ['add'],
 	        \     'input'   : ['t'],
 	        \   },
@@ -1260,7 +1269,6 @@ listexpr
 	        \     'buns'    : 'HTMLTagInput()',
 	        \     'listexpr': 1,
 	        \     'filetype': ['html'],
-	        \     'kind'    : ['add', 'replace'],
 	        \     'action'  : ['add'],
 	        \     'input'   : ['t'],
 	        \   },

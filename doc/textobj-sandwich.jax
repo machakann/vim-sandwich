@@ -1,5 +1,5 @@
 *textobj-sandwich.jax*	『挟まれた』テキストを選択する。
-						Last change:16-Aug-2016.
+						Last change:24-Feb-2019.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -540,6 +540,26 @@ mode
 	let g:sandwich#recipes += [
 	  \    {'buns': ['"', '"'], 'mode': ['o']}
 	  \    {'buns': ['"""', '"""'], 'mode': ['x'], 'input': ['"']}
+	  \  ]
+<
+
+
+
+action
+	編集の種類によってレシピを選別するフィルターです。"add" 及び "delete"
+	が |operator-sandwich| のために用意されています。"all" は先の二つを包
+	含します。"add" のみが指定されている場合は |textobj-sandwich| では無効
+	になります。しかし、"delete" か "all" が含まれた場合は有効になります。
+	これは削除においてそれらのテキストオブジェクトが連動するためです。
+>
+	" This recipe does not take effect for textobjects
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"""', '"""'], 'action': ['add'], 'input': ['"']}
+	  \  ]
+
+	" This recipe is valid for delete actions and textobjects
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"""', '"""'], 'action': ['delete'], 'input': ['"']}
 	  \  ]
 <
 

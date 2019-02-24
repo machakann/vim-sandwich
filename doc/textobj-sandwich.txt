@@ -1,5 +1,5 @@
 *textobj-sandwich.txt*	The textobject plugin to select sandwiched texts.
-						Last change:16-Aug-2016.
+						Last change:24-Feb-2019.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -534,6 +534,26 @@ mode
 	let g:sandwich#recipes += [
 	  \    {'buns': ['"', '"'], 'mode': ['o']}
 	  \    {'buns': ['"""', '"""'], 'mode': ['x'], 'input': ['"']}
+	  \  ]
+<
+
+
+
+action
+	This key is used to filter the recipes by the kinds of action. "add"
+	and "delete" is reserved for |operator-sandwich|, "all" includes the
+	those two kinds of action. "add" prohibits to take effect for
+	|textobj-sandwich| and "delete" and "all" allows it, because usually a
+	delete action uses those textobjects.
+>
+	" This recipe does not take effect for textobjects
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"""', '"""'], 'action': ['add'], 'input': ['"']}
+	  \  ]
+
+	" This recipe is valid for delete actions and textobjects
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"""', '"""'], 'action': ['delete'], 'input': ['"']}
 	  \  ]
 <
 

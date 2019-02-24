@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:21-Nov-2017.
+						Last change:02-Mar-2019.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -727,10 +727,21 @@ action
 	り置換しています。このフィルターはそれぞれの編集において使われる機会を
 	制限します。使用可能な名前は "add", "delete", "all" です。レシピが
 	"action" キーを持たなければすべての編集操作において有効になります。
+	"add" のみが指定されている場合、そのレシピは |textobj-sandwich| で無効
+	になりますが、"delete" 及び "all" が含まれていれば有効になります。これ
+	は通常、削除においてそれらのテキストオブジェクトが内部的に使われるため
+	です。
+	つまり、"add" は追加と置換のオペレータで有効、"delete" は削除と置換の
+	オペレータに加え、テキストオブジェクトで有効となります。
 >
-	" The recipe is valid only in add actions
+	" The recipe is valid only for add actions
 	let g:sandwich#recipes += [
 	  \    {'buns': ['"""', '"""'], 'action': ['add'], 'input': ['"']}
+	  \  ]
+
+	" The recipe is valid for delete actions and textobjects
+	let g:sandwich#recipes += [
+	  \    {'buns': ['"""', '"""'], 'action': ['delete'], 'input': ['"']}
 	  \  ]
 <
 
@@ -1194,7 +1205,6 @@ expr
 	        \     'buns'    : ['TagInput(1)', 'TagInput(0)'],
 	        \     'expr'    : 1,
 	        \     'filetype': ['html'],
-	        \     'kind'    : ['add', 'replace'],
 	        \     'action'  : ['add'],
 	        \     'input'   : ['t'],
 	        \   },
@@ -1238,7 +1248,6 @@ listexpr
 	        \     'buns'    : 'HTMLTagInput()',
 	        \     'listexpr': 1,
 	        \     'filetype': ['html'],
-	        \     'kind'    : ['add', 'replace'],
 	        \     'action'  : ['add'],
 	        \     'input'   : ['t'],
 	        \   },
