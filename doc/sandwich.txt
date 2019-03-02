@@ -1,4 +1,4 @@
-*sandwich.txt*				Last change:02-Feb-2019.
+*sandwich.txt*				Last change:02-Mar-2019.
 
 The set of operator and textobject plugins to edit sandwiched textobjects.
 
@@ -20,6 +20,7 @@ KEYMAPPINGS			|sandwich-keymappings|
 CONFIGURATION			|sandwich-configuration|
 MAGICCHARACTERS			|sandwich-magiccharacters|
 FILETYPE RECIPES		|sandwich-filetype-recipes|
+FUNCTIONS			|sandwich-functions|
 MISCELLANEOUS			|sandwich-miscellaneous|
   Introduce vim-surround keymappings
   Customize the behavior of magicchar-f
@@ -389,7 +390,21 @@ tex~
 	`g:sandwich#filetype#tex#environments`
 	(or `b:sandwich#filetype#tex#environments` if exists).
 
-------------------------------------------------------------------------------
+
+==============================================================================
+FUNCTIONS				*sandwich-functions*
+
+sandwich#util#addlocal({recipes})	*sandwich#util#addlocal()*
+	This function appends the list of recipes {recipes} as buffer-local
+	settings with inheritance of the global settings. This is useful when
+	one wants to add filetype specific settings with keeping global
+	setting |g:sandwich#recipes| clean. Note that {recipe} is a |List| of
+	recipes.
+>
+	autocmd FileType python call sandwich#util#addlocal([
+	  \   {'buns': ['"""', '"""'], 'nesting': 0, 'input': ['3"']},
+	  \ ])
+<
 
 ==============================================================================
 MISCELLANEOUS				*sandwich-miscellaneous*

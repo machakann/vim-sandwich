@@ -1,4 +1,4 @@
-*sandwich.jax*	日本語ヘルプ		Last change:02-Feb-2019.
+*sandwich.jax*	日本語ヘルプ		Last change:02-Mar-2019.
 
 “挟まれた”テキストを編集するためのオペレータとテキストオブジェクトの詰め合わせ
 です。
@@ -21,6 +21,7 @@ KEYMAPPINGS			|sandwich-keymappings|
 CONFIGURATION			|sandwich-configuration|
 MAGICCHARACTERS			|sandwich-magiccharacters|
 FILETYPE RECIPES		|sandwich-filetype-recipes|
+FUNCTIONS			|sandwich-functions|
 MISCELLANEOUS			|sandwich-miscellaneous|
   vim-surround のキ－マッピングを使う
   magicchar-f の挙動を変更する
@@ -394,7 +395,21 @@ tex~
 	(あるいは存在すれば `b:sandwich#filetype#tex#environments`) から読み込
 	まれます。
 
-------------------------------------------------------------------------------
+
+==============================================================================
+FUNCTIONS				*sandwich-functions*
+
+sandwich#util#addlocal({recipes})	*sandwich#util#addlocal()*
+	レシピのリスト {recipes} をそのバッファにのみ有効な設定として追加しま
+	す。この際、既存のグローバルな設定はそのまま受け継がれます。この関数は
+	グローバルな設定をきれいに保ったままファイルタイプに特有な設定を追加す
+	る、などの用途に使えます。{recipes} はレシピのリスト |List| である点は
+	注意してください。
+>
+	autocmd FileType python call sandwich#util#addlocal([
+	  \   {'buns': ['"""', '"""'], 'nesting': 0, 'input': ['3"']},
+	  \ ])
+<
 
 ==============================================================================
 MISCELLANEOUS				*sandwich-miscellaneous*
