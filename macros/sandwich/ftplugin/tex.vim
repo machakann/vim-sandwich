@@ -178,6 +178,6 @@ if !exists('s:local_recipes')
         \   },
         \ ]
 endif
-call sandwich#util#addlocal(s:local_recipes)
+call sandwich#util#insertlocal(s:local_recipes)
 let b:sandwich_tex_marks_recipes = deepcopy(s:marks_recipes)
 
