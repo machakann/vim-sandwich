@@ -28,6 +28,9 @@ else
   let s:has_patch_7_4_310 = v:version == 704 && has('patch310')
 endif
 
+" functions
+let s:exists_reg_executing = exists('*reg_executing')
+
 " features
 let s:has_gui_running = has('gui_running')
 let s:has_timer       = has('timers')
@@ -102,7 +105,6 @@ function! s:operator.execute(motionwise) dict abort  "{{{
   finally
     call self.finalize()
     call s:restore_options(self.kind, self.mode, options)
-    redraw
   endtry
 endfunction
 "}}}
@@ -498,7 +500,7 @@ endfunction
 "}}}
 function! s:operator.show(place, hi_group, ...) dict abort "{{{
   let forcibly = get(a:000, 0, 0)
-  if !self.opt.of('highlight') && !forcibly
+  if !forcibly && (!self.opt.of('highlight') || s:reg_executing() isnot# '')
     return 1
   endif
 
@@ -1023,6 +1025,12 @@ function! s:get_tailstart_cursor_pos(tail, inner_tail) abort  "{{{
   return tailstart
 endfunction
 "}}}
+function! s:reg_executing() abort "{{{
+  if s:exists_reg_executing
+    return reg_executing()
+  endif
+  return ''
+endfunction "}}}
 
 let [s:get_left_pos, s:get_right_pos, s:c2p, s:is_valid_2pos, s:is_ahead, s:is_equal_or_ahead, s:get]
       \ = operator#sandwich#lib#funcref(['get_left_pos', 'get_right_pos', 'c2p', 'is_valid_2pos', 'is_ahead', 'is_equal_or_ahead', 'get'])
