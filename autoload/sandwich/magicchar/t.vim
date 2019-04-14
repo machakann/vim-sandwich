@@ -129,6 +129,13 @@ function! s:tokenize_custom_attributes(text, j) abort "{{{
   return [j - a:j, tokenlist]
 endfunction
 "}}}
+
+
+function! s:matches_filetype(filetype, list) abort "{{{
+    return index(a:list, a:filetype) != -1
+    }}}"
+endfunction
+
 function! s:parse(tokenlist) abort  "{{{
   let itemdict = deepcopy(s:itemdict)
   let itemlist = map(copy(a:tokenlist), '{"is_operator": v:val =~# ''^\%([][#.=]\|\s\+\)$'' ? 1 : 0, "string": v:val}')
@@ -148,7 +155,11 @@ function! s:parse(tokenlist) abort  "{{{
       if item.string ==# '#'
         let i = s:handle_id(itemdict, itemlist, i)
       elseif item.string ==# '.'
-        let i = s:handle_class(itemdict, itemlist, i)
+          if (s:matches_filetype(&filetype, g:sandwich#jsx_filetypes))
+              let i = s:handle_className(itemdict, itemlist, i)
+          else
+              let i = s:handle_class(itemdict, itemlist, i)
+          endif
       elseif item.string ==# '['
         let i = s:parse_custom_attributes(itemdict, itemlist, i)
       else
@@ -212,6 +223,18 @@ function! s:handle_class(itemdict, itemlist, i) abort  "{{{
     call a:itemdict.queue_class()
   else
     call a:itemdict.queue_class(item.string)
+    let i += 1
+  endif
+  return i
+endfunction
+"}}}
+function! s:handle_className(itemdict, itemlist, i) abort  "{{{
+  let i = a:i + 1
+  let item = get(a:itemlist, i, {'is_operator': 1})
+  if item.is_operator
+    call a:itemdict.queue_className()
+  else
+    call a:itemdict.queue_className(item.string)
     let i += 1
   endif
   return i
@@ -354,9 +377,11 @@ let s:itemdict = {
       \   'element': {'name': 'element', 'value': ''},
       \   'id'     : {'name': 'id',      'value': '', 'queued': 0},
       \   'class'  : {'name': 'class',   'value': [], 'queued': 0},
+      \   'className'  : {'name': 'className',   'value': [], 'queued': 0},
       \   'queue'  : [],
       \   'customlist': [],
       \ }
+
 function! s:itemdict.queue_element(value) dict abort  "{{{
   let self.element.value = a:value
   call add(self.queue, self.element)
@@ -375,6 +400,14 @@ function! s:itemdict.queue_class(...) dict abort  "{{{
   if !self.class.queued
     call add(self.queue, self.class)
     let self.class.queued = 1
+  endif
+endfunction
+"}}}
+function! s:itemdict.queue_className(...) dict abort  "{{{
+  call add(self.className.value, get(a:000, 0, ''))
+  if !self.className.queued
+    call add(self.queue, self.className)
+    let self.className.queued = 1
   endif
 endfunction
 "}}}
