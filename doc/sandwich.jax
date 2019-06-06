@@ -1,4 +1,4 @@
-*sandwich.jax*	日本語ヘルプ		Last change:02-Mar-2019.
+*sandwich.jax*	日本語ヘルプ		Last change:06-Jun-2019.
 
 “挟まれた”テキストを編集するためのオペレータとテキストオブジェクトの詰め合わせ
 です。
@@ -237,7 +237,7 @@ g:sandwich#default_recipes		*g:sandwich#default_recipes*
 `[`, `]`
 `{`, `}`
 `<`, `>`
-	開き/閉じ括弧は同様に機能します。例えば、 `sa(iw` と `sa)iw` は同様の
+	開き/閉じ括弧は同様に機能します。例えば、 `saiw(` と `saiw)` は同様の
 	結果を与えます。
 >
 		foo -> (foo)
