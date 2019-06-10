@@ -1,4 +1,4 @@
-*sandwich.txt*				Last change:02-Mar-2019.
+*sandwich.txt*				Last change:06-Jun-2019.
 
 The set of operator and textobject plugins to edit sandwiched textobjects.
 
@@ -229,7 +229,7 @@ Notes on default recipes~
 `[`, `]`
 `{`, `}`
 `<`, `>`
-	Both open/close braces behave as same. For example, `sa(iw` and `sa)iw`
+	Both open/close braces behave as same. For example, `saiw(` and `saiw)`
 	result in the same text.
 >
 		foo -> (foo)
