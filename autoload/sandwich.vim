@@ -40,6 +40,11 @@ let g:sandwich#default_recipes = [
       \ ]
 lockvar! g:sandwich#default_recipes
 
+let g:sandwich#jsx_filetypes = [
+      \ 'javascript.jsx',
+      \ 'typescript.tsx'
+      \ ]
+
 " vim:set foldmethod=marker:
 " vim:set commentstring="%s:
 " vim:set ts=2 sts=2 sw=2:
