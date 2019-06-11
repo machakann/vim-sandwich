@@ -132,7 +132,7 @@ endfunction
 
 
 function! s:matches_filetype(filetype, list) abort "{{{
-    return index(a:list, a:filetype) != -1
+  return index(a:list, a:filetype) != -1
 endfunction
 " }}}
 
@@ -156,9 +156,9 @@ function! s:parse(tokenlist) abort  "{{{
         let i = s:handle_id(itemdict, itemlist, i)
       elseif item.string ==# '.'
         if s:matches_filetype(&filetype, g:sandwich#jsx_filetypes)
-            let i = s:handle_className(itemdict, itemlist, i)
+          let i = s:handle_className(itemdict, itemlist, i)
         else
-            let i = s:handle_class(itemdict, itemlist, i)
+          let i = s:handle_class(itemdict, itemlist, i)
         endif
       elseif item.string ==# '['
         let i = s:parse_custom_attributes(itemdict, itemlist, i)
