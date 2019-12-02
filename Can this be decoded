@@ -1,0 +1,2179 @@
+[00:00:00] Build started
+[00:00:00] git clone -q https://github.com/machakann/vim-sandwich.git C:\projects\vim-sandwich
+[00:00:01] git fetch -q origin +refs/pull/83/merge:
+[00:00:02] git checkout -qf FETCH_HEAD
+[00:00:02] git clone --quiet https://github.com/thinca/vim-themis.git themis
+[00:00:02] 
+[00:00:02] $zip_latest = $Env:APPVEYOR_BUILD_FOLDER + '\vim_latest.zip'
+[00:00:02] $vim_latest = $Env:APPVEYOR_BUILD_FOLDER + '\vim_latest'
+[00:00:02] $zip_old    = $Env:APPVEYOR_BUILD_FOLDER + '\vim_old.zip'
+[00:00:02] $vim_old    = $Env:APPVEYOR_BUILD_FOLDER + '\vim_old'
+[00:00:02] 
+[00:00:02] (New-Object Net.WebClient).DownloadFile('http://files.kaoriya.net/vim/vim74-kaoriya-win64.zip', $zip_latest)
+[00:00:02] (New-Object Net.WebClient).DownloadFile('http://files.kaoriya.net/vim/vim73-kaoriya-win64.zip', $zip_old)
+[00:00:02] 
+[00:00:02] [Reflection.Assembly]::LoadWithPartialName('System.IO.Compression.FileSystem') > $null
+[00:00:02] [System.IO.Compression.ZipFile]::ExtractToDirectory($zip_latest, $vim_latest)
+[00:00:02] [System.IO.Compression.ZipFile]::ExtractToDirectory($zip_old,    $vim_old)
+[00:00:02] 
+[00:00:02] $Env:THEMIS_VIM = $vim_latest + '\vim74-kaoriya-win64\vim.exe'
+[00:00:02] 
+[00:00:02] & $Env:THEMIS_VIM --version
+[00:00:02] .\themis\bin\themis.bat
+[00:00:02] if ($?) {
+[00:00:02]   .\test\dot-repeat\test_dot.bat
+[00:00:02]   if ($?) {
+[00:00:02]     $Env:THEMIS_VIM = $vim_old + '\vim73-kaoriya-win64\vim.exe'
+[00:00:02]     & $Env:THEMIS_VIM --version
+[00:00:02]     .\themis\bin\themis.bat
+[00:00:02]     if ($?) {
+[00:00:02]       .\test\dot-repeat\test_dot.bat
+[00:00:02]     }
+[00:00:02]   }
+[00:00:02] }
+[00:00:16] VIM - Vi IMproved 7.4 (2013 Aug 10, compiled Sep 10 2016 12:52:22)
+[00:00:16] MS-Windows 64-bit console version
+[00:00:16] Included patches: 1-2358
+[00:00:16] Modified by koron.kaoriya@gmail.com
+[00:00:16] Compiled by koron.kaoriya@gmail.com
+[00:00:16] Huge version without GUI.  Features included (+) or not (-):
+[00:00:16] +acl             +extra_search    +mouse           +tag_old_static
+[00:00:16] +arabic          +farsi           -mouseshape      -tag_any_white
+[00:00:16] +autocmd         +file_in_path    +multi_byte      -tcl
+[00:00:16] -balloon_eval    +find_in_path    +multi_lang      +termguicolors
+[00:00:16] -browse          +float           -mzscheme        -tgetent
+[00:00:16] ++builtin_terms  +folding         -netbeans_intg   -termresponse
+[00:00:16] +byte_offset     -footer          +num64           +textobjects
+[00:00:16] +channel         +gettext/dyn     +packages        +timers
+[00:00:16] +cindent         +guess_encode    +path_extra      +title
+[00:00:16] +clientserver    -hangul_input    +perl/dyn        -toolbar
+[00:00:16] +clipboard       +iconv/dyn       +persistent_undo +user_commands
+[00:00:16] +cmdline_compl   +insert_expand   -postscript      +vertsplit
+[00:00:16] +cmdline_hist    +job             +printer         +virtualedit
+[00:00:16] +cmdline_info    +jumplist        +profile         +visual
+[00:00:16] +comments        +kaoriya         +python/dyn      +visualextra
+[00:00:16] +conceal         +keymap          +python3/dyn     +viminfo
+[00:00:16] +cryptv          +lambda          +quickfix        +vreplace
+[00:00:16] +cscope          +langmap         +reltime         +wildignore
+[00:00:16] +cursorbind      +libcall         +rightleft       +wildmenu
+[00:00:16] +cursorshape     +linebreak       +ruby/dyn        +windows
+[00:00:16] +dialog_con      +lispindent      +scrollbind      +writebackup
+[00:00:16] +diff            +listcmds        +signs           -xfontset
+[00:00:16] +digraphs        +localmap        +smartindent     -xim
+[00:00:16] -dnd             +lua/dyn         +startuptime     -xpm_w32
+[00:00:16] -ebcdic          +menu            +statusline      -xterm_save
+[00:00:16] +emacs_tags      +migemo/dyn      -sun_workshop    
+[00:00:16] +eval            +mksession       +syntax          
+[00:00:16] +ex_extra        +modify_fname    +tag_binary      
+[00:00:16]    system vimrc file: "$VIM\vimrc"
+[00:00:16]      user vimrc file: "$HOME\_vimrc"
+[00:00:16]  2nd user vimrc file: "$HOME\vimfiles\vimrc"
+[00:00:16]  3rd user vimrc file: "$VIM\_vimrc"
+[00:00:16]       user exrc file: "$HOME\_exrc"
+[00:00:16]   2nd user exrc file: "$VIM\_exrc"
+[00:00:16]        defaults file: "$VIMRUNTIME\defaults.vim"
+[00:00:16] Compilation: cl -c /W3 /nologo  -I. -Iproto -DHAVE_PATHDEF -DWIN32  -DFEAT_CSCOPE  -DFEAT_JOB_CHANNEL     /DMODIFIED_BY=\"koron.kaoriya@gmail.com\" /DDYNAMIC_MSVCRT_DLL=\"msvcr100.dll\" /DGETTEXT_DLL=\"intl.dll\" /DGETTEXT_DLL_ALT=\"intl.dll\" /D_BIND_TO_CURRENT_VCLIBS_VERSION=1 -DWINVER=0x0501 -D_WIN32_WINNT=0x0501 /Fo.\ObjCXULYHRAMD64/ -DHAVE_STDINT_H /Ox /GL -DNDEBUG /MD -DDYNAMIC_ICONV -DDYNAMIC_GETTEXT -DDYNAMIC_MIGEMO -DFEAT_LUA -DDYNAMIC_LUA -DDYNAMIC_LUA_DLL=\"lua51.dll\" -DFEAT_PYTHON -DDYNAMIC_PYTHON -DDYNAMIC_PYTHON_DLL=\"python27.dll\" -DFEAT_PYTHON3 -DDYNAMIC_PYTHON3 -DDYNAMIC_PYTHON3_DLL=\"python35.dll\" -DFEAT_PERL -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -DDYNAMIC_PERL -DDYNAMIC_PERL_DLL=\"perl524.dll\" -DFEAT_RUBY -DDYNAMIC_RUBY -DDYNAMIC_RUBY_VER=23 -DDYNAMIC_RUBY_DLL=\"x64-msvcrt-ruby230.dll\" -DFEAT_HUGE /Fd.\ObjCXULYHRAMD64/ /Zi
+[00:00:16] Linking: link /RELEASE /nologo /subsystem:console /LTCG:STATUS oldnames.lib kernel32.lib advapi32.lib shell32.lib gdi32.lib  comdlg32.lib ole32.lib uuid.lib /machine:AMD64  /nodefaultlib msvcrt.lib  user32.lib  /nodefaultlib:lua51.lib   /nodefaultlib:python27.lib /nodefaultlib:python35.lib    WSock32.lib  /PDB:vim.pdb -debug
+[00:00:20] 1..511
+[00:00:20] 
+[00:00:20] ok 1 - textobj-sandwich: auto: filter_filetype
+[00:00:20] 
+[00:00:20] ok 2 - textobj-sandwich: auto: filter_kind
+[00:00:20] 
+[00:00:20] ok 3 - textobj-sandwich: auto: filter_mode
+[00:00:20] 
+[00:00:20] ok 4 - textobj-sandwich: auto: filter_expr
+[00:00:20] 
+[00:00:20] ok 5 - textobj-sandwich: auto: i_o_default_recipes
+[00:00:20] 
+[00:00:20] ok 6 - textobj-sandwich: auto: i_o_nest
+[00:00:20] 
+[00:00:20] ok 7 - textobj-sandwich: auto: i_o_no_nest
+[00:00:20] 
+[00:00:20] ok 8 - textobj-sandwich: auto: i_o_external_textobj
+[00:00:20] 
+[00:00:20] ok 9 - textobj-sandwich: auto: i_o_multibyte
+[00:00:20] 
+[00:00:20] ok 10 - textobj-sandwich: auto: i_o_option_expr
+[00:00:20] 
+[00:00:20] ok 11 - textobj-sandwich: auto: i_o_option_listexpr
+[00:00:20] 
+[00:00:20] ok 12 - textobj-sandwich: auto: i_o_option_regex
+[00:00:20] 
+[00:00:20] ok 13 - textobj-sandwich: auto: i_o_option_skip_regex
+[00:00:20] 
+[00:00:20] ok 14 - textobj-sandwich: auto: i_o_option_quoteescape
+[00:00:20] 
+[00:00:20] ok 15 - textobj-sandwich: auto: i_o_option_expand_range
+[00:00:20] 
+[00:00:20] ok 16 - textobj-sandwich: auto: i_o_option_noremap
+[00:00:20] 
+[00:00:20] ok 17 - textobj-sandwich: auto: i_o_option_syntax
+[00:00:20] 
+[00:00:20] ok 18 - textobj-sandwich: auto: i_o_option_inner_syntax
+[00:00:20] 
+[00:00:20] ok 19 - textobj-sandwich: auto: i_o_option_match_syntax
+[00:00:20] 
+[00:00:20] ok 20 - textobj-sandwich: auto: i_o_option_skip_break
+[00:00:20] 
+[00:00:20] ok 21 - textobj-sandwich: auto: i_o_option_skip_expr
+[00:00:20] 
+[00:00:20] ok 22 - textobj-sandwich: auto: i_o_priority
+[00:00:20] 
+[00:00:20] ok 23 - textobj-sandwich: auto: i_x_default_recipes
+[00:00:20] 
+[00:00:20] ok 24 - textobj-sandwich: auto: i_x_nest
+[00:00:20] 
+[00:00:20] ok 25 - textobj-sandwich: auto: i_x_no_nest
+[00:00:20] 
+[00:00:20] ok 26 - textobj-sandwich: auto: i_x_external_textobj
+[00:00:20] 
+[00:00:20] ok 27 - textobj-sandwich: auto: i_x_selected_area_extending
+[00:00:20] 
+[00:00:20] ok 28 - textobj-sandwich: auto: i_x_blockwise_visual
+[00:00:20] 
+[00:00:20] ok 29 - textobj-sandwich: auto: i_x_multibyte
+[00:00:20] 
+[00:00:20] ok 30 - textobj-sandwich: auto: i_x_option_expr
+[00:00:20] 
+[00:00:20] ok 31 - textobj-sandwich: auto: i_x_option_listexpr
+[00:00:20] 
+[00:00:20] ok 32 - textobj-sandwich: auto: i_x_option_regex
+[00:00:20] 
+[00:00:20] ok 33 - textobj-sandwich: auto: i_x_option_skip_regex
+[00:00:20] 
+[00:00:20] ok 34 - textobj-sandwich: auto: i_x_option_quoteescape
+[00:00:20] 
+[00:00:20] ok 35 - textobj-sandwich: auto: i_x_option_expand_range
+[00:00:20] 
+[00:00:20] ok 36 - textobj-sandwich: auto: i_x_option_noremap
+[00:00:20] 
+[00:00:20] ok 37 - textobj-sandwich: auto: i_x_option_syntax
+[00:00:20] 
+[00:00:20] ok 38 - textobj-sandwich: auto: i_x_option_inner_syntax
+[00:00:20] 
+[00:00:20] ok 39 - textobj-sandwich: auto: i_x_option_match_syntax
+[00:00:20] 
+[00:00:20] ok 40 - textobj-sandwich: auto: i_x_option_skip_break
+[00:00:20] 
+[00:00:20] ok 41 - textobj-sandwich: auto: i_x_option_skip_expr
+[00:00:20] 
+[00:00:20] ok 42 - textobj-sandwich: auto: i_x_priority
+[00:00:20] 
+[00:00:20] ok 43 - textobj-sandwich: auto: a_o_default_recipes
+[00:00:20] 
+[00:00:20] ok 44 - textobj-sandwich: auto: a_o_nest
+[00:00:20] 
+[00:00:20] ok 45 - textobj-sandwich: auto: a_o_no_nest
+[00:00:20] 
+[00:00:20] ok 46 - textobj-sandwich: auto: a_o_external_textobj
+[00:00:20] 
+[00:00:20] ok 47 - textobj-sandwich: auto: a_o_multibyte
+[00:00:20] 
+[00:00:20] ok 48 - textobj-sandwich: auto: a_o_option_expr
+[00:00:20] 
+[00:00:20] ok 49 - textobj-sandwich: auto: a_o_option_listexpr
+[00:00:20] 
+[00:00:20] ok 50 - textobj-sandwich: auto: a_o_option_regex
+[00:00:20] 
+[00:00:20] ok 51 - textobj-sandwich: auto: a_o_option_skip_regex
+[00:00:20] 
+[00:00:20] ok 52 - textobj-sandwich: auto: a_o_option_quoteescape
+[00:00:20] 
+[00:00:20] ok 53 - textobj-sandwich: auto: a_o_option_expand_range
+[00:00:20] 
+[00:00:20] ok 54 - textobj-sandwich: auto: a_o_option_noremap
+[00:00:20] 
+[00:00:20] ok 55 - textobj-sandwich: auto: a_o_option_syntax
+[00:00:20] 
+[00:00:20] ok 56 - textobj-sandwich: auto: a_o_option_inner_syntax
+[00:00:20] 
+[00:00:20] ok 57 - textobj-sandwich: auto: a_o_option_match_syntax
+[00:00:20] 
+[00:00:20] ok 58 - textobj-sandwich: auto: a_o_option_synchro
+[00:00:20] 
+[00:00:20] ok 59 - textobj-sandwich: auto: a_o_option_skip_expr
+[00:00:20] 
+[00:00:20] ok 60 - textobj-sandwich: auto: a_o_priority
+[00:00:20] 
+[00:00:20] ok 61 - textobj-sandwich: auto: a_x_default_recipes
+[00:00:20] 
+[00:00:20] ok 62 - textobj-sandwich: auto: a_x_nest
+[00:00:20] 
+[00:00:20] ok 63 - textobj-sandwich: auto: a_x_no_nest
+[00:00:20] 
+[00:00:20] ok 64 - textobj-sandwich: auto: a_x_external_textobj
+[00:00:20] 
+[00:00:20] ok 65 - textobj-sandwich: auto: a_x_selected_area_extending
+[00:00:20] 
+[00:00:20] ok 66 - textobj-sandwich: auto: a_x_blockwise_visual
+[00:00:20] 
+[00:00:20] ok 67 - textobj-sandwich: auto: a_x_multibyte
+[00:00:20] 
+[00:00:20] ok 68 - textobj-sandwich: auto: a_x_option_expr
+[00:00:20] 
+[00:00:20] ok 69 - textobj-sandwich: auto: a_x_option_listexpr
+[00:00:20] 
+[00:00:20] ok 70 - textobj-sandwich: auto: a_x_option_regex
+[00:00:20] 
+[00:00:20] ok 71 - textobj-sandwich: auto: a_x_option_skip_regex
+[00:00:20] 
+[00:00:20] ok 72 - textobj-sandwich: auto: a_x_option_quoteescape
+[00:00:20] 
+[00:00:20] ok 73 - textobj-sandwich: auto: a_x_option_expand_range
+[00:00:20] 
+[00:00:20] ok 74 - textobj-sandwich: auto: a_x_option_noremap
+[00:00:20] 
+[00:00:20] ok 75 - textobj-sandwich: auto: a_x_option_syntax
+[00:00:20] 
+[00:00:20] ok 76 - textobj-sandwich: auto: a_x_option_inner_syntax
+[00:00:20] 
+[00:00:20] ok 77 - textobj-sandwich: auto: a_x_option_match_syntax
+[00:00:20] 
+[00:00:20] ok 78 - textobj-sandwich: auto: a_x_option_skip_expr
+[00:00:20] 
+[00:00:20] ok 79 - textobj-sandwich: auto: a_x_priority
+[00:00:20] 
+[00:00:24] ok 80 - textobj-sandwich: auto: i_function_interface
+[00:00:24] 
+[00:00:24] ok 81 - textobj-sandwich: auto: a_function_interface
+[00:00:24] 
+[00:00:24] ok 82 - textobj-sandwich: query: input
+[00:00:24] 
+[00:00:24] ok 83 - textobj-sandwich: query: filter_filetype
+[00:00:24] 
+[00:00:24] ok 84 - textobj-sandwich: query: filter_kind
+[00:00:24] 
+[00:00:24] ok 85 - textobj-sandwich: query: filter_mode
+[00:00:24] 
+[00:00:24] ok 86 - textobj-sandwich: query: filter_expr
+[00:00:24] 
+[00:00:24] ok 87 - textobj-sandwich: query: i_o_default_recipes
+[00:00:24] 
+[00:00:24] ok 88 - textobj-sandwich: query: i_o_nest
+[00:00:24] 
+[00:00:24] ok 89 - textobj-sandwich: query: i_o_no_nest
+[00:00:24] 
+[00:00:24] ok 90 - textobj-sandwich: query: i_o_external_textobj
+[00:00:24] 
+[00:00:24] ok 91 - textobj-sandwich: query: i_o_multibyte
+[00:00:24] 
+[00:00:24] ok 92 - textobj-sandwich: query: i_o_option_expr
+[00:00:24] 
+[00:00:24] ok 93 - textobj-sandwich: query: i_o_option_listexpr
+[00:00:24] 
+[00:00:24] ok 94 - textobj-sandwich: query: i_o_option_regex
+[00:00:24] 
+[00:00:24] ok 95 - textobj-sandwich: query: i_o_option_skip_regex
+[00:00:24] 
+[00:00:24] ok 96 - textobj-sandwich: query: i_o_option_quoteescape
+[00:00:24] 
+[00:00:24] ok 97 - textobj-sandwich: query: i_o_option_expand_range
+[00:00:24] 
+[00:00:24] ok 98 - textobj-sandwich: query: i_o_option_noremap
+[00:00:24] 
+[00:00:24] ok 99 - textobj-sandwich: query: i_o_option_syntax
+[00:00:24] 
+[00:00:24] ok 100 - textobj-sandwich: query: i_o_option_inner_syntax
+[00:00:24] 
+[00:00:24] ok 101 - textobj-sandwich: query: i_o_option_match_syntax
+[00:00:24] 
+[00:00:24] ok 102 - textobj-sandwich: query: i_o_option_skip_break
+[00:00:24] 
+[00:00:24] ok 103 - textobj-sandwich: query: i_o_option_skip_expr
+[00:00:24] 
+[00:00:24] ok 104 - textobj-sandwich: query: i_x_default_recipes
+[00:00:24] 
+[00:00:24] ok 105 - textobj-sandwich: query: i_x_nest
+[00:00:24] 
+[00:00:24] ok 106 - textobj-sandwich: query: i_x_no_nest
+[00:00:24] 
+[00:00:24] ok 107 - textobj-sandwich: query: i_x_external_textobj
+[00:00:24] 
+[00:00:24] ok 108 - textobj-sandwich: query: i_x_selected_area_extending
+[00:00:24] 
+[00:00:24] ok 109 - textobj-sandwich: query: i_x_blockwise_visual
+[00:00:24] 
+[00:00:24] ok 110 - textobj-sandwich: query: i_x_multibyte
+[00:00:24] 
+[00:00:24] ok 111 - textobj-sandwich: query: i_x_option_expr
+[00:00:24] 
+[00:00:24] ok 112 - textobj-sandwich: query: i_x_option_listexpr
+[00:00:24] 
+[00:00:24] ok 113 - textobj-sandwich: query: i_x_option_regex
+[00:00:24] 
+[00:00:24] ok 114 - textobj-sandwich: query: i_x_option_skip_regex
+[00:00:24] 
+[00:00:24] ok 115 - textobj-sandwich: query: i_x_option_quoteescape
+[00:00:24] 
+[00:00:24] ok 116 - textobj-sandwich: query: i_x_option_expand_range
+[00:00:24] 
+[00:00:24] ok 117 - textobj-sandwich: query: i_x_option_noremap
+[00:00:24] 
+[00:00:24] ok 118 - textobj-sandwich: query: i_x_option_syntax
+[00:00:24] 
+[00:00:24] ok 119 - textobj-sandwich: query: i_x_option_inner_syntax
+[00:00:24] 
+[00:00:24] ok 120 - textobj-sandwich: query: i_x_option_match_syntax
+[00:00:24] 
+[00:00:24] ok 121 - textobj-sandwich: query: i_x_option_skip_break
+[00:00:24] 
+[00:00:24] ok 122 - textobj-sandwich: query: i_x_option_skip_expr
+[00:00:24] 
+[00:00:24] ok 123 - textobj-sandwich: query: a_o_default_recipes
+[00:00:24] 
+[00:00:24] ok 124 - textobj-sandwich: query: a_o_nest
+[00:00:24] 
+[00:00:24] ok 125 - textobj-sandwich: query: a_o_no_nest
+[00:00:24] 
+[00:00:24] ok 126 - textobj-sandwich: query: a_o_external_textobj
+[00:00:24] 
+[00:00:24] ok 127 - textobj-sandwich: query: a_o_priority
+[00:00:24] 
+[00:00:24] ok 128 - textobj-sandwich: query: a_o_multibyte
+[00:00:24] 
+[00:00:24] ok 129 - textobj-sandwich: query: a_o_option_expr
+[00:00:24] 
+[00:00:24] ok 130 - textobj-sandwich: query: a_o_option_listexpr
+[00:00:24] 
+[00:00:24] ok 131 - textobj-sandwich: query: a_o_option_regex
+[00:00:24] 
+[00:00:24] ok 132 - textobj-sandwich: query: a_o_option_skip_regex
+[00:00:24] 
+[00:00:24] ok 133 - textobj-sandwich: query: a_o_option_quoteescape
+[00:00:24] 
+[00:00:24] ok 134 - textobj-sandwich: query: a_o_option_expand_range
+[00:00:24] 
+[00:00:24] ok 135 - textobj-sandwich: query: a_o_option_noremap
+[00:00:24] 
+[00:00:24] ok 136 - textobj-sandwich: query: a_o_option_syntax
+[00:00:24] 
+[00:00:24] ok 137 - textobj-sandwich: query: a_o_option_inner_syntax
+[00:00:24] 
+[00:00:24] ok 138 - textobj-sandwich: query: a_o_option_match_syntax
+[00:00:24] 
+[00:00:24] ok 139 - textobj-sandwich: query: a_o_option_synchro
+[00:00:24] 
+[00:00:24] ok 140 - textobj-sandwich: query: a_o_option_skip_expr
+[00:00:24] 
+[00:00:24] ok 141 - textobj-sandwich: query: a_x_default_recipes
+[00:00:24] 
+[00:00:24] ok 142 - textobj-sandwich: query: a_x_nest
+[00:00:24] 
+[00:00:24] ok 143 - textobj-sandwich: query: a_x_no_nest
+[00:00:24] 
+[00:00:24] ok 144 - textobj-sandwich: query: a_x_external_textobj
+[00:00:24] 
+[00:00:24] ok 145 - textobj-sandwich: query: a_x_priority
+[00:00:24] 
+[00:00:24] ok 146 - textobj-sandwich: query: a_x_selected_area_extending
+[00:00:24] 
+[00:00:24] ok 147 - textobj-sandwich: query: a_x_blockwise_visual
+[00:00:24] 
+[00:00:24] ok 148 - textobj-sandwich: query: a_x_multibyte
+[00:00:24] 
+[00:00:24] ok 149 - textobj-sandwich: query: a_x_option_expr
+[00:00:24] 
+[00:00:24] ok 150 - textobj-sandwich: query: a_x_option_listexpr
+[00:00:24] 
+[00:00:24] ok 151 - textobj-sandwich: query: a_x_option_regex
+[00:00:24] 
+[00:00:24] ok 152 - textobj-sandwich: query: a_x_option_skip_regex
+[00:00:24] 
+[00:00:24] ok 153 - textobj-sandwich: query: a_x_option_quoteescape
+[00:00:24] 
+[00:00:24] ok 154 - textobj-sandwich: query: a_x_option_expand_range
+[00:00:24] 
+[00:00:24] ok 155 - textobj-sandwich: query: a_x_option_noremap
+[00:00:24] 
+[00:00:29] ok 156 - textobj-sandwich: query: a_x_option_syntax
+[00:00:29] 
+[00:00:29] ok 157 - textobj-sandwich: query: a_x_option_inner_syntax
+[00:00:29] 
+[00:00:29] ok 158 - textobj-sandwich: query: a_x_option_match_syntax
+[00:00:29] 
+[00:00:29] ok 159 - textobj-sandwich: query: a_x_option_skip_expr
+[00:00:29] 
+[00:00:29] ok 160 - textobj-sandwich: query: i_function_interface
+[00:00:29] 
+[00:00:29] ok 161 - textobj-sandwich: query: a_function_interface
+[00:00:29] 
+[00:00:29] ok 162 - operator-sandwich: add: input
+[00:00:29] 
+[00:00:29] ok 163 - operator-sandwich: add: filter_filetype
+[00:00:29] 
+[00:00:29] ok 164 - operator-sandwich: add: filter_kind
+[00:00:29] 
+[00:00:29] ok 165 - operator-sandwich: add: filter_motionwise
+[00:00:29] 
+[00:00:29] ok 166 - operator-sandwich: add: filter_mode
+[00:00:29] 
+[00:00:29] ok 167 - operator-sandwich: add: filter_action
+[00:00:29] 
+[00:00:29] ok 168 - operator-sandwich: add: filter_expr
+[00:00:29] 
+[00:00:29] ok 169 - operator-sandwich: add: charwise_n_default_recipes
+[00:00:29] 
+[00:00:29] ok 170 - operator-sandwich: add: charwise_n_not_registered
+[00:00:29] 
+[00:00:29] ok 171 - operator-sandwich: add: charwise_n_positioning
+[00:00:29] 
+[00:00:29] ok 172 - operator-sandwich: add: charwise_n_a_character
+[00:00:29] 
+[00:00:29] ok 173 - operator-sandwich: add: charwise_n_breaking
+[00:00:29] 
+[00:00:29] ok 174 - operator-sandwich: add: charwise_n_count
+[00:00:29] 
+[00:00:29] ok 175 - operator-sandwich: add: charwise_n_multibyte
+[00:00:29] 
+[00:00:29] ok 176 - operator-sandwich: add: charwise_n_option_cursor
+[00:00:29] 
+[00:00:29] ok 177 - operator-sandwich: add: charwise_n_option_query_once
+[00:00:29] 
+[00:00:29] ok 178 - operator-sandwich: add: charwise_n_option_expr
+[00:00:29] 
+[00:00:29] ok 179 - operator-sandwich: add: charwise_n_option_listexpr
+[00:00:29] 
+[00:00:29] ok 180 - operator-sandwich: add: charwise_n_option_noremap
+[00:00:29] 
+[00:00:29] ok 181 - operator-sandwich: add: charwise_n_option_skip_space
+[00:00:29] 
+[00:00:29] ok 182 - operator-sandwich: add: charwise_n_option_command
+[00:00:29] 
+[00:00:29] ok 183 - operator-sandwich: add: charwise_n_option_linewise
+[00:00:29] 
+[00:00:29] ok 184 - operator-sandwich: add: charwise_n_option_autoindent
+[00:00:29] 
+[00:00:29] ok 185 - operator-sandwich: add: charwise_n_option_indentkeys
+[00:00:29] 
+[00:00:29] ok 186 - operator-sandwich: add: charwise_x_default_recipes
+[00:00:29] 
+[00:00:29] ok 187 - operator-sandwich: add: charwise_x_not_registered
+[00:00:29] 
+[00:00:29] ok 188 - operator-sandwich: add: charwise_x_positioning
+[00:00:29] 
+[00:00:29] ok 189 - operator-sandwich: add: charwise_x_a_character
+[00:00:29] 
+[00:00:29] ok 190 - operator-sandwich: add: charwise_x_breaking
+[00:00:29] 
+[00:00:29] ok 191 - operator-sandwich: add: charwise_x_count
+[00:00:29] 
+[00:00:29] ok 192 - operator-sandwich: add: charwise_x_multibyte
+[00:00:29] 
+[00:00:29] ok 193 - operator-sandwich: add: charwise_x_option_cursor
+[00:00:29] 
+[00:00:29] ok 194 - operator-sandwich: add: charwise_x_option_query_once
+[00:00:29] 
+[00:00:29] ok 195 - operator-sandwich: add: charwise_x_option_expr
+[00:00:29] 
+[00:00:29] ok 196 - operator-sandwich: add: charwise_x_option_listexpr
+[00:00:29] 
+[00:00:29] ok 197 - operator-sandwich: add: charwise_x_option_noremap
+[00:00:29] 
+[00:00:29] ok 198 - operator-sandwich: add: charwise_x_option_skip_space
+[00:00:29] 
+[00:00:29] ok 199 - operator-sandwich: add: charwise_x_option_command
+[00:00:29] 
+[00:00:29] ok 200 - operator-sandwich: add: charwise_x_option_linewise
+[00:00:29] 
+[00:00:29] ok 201 - operator-sandwich: add: charwise_x_option_autoindent
+[00:00:29] 
+[00:00:29] ok 202 - operator-sandwich: add: charwise_x_option_indentkeys
+[00:00:29] 
+[00:00:29] ok 203 - operator-sandwich: add: linewise_n_default_recipes
+[00:00:29] 
+[00:00:29] ok 204 - operator-sandwich: add: linewise_n_not_registered
+[00:00:29] 
+[00:00:29] ok 205 - operator-sandwich: add: linewise_n_positioning
+[00:00:29] 
+[00:00:29] ok 206 - operator-sandwich: add: linewise_n_a_character
+[00:00:29] 
+[00:00:29] ok 207 - operator-sandwich: add: linewise_n_breaking
+[00:00:29] 
+[00:00:29] ok 208 - operator-sandwich: add: linewise_n_count
+[00:00:29] 
+[00:00:29] ok 209 - operator-sandwich: add: linewise_n_multibyte
+[00:00:29] 
+[00:00:29] ok 210 - operator-sandwich: add: linewise_n_option_cursor
+[00:00:29] 
+[00:00:29] ok 211 - operator-sandwich: add: linewise_n_option_query_once
+[00:00:29] 
+[00:00:29] ok 212 - operator-sandwich: add: linewise_n_option_expr
+[00:00:29] 
+[00:00:29] ok 213 - operator-sandwich: add: linewise_n_option_listexpr
+[00:00:29] 
+[00:00:29] ok 214 - operator-sandwich: add: linewise_n_option_noremap
+[00:00:29] 
+[00:00:29] ok 215 - operator-sandwich: add: linewise_n_option_skip_space
+[00:00:29] 
+[00:00:29] ok 216 - operator-sandwich: add: linewise_n_option_command
+[00:00:29] 
+[00:00:29] ok 217 - operator-sandwich: add: linewise_n_option_linewise
+[00:00:29] 
+[00:00:29] ok 218 - operator-sandwich: add: linewise_n_option_autoindent
+[00:00:29] 
+[00:00:29] ok 219 - operator-sandwich: add: linewise_n_option_indentkeys
+[00:00:29] 
+[00:00:29] ok 220 - operator-sandwich: add: linewise_x_default_recipes
+[00:00:29] 
+[00:00:29] ok 221 - operator-sandwich: add: linewise_x_not_registered
+[00:00:29] 
+[00:00:29] ok 222 - operator-sandwich: add: linewise_x_positioning
+[00:00:29] 
+[00:00:29] ok 223 - operator-sandwich: add: linewise_x_a_character
+[00:00:29] 
+[00:00:29] ok 224 - operator-sandwich: add: linewise_x_breaking
+[00:00:29] 
+[00:00:29] ok 225 - operator-sandwich: add: linewise_x_count
+[00:00:29] 
+[00:00:29] ok 226 - operator-sandwich: add: linewise_x_multibyte
+[00:00:29] 
+[00:00:29] ok 227 - operator-sandwich: add: linewise_x_option_cursor
+[00:00:29] 
+[00:00:39] ok 228 - operator-sandwich: add: linewise_x_option_query_once
+[00:00:39] 
+[00:00:39] ok 229 - operator-sandwich: add: linewise_x_option_expr
+[00:00:39] 
+[00:00:39] ok 230 - operator-sandwich: add: linewise_x_option_listexpr
+[00:00:39] 
+[00:00:39] ok 231 - operator-sandwich: add: linewise_x_option_noremap
+[00:00:39] 
+[00:00:39] ok 232 - operator-sandwich: add: linewise_x_option_skip_space
+[00:00:39] 
+[00:00:39] ok 233 - operator-sandwich: add: linewise_x_option_command
+[00:00:39] 
+[00:00:39] ok 234 - operator-sandwich: add: linewise_x_option_linewise
+[00:00:39] 
+[00:00:39] ok 235 - operator-sandwich: add: linewise_x_option_autoindent
+[00:00:39] 
+[00:00:39] ok 236 - operator-sandwich: add: linewise_x_option_indentkeys
+[00:00:39] 
+[00:00:39] ok 237 - operator-sandwich: add: blockwise_n_default_recipes
+[00:00:39] 
+[00:00:39] ok 238 - operator-sandwich: add: blockwise_n_not_registered
+[00:00:39] 
+[00:00:39] ok 239 - operator-sandwich: add: blockwise_n_positioning
+[00:00:39] 
+[00:00:39] ok 240 - operator-sandwich: add: blockwise_n_a_character
+[00:00:39] 
+[00:00:39] ok 241 - operator-sandwich: add: blockwise_n_breaking
+[00:00:39] 
+[00:00:39] ok 242 - operator-sandwich: add: blockwise_n_count
+[00:00:39] 
+[00:00:39] ok 243 - operator-sandwich: add: blockwise_n_multibyte
+[00:00:39] 
+[00:00:39] ok 244 - operator-sandwich: add: blockwise_n_option_cursor
+[00:00:39] 
+[00:00:39] ok 245 - operator-sandwich: add: blockwise_n_option_query_once
+[00:00:39] 
+[00:00:39] ok 246 - operator-sandwich: add: blockwise_n_option_expr
+[00:00:39] 
+[00:00:39] ok 247 - operator-sandwich: add: blockwise_n_option_listexpr
+[00:00:39] 
+[00:00:39] ok 248 - operator-sandwich: add: blockwise_n_option_noremap
+[00:00:39] 
+[00:00:39] ok 249 - operator-sandwich: add: blockwise_n_option_skip_space
+[00:00:39] 
+[00:00:39] ok 250 - operator-sandwich: add: blockwise_n_option_command
+[00:00:39] 
+[00:00:39] ok 251 - operator-sandwich: add: blockwise_n_option_linewise
+[00:00:39] 
+[00:00:39] ok 252 - operator-sandwich: add: blockwise_n_option_autoindent
+[00:00:39] 
+[00:00:39] ok 253 - operator-sandwich: add: blockwise_n_option_indentkeys
+[00:00:39] 
+[00:00:39] ok 254 - operator-sandwich: add: blockwise_x_default_recipes
+[00:00:39] 
+[00:00:39] ok 255 - operator-sandwich: add: blockwise_x_not_registered
+[00:00:39] 
+[00:00:39] ok 256 - operator-sandwich: add: blockwise_x_positioning
+[00:00:39] 
+[00:00:39] ok 257 - operator-sandwich: add: blockwise_x_a_character
+[00:00:39] 
+[00:00:39] ok 258 - operator-sandwich: add: blockwise_x_breaking
+[00:00:39] 
+[00:00:39] ok 259 - operator-sandwich: add: blockwise_x_count
+[00:00:39] 
+[00:00:39] ok 260 - operator-sandwich: add: blockwise_x_multibyte
+[00:00:39] 
+[00:00:39] ok 261 - operator-sandwich: add: blockwise_x_option_cursor
+[00:00:39] 
+[00:00:39] ok 262 - operator-sandwich: add: blockwise_x_option_query_once
+[00:00:39] 
+[00:00:39] ok 263 - operator-sandwich: add: blockwise_x_option_expr
+[00:00:39] 
+[00:00:39] ok 264 - operator-sandwich: add: blockwise_x_option_listexpr
+[00:00:39] 
+[00:00:39] ok 265 - operator-sandwich: add: blockwise_x_option_noremap
+[00:00:39] 
+[00:00:39] ok 266 - operator-sandwich: add: blockwise_x_option_skip_space
+[00:00:39] 
+[00:00:39] ok 267 - operator-sandwich: add: blockwise_x_option_command
+[00:00:39] 
+[00:00:39] ok 268 - operator-sandwich: add: blockwise_x_option_linewise
+[00:00:39] 
+[00:00:39] ok 269 - operator-sandwich: add: blockwise_x_option_autoindent
+[00:00:39] 
+[00:00:39] ok 270 - operator-sandwich: add: blockwise_x_option_indentkeys
+[00:00:39] 
+[00:00:39] ok 271 - operator-sandwich: add: function_interface
+[00:00:39] 
+[00:00:39] ok 272 - operator-sandwich: add: undo
+[00:00:39] 
+[00:00:39] ok 273 - operator-sandwich: add: autoindent
+[00:00:39] 
+[00:00:39] ok 274 - operator-sandwich: add: insertspace
+[00:00:39] 
+[00:00:39] ok 275 - operator-sandwich: add: autoformat
+[00:00:39] 
+[00:00:39] ok 276 - operator-sandwich: delete: filter_filetype
+[00:00:39] 
+[00:00:39] ok 277 - operator-sandwich: delete: filter_kind
+[00:00:39] 
+[00:00:39] ok 278 - operator-sandwich: delete: filter_motionwise
+[00:00:39] 
+[00:00:39] ok 279 - operator-sandwich: delete: filter_mode
+[00:00:39] 
+[00:00:39] ok 280 - operator-sandwich: delete: filter_action
+[00:00:39] 
+[00:00:39] ok 281 - operator-sandwich: delete: filter_expr
+[00:00:39] 
+[00:00:39] ok 282 - operator-sandwich: delete: charwise_n_default_recipes
+[00:00:39] 
+[00:00:39] ok 283 - operator-sandwich: delete: charwise_n_not_registered
+[00:00:39] 
+[00:00:39] ok 284 - operator-sandwich: delete: charwise_n_positioning
+[00:00:39] 
+[00:00:39] ok 285 - operator-sandwich: delete: charwise_n_a_character
+[00:00:39] 
+[00:00:39] ok 286 - operator-sandwich: delete: charwise_n_nothing_inside
+[00:00:39] 
+[00:00:39] ok 287 - operator-sandwich: delete: charwise_n_breaking
+[00:00:39] 
+[00:00:39] ok 288 - operator-sandwich: delete: charwise_n_count
+[00:00:39] 
+[00:00:39] ok 289 - operator-sandwich: delete: charwise_n_external_textobj
+[00:00:39] 
+[00:00:39] ok 290 - operator-sandwich: delete: charwise_n_multibyte
+[00:00:39] 
+[00:00:39] ok 291 - operator-sandwich: delete: charwise_n_option_cursor
+[00:00:39] 
+[00:00:39] ok 292 - operator-sandwich: delete: charwise_n_option_noremap
+[00:00:39] 
+[00:00:39] ok 293 - operator-sandwich: delete: charwise_n_option_regex
+[00:00:39] 
+[00:00:39] ok 294 - operator-sandwich: delete: charwise_n_option_skip_space
+[00:00:39] 
+[00:00:39] ok 295 - operator-sandwich: delete: charwise_n_option_skip_char
+[00:00:39] 
+[00:00:39] ok 296 - operator-sandwich: delete: charwise_n_option_command
+[00:00:39] 
+[00:00:56] ok 297 - operator-sandwich: delete: charwise_n_option_linewise
+[00:00:56] 
+[00:00:56] ok 298 - operator-sandwich: delete: charwise_x_default_recipes
+[00:00:56] 
+[00:00:56] ok 299 - operator-sandwich: delete: charwise_x_not_registered
+[00:00:56] 
+[00:00:56] ok 300 - operator-sandwich: delete: charwise_x_positioning
+[00:00:56] 
+[00:00:56] ok 301 - operator-sandwich: delete: charwise_x_a_character
+[00:00:56] 
+[00:00:56] ok 302 - operator-sandwich: delete: charwise_x_nothing_inside
+[00:00:56] 
+[00:00:56] ok 303 - operator-sandwich: delete: charwise_x_breaking
+[00:00:56] 
+[00:00:56] ok 304 - operator-sandwich: delete: charwise_x_count
+[00:00:56] 
+[00:00:56] ok 305 - operator-sandwich: delete: charwise_x_external_textobj
+[00:00:56] 
+[00:00:56] ok 306 - operator-sandwich: delete: charwise_x_multibyte
+[00:00:56] 
+[00:00:56] ok 307 - operator-sandwich: delete: charwise_x_option_cursor
+[00:00:56] 
+[00:00:56] ok 308 - operator-sandwich: delete: charwise_x_option_noremap
+[00:00:56] 
+[00:00:56] ok 309 - operator-sandwich: delete: charwise_x_option_regex
+[00:00:56] 
+[00:00:56] ok 310 - operator-sandwich: delete: charwise_x_option_skip_space
+[00:00:56] 
+[00:00:56] ok 311 - operator-sandwich: delete: charwise_x_option_skip_char
+[00:00:56] 
+[00:00:56] ok 312 - operator-sandwich: delete: charwise_x_option_command
+[00:00:56] 
+[00:00:56] ok 313 - operator-sandwich: delete: charwise_x_option_linewise
+[00:00:56] 
+[00:00:56] ok 314 - operator-sandwich: delete: linewise_n_default_recipes
+[00:00:56] 
+[00:00:56] ok 315 - operator-sandwich: delete: linewise_n_not_registered
+[00:00:56] 
+[00:00:56] ok 316 - operator-sandwich: delete: linewise_n_positioning
+[00:00:56] 
+[00:00:56] ok 317 - operator-sandwich: delete: linewise_n_a_character
+[00:00:56] 
+[00:00:56] ok 318 - operator-sandwich: delete: linewise_n_nothing_inside
+[00:00:56] 
+[00:00:56] ok 319 - operator-sandwich: delete: linewise_n_breaking
+[00:00:56] 
+[00:00:56] ok 320 - operator-sandwich: delete: linewise_n_count
+[00:00:56] 
+[00:00:56] ok 321 - operator-sandwich: delete: linewise_n_external_textobj
+[00:00:56] 
+[00:00:56] ok 322 - operator-sandwich: delete: linewise_n_multibyte
+[00:00:56] 
+[00:00:56] ok 323 - operator-sandwich: delete: linewise_n_option_cursor
+[00:00:56] 
+[00:00:56] ok 324 - operator-sandwich: delete: linewise_n_option_noremap
+[00:00:56] 
+[00:00:56] ok 325 - operator-sandwich: delete: linewise_n_option_regex
+[00:00:56] 
+[00:00:56] ok 326 - operator-sandwich: delete: linewise_n_option_skip_space
+[00:00:56] 
+[00:00:56] ok 327 - operator-sandwich: delete: linewise_n_option_skip_char
+[00:00:56] 
+[00:00:56] ok 328 - operator-sandwich: delete: linewise_n_option_command
+[00:00:56] 
+[00:00:56] ok 329 - operator-sandwich: delete: linewise_n_option_linewise
+[00:00:56] 
+[00:00:56] ok 330 - operator-sandwich: delete: linewise_x_default_recipes
+[00:00:56] 
+[00:00:56] ok 331 - operator-sandwich: delete: linewise_x_not_registered
+[00:00:56] 
+[00:00:56] ok 332 - operator-sandwich: delete: linewise_x_positioning
+[00:00:56] 
+[00:00:56] ok 333 - operator-sandwich: delete: linewise_x_a_character
+[00:00:56] 
+[00:00:56] ok 334 - operator-sandwich: delete: linewise_x_nothing_inside
+[00:00:56] 
+[00:00:56] ok 335 - operator-sandwich: delete: linewise_x_breaking
+[00:00:56] 
+[00:00:56] ok 336 - operator-sandwich: delete: linewise_x_count
+[00:00:56] 
+[00:00:56] ok 337 - operator-sandwich: delete: linewise_x_external_textobj
+[00:00:56] 
+[00:00:56] ok 338 - operator-sandwich: delete: linewise_x_multibyte
+[00:00:56] 
+[00:00:56] ok 339 - operator-sandwich: delete: linewise_x_option_cursor
+[00:00:56] 
+[00:00:56] ok 340 - operator-sandwich: delete: linewise_x_option_noremap
+[00:00:56] 
+[00:00:56] ok 341 - operator-sandwich: delete: linewise_x_option_regex
+[00:00:56] 
+[00:00:56] ok 342 - operator-sandwich: delete: linewise_x_option_skip_space
+[00:00:56] 
+[00:00:56] ok 343 - operator-sandwich: delete: linewise_x_option_skip_char
+[00:00:56] 
+[00:00:56] ok 344 - operator-sandwich: delete: linewise_x_option_command
+[00:00:56] 
+[00:00:56] ok 345 - operator-sandwich: delete: linewise_x_option_linewise
+[00:00:56] 
+[00:00:56] ok 346 - operator-sandwich: delete: blockwise_n_default_recipes
+[00:00:56] 
+[00:00:56] ok 347 - operator-sandwich: delete: blockwise_n_not_registered
+[00:00:56] 
+[00:00:56] ok 348 - operator-sandwich: delete: blockwise_n_positioning
+[00:00:56] 
+[00:00:56] ok 349 - operator-sandwich: delete: blockwise_n_a_character
+[00:00:56] 
+[00:00:56] ok 350 - operator-sandwich: delete: blockwise_n_nothing_inside
+[00:00:56] 
+[00:00:56] ok 351 - operator-sandwich: delete: blockwise_n_count
+[00:00:56] 
+[00:00:56] ok 352 - operator-sandwich: delete: blockwise_n_external_textobj
+[00:00:56] 
+[00:00:56] ok 353 - operator-sandwich: delete: blockwise_n_multibyte
+[00:00:56] 
+[00:00:56] ok 354 - operator-sandwich: delete: blockwise_n_option_cursor
+[00:00:56] 
+[00:00:56] ok 355 - operator-sandwich: delete: blockwise_n_option_noremap
+[00:00:56] 
+[00:00:56] ok 356 - operator-sandwich: delete: blockwise_n_option_regex
+[00:00:56] 
+[00:00:56] ok 357 - operator-sandwich: delete: blockwise_n_option_skip_space
+[00:00:56] 
+[00:00:56] ok 358 - operator-sandwich: delete: blockwise_n_option_skip_char
+[00:00:56] 
+[00:00:56] ok 359 - operator-sandwich: delete: blockwise_n_option_command
+[00:00:56] 
+[00:00:56] ok 360 - operator-sandwich: delete: blockwise_x_default_recipes
+[00:00:56] 
+[00:00:56] ok 361 - operator-sandwich: delete: blockwise_x_not_registered
+[00:00:56] 
+[00:00:56] ok 362 - operator-sandwich: delete: blockwise_x_positioning
+[00:00:56] 
+[00:01:08] ok 363 - operator-sandwich: delete: blockwise_x_a_character
+[00:01:08] 
+[00:01:08] ok 364 - operator-sandwich: delete: blockwise_x_nothing_inside
+[00:01:08] 
+[00:01:08] ok 365 - operator-sandwich: delete: blockwise_x_count
+[00:01:08] 
+[00:01:08] ok 366 - operator-sandwich: delete: blockwise_x_external_textobj
+[00:01:08] 
+[00:01:08] ok 367 - operator-sandwich: delete: blockwise_x_multibyte
+[00:01:08] 
+[00:01:08] ok 368 - operator-sandwich: delete: blockwise_x_option_cursor
+[00:01:08] 
+[00:01:08] ok 369 - operator-sandwich: delete: blockwise_x_option_noremap
+[00:01:08] 
+[00:01:08] ok 370 - operator-sandwich: delete: blockwise_x_option_regex
+[00:01:08] 
+[00:01:08] ok 371 - operator-sandwich: delete: blockwise_x_option_skip_space
+[00:01:08] 
+[00:01:08] ok 372 - operator-sandwich: delete: blockwise_x_option_skip_char
+[00:01:08] 
+[00:01:08] ok 373 - operator-sandwich: delete: blockwise_x_option_command
+[00:01:08] 
+[00:01:08] ok 374 - operator-sandwich: delete: function_interface
+[00:01:08] 
+[00:01:08] ok 375 - operator-sandwich: delete: undo
+[00:01:08] 
+[00:01:08] ok 376 - operator-sandwich: delete: invalid_region
+[00:01:08] 
+[00:01:08] ok 377 - operator-sandwich: replace: input
+[00:01:08] 
+[00:01:08] ok 378 - operator-sandwich: replace: filter_filetype
+[00:01:08] 
+[00:01:08] ok 379 - operator-sandwich: replace: filter_kind
+[00:01:08] 
+[00:01:08] ok 380 - operator-sandwich: replace: filter_motionwise
+[00:01:08] 
+[00:01:08] ok 381 - operator-sandwich: replace: filter_mode
+[00:01:08] 
+[00:01:08] ok 382 - operator-sandwich: replace: filter_action
+[00:01:08] 
+[00:01:08] ok 383 - operator-sandwich: replace: filter_expr
+[00:01:08] 
+[00:01:08] ok 384 - operator-sandwich: replace: charwise_n_default_recipes
+[00:01:08] 
+[00:01:08] ok 385 - operator-sandwich: replace: charwise_n_not_registered
+[00:01:08] 
+[00:01:08] ok 386 - operator-sandwich: replace: charwise_n_positioning
+[00:01:08] 
+[00:01:08] ok 387 - operator-sandwich: replace: charwise_n_a_character
+[00:01:08] 
+[00:01:08] ok 388 - operator-sandwich: replace: charwise_n_nothing_inside
+[00:01:08] 
+[00:01:08] ok 389 - operator-sandwich: replace: charwise_n_count
+[00:01:08] 
+[00:01:08] ok 390 - operator-sandwich: replace: charwise_n_breaking
+[00:01:08] 
+[00:01:08] ok 391 - operator-sandwich: replace: charwise_n_external_textobj
+[00:01:08] 
+[00:01:08] ok 392 - operator-sandwich: replace: charwise_n_multibyte
+[00:01:08] 
+[00:01:08] ok 393 - operator-sandwich: replace: charwise_n_option_cursor
+[00:01:08] 
+[00:01:08] ok 394 - operator-sandwich: replace: charwise_n_option_noremap
+[00:01:08] 
+[00:01:08] ok 395 - operator-sandwich: replace: charwise_n_option_regex
+[00:01:08] 
+[00:01:08] ok 396 - operator-sandwich: replace: charwise_n_option_skip_space
+[00:01:08] 
+[00:01:08] ok 397 - operator-sandwich: replace: charwise_n_option_skip_char
+[00:01:08] 
+[00:01:08] ok 398 - operator-sandwich: replace: charwise_n_option_command
+[00:01:08] 
+[00:01:08] ok 399 - operator-sandwich: replace: charwise_n_option_linewise
+[00:01:08] 
+[00:01:08] ok 400 - operator-sandwich: replace: charwise_n_option_query_once
+[00:01:08] 
+[00:01:08] ok 401 - operator-sandwich: replace: charwise_n_option_expr
+[00:01:08] 
+[00:01:08] ok 402 - operator-sandwich: replace: charwise_n_option_listexpr
+[00:01:08] 
+[00:01:08] ok 403 - operator-sandwich: replace: charwise_n_option_autoindent
+[00:01:08] 
+[00:01:08] ok 404 - operator-sandwich: replace: charwise_n_option_indentkeys
+[00:01:08] 
+[00:01:08] ok 405 - operator-sandwich: replace: charwise_x_default_recipes
+[00:01:08] 
+[00:01:08] ok 406 - operator-sandwich: replace: charwise_x_not_registered
+[00:01:08] 
+[00:01:08] ok 407 - operator-sandwich: replace: charwise_x_positioning
+[00:01:08] 
+[00:01:08] ok 408 - operator-sandwich: replace: charwise_x_a_character
+[00:01:08] 
+[00:01:08] ok 409 - operator-sandwich: replace: charwise_x_nothing_inside
+[00:01:08] 
+[00:01:08] ok 410 - operator-sandwich: replace: charwise_x_count
+[00:01:08] 
+[00:01:08] ok 411 - operator-sandwich: replace: charwise_x_breaking
+[00:01:08] 
+[00:01:08] ok 412 - operator-sandwich: replace: charwise_x_external_textobj
+[00:01:08] 
+[00:01:08] ok 413 - operator-sandwich: replace: charwise_x_multibyte
+[00:01:08] 
+[00:01:08] ok 414 - operator-sandwich: replace: charwise_x_option_cursor
+[00:01:08] 
+[00:01:08] ok 415 - operator-sandwich: replace: charwise_x_option_noremap
+[00:01:08] 
+[00:01:08] ok 416 - operator-sandwich: replace: charwise_x_option_regex
+[00:01:08] 
+[00:01:08] ok 417 - operator-sandwich: replace: charwise_x_option_skip_space
+[00:01:08] 
+[00:01:08] ok 418 - operator-sandwich: replace: charwise_x_option_skip_char
+[00:01:08] 
+[00:01:08] ok 419 - operator-sandwich: replace: charwise_x_option_command
+[00:01:08] 
+[00:01:08] ok 420 - operator-sandwich: replace: charwise_x_option_linewise
+[00:01:08] 
+[00:01:08] ok 421 - operator-sandwich: replace: charwise_x_option_query_once
+[00:01:08] 
+[00:01:08] ok 422 - operator-sandwich: replace: charwise_x_option_expr
+[00:01:08] 
+[00:01:08] ok 423 - operator-sandwich: replace: charwise_x_option_listexpr
+[00:01:08] 
+[00:01:08] ok 424 - operator-sandwich: replace: charwise_x_option_autoindent
+[00:01:08] 
+[00:01:08] ok 425 - operator-sandwich: replace: charwise_x_option_indentkeys
+[00:01:08] 
+[00:01:08] ok 426 - operator-sandwich: replace: linewise_n_default_recipes
+[00:01:08] 
+[00:01:08] ok 427 - operator-sandwich: replace: linewise_n_not_registered
+[00:01:08] 
+[00:01:08] ok 428 - operator-sandwich: replace: linewise_n_positioning
+[00:01:08] 
+[00:01:08] ok 429 - operator-sandwich: replace: linewise_n_nothing_inside
+[00:01:08] 
+[00:01:25] ok 430 - operator-sandwich: replace: linewise_n_count
+[00:01:25] 
+[00:01:25] ok 431 - operator-sandwich: replace: linewise_n_breaking
+[00:01:25] 
+[00:01:25] ok 432 - operator-sandwich: replace: linewise_n_external_textobj
+[00:01:25] 
+[00:01:25] ok 433 - operator-sandwich: replace: linewise_n_multibyte
+[00:01:25] 
+[00:01:25] ok 434 - operator-sandwich: replace: linewise_n_option_cursor
+[00:01:25] 
+[00:01:25] ok 435 - operator-sandwich: replace: linewise_n_option_noremap
+[00:01:25] 
+[00:01:25] ok 436 - operator-sandwich: replace: linewise_n_option_regex
+[00:01:25] 
+[00:01:25] ok 437 - operator-sandwich: replace: linewise_n_option_skip_space
+[00:01:25] 
+[00:01:25] ok 438 - operator-sandwich: replace: linewise_n_option_skip_char
+[00:01:25] 
+[00:01:25] ok 439 - operator-sandwich: replace: linewise_n_option_command
+[00:01:25] 
+[00:01:25] ok 440 - operator-sandwich: replace: linewise_n_option_linewise
+[00:01:25] 
+[00:01:25] ok 441 - operator-sandwich: replace: linewise_n_option_query_once
+[00:01:25] 
+[00:01:25] ok 442 - operator-sandwich: replace: linewise_n_option_expr
+[00:01:25] 
+[00:01:25] ok 443 - operator-sandwich: replace: linewise_n_option_listexpr
+[00:01:25] 
+[00:01:25] ok 444 - operator-sandwich: replace: linewise_n_option_autoindent
+[00:01:25] 
+[00:01:25] ok 445 - operator-sandwich: replace: linewise_n_option_indentkeys
+[00:01:25] 
+[00:01:25] ok 446 - operator-sandwich: replace: linewise_x_default_recipes
+[00:01:25] 
+[00:01:25] ok 447 - operator-sandwich: replace: linewise_x_not_registered
+[00:01:25] 
+[00:01:25] ok 448 - operator-sandwich: replace: linewise_x_positioning
+[00:01:25] 
+[00:01:25] ok 449 - operator-sandwich: replace: linewise_x_nothing_inside
+[00:01:25] 
+[00:01:25] ok 450 - operator-sandwich: replace: linewise_x_count
+[00:01:25] 
+[00:01:25] ok 451 - operator-sandwich: replace: linewise_x_breaking
+[00:01:25] 
+[00:01:25] ok 452 - operator-sandwich: replace: linewise_x_external_textobj
+[00:01:25] 
+[00:01:25] ok 453 - operator-sandwich: replace: linewise_x_multibyte
+[00:01:25] 
+[00:01:25] ok 454 - operator-sandwich: replace: linewise_x_option_cursor
+[00:01:25] 
+[00:01:25] ok 455 - operator-sandwich: replace: linewise_x_option_noremap
+[00:01:25] 
+[00:01:25] ok 456 - operator-sandwich: replace: linewise_x_option_regex
+[00:01:25] 
+[00:01:25] ok 457 - operator-sandwich: replace: linewise_x_option_skip_space
+[00:01:25] 
+[00:01:25] ok 458 - operator-sandwich: replace: linewise_x_option_skip_char
+[00:01:25] 
+[00:01:25] ok 459 - operator-sandwich: replace: linewise_x_option_command
+[00:01:25] 
+[00:01:25] ok 460 - operator-sandwich: replace: linewise_x_option_linewise
+[00:01:25] 
+[00:01:25] ok 461 - operator-sandwich: replace: linewise_x_option_query_once
+[00:01:25] 
+[00:01:25] ok 462 - operator-sandwich: replace: linewise_x_option_expr
+[00:01:25] 
+[00:01:25] ok 463 - operator-sandwich: replace: linewise_x_option_listexpr
+[00:01:25] 
+[00:01:25] ok 464 - operator-sandwich: replace: linewise_x_option_autoindent
+[00:01:25] 
+[00:01:25] ok 465 - operator-sandwich: replace: linewise_x_option_indentkeys
+[00:01:25] 
+[00:01:25] ok 466 - operator-sandwich: replace: blockwise_n_default_recipes
+[00:01:25] 
+[00:01:25] ok 467 - operator-sandwich: replace: blockwise_n_not_registered
+[00:01:25] 
+[00:01:25] ok 468 - operator-sandwich: replace: blockwise_n_positioning
+[00:01:25] 
+[00:01:25] ok 469 - operator-sandwich: replace: blockwise_n_a_character
+[00:01:25] 
+[00:01:25] ok 470 - operator-sandwich: replace: blockwise_n_nothing_inside
+[00:01:25] 
+[00:01:25] ok 471 - operator-sandwich: replace: blockwise_n_count
+[00:01:25] 
+[00:01:25] ok 472 - operator-sandwich: replace: blockwise_n_external_textobj
+[00:01:25] 
+[00:01:25] ok 473 - operator-sandwich: replace: blockwise_n_multibyte
+[00:01:25] 
+[00:01:25] ok 474 - operator-sandwich: replace: blockwise_n_option_cursor
+[00:01:25] 
+[00:01:25] ok 475 - operator-sandwich: replace: blockwise_n_option_noremap
+[00:01:25] 
+[00:01:25] ok 476 - operator-sandwich: replace: blockwise_n_option_regex
+[00:01:25] 
+[00:01:25] ok 477 - operator-sandwich: replace: blockwise_n_option_skip_space
+[00:01:25] 
+[00:01:25] ok 478 - operator-sandwich: replace: blockwise_n_option_skip_char
+[00:01:25] 
+[00:01:25] ok 479 - operator-sandwich: replace: blockwise_n_option_command
+[00:01:25] 
+[00:01:25] ok 480 - operator-sandwich: replace: blockwise_n_option_query_once
+[00:01:25] 
+[00:01:25] ok 481 - operator-sandwich: replace: blockwise_n_option_expr
+[00:01:25] 
+[00:01:25] ok 482 - operator-sandwich: replace: blockwise_n_option_listexpr
+[00:01:25] 
+[00:01:25] ok 483 - operator-sandwich: replace: blockwise_n_option_autoindent
+[00:01:25] 
+[00:01:25] ok 484 - operator-sandwich: replace: blockwise_n_option_indentkeys
+[00:01:25] 
+[00:01:25] ok 485 - operator-sandwich: replace: blockwise_x_default_recipes
+[00:01:25] 
+[00:01:25] ok 486 - operator-sandwich: replace: blockwise_x_not_registered
+[00:01:25] 
+[00:01:25] ok 487 - operator-sandwich: replace: blockwise_x_positioning
+[00:01:25] 
+[00:01:25] ok 488 - operator-sandwich: replace: blockwise_x_a_character
+[00:01:25] 
+[00:01:25] ok 489 - operator-sandwich: replace: blockwise_x_nothing_inside
+[00:01:25] 
+[00:01:25] ok 490 - operator-sandwich: replace: blockwise_x_count
+[00:01:25] 
+[00:01:25] ok 491 - operator-sandwich: replace: blockwise_x_external_textobj
+[00:01:25] 
+[00:01:25] ok 492 - operator-sandwich: replace: blockwise_x_multibyte
+[00:01:25] 
+[00:01:25] ok 493 - operator-sandwich: replace: blockwise_x_option_cursor
+[00:01:25] 
+[00:01:33] ok 494 - operator-sandwich: replace: blockwise_x_option_noremap
+[00:01:33] 
+[00:01:33] ok 495 - operator-sandwich: replace: blockwise_x_option_regex
+[00:01:33] 
+[00:01:33] ok 496 - operator-sandwich: replace: blockwise_x_option_skip_space
+[00:01:33] 
+[00:01:33] ok 497 - operator-sandwich: replace: blockwise_x_option_skip_char
+[00:01:33] 
+[00:01:33] ok 498 - operator-sandwich: replace: blockwise_x_option_command
+[00:01:33] 
+[00:01:33] ok 499 - operator-sandwich: replace: blockwise_x_option_query_once
+[00:01:33] 
+[00:01:33] ok 500 - operator-sandwich: replace: blockwise_x_option_expr
+[00:01:33] 
+[00:01:33] ok 501 - operator-sandwich: replace: blockwise_x_option_listexpr
+[00:01:33] 
+[00:01:33] ok 502 - operator-sandwich: replace: blockwise_x_option_autoindent
+[00:01:33] 
+[00:01:33] ok 503 - operator-sandwich: replace: blockwise_x_option_indentkeys
+[00:01:33] 
+[00:01:33] ok 504 - operator-sandwich: replace: function_interface
+[00:01:33] 
+[00:01:33] ok 505 - operator-sandwich: replace: undo
+[00:01:33] 
+[00:01:33] ok 506 - operator-sandwich: replace: invalid_region
+[00:01:33] 
+[00:01:33] ok 507 - magicchar-t emmet-like behavior: tokenize
+[00:01:33] 
+[00:01:33] ok 508 - magicchar-t emmet-like behavior: parse
+[00:01:33] 
+[00:01:33] ok 509 - magicchar-f:  default_pattern
+[00:01:33] 
+[00:01:33] ok 510 - magicchar-f:  global_pattern
+[00:01:33] 
+[00:01:33] ok 511 - magicchar-f:  local_pattern
+[00:01:33] 
+[00:01:33] 
+[00:01:33] 
+[00:01:33] # tests 511
+[00:01:33] 
+[00:01:33] # passes 511
+[00:01:33] 
+[00:01:35] Succeeded.
+[00:01:35] VIM - Vi IMproved 7.3 (2010 Aug 15, compiled Jul  6 2013 23:49:55)
+[00:01:35] MS-Windows 64-bit console version
+[00:01:35] Included patches: 1-1314
+[00:01:35] Modified by koron.kaoriya@gmail.com
+[00:01:35] Compiled by koron.kaoriya@gmail.com
+[00:01:35] Huge version without GUI.  Features included (+) or not (-):
+[00:01:35] +arabic          +extra_search    +mouse           +tag_binary
+[00:01:35] +autocmd         +farsi           -mouseshape      +tag_old_static
+[00:01:35] -balloon_eval    +file_in_path    +multi_byte      -tag_any_white
+[00:01:35] -browse          +find_in_path    +multi_lang      -tcl
+[00:01:35] ++builtin_terms  +float           -mzscheme        -tgetent
+[00:01:35] +byte_offset     +folding         -netbeans_intg   -termresponse
+[00:01:35] +cindent         -footer          +path_extra      +textobjects
+[00:01:35] +clientserver    +gettext/dyn     +perl/dyn        +title
+[00:01:35] +clipboard       +guess_encode    +persistent_undo -toolbar
+[00:01:35] +cmdline_compl   -hangul_input    -postscript      +user_commands
+[00:01:35] +cmdline_hist    +iconv/dyn       +printer         +vertsplit
+[00:01:35] +cmdline_info    +insert_expand   +profile         +virtualedit
+[00:01:35] +comments        +jumplist        +python/dyn      +visual
+[00:01:35] +conceal         +keymap          +python3/dyn     +visualextra
+[00:01:35] +cryptv          +kaoriya         +quickfix        +viminfo
+[00:01:35] +cscope          +langmap         +reltime         +vreplace
+[00:01:35] +cursorbind      +libcall         +rightleft       +wildignore
+[00:01:35] +cursorshape     +linebreak       +ruby/dyn        +wildmenu
+[00:01:35] +dialog_con      +lispindent      +scrollbind      +windows
+[00:01:35] +diff            +listcmds        +signs           +writebackup
+[00:01:35] +digraphs        +localmap        +smartindent     -xfontset
+[00:01:35] -dnd             +lua/dyn         -sniff           -xim
+[00:01:35] -ebcdic          +menu            +startuptime     -xterm_save
+[00:01:35] +emacs_tags      +migemo/dyn      +statusline      -xpm_w32
+[00:01:35] +eval            +mksession       -sun_workshop    
+[00:01:35] +ex_extra        +modify_fname    +syntax          
+[00:01:35]    system vimrc file: "$VIM\vimrc"
+[00:01:35]      user vimrc file: "$HOME\_vimrc"
+[00:01:35]  2nd user vimrc file: "$HOME\vimfiles\vimrc"
+[00:01:35]  3rd user vimrc file: "$VIM\_vimrc"
+[00:01:35]       user exrc file: "$HOME\_exrc"
+[00:01:35]   2nd user exrc file: "$VIM\_exrc"
+[00:01:35] Compilation: cl -c /W3 /nologo  -I. -Iproto -DHAVE_PATHDEF -DWIN32   -DFEAT_CSCOPE      /DMODIFIED_BY=\"koron.kaoriya@gmail.com\" /DDYNAMIC_MSVCRT_DLL=\"msvcr100.dll\" /DGETTEXT_DLL=\"intl.dll\" /D_BIND_TO_CURRENT_VCLIBS_VERSION=1 -DWINVER=0x0400 -D_WIN32_WINNT=0x0400 /Fo.\ObjCXULYHRAMD64/ /Ox /GL -DNDEBUG /MD -DDYNAMIC_ICONV -DDYNAMIC_GETTEXT -DDYNAMIC_MIGEMO -DFEAT_LUA -DDYNAMIC_LUA -DDYNAMIC_LUA_DLL=\"lua51.dll\" -DFEAT_PYTHON -DDYNAMIC_PYTHON -DDYNAMIC_PYTHON_DLL=\"python27.dll\" -DFEAT_PYTHON3 -DDYNAMIC_PYTHON3 -DDYNAMIC_PYTHON3_DLL=\"python33.dll\" -DFEAT_PERL -DDYNAMIC_PERL -DDYNAMIC_PERL_DLL=\"perl516.dll\" -DFEAT_RUBY -DDYNAMIC_RUBY -DDYNAMIC_RUBY_VER=20 -DDYNAMIC_RUBY_DLL=\"x64-msvcrt-ruby200.dll\" -DFEAT_HUGE /Fd.\ObjCXULYHRAMD64/ /Zi
+[00:01:35] Linking: link /RELEASE /nologo /subsystem:console /LTCG:STATUS oldnames.lib kernel32.lib advapi32.lib shell32.lib gdi32.lib  comdlg32.lib ole32.lib uuid.lib /machine:AMD64 /nodefaultlib  msvcrt.lib   user32.lib   /nodefaultlib:lua51.lib   /nodefaultlib:python27.lib /nodefaultlib:python33.lib      /PDB:vim.pdb -debug
+[00:01:42] 1..511
+[00:01:42] 
+[00:01:42] ok 1 - textobj-sandwich: auto: filter_filetype
+[00:01:42] 
+[00:01:42] ok 2 - textobj-sandwich: auto: filter_kind
+[00:01:42] 
+[00:01:42] ok 3 - textobj-sandwich: auto: filter_mode
+[00:01:42] 
+[00:01:42] ok 4 - textobj-sandwich: auto: filter_expr
+[00:01:42] 
+[00:01:42] ok 5 - textobj-sandwich: auto: i_o_default_recipes
+[00:01:42] 
+[00:01:42] ok 6 - textobj-sandwich: auto: i_o_nest
+[00:01:42] 
+[00:01:42] ok 7 - textobj-sandwich: auto: i_o_no_nest
+[00:01:42] 
+[00:01:42] ok 8 - textobj-sandwich: auto: i_o_external_textobj
+[00:01:42] 
+[00:01:42] ok 9 - textobj-sandwich: auto: i_o_multibyte
+[00:01:42] 
+[00:01:42] ok 10 - textobj-sandwich: auto: i_o_option_expr
+[00:01:42] 
+[00:01:42] ok 11 - textobj-sandwich: auto: i_o_option_listexpr
+[00:01:42] 
+[00:01:42] ok 12 - textobj-sandwich: auto: i_o_option_regex
+[00:01:42] 
+[00:01:42] ok 13 - textobj-sandwich: auto: i_o_option_skip_regex
+[00:01:42] 
+[00:01:42] ok 14 - textobj-sandwich: auto: i_o_option_quoteescape
+[00:01:42] 
+[00:01:42] ok 15 - textobj-sandwich: auto: i_o_option_expand_range
+[00:01:42] 
+[00:01:42] ok 16 - textobj-sandwich: auto: i_o_option_noremap
+[00:01:42] 
+[00:01:42] ok 17 - textobj-sandwich: auto: i_o_option_syntax
+[00:01:42] 
+[00:01:42] ok 18 - textobj-sandwich: auto: i_o_option_inner_syntax
+[00:01:42] 
+[00:01:42] ok 19 - textobj-sandwich: auto: i_o_option_match_syntax
+[00:01:42] 
+[00:01:42] ok 20 - textobj-sandwich: auto: i_o_option_skip_break
+[00:01:42] 
+[00:01:42] ok 21 - textobj-sandwich: auto: i_o_option_skip_expr
+[00:01:42] 
+[00:01:42] ok 22 - textobj-sandwich: auto: i_o_priority
+[00:01:42] 
+[00:01:42] ok 23 - textobj-sandwich: auto: i_x_default_recipes
+[00:01:42] 
+[00:01:42] ok 24 - textobj-sandwich: auto: i_x_nest
+[00:01:42] 
+[00:01:42] ok 25 - textobj-sandwich: auto: i_x_no_nest
+[00:01:42] 
+[00:01:42] ok 26 - textobj-sandwich: auto: i_x_external_textobj
+[00:01:42] 
+[00:01:42] ok 27 - textobj-sandwich: auto: i_x_selected_area_extending
+[00:01:42] 
+[00:01:42] ok 28 - textobj-sandwich: auto: i_x_blockwise_visual
+[00:01:42] 
+[00:01:42] ok 29 - textobj-sandwich: auto: i_x_multibyte
+[00:01:42] 
+[00:01:42] ok 30 - textobj-sandwich: auto: i_x_option_expr
+[00:01:42] 
+[00:01:42] ok 31 - textobj-sandwich: auto: i_x_option_listexpr
+[00:01:42] 
+[00:01:42] ok 32 - textobj-sandwich: auto: i_x_option_regex
+[00:01:42] 
+[00:01:42] ok 33 - textobj-sandwich: auto: i_x_option_skip_regex
+[00:01:42] 
+[00:01:42] ok 34 - textobj-sandwich: auto: i_x_option_quoteescape
+[00:01:42] 
+[00:01:42] ok 35 - textobj-sandwich: auto: i_x_option_expand_range
+[00:01:42] 
+[00:01:42] ok 36 - textobj-sandwich: auto: i_x_option_noremap
+[00:01:42] 
+[00:01:42] ok 37 - textobj-sandwich: auto: i_x_option_syntax
+[00:01:42] 
+[00:01:42] ok 38 - textobj-sandwich: auto: i_x_option_inner_syntax
+[00:01:42] 
+[00:01:42] ok 39 - textobj-sandwich: auto: i_x_option_match_syntax
+[00:01:42] 
+[00:01:42] ok 40 - textobj-sandwich: auto: i_x_option_skip_break
+[00:01:42] 
+[00:01:42] ok 41 - textobj-sandwich: auto: i_x_option_skip_expr
+[00:01:42] 
+[00:01:42] ok 42 - textobj-sandwich: auto: i_x_priority
+[00:01:42] 
+[00:01:42] ok 43 - textobj-sandwich: auto: a_o_default_recipes
+[00:01:42] 
+[00:01:42] ok 44 - textobj-sandwich: auto: a_o_nest
+[00:01:42] 
+[00:01:42] ok 45 - textobj-sandwich: auto: a_o_no_nest
+[00:01:42] 
+[00:01:42] ok 46 - textobj-sandwich: auto: a_o_external_textobj
+[00:01:42] 
+[00:01:42] ok 47 - textobj-sandwich: auto: a_o_multibyte
+[00:01:42] 
+[00:01:42] ok 48 - textobj-sandwich: auto: a_o_option_expr
+[00:01:42] 
+[00:01:42] ok 49 - textobj-sandwich: auto: a_o_option_listexpr
+[00:01:42] 
+[00:01:42] ok 50 - textobj-sandwich: auto: a_o_option_regex
+[00:01:42] 
+[00:01:42] ok 51 - textobj-sandwich: auto: a_o_option_skip_regex
+[00:01:42] 
+[00:01:42] ok 52 - textobj-sandwich: auto: a_o_option_quoteescape
+[00:01:42] 
+[00:01:42] ok 53 - textobj-sandwich: auto: a_o_option_expand_range
+[00:01:42] 
+[00:01:42] ok 54 - textobj-sandwich: auto: a_o_option_noremap
+[00:01:42] 
+[00:01:42] ok 55 - textobj-sandwich: auto: a_o_option_syntax
+[00:01:42] 
+[00:01:42] ok 56 - textobj-sandwich: auto: a_o_option_inner_syntax
+[00:01:42] 
+[00:01:42] ok 57 - textobj-sandwich: auto: a_o_option_match_syntax
+[00:01:42] 
+[00:01:42] ok 58 - textobj-sandwich: auto: a_o_option_synchro
+[00:01:42] 
+[00:01:42] ok 59 - textobj-sandwich: auto: a_o_option_skip_expr
+[00:01:42] 
+[00:01:42] ok 60 - textobj-sandwich: auto: a_o_priority
+[00:01:42] 
+[00:01:42] ok 61 - textobj-sandwich: auto: a_x_default_recipes
+[00:01:42] 
+[00:01:42] ok 62 - textobj-sandwich: auto: a_x_nest
+[00:01:42] 
+[00:01:42] ok 63 - textobj-sandwich: auto: a_x_no_nest
+[00:01:42] 
+[00:01:42] ok 64 - textobj-sandwich: auto: a_x_external_textobj
+[00:01:42] 
+[00:01:42] ok 65 - textobj-sandwich: auto: a_x_selected_area_extending
+[00:01:42] 
+[00:01:42] ok 66 - textobj-sandwich: auto: a_x_blockwise_visual
+[00:01:42] 
+[00:01:42] ok 67 - textobj-sandwich: auto: a_x_multibyte
+[00:01:42] 
+[00:01:42] ok 68 - textobj-sandwich: auto: a_x_option_expr
+[00:01:42] 
+[00:01:42] ok 69 - textobj-sandwich: auto: a_x_option_listexpr
+[00:01:42] 
+[00:01:42] ok 70 - textobj-sandwich: auto: a_x_option_regex
+[00:01:42] 
+[00:01:42] ok 71 - textobj-sandwich: auto: a_x_option_skip_regex
+[00:01:42] 
+[00:01:42] ok 72 - textobj-sandwich: auto: a_x_option_quoteescape
+[00:01:42] 
+[00:01:42] ok 73 - textobj-sandwich: auto: a_x_option_expand_range
+[00:01:42] 
+[00:01:42] ok 74 - textobj-sandwich: auto: a_x_option_noremap
+[00:01:42] 
+[00:01:42] ok 75 - textobj-sandwich: auto: a_x_option_syntax
+[00:01:42] 
+[00:01:42] ok 76 - textobj-sandwich: auto: a_x_option_inner_syntax
+[00:01:42] 
+[00:01:42] ok 77 - textobj-sandwich: auto: a_x_option_match_syntax
+[00:01:42] 
+[00:01:42] ok 78 - textobj-sandwich: auto: a_x_option_skip_expr
+[00:01:42] 
+[00:01:42] ok 79 - textobj-sandwich: auto: a_x_priority
+[00:01:42] 
+[00:01:47] ok 80 - textobj-sandwich: auto: i_function_interface
+[00:01:47] 
+[00:01:47] ok 81 - textobj-sandwich: auto: a_function_interface
+[00:01:47] 
+[00:01:47] ok 82 - textobj-sandwich: query: input
+[00:01:47] 
+[00:01:47] ok 83 - textobj-sandwich: query: filter_filetype
+[00:01:47] 
+[00:01:47] ok 84 - textobj-sandwich: query: filter_kind
+[00:01:47] 
+[00:01:47] ok 85 - textobj-sandwich: query: filter_mode
+[00:01:47] 
+[00:01:47] ok 86 - textobj-sandwich: query: filter_expr
+[00:01:47] 
+[00:01:47] ok 87 - textobj-sandwich: query: i_o_default_recipes
+[00:01:47] 
+[00:01:47] ok 88 - textobj-sandwich: query: i_o_nest
+[00:01:47] 
+[00:01:47] ok 89 - textobj-sandwich: query: i_o_no_nest
+[00:01:47] 
+[00:01:47] ok 90 - textobj-sandwich: query: i_o_external_textobj
+[00:01:47] 
+[00:01:47] ok 91 - textobj-sandwich: query: i_o_multibyte
+[00:01:47] 
+[00:01:47] ok 92 - textobj-sandwich: query: i_o_option_expr
+[00:01:47] 
+[00:01:47] ok 93 - textobj-sandwich: query: i_o_option_listexpr
+[00:01:47] 
+[00:01:47] ok 94 - textobj-sandwich: query: i_o_option_regex
+[00:01:47] 
+[00:01:47] ok 95 - textobj-sandwich: query: i_o_option_skip_regex
+[00:01:47] 
+[00:01:47] ok 96 - textobj-sandwich: query: i_o_option_quoteescape
+[00:01:47] 
+[00:01:47] ok 97 - textobj-sandwich: query: i_o_option_expand_range
+[00:01:47] 
+[00:01:47] ok 98 - textobj-sandwich: query: i_o_option_noremap
+[00:01:47] 
+[00:01:47] ok 99 - textobj-sandwich: query: i_o_option_syntax
+[00:01:47] 
+[00:01:47] ok 100 - textobj-sandwich: query: i_o_option_inner_syntax
+[00:01:47] 
+[00:01:47] ok 101 - textobj-sandwich: query: i_o_option_match_syntax
+[00:01:47] 
+[00:01:47] ok 102 - textobj-sandwich: query: i_o_option_skip_break
+[00:01:47] 
+[00:01:47] ok 103 - textobj-sandwich: query: i_o_option_skip_expr
+[00:01:47] 
+[00:01:47] ok 104 - textobj-sandwich: query: i_x_default_recipes
+[00:01:47] 
+[00:01:47] ok 105 - textobj-sandwich: query: i_x_nest
+[00:01:47] 
+[00:01:47] ok 106 - textobj-sandwich: query: i_x_no_nest
+[00:01:47] 
+[00:01:47] ok 107 - textobj-sandwich: query: i_x_external_textobj
+[00:01:47] 
+[00:01:47] ok 108 - textobj-sandwich: query: i_x_selected_area_extending
+[00:01:47] 
+[00:01:47] ok 109 - textobj-sandwich: query: i_x_blockwise_visual
+[00:01:47] 
+[00:01:47] ok 110 - textobj-sandwich: query: i_x_multibyte
+[00:01:47] 
+[00:01:47] ok 111 - textobj-sandwich: query: i_x_option_expr
+[00:01:47] 
+[00:01:47] ok 112 - textobj-sandwich: query: i_x_option_listexpr
+[00:01:47] 
+[00:01:47] ok 113 - textobj-sandwich: query: i_x_option_regex
+[00:01:47] 
+[00:01:47] ok 114 - textobj-sandwich: query: i_x_option_skip_regex
+[00:01:47] 
+[00:01:47] ok 115 - textobj-sandwich: query: i_x_option_quoteescape
+[00:01:47] 
+[00:01:47] ok 116 - textobj-sandwich: query: i_x_option_expand_range
+[00:01:47] 
+[00:01:47] ok 117 - textobj-sandwich: query: i_x_option_noremap
+[00:01:47] 
+[00:01:47] ok 118 - textobj-sandwich: query: i_x_option_syntax
+[00:01:47] 
+[00:01:47] ok 119 - textobj-sandwich: query: i_x_option_inner_syntax
+[00:01:47] 
+[00:01:47] ok 120 - textobj-sandwich: query: i_x_option_match_syntax
+[00:01:47] 
+[00:01:47] ok 121 - textobj-sandwich: query: i_x_option_skip_break
+[00:01:47] 
+[00:01:47] ok 122 - textobj-sandwich: query: i_x_option_skip_expr
+[00:01:47] 
+[00:01:47] ok 123 - textobj-sandwich: query: a_o_default_recipes
+[00:01:47] 
+[00:01:47] ok 124 - textobj-sandwich: query: a_o_nest
+[00:01:47] 
+[00:01:47] ok 125 - textobj-sandwich: query: a_o_no_nest
+[00:01:47] 
+[00:01:47] ok 126 - textobj-sandwich: query: a_o_external_textobj
+[00:01:47] 
+[00:01:47] ok 127 - textobj-sandwich: query: a_o_priority
+[00:01:47] 
+[00:01:47] ok 128 - textobj-sandwich: query: a_o_multibyte
+[00:01:47] 
+[00:01:47] ok 129 - textobj-sandwich: query: a_o_option_expr
+[00:01:47] 
+[00:01:47] ok 130 - textobj-sandwich: query: a_o_option_listexpr
+[00:01:47] 
+[00:01:47] ok 131 - textobj-sandwich: query: a_o_option_regex
+[00:01:47] 
+[00:01:47] ok 132 - textobj-sandwich: query: a_o_option_skip_regex
+[00:01:47] 
+[00:01:47] ok 133 - textobj-sandwich: query: a_o_option_quoteescape
+[00:01:47] 
+[00:01:47] ok 134 - textobj-sandwich: query: a_o_option_expand_range
+[00:01:47] 
+[00:01:47] ok 135 - textobj-sandwich: query: a_o_option_noremap
+[00:01:47] 
+[00:01:47] ok 136 - textobj-sandwich: query: a_o_option_syntax
+[00:01:47] 
+[00:01:47] ok 137 - textobj-sandwich: query: a_o_option_inner_syntax
+[00:01:47] 
+[00:01:47] ok 138 - textobj-sandwich: query: a_o_option_match_syntax
+[00:01:47] 
+[00:01:47] ok 139 - textobj-sandwich: query: a_o_option_synchro
+[00:01:47] 
+[00:01:47] ok 140 - textobj-sandwich: query: a_o_option_skip_expr
+[00:01:47] 
+[00:01:47] ok 141 - textobj-sandwich: query: a_x_default_recipes
+[00:01:47] 
+[00:01:47] ok 142 - textobj-sandwich: query: a_x_nest
+[00:01:47] 
+[00:01:47] ok 143 - textobj-sandwich: query: a_x_no_nest
+[00:01:47] 
+[00:01:47] ok 144 - textobj-sandwich: query: a_x_external_textobj
+[00:01:47] 
+[00:01:47] ok 145 - textobj-sandwich: query: a_x_priority
+[00:01:47] 
+[00:01:47] ok 146 - textobj-sandwich: query: a_x_selected_area_extending
+[00:01:47] 
+[00:01:47] ok 147 - textobj-sandwich: query: a_x_blockwise_visual
+[00:01:47] 
+[00:01:47] ok 148 - textobj-sandwich: query: a_x_multibyte
+[00:01:47] 
+[00:01:47] ok 149 - textobj-sandwich: query: a_x_option_expr
+[00:01:47] 
+[00:01:47] ok 150 - textobj-sandwich: query: a_x_option_listexpr
+[00:01:47] 
+[00:01:47] ok 151 - textobj-sandwich: query: a_x_option_regex
+[00:01:47] 
+[00:01:47] ok 152 - textobj-sandwich: query: a_x_option_skip_regex
+[00:01:47] 
+[00:01:47] ok 153 - textobj-sandwich: query: a_x_option_quoteescape
+[00:01:47] 
+[00:01:47] ok 154 - textobj-sandwich: query: a_x_option_expand_range
+[00:01:47] 
+[00:01:47] ok 155 - textobj-sandwich: query: a_x_option_noremap
+[00:01:47] 
+[00:02:08] ok 156 - textobj-sandwich: query: a_x_option_syntax
+[00:02:08] 
+[00:02:08] ok 157 - textobj-sandwich: query: a_x_option_inner_syntax
+[00:02:08] 
+[00:02:08] ok 158 - textobj-sandwich: query: a_x_option_match_syntax
+[00:02:08] 
+[00:02:08] ok 159 - textobj-sandwich: query: a_x_option_skip_expr
+[00:02:08] 
+[00:02:08] ok 160 - textobj-sandwich: query: i_function_interface
+[00:02:08] 
+[00:02:08] ok 161 - textobj-sandwich: query: a_function_interface
+[00:02:08] 
+[00:02:08] ok 162 - operator-sandwich: add: input
+[00:02:08] 
+[00:02:08] ok 163 - operator-sandwich: add: filter_filetype
+[00:02:08] 
+[00:02:08] ok 164 - operator-sandwich: add: filter_kind
+[00:02:08] 
+[00:02:08] ok 165 - operator-sandwich: add: filter_motionwise
+[00:02:08] 
+[00:02:08] ok 166 - operator-sandwich: add: filter_mode
+[00:02:08] 
+[00:02:08] ok 167 - operator-sandwich: add: filter_action
+[00:02:08] 
+[00:02:08] ok 168 - operator-sandwich: add: filter_expr
+[00:02:08] 
+[00:02:08] ok 169 - operator-sandwich: add: charwise_n_default_recipes
+[00:02:08] 
+[00:02:08] ok 170 - operator-sandwich: add: charwise_n_not_registered
+[00:02:08] 
+[00:02:08] ok 171 - operator-sandwich: add: charwise_n_positioning
+[00:02:08] 
+[00:02:08] ok 172 - operator-sandwich: add: charwise_n_a_character
+[00:02:08] 
+[00:02:08] ok 173 - operator-sandwich: add: charwise_n_breaking
+[00:02:08] 
+[00:02:08] ok 174 - operator-sandwich: add: charwise_n_count
+[00:02:08] 
+[00:02:08] ok 175 - operator-sandwich: add: charwise_n_multibyte
+[00:02:08] 
+[00:02:08] ok 176 - operator-sandwich: add: charwise_n_option_cursor
+[00:02:08] 
+[00:02:08] ok 177 - operator-sandwich: add: charwise_n_option_query_once
+[00:02:08] 
+[00:02:08] ok 178 - operator-sandwich: add: charwise_n_option_expr
+[00:02:08] 
+[00:02:08] ok 179 - operator-sandwich: add: charwise_n_option_listexpr
+[00:02:08] 
+[00:02:08] ok 180 - operator-sandwich: add: charwise_n_option_noremap
+[00:02:08] 
+[00:02:08] ok 181 - operator-sandwich: add: charwise_n_option_skip_space
+[00:02:08] 
+[00:02:08] ok 182 - operator-sandwich: add: charwise_n_option_command
+[00:02:08] 
+[00:02:08] ok 183 - operator-sandwich: add: charwise_n_option_linewise
+[00:02:08] 
+[00:02:08] ok 184 - operator-sandwich: add: charwise_n_option_autoindent
+[00:02:08] 
+[00:02:08] ok 185 - operator-sandwich: add: charwise_n_option_indentkeys
+[00:02:08] 
+[00:02:08] ok 186 - operator-sandwich: add: charwise_x_default_recipes
+[00:02:08] 
+[00:02:08] ok 187 - operator-sandwich: add: charwise_x_not_registered
+[00:02:08] 
+[00:02:08] ok 188 - operator-sandwich: add: charwise_x_positioning
+[00:02:08] 
+[00:02:08] ok 189 - operator-sandwich: add: charwise_x_a_character
+[00:02:08] 
+[00:02:08] ok 190 - operator-sandwich: add: charwise_x_breaking
+[00:02:08] 
+[00:02:08] ok 191 - operator-sandwich: add: charwise_x_count
+[00:02:08] 
+[00:02:08] ok 192 - operator-sandwich: add: charwise_x_multibyte
+[00:02:08] 
+[00:02:08] ok 193 - operator-sandwich: add: charwise_x_option_cursor
+[00:02:08] 
+[00:02:08] ok 194 - operator-sandwich: add: charwise_x_option_query_once
+[00:02:08] 
+[00:02:08] ok 195 - operator-sandwich: add: charwise_x_option_expr
+[00:02:08] 
+[00:02:08] ok 196 - operator-sandwich: add: charwise_x_option_listexpr
+[00:02:08] 
+[00:02:08] ok 197 - operator-sandwich: add: charwise_x_option_noremap
+[00:02:08] 
+[00:02:08] ok 198 - operator-sandwich: add: charwise_x_option_skip_space
+[00:02:08] 
+[00:02:08] ok 199 - operator-sandwich: add: charwise_x_option_command
+[00:02:08] 
+[00:02:08] ok 200 - operator-sandwich: add: charwise_x_option_linewise
+[00:02:08] 
+[00:02:08] ok 201 - operator-sandwich: add: charwise_x_option_autoindent
+[00:02:08] 
+[00:02:08] ok 202 - operator-sandwich: add: charwise_x_option_indentkeys
+[00:02:08] 
+[00:02:08] ok 203 - operator-sandwich: add: linewise_n_default_recipes
+[00:02:08] 
+[00:02:08] ok 204 - operator-sandwich: add: linewise_n_not_registered
+[00:02:08] 
+[00:02:08] ok 205 - operator-sandwich: add: linewise_n_positioning
+[00:02:08] 
+[00:02:08] ok 206 - operator-sandwich: add: linewise_n_a_character
+[00:02:08] 
+[00:02:08] ok 207 - operator-sandwich: add: linewise_n_breaking
+[00:02:08] 
+[00:02:08] ok 208 - operator-sandwich: add: linewise_n_count
+[00:02:08] 
+[00:02:08] ok 209 - operator-sandwich: add: linewise_n_multibyte
+[00:02:08] 
+[00:02:08] ok 210 - operator-sandwich: add: linewise_n_option_cursor
+[00:02:08] 
+[00:02:08] ok 211 - operator-sandwich: add: linewise_n_option_query_once
+[00:02:08] 
+[00:02:08] ok 212 - operator-sandwich: add: linewise_n_option_expr
+[00:02:08] 
+[00:02:08] ok 213 - operator-sandwich: add: linewise_n_option_listexpr
+[00:02:08] 
+[00:02:08] ok 214 - operator-sandwich: add: linewise_n_option_noremap
+[00:02:08] 
+[00:02:08] ok 215 - operator-sandwich: add: linewise_n_option_skip_space
+[00:02:08] 
+[00:02:08] ok 216 - operator-sandwich: add: linewise_n_option_command
+[00:02:08] 
+[00:02:08] ok 217 - operator-sandwich: add: linewise_n_option_linewise
+[00:02:08] 
+[00:02:08] ok 218 - operator-sandwich: add: linewise_n_option_autoindent
+[00:02:08] 
+[00:02:08] ok 219 - operator-sandwich: add: linewise_n_option_indentkeys
+[00:02:08] 
+[00:02:08] ok 220 - operator-sandwich: add: linewise_x_default_recipes
+[00:02:08] 
+[00:02:08] ok 221 - operator-sandwich: add: linewise_x_not_registered
+[00:02:08] 
+[00:02:08] ok 222 - operator-sandwich: add: linewise_x_positioning
+[00:02:08] 
+[00:02:08] ok 223 - operator-sandwich: add: linewise_x_a_character
+[00:02:08] 
+[00:02:08] ok 224 - operator-sandwich: add: linewise_x_breaking
+[00:02:08] 
+[00:02:08] ok 225 - operator-sandwich: add: linewise_x_count
+[00:02:08] 
+[00:02:08] ok 226 - operator-sandwich: add: linewise_x_multibyte
+[00:02:08] 
+[00:02:08] ok 227 - operator-sandwich: add: linewise_x_option_cursor
+[00:02:08] 
+[00:02:28] ok 228 - operator-sandwich: add: linewise_x_option_query_once
+[00:02:28] 
+[00:02:28] ok 229 - operator-sandwich: add: linewise_x_option_expr
+[00:02:28] 
+[00:02:28] ok 230 - operator-sandwich: add: linewise_x_option_listexpr
+[00:02:28] 
+[00:02:28] ok 231 - operator-sandwich: add: linewise_x_option_noremap
+[00:02:28] 
+[00:02:28] ok 232 - operator-sandwich: add: linewise_x_option_skip_space
+[00:02:28] 
+[00:02:28] ok 233 - operator-sandwich: add: linewise_x_option_command
+[00:02:28] 
+[00:02:28] ok 234 - operator-sandwich: add: linewise_x_option_linewise
+[00:02:28] 
+[00:02:28] ok 235 - operator-sandwich: add: linewise_x_option_autoindent
+[00:02:28] 
+[00:02:28] ok 236 - operator-sandwich: add: linewise_x_option_indentkeys
+[00:02:28] 
+[00:02:28] ok 237 - operator-sandwich: add: blockwise_n_default_recipes
+[00:02:28] 
+[00:02:28] ok 238 - operator-sandwich: add: blockwise_n_not_registered
+[00:02:28] 
+[00:02:28] ok 239 - operator-sandwich: add: blockwise_n_positioning
+[00:02:28] 
+[00:02:28] ok 240 - operator-sandwich: add: blockwise_n_a_character
+[00:02:28] 
+[00:02:28] ok 241 - operator-sandwich: add: blockwise_n_breaking
+[00:02:28] 
+[00:02:28] ok 242 - operator-sandwich: add: blockwise_n_count
+[00:02:28] 
+[00:02:28] ok 243 - operator-sandwich: add: blockwise_n_multibyte
+[00:02:28] 
+[00:02:28] ok 244 - operator-sandwich: add: blockwise_n_option_cursor
+[00:02:28] 
+[00:02:28] ok 245 - operator-sandwich: add: blockwise_n_option_query_once
+[00:02:28] 
+[00:02:28] ok 246 - operator-sandwich: add: blockwise_n_option_expr
+[00:02:28] 
+[00:02:28] ok 247 - operator-sandwich: add: blockwise_n_option_listexpr
+[00:02:28] 
+[00:02:28] ok 248 - operator-sandwich: add: blockwise_n_option_noremap
+[00:02:28] 
+[00:02:28] ok 249 - operator-sandwich: add: blockwise_n_option_skip_space
+[00:02:28] 
+[00:02:28] ok 250 - operator-sandwich: add: blockwise_n_option_command
+[00:02:28] 
+[00:02:28] ok 251 - operator-sandwich: add: blockwise_n_option_linewise
+[00:02:28] 
+[00:02:28] ok 252 - operator-sandwich: add: blockwise_n_option_autoindent
+[00:02:28] 
+[00:02:28] ok 253 - operator-sandwich: add: blockwise_n_option_indentkeys
+[00:02:28] 
+[00:02:28] ok 254 - operator-sandwich: add: blockwise_x_default_recipes
+[00:02:28] 
+[00:02:28] ok 255 - operator-sandwich: add: blockwise_x_not_registered
+[00:02:28] 
+[00:02:28] ok 256 - operator-sandwich: add: blockwise_x_positioning
+[00:02:28] 
+[00:02:28] ok 257 - operator-sandwich: add: blockwise_x_a_character
+[00:02:28] 
+[00:02:28] ok 258 - operator-sandwich: add: blockwise_x_breaking
+[00:02:28] 
+[00:02:28] ok 259 - operator-sandwich: add: blockwise_x_count
+[00:02:28] 
+[00:02:28] ok 260 - operator-sandwich: add: blockwise_x_multibyte
+[00:02:28] 
+[00:02:28] ok 261 - operator-sandwich: add: blockwise_x_option_cursor
+[00:02:28] 
+[00:02:28] ok 262 - operator-sandwich: add: blockwise_x_option_query_once
+[00:02:28] 
+[00:02:28] ok 263 - operator-sandwich: add: blockwise_x_option_expr
+[00:02:28] 
+[00:02:28] ok 264 - operator-sandwich: add: blockwise_x_option_listexpr
+[00:02:28] 
+[00:02:28] ok 265 - operator-sandwich: add: blockwise_x_option_noremap
+[00:02:28] 
+[00:02:28] ok 266 - operator-sandwich: add: blockwise_x_option_skip_space
+[00:02:28] 
+[00:02:28] ok 267 - operator-sandwich: add: blockwise_x_option_command
+[00:02:28] 
+[00:02:28] ok 268 - operator-sandwich: add: blockwise_x_option_linewise
+[00:02:28] 
+[00:02:28] ok 269 - operator-sandwich: add: blockwise_x_option_autoindent
+[00:02:28] 
+[00:02:28] ok 270 - operator-sandwich: add: blockwise_x_option_indentkeys
+[00:02:28] 
+[00:02:28] ok 271 - operator-sandwich: add: function_interface
+[00:02:28] 
+[00:02:28] ok 272 - operator-sandwich: add: undo
+[00:02:28] 
+[00:02:28] ok 273 - operator-sandwich: add: autoindent
+[00:02:28] 
+[00:02:28] ok 274 - operator-sandwich: add: insertspace
+[00:02:28] 
+[00:02:28] ok 275 - operator-sandwich: add: autoformat
+[00:02:28] 
+[00:02:28] ok 276 - operator-sandwich: delete: filter_filetype
+[00:02:28] 
+[00:02:28] ok 277 - operator-sandwich: delete: filter_kind
+[00:02:28] 
+[00:02:28] ok 278 - operator-sandwich: delete: filter_motionwise
+[00:02:28] 
+[00:02:28] ok 279 - operator-sandwich: delete: filter_mode
+[00:02:28] 
+[00:02:28] ok 280 - operator-sandwich: delete: filter_action
+[00:02:28] 
+[00:02:28] ok 281 - operator-sandwich: delete: filter_expr
+[00:02:28] 
+[00:02:28] ok 282 - operator-sandwich: delete: charwise_n_default_recipes
+[00:02:28] 
+[00:02:28] ok 283 - operator-sandwich: delete: charwise_n_not_registered
+[00:02:28] 
+[00:02:28] ok 284 - operator-sandwich: delete: charwise_n_positioning
+[00:02:28] 
+[00:02:28] ok 285 - operator-sandwich: delete: charwise_n_a_character
+[00:02:28] 
+[00:02:28] ok 286 - operator-sandwich: delete: charwise_n_nothing_inside
+[00:02:28] 
+[00:02:28] ok 287 - operator-sandwich: delete: charwise_n_breaking
+[00:02:28] 
+[00:02:28] ok 288 - operator-sandwich: delete: charwise_n_count
+[00:02:28] 
+[00:02:28] ok 289 - operator-sandwich: delete: charwise_n_external_textobj
+[00:02:28] 
+[00:02:28] ok 290 - operator-sandwich: delete: charwise_n_multibyte
+[00:02:28] 
+[00:02:28] ok 291 - operator-sandwich: delete: charwise_n_option_cursor
+[00:02:28] 
+[00:02:28] ok 292 - operator-sandwich: delete: charwise_n_option_noremap
+[00:02:28] 
+[00:02:28] ok 293 - operator-sandwich: delete: charwise_n_option_regex
+[00:02:28] 
+[00:02:28] ok 294 - operator-sandwich: delete: charwise_n_option_skip_space
+[00:02:28] 
+[00:02:28] ok 295 - operator-sandwich: delete: charwise_n_option_skip_char
+[00:02:28] 
+[00:02:28] ok 296 - operator-sandwich: delete: charwise_n_option_command
+[00:02:28] 
+[00:02:48] ok 297 - operator-sandwich: delete: charwise_n_option_linewise
+[00:02:48] 
+[00:02:48] ok 298 - operator-sandwich: delete: charwise_x_default_recipes
+[00:02:48] 
+[00:02:48] ok 299 - operator-sandwich: delete: charwise_x_not_registered
+[00:02:48] 
+[00:02:48] ok 300 - operator-sandwich: delete: charwise_x_positioning
+[00:02:48] 
+[00:02:48] ok 301 - operator-sandwich: delete: charwise_x_a_character
+[00:02:48] 
+[00:02:48] ok 302 - operator-sandwich: delete: charwise_x_nothing_inside
+[00:02:48] 
+[00:02:48] ok 303 - operator-sandwich: delete: charwise_x_breaking
+[00:02:48] 
+[00:02:48] ok 304 - operator-sandwich: delete: charwise_x_count
+[00:02:48] 
+[00:02:48] ok 305 - operator-sandwich: delete: charwise_x_external_textobj
+[00:02:48] 
+[00:02:48] ok 306 - operator-sandwich: delete: charwise_x_multibyte
+[00:02:48] 
+[00:02:48] ok 307 - operator-sandwich: delete: charwise_x_option_cursor
+[00:02:48] 
+[00:02:48] ok 308 - operator-sandwich: delete: charwise_x_option_noremap
+[00:02:48] 
+[00:02:48] ok 309 - operator-sandwich: delete: charwise_x_option_regex
+[00:02:48] 
+[00:02:48] ok 310 - operator-sandwich: delete: charwise_x_option_skip_space
+[00:02:48] 
+[00:02:48] ok 311 - operator-sandwich: delete: charwise_x_option_skip_char
+[00:02:48] 
+[00:02:48] ok 312 - operator-sandwich: delete: charwise_x_option_command
+[00:02:48] 
+[00:02:48] ok 313 - operator-sandwich: delete: charwise_x_option_linewise
+[00:02:48] 
+[00:02:48] ok 314 - operator-sandwich: delete: linewise_n_default_recipes
+[00:02:48] 
+[00:02:48] ok 315 - operator-sandwich: delete: linewise_n_not_registered
+[00:02:48] 
+[00:02:48] ok 316 - operator-sandwich: delete: linewise_n_positioning
+[00:02:48] 
+[00:02:48] ok 317 - operator-sandwich: delete: linewise_n_a_character
+[00:02:48] 
+[00:02:48] ok 318 - operator-sandwich: delete: linewise_n_nothing_inside
+[00:02:48] 
+[00:02:48] ok 319 - operator-sandwich: delete: linewise_n_breaking
+[00:02:48] 
+[00:02:48] ok 320 - operator-sandwich: delete: linewise_n_count
+[00:02:48] 
+[00:02:48] ok 321 - operator-sandwich: delete: linewise_n_external_textobj
+[00:02:48] 
+[00:02:48] ok 322 - operator-sandwich: delete: linewise_n_multibyte
+[00:02:48] 
+[00:02:48] ok 323 - operator-sandwich: delete: linewise_n_option_cursor
+[00:02:48] 
+[00:02:48] ok 324 - operator-sandwich: delete: linewise_n_option_noremap
+[00:02:48] 
+[00:02:48] ok 325 - operator-sandwich: delete: linewise_n_option_regex
+[00:02:48] 
+[00:02:48] ok 326 - operator-sandwich: delete: linewise_n_option_skip_space
+[00:02:48] 
+[00:02:48] ok 327 - operator-sandwich: delete: linewise_n_option_skip_char
+[00:02:48] 
+[00:02:48] ok 328 - operator-sandwich: delete: linewise_n_option_command
+[00:02:48] 
+[00:02:48] ok 329 - operator-sandwich: delete: linewise_n_option_linewise
+[00:02:48] 
+[00:02:48] ok 330 - operator-sandwich: delete: linewise_x_default_recipes
+[00:02:48] 
+[00:02:48] ok 331 - operator-sandwich: delete: linewise_x_not_registered
+[00:02:48] 
+[00:02:48] ok 332 - operator-sandwich: delete: linewise_x_positioning
+[00:02:48] 
+[00:02:48] ok 333 - operator-sandwich: delete: linewise_x_a_character
+[00:02:48] 
+[00:02:48] ok 334 - operator-sandwich: delete: linewise_x_nothing_inside
+[00:02:48] 
+[00:02:48] ok 335 - operator-sandwich: delete: linewise_x_breaking
+[00:02:48] 
+[00:02:48] ok 336 - operator-sandwich: delete: linewise_x_count
+[00:02:48] 
+[00:02:48] ok 337 - operator-sandwich: delete: linewise_x_external_textobj
+[00:02:48] 
+[00:02:48] ok 338 - operator-sandwich: delete: linewise_x_multibyte
+[00:02:48] 
+[00:02:48] ok 339 - operator-sandwich: delete: linewise_x_option_cursor
+[00:02:48] 
+[00:02:48] ok 340 - operator-sandwich: delete: linewise_x_option_noremap
+[00:02:48] 
+[00:02:48] ok 341 - operator-sandwich: delete: linewise_x_option_regex
+[00:02:48] 
+[00:02:48] ok 342 - operator-sandwich: delete: linewise_x_option_skip_space
+[00:02:48] 
+[00:02:48] ok 343 - operator-sandwich: delete: linewise_x_option_skip_char
+[00:02:48] 
+[00:02:48] ok 344 - operator-sandwich: delete: linewise_x_option_command
+[00:02:48] 
+[00:02:48] ok 345 - operator-sandwich: delete: linewise_x_option_linewise
+[00:02:48] 
+[00:02:48] ok 346 - operator-sandwich: delete: blockwise_n_default_recipes
+[00:02:48] 
+[00:02:48] ok 347 - operator-sandwich: delete: blockwise_n_not_registered
+[00:02:48] 
+[00:02:48] ok 348 - operator-sandwich: delete: blockwise_n_positioning
+[00:02:48] 
+[00:02:48] ok 349 - operator-sandwich: delete: blockwise_n_a_character
+[00:02:48] 
+[00:02:48] ok 350 - operator-sandwich: delete: blockwise_n_nothing_inside
+[00:02:48] 
+[00:02:48] ok 351 - operator-sandwich: delete: blockwise_n_count
+[00:02:48] 
+[00:02:48] ok 352 - operator-sandwich: delete: blockwise_n_external_textobj
+[00:02:48] 
+[00:02:48] ok 353 - operator-sandwich: delete: blockwise_n_multibyte
+[00:02:48] 
+[00:02:48] ok 354 - operator-sandwich: delete: blockwise_n_option_cursor
+[00:02:48] 
+[00:02:48] ok 355 - operator-sandwich: delete: blockwise_n_option_noremap
+[00:02:48] 
+[00:02:48] ok 356 - operator-sandwich: delete: blockwise_n_option_regex
+[00:02:48] 
+[00:02:48] ok 357 - operator-sandwich: delete: blockwise_n_option_skip_space
+[00:02:48] 
+[00:02:48] ok 358 - operator-sandwich: delete: blockwise_n_option_skip_char
+[00:02:48] 
+[00:02:48] ok 359 - operator-sandwich: delete: blockwise_n_option_command
+[00:02:48] 
+[00:02:48] ok 360 - operator-sandwich: delete: blockwise_x_default_recipes
+[00:02:48] 
+[00:02:48] ok 361 - operator-sandwich: delete: blockwise_x_not_registered
+[00:02:48] 
+[00:02:48] ok 362 - operator-sandwich: delete: blockwise_x_positioning
+[00:02:48] 
+[00:03:20] ok 363 - operator-sandwich: delete: blockwise_x_a_character
+[00:03:20] 
+[00:03:20] ok 364 - operator-sandwich: delete: blockwise_x_nothing_inside
+[00:03:20] 
+[00:03:20] ok 365 - operator-sandwich: delete: blockwise_x_count
+[00:03:20] 
+[00:03:20] ok 366 - operator-sandwich: delete: blockwise_x_external_textobj
+[00:03:20] 
+[00:03:20] ok 367 - operator-sandwich: delete: blockwise_x_multibyte
+[00:03:20] 
+[00:03:20] ok 368 - operator-sandwich: delete: blockwise_x_option_cursor
+[00:03:20] 
+[00:03:20] ok 369 - operator-sandwich: delete: blockwise_x_option_noremap
+[00:03:20] 
+[00:03:20] ok 370 - operator-sandwich: delete: blockwise_x_option_regex
+[00:03:20] 
+[00:03:20] ok 371 - operator-sandwich: delete: blockwise_x_option_skip_space
+[00:03:20] 
+[00:03:20] ok 372 - operator-sandwich: delete: blockwise_x_option_skip_char
+[00:03:20] 
+[00:03:20] ok 373 - operator-sandwich: delete: blockwise_x_option_command
+[00:03:20] 
+[00:03:20] ok 374 - operator-sandwich: delete: function_interface
+[00:03:20] 
+[00:03:20] ok 375 - operator-sandwich: delete: undo
+[00:03:20] 
+[00:03:20] ok 376 - operator-sandwich: delete: invalid_region
+[00:03:20] 
+[00:03:20] ok 377 - operator-sandwich: replace: input
+[00:03:20] 
+[00:03:20] ok 378 - operator-sandwich: replace: filter_filetype
+[00:03:20] 
+[00:03:20] ok 379 - operator-sandwich: replace: filter_kind
+[00:03:20] 
+[00:03:20] ok 380 - operator-sandwich: replace: filter_motionwise
+[00:03:20] 
+[00:03:20] ok 381 - operator-sandwich: replace: filter_mode
+[00:03:20] 
+[00:03:20] ok 382 - operator-sandwich: replace: filter_action
+[00:03:20] 
+[00:03:20] ok 383 - operator-sandwich: replace: filter_expr
+[00:03:20] 
+[00:03:20] ok 384 - operator-sandwich: replace: charwise_n_default_recipes
+[00:03:20] 
+[00:03:20] ok 385 - operator-sandwich: replace: charwise_n_not_registered
+[00:03:20] 
+[00:03:20] ok 386 - operator-sandwich: replace: charwise_n_positioning
+[00:03:20] 
+[00:03:20] ok 387 - operator-sandwich: replace: charwise_n_a_character
+[00:03:20] 
+[00:03:20] ok 388 - operator-sandwich: replace: charwise_n_nothing_inside
+[00:03:20] 
+[00:03:20] ok 389 - operator-sandwich: replace: charwise_n_count
+[00:03:20] 
+[00:03:20] ok 390 - operator-sandwich: replace: charwise_n_breaking
+[00:03:20] 
+[00:03:20] ok 391 - operator-sandwich: replace: charwise_n_external_textobj
+[00:03:20] 
+[00:03:20] ok 392 - operator-sandwich: replace: charwise_n_multibyte
+[00:03:20] 
+[00:03:20] ok 393 - operator-sandwich: replace: charwise_n_option_cursor
+[00:03:20] 
+[00:03:20] ok 394 - operator-sandwich: replace: charwise_n_option_noremap
+[00:03:20] 
+[00:03:20] ok 395 - operator-sandwich: replace: charwise_n_option_regex
+[00:03:20] 
+[00:03:20] ok 396 - operator-sandwich: replace: charwise_n_option_skip_space
+[00:03:20] 
+[00:03:20] ok 397 - operator-sandwich: replace: charwise_n_option_skip_char
+[00:03:20] 
+[00:03:20] ok 398 - operator-sandwich: replace: charwise_n_option_command
+[00:03:20] 
+[00:03:20] ok 399 - operator-sandwich: replace: charwise_n_option_linewise
+[00:03:20] 
+[00:03:20] ok 400 - operator-sandwich: replace: charwise_n_option_query_once
+[00:03:20] 
+[00:03:20] ok 401 - operator-sandwich: replace: charwise_n_option_expr
+[00:03:20] 
+[00:03:20] ok 402 - operator-sandwich: replace: charwise_n_option_listexpr
+[00:03:20] 
+[00:03:20] ok 403 - operator-sandwich: replace: charwise_n_option_autoindent
+[00:03:20] 
+[00:03:20] ok 404 - operator-sandwich: replace: charwise_n_option_indentkeys
+[00:03:20] 
+[00:03:20] ok 405 - operator-sandwich: replace: charwise_x_default_recipes
+[00:03:20] 
+[00:03:20] ok 406 - operator-sandwich: replace: charwise_x_not_registered
+[00:03:20] 
+[00:03:20] ok 407 - operator-sandwich: replace: charwise_x_positioning
+[00:03:20] 
+[00:03:20] ok 408 - operator-sandwich: replace: charwise_x_a_character
+[00:03:20] 
+[00:03:20] ok 409 - operator-sandwich: replace: charwise_x_nothing_inside
+[00:03:20] 
+[00:03:20] ok 410 - operator-sandwich: replace: charwise_x_count
+[00:03:20] 
+[00:03:20] ok 411 - operator-sandwich: replace: charwise_x_breaking
+[00:03:20] 
+[00:03:20] ok 412 - operator-sandwich: replace: charwise_x_external_textobj
+[00:03:20] 
+[00:03:20] ok 413 - operator-sandwich: replace: charwise_x_multibyte
+[00:03:20] 
+[00:03:20] ok 414 - operator-sandwich: replace: charwise_x_option_cursor
+[00:03:20] 
+[00:03:20] ok 415 - operator-sandwich: replace: charwise_x_option_noremap
+[00:03:20] 
+[00:03:20] ok 416 - operator-sandwich: replace: charwise_x_option_regex
+[00:03:20] 
+[00:03:20] ok 417 - operator-sandwich: replace: charwise_x_option_skip_space
+[00:03:20] 
+[00:03:20] ok 418 - operator-sandwich: replace: charwise_x_option_skip_char
+[00:03:20] 
+[00:03:20] ok 419 - operator-sandwich: replace: charwise_x_option_command
+[00:03:20] 
+[00:03:20] ok 420 - operator-sandwich: replace: charwise_x_option_linewise
+[00:03:20] 
+[00:03:20] ok 421 - operator-sandwich: replace: charwise_x_option_query_once
+[00:03:20] 
+[00:03:20] ok 422 - operator-sandwich: replace: charwise_x_option_expr
+[00:03:20] 
+[00:03:20] ok 423 - operator-sandwich: replace: charwise_x_option_listexpr
+[00:03:20] 
+[00:03:20] ok 424 - operator-sandwich: replace: charwise_x_option_autoindent
+[00:03:20] 
+[00:03:20] ok 425 - operator-sandwich: replace: charwise_x_option_indentkeys
+[00:03:20] 
+[00:03:20] ok 426 - operator-sandwich: replace: linewise_n_default_recipes
+[00:03:20] 
+[00:03:20] ok 427 - operator-sandwich: replace: linewise_n_not_registered
+[00:03:20] 
+[00:03:20] ok 428 - operator-sandwich: replace: linewise_n_positioning
+[00:03:20] 
+[00:03:20] ok 429 - operator-sandwich: replace: linewise_n_nothing_inside
+[00:03:20] 
+[00:03:57] ok 430 - operator-sandwich: replace: linewise_n_count
+[00:03:57] 
+[00:03:57] ok 431 - operator-sandwich: replace: linewise_n_breaking
+[00:03:57] 
+[00:03:57] ok 432 - operator-sandwich: replace: linewise_n_external_textobj
+[00:03:57] 
+[00:03:57] ok 433 - operator-sandwich: replace: linewise_n_multibyte
+[00:03:57] 
+[00:03:57] ok 434 - operator-sandwich: replace: linewise_n_option_cursor
+[00:03:57] 
+[00:03:57] ok 435 - operator-sandwich: replace: linewise_n_option_noremap
+[00:03:57] 
+[00:03:57] ok 436 - operator-sandwich: replace: linewise_n_option_regex
+[00:03:57] 
+[00:03:57] ok 437 - operator-sandwich: replace: linewise_n_option_skip_space
+[00:03:57] 
+[00:03:57] ok 438 - operator-sandwich: replace: linewise_n_option_skip_char
+[00:03:57] 
+[00:03:57] ok 439 - operator-sandwich: replace: linewise_n_option_command
+[00:03:57] 
+[00:03:57] ok 440 - operator-sandwich: replace: linewise_n_option_linewise
+[00:03:57] 
+[00:03:57] ok 441 - operator-sandwich: replace: linewise_n_option_query_once
+[00:03:57] 
+[00:03:57] ok 442 - operator-sandwich: replace: linewise_n_option_expr
+[00:03:57] 
+[00:03:57] ok 443 - operator-sandwich: replace: linewise_n_option_listexpr
+[00:03:57] 
+[00:03:57] ok 444 - operator-sandwich: replace: linewise_n_option_autoindent
+[00:03:57] 
+[00:03:57] ok 445 - operator-sandwich: replace: linewise_n_option_indentkeys
+[00:03:57] 
+[00:03:57] ok 446 - operator-sandwich: replace: linewise_x_default_recipes
+[00:03:57] 
+[00:03:57] ok 447 - operator-sandwich: replace: linewise_x_not_registered
+[00:03:57] 
+[00:03:57] ok 448 - operator-sandwich: replace: linewise_x_positioning
+[00:03:57] 
+[00:03:57] ok 449 - operator-sandwich: replace: linewise_x_nothing_inside
+[00:03:57] 
+[00:03:57] ok 450 - operator-sandwich: replace: linewise_x_count
+[00:03:57] 
+[00:03:57] ok 451 - operator-sandwich: replace: linewise_x_breaking
+[00:03:57] 
+[00:03:57] ok 452 - operator-sandwich: replace: linewise_x_external_textobj
+[00:03:57] 
+[00:03:57] ok 453 - operator-sandwich: replace: linewise_x_multibyte
+[00:03:57] 
+[00:03:57] ok 454 - operator-sandwich: replace: linewise_x_option_cursor
+[00:03:57] 
+[00:03:57] ok 455 - operator-sandwich: replace: linewise_x_option_noremap
+[00:03:57] 
+[00:03:57] ok 456 - operator-sandwich: replace: linewise_x_option_regex
+[00:03:57] 
+[00:03:57] ok 457 - operator-sandwich: replace: linewise_x_option_skip_space
+[00:03:57] 
+[00:03:57] ok 458 - operator-sandwich: replace: linewise_x_option_skip_char
+[00:03:57] 
+[00:03:57] ok 459 - operator-sandwich: replace: linewise_x_option_command
+[00:03:57] 
+[00:03:57] ok 460 - operator-sandwich: replace: linewise_x_option_linewise
+[00:03:57] 
+[00:03:57] ok 461 - operator-sandwich: replace: linewise_x_option_query_once
+[00:03:57] 
+[00:03:57] ok 462 - operator-sandwich: replace: linewise_x_option_expr
+[00:03:57] 
+[00:03:57] ok 463 - operator-sandwich: replace: linewise_x_option_listexpr
+[00:03:57] 
+[00:03:57] ok 464 - operator-sandwich: replace: linewise_x_option_autoindent
+[00:03:57] 
+[00:03:57] ok 465 - operator-sandwich: replace: linewise_x_option_indentkeys
+[00:03:57] 
+[00:03:57] ok 466 - operator-sandwich: replace: blockwise_n_default_recipes
+[00:03:57] 
+[00:03:57] ok 467 - operator-sandwich: replace: blockwise_n_not_registered
+[00:03:57] 
+[00:03:57] ok 468 - operator-sandwich: replace: blockwise_n_positioning
+[00:03:57] 
+[00:03:57] ok 469 - operator-sandwich: replace: blockwise_n_a_character
+[00:03:57] 
+[00:03:57] ok 470 - operator-sandwich: replace: blockwise_n_nothing_inside
+[00:03:57] 
+[00:03:57] ok 471 - operator-sandwich: replace: blockwise_n_count
+[00:03:57] 
+[00:03:57] ok 472 - operator-sandwich: replace: blockwise_n_external_textobj
+[00:03:57] 
+[00:03:57] ok 473 - operator-sandwich: replace: blockwise_n_multibyte
+[00:03:57] 
+[00:03:57] ok 474 - operator-sandwich: replace: blockwise_n_option_cursor
+[00:03:57] 
+[00:03:57] ok 475 - operator-sandwich: replace: blockwise_n_option_noremap
+[00:03:57] 
+[00:03:57] ok 476 - operator-sandwich: replace: blockwise_n_option_regex
+[00:03:57] 
+[00:03:57] ok 477 - operator-sandwich: replace: blockwise_n_option_skip_space
+[00:03:57] 
+[00:03:57] ok 478 - operator-sandwich: replace: blockwise_n_option_skip_char
+[00:03:57] 
+[00:03:57] ok 479 - operator-sandwich: replace: blockwise_n_option_command
+[00:03:57] 
+[00:03:57] ok 480 - operator-sandwich: replace: blockwise_n_option_query_once
+[00:03:57] 
+[00:03:57] ok 481 - operator-sandwich: replace: blockwise_n_option_expr
+[00:03:57] 
+[00:03:57] ok 482 - operator-sandwich: replace: blockwise_n_option_listexpr
+[00:03:57] 
+[00:03:57] ok 483 - operator-sandwich: replace: blockwise_n_option_autoindent
+[00:03:57] 
+[00:03:57] ok 484 - operator-sandwich: replace: blockwise_n_option_indentkeys
+[00:03:57] 
+[00:03:57] ok 485 - operator-sandwich: replace: blockwise_x_default_recipes
+[00:03:57] 
+[00:03:57] ok 486 - operator-sandwich: replace: blockwise_x_not_registered
+[00:03:57] 
+[00:03:57] ok 487 - operator-sandwich: replace: blockwise_x_positioning
+[00:03:57] 
+[00:03:57] ok 488 - operator-sandwich: replace: blockwise_x_a_character
+[00:03:57] 
+[00:03:57] ok 489 - operator-sandwich: replace: blockwise_x_nothing_inside
+[00:03:57] 
+[00:03:57] ok 490 - operator-sandwich: replace: blockwise_x_count
+[00:03:57] 
+[00:03:57] ok 491 - operator-sandwich: replace: blockwise_x_external_textobj
+[00:03:57] 
+[00:03:57] ok 492 - operator-sandwich: replace: blockwise_x_multibyte
+[00:03:57] 
+[00:03:57] ok 493 - operator-sandwich: replace: blockwise_x_option_cursor
+[00:03:57] 
+[00:04:11] ok 494 - operator-sandwich: replace: blockwise_x_option_noremap
+[00:04:11] 
+[00:04:11] ok 495 - operator-sandwich: replace: blockwise_x_option_regex
+[00:04:11] 
+[00:04:11] ok 496 - operator-sandwich: replace: blockwise_x_option_skip_space
+[00:04:11] 
+[00:04:11] ok 497 - operator-sandwich: replace: blockwise_x_option_skip_char
+[00:04:11] 
+[00:04:11] ok 498 - operator-sandwich: replace: blockwise_x_option_command
+[00:04:11] 
+[00:04:11] ok 499 - operator-sandwich: replace: blockwise_x_option_query_once
+[00:04:11] 
+[00:04:11] ok 500 - operator-sandwich: replace: blockwise_x_option_expr
+[00:04:11] 
+[00:04:11] ok 501 - operator-sandwich: replace: blockwise_x_option_listexpr
+[00:04:11] 
+[00:04:11] ok 502 - operator-sandwich: replace: blockwise_x_option_autoindent
+[00:04:11] 
+[00:04:11] ok 503 - operator-sandwich: replace: blockwise_x_option_indentkeys
+[00:04:11] 
+[00:04:11] ok 504 - operator-sandwich: replace: function_interface
+[00:04:11] 
+[00:04:11] ok 505 - operator-sandwich: replace: undo
+[00:04:11] 
+[00:04:11] ok 506 - operator-sandwich: replace: invalid_region
+[00:04:11] 
+[00:04:11] ok 507 - magicchar-t emmet-like behavior: tokenize
+[00:04:11] 
+[00:04:11] ok 508 - magicchar-t emmet-like behavior: parse
+[00:04:11] 
+[00:04:11] ok 509 - magicchar-f:  default_pattern
+[00:04:11] 
+[00:04:11] ok 510 - magicchar-f:  global_pattern
+[00:04:11] 
+[00:04:11] ok 511 - magicchar-f:  local_pattern
+[00:04:11] 
+[00:04:11] 
+[00:04:11] 
+[00:04:11] # tests 511
+[00:04:11] 
+[00:04:11] # passes 511
+[00:04:11] 
+[00:04:14] Succeeded.
+[00:04:15] Build success
