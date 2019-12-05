@@ -42,7 +42,9 @@ lockvar! g:sandwich#default_recipes
 
 let g:sandwich#jsx_filetypes = [
       \ 'javascript.jsx',
-      \ 'typescript.tsx'
+      \ 'typescript.tsx',
+      \ 'javascriptreact',
+      \ 'typescriptreact'
       \ ]
 
 " vim:set foldmethod=marker:
