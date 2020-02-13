@@ -11045,6 +11045,15 @@ function! s:suite.autoformat() abort "{{{
   call g:assert.equals(getline('.'), 'ab cd ef gh ij (kl) mn op', 'failed at #1')
 endfunction "}}}
 
+" inappropriate input
+function! s:suite.inappropriate_input() abort "{{{
+  " #1
+  call setline(1, 'abc')
+  call cursor(1, 1)
+  execute "normal saiw\<Left>l"
+  call g:assert.equals(getline('.'), 'abc', 'failed at #1')
+endfunction "}}}
+
 
 " vim:set foldmethod=marker:
 " vim:set commentstring="%s:

@@ -462,7 +462,7 @@ function! s:operator.query() dict abort  "{{{
   if filter(recipes, 's:is_input_matched(v:val, input, opt, 1)') != []
     let recipe = recipes[0]
   else
-    if input ==# "\<Esc>" || input ==# ''
+    if input ==# "\<Esc>" || input ==# '' || input =~# '^[\x80]'
       let recipe = {}
     else
       let c = split(input, '\zs')[0]
