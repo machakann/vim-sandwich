@@ -49,7 +49,6 @@ let g:sandwich#recipes = [
       \   {
       \     'buns':         ['<', '>'],
       \     'expand_range': 0,
-      \     'match_syntax': 1,
       \     'input':        ['>', 'a'],
       \   },
       \
@@ -83,7 +82,6 @@ let g:sandwich#recipes = [
       \   {
       \     'buns':         ['{', '}'],
       \     'nesting':      1,
-      \     'match_syntax': 1,
       \     'skip_break':   1,
       \     'input':        ['{', '}', 'B'],
       \   },
@@ -91,14 +89,12 @@ let g:sandwich#recipes = [
       \   {
       \     'buns':         ['[', ']'],
       \     'nesting':      1,
-      \     'match_syntax': 1,
       \     'input':        ['[', ']', 'r'],
       \   },
       \
       \   {
       \     'buns':         ['(', ')'],
       \     'nesting':      1,
-      \     'match_syntax': 1,
       \     'input':        ['(', ')', 'b'],
       \   },
       \
