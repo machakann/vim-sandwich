@@ -1,4 +1,4 @@
-*sandwich.txt*				Last change:06-Jun-2019.
+*sandwich.txt*				Last change:25-Jul-2020.
 
 The set of operator and textobject plugins to edit sandwiched textobjects.
 
@@ -301,7 +301,7 @@ I~
 	`sdifoo<CR>bar<CR>` makes `foowordbar` to `word`, the inputs would be
 	interpreted as regular expressions. This is useful when a lot of
 	targets are there because the action could be repeated by |.| command.
-	`sd{textobj}I`, `sdI` reuse the last inputs.
+	`sa{textobj}I`, `sdI` reuse the last inputs.
 
 
 t~
