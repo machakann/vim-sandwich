@@ -278,6 +278,9 @@ function! s:textobj._get_region(sandwich, stimeoutlen) dict abort "{{{
   else
     let initpos = [self.cursor, self.cursor]
   endif
+
+  let selection = &selection
+  set selection=inclusive
   try
     while 1
       let [prev_head, prev_tail] = [coord.head, coord.tail]
@@ -324,6 +327,8 @@ function! s:textobj._get_region(sandwich, stimeoutlen) dict abort "{{{
     " restore marks
     call setpos("'<", s:lib.c2p(self.visual.head))
     call setpos("'>", s:lib.c2p(self.visual.tail))
+    " restore options
+    let &selection = selection
   endtry
   return candidates
 endfunction
