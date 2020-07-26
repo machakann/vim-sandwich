@@ -32,6 +32,8 @@ endfunction
 "}}}
 function! s:suite.after() abort "{{{
   call s:suite.before_each()
+  nmap sr <Plug>(operator-sandwich-replace)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-query-a)
+  xmap sr <Plug>(operator-sandwich-replace)
 endfunction
 "}}}
 
