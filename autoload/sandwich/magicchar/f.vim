@@ -319,8 +319,8 @@ function! s:is_continuous_syntax(bra_pos, ket_pos) abort  "{{{
 endfunction
 "}}}
 function! s:resolve_patterns() abort  "{{{
-  return deepcopy(get(g:, 'sandwich#magicchar#f#patterns',
-                \ get(b:, 'sandwich_magicchar_f_patterns',
+  return deepcopy(get(b:, 'sandwich_magicchar_f_patterns',
+                \ get(g:, 'sandwich#magicchar#f#patterns',
                 \ g:sandwich#magicchar#f#default_patterns)))
 endfunction
 "}}}
