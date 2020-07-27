@@ -45,7 +45,7 @@ endfunction "}}}
 function! s:suite.local_pattern() abort "{{{
   let g:sandwich#magicchar#f#patterns = [
     \   {
-    \     'header' : '\<\%(\h\k*\.\)*\h\k*',
+    \     'header' : '\<\h\k*\.\h\k*',
     \     'bra'    : '(',
     \     'ket'    : ')',
     \     'footer' : '',
@@ -53,7 +53,7 @@ function! s:suite.local_pattern() abort "{{{
     \ ]
   let b:sandwich_magicchar_f_patterns = [
     \   {
-    \     'header' : '\<\h\k*\.\h\k*',
+    \     'header' : '\<\%(\h\k*\.\)*\h\k*',
     \     'bra'    : '(',
     \     'ket'    : ')',
     \     'footer' : '',
