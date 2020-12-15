@@ -124,7 +124,6 @@ let g:sandwich#recipes = [
       \     'noremap': 0,
       \     'kind': ['delete', 'textobj'],
       \     'expr_filter': ['operator#sandwich#kind() !=# "replace"'],
-      \     'synchro': 1,
       \     'linewise': 1,
       \     'input': ['t', 'T', '<'],
       \   },
@@ -134,7 +133,6 @@ let g:sandwich#recipes = [
       \     'noremap': 0,
       \     'kind': ['replace', 'query'],
       \     'expr_filter': ['operator#sandwich#kind() ==# "replace"'],
-      \     'synchro': 1,
       \     'input': ['T', '<'],
       \   },
       \
@@ -143,7 +141,6 @@ let g:sandwich#recipes = [
       \     'noremap': 0,
       \     'kind': ['replace', 'textobj'],
       \     'expr_filter': ['operator#sandwich#kind() ==# "replace"'],
-      \     'synchro': 1,
       \     'input': ['t'],
       \   },
       \
@@ -182,7 +179,6 @@ let g:sandwich#recipes = [
       \     'kind': ['delete', 'replace', 'query'],
       \     'listexpr': 1,
       \     'regex': 1,
-      \     'synchro': 1,
       \     'input': ['i'],
       \   },
       \
@@ -199,7 +195,6 @@ let g:sandwich#recipes = [
       \     'kind': ['delete', 'replace', 'query'],
       \     'listexpr': 1,
       \     'regex': 1,
-      \     'synchro': 1,
       \     'input': ['I'],
       \   },
       \ ]

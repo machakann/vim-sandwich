@@ -1,5 +1,5 @@
 *textobj-sandwich.txt*	The textobject plugin to select sandwiched texts.
-						Last change:24-Feb-2019.
+						Last change:15-Dec-2020.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -34,7 +34,6 @@ CONFIGURATION			|textobj-sandwich-configuration|
     skip_regex_tail
     quoteescape
     expr
-    synchro
     noremap
     syntax
     inner_syntax
@@ -643,7 +642,6 @@ g:textobj#sandwich#options		*g:textobj#sandwich#options*
 	    - skip_regex_tail
 	    - quoteescape
 	    - expr
-	    - synchro
 	    - noremap
 	    - syntax
 	    - inner_syntax
@@ -857,26 +855,6 @@ expr
 	Default values
 	  * query: 0
 	  * auto : 0
-
-
-
-synchro
-	If this option is true, in case that the textobjects are used with
-	|<Plug>(operator-sandwich-delete)| or
-	|<Plug>(operator-sandwich-replace)|, the matched recipe is passed to
-	these operators and the surroundings are deleted/replaced in higher
-	priority. This option is useful when a evaluated recipe by "expr"
-	option in |g:textobj#sandwich#recipes| collaborates with these
-	operators.
-
-	NOTE: This feature is not valid with visual mode selection.
-	NOTE: When the recipe is passed to these operators, the "action"
-	      filter is fixed to only "delete". See
-	      |operator-sandwich-configuration| also.
-
-	Default values
-	  * query: 1
-	  * auto : 1
 
 
 
