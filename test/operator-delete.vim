@@ -22,6 +22,7 @@ function! s:suite.before_each() abort "{{{
   unlet! g:sandwich#recipes
   unlet! g:operator#sandwich#recipes
   call operator#sandwich#set_default()
+  call visualmode(1)
 endfunction
 "}}}
 function! s:suite.after() abort "{{{

@@ -340,8 +340,12 @@ function! s:check_textobj_diff(head, tail, candidate, opt_noremap) abort  "{{{
   endfor
 
   " restore visualmode
-  execute 'normal! ' . visualmode
-  execute 'normal! ' . "\<Esc>"
+  if visualmode ==# ''
+    call visualmode(1)
+  else
+    execute 'normal! ' . visualmode
+    execute 'normal! ' . "\<Esc>"
+  endif
   " restore marks
   call setpos("'<", visual_head)
   call setpos("'>", visual_tail)
