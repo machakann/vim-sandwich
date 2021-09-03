@@ -693,7 +693,7 @@ function! s:has_filetype(candidate) abort "{{{
     if filetypes == []
       let filter = 'v:val ==# "all" || v:val ==# ""'
     else
-      let filter = 'v:val ==# "all" || (v:val !=# "" && match(filetypes, v:val) > -1)'
+      let filter = 'v:val ==# "all" || index(filetypes, v:val) > -1'
     endif
     return filter(copy(a:candidate['filetype']), filter) != []
   endif
