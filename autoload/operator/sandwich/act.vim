@@ -4,6 +4,19 @@
 let s:constants = function('sandwich#constants#get')
 let s:TRUE = 1
 let s:FALSE = 0
+function! s:SID() abort
+  return matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_SID$')
+endfunction
+let s:SNR = printf("\<SNR>%s_", s:SID())
+delfunction s:SID
+
+nnoremap <SID>(i) i
+nnoremap <SID>(o) o
+nnoremap <SID>(O) O
+
+let s:KEY_i = printf('%s(i)', s:SNR)
+let s:KEY_o = printf('%s(o)', s:SNR)
+let s:KEY_O = printf('%s(O)', s:SNR)
 
 " null valiables
 let s:null_pos   = [0, 0, 0, 0]
@@ -386,10 +399,10 @@ function! s:add_former(buns, pos, opt, ...) abort  "{{{
   let indent = s:Indent(a:pos, a:opt)
   let opt_linewise  = a:opt.of('linewise')
   if opt_linewise
-    let startinsert = a:opt.of('noremap') ? 'normal! O' : "normal \<Plug>(sandwich-O)"
+    let startinsert = a:opt.of('noremap') ? 'normal! O' : 'normal ' . s:KEY_O
     let insertion = indent.savedstr . a:buns[0]
   else
-    let startinsert = a:opt.of('noremap') ? 'normal! i' : "normal \<Plug>(sandwich-i)"
+    let startinsert = a:opt.of('noremap') ? 'normal! i' : 'normal ' . s:KEY_i
     let insertion = a:buns[0]
   endif
   call s:add_portion(insertion, a:pos, undojoin_cmd, startinsert)
@@ -401,10 +414,10 @@ function! s:add_latter(buns, pos, opt) abort  "{{{
   let indent = s:Indent(a:pos, a:opt)
   let opt_linewise = a:opt.of('linewise')
   if opt_linewise
-    let startinsert = a:opt.of('noremap') ? 'normal! o' : "normal \<Plug>(sandwich-o)"
+    let startinsert = a:opt.of('noremap') ? 'normal! o' : 'normal ' . s:KEY_o
     let insertion = indent.savedstr . a:buns[1]
   else
-    let startinsert = a:opt.of('noremap') ? 'normal! i' : "normal \<Plug>(sandwich-i)"
+    let startinsert = a:opt.of('noremap') ? 'normal! i' : 'normal ' . s:KEY_i
     let insertion = a:buns[1]
   endif
   call s:add_portion(insertion, a:pos, undojoin_cmd, startinsert)
@@ -478,18 +491,18 @@ function! s:replace_former(buns, head, tail, within_a_line, opt, ...) abort "{{{
   else
     if opt_linewise == 1 && getline('.') =~# '^\s*$'
       .delete
-      let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! O' : "normal \<Plug>(sandwich-O)"
+      let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! O' : 'normal ' . s:KEY_O
       execute 'silent noautocmd ' . startinsert . indent.savedstr . a:buns[0]
       let is_linewise = 1
     elseif opt_linewise == 2
       if !a:within_a_line
         .delete
       endif
-      let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! O' : "normal \<Plug>(sandwich-O)"
+      let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! O' : 'normal ' . s:KEY_O
       execute 'silent noautocmd ' . startinsert . indent.savedstr . a:buns[0]
       let is_linewise = 1
     else
-      let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! i' : "normal \<Plug>(sandwich-i)"
+      let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! i' : 'normal ' . s:KEY_i
       execute 'silent noautocmd ' . startinsert . a:buns[0]
     endif
   endif
@@ -510,7 +523,7 @@ function! s:replace_latter(buns, head, tail, within_a_line, opt) abort "{{{
     let tail = getpos("']")
   else
     if opt_linewise == 1 && getline('.') =~# '^\s*$'
-      let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! o' : "normal \<Plug>(sandwich-o)"
+      let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! o' : 'normal ' . s:KEY_o
       let current = line('.')
       let fileend = line('$')
       .delete
@@ -522,7 +535,7 @@ function! s:replace_latter(buns, head, tail, within_a_line, opt) abort "{{{
       let tail = getpos("']")
       let is_linewise = 1
     elseif opt_linewise == 2
-      let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! o' : "normal \<Plug>(sandwich-o)"
+      let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! o' : 'normal ' . s:KEY_o
       if a:within_a_line
         " exceptional behavior
         let lnum = line('.')
@@ -546,7 +559,7 @@ function! s:replace_latter(buns, head, tail, within_a_line, opt) abort "{{{
       endif
       let is_linewise = 1
     else
-      let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! i' : "normal \<Plug>(sandwich-i)"
+      let startinsert = a:opt.of('noremap', 'recipe_add') ? 'normal! i' : 'normal ' . s:KEY_i
       execute 'silent noautocmd ' . startinsert . a:buns[1]
       let head = getpos("'[")
       let tail = getpos("']")

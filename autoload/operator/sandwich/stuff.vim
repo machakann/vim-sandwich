@@ -14,6 +14,15 @@ let s:null_4pos  = {
       \   'head2': copy(s:null_pos),
       \   'tail2': copy(s:null_pos),
       \ }
+function! s:SID() abort
+  return matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_SID$')
+endfunction
+let s:SNR = printf("\<SNR>%s_", s:SID())
+delfunction s:SID
+
+nnoremap <SID>(v) v
+
+let s:KEY_v = printf('%s(v)', s:SNR)
 
 " types
 let s:type_list = type([])
@@ -297,7 +306,7 @@ function! s:check_textobj_diff(head, tail, candidate, opt_noremap) abort  "{{{
     let v   = 'v'
   else
     let cmd = 'silent! normal'
-    let v   = "\<Plug>(sandwich-v)"
+    let v   = s:KEY_v
   endif
 
   let order_list = [[1, a:head], [1, a:tail]]

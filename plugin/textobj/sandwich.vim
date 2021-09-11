@@ -1,5 +1,5 @@
 " The vim textobject plugin to search and select 'sandwich' like structure
-" Last Change: 16-Sep-2016.
+" Last Change: 11-Sep-2021.
 " Maintainer : Masaaki Nakamura <mckn@outlook.com>
 
 " License    : NYSL
@@ -31,9 +31,6 @@ xnoremap <silent><expr> <Plug>(textobj-sandwich-literal-query-i) textobj#sandwic
 nnoremap <silent><expr> <Plug>(textobj-sandwich-literal-query-a) textobj#sandwich#query('n', 'a', {}, [])
 onoremap <silent><expr> <Plug>(textobj-sandwich-literal-query-a) textobj#sandwich#query('o', 'a', {}, [])
 xnoremap <silent><expr> <Plug>(textobj-sandwich-literal-query-a) textobj#sandwich#query('x', 'a', {}, [])
-
-" intrinsic keymappings
-noremap <Plug>(sandwich-nop) <Nop>
 
 """ default keymappings
 " If g:textobj_sandwich_no_default_key_mappings has been defined, then quit immediately.

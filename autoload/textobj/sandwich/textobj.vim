@@ -1,6 +1,20 @@
 " textobj object - search & select a sandwiched text
 
 " variables "{{{
+function! s:SID() abort
+  return matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_SID$')
+endfunction
+let s:SNR = printf("\<SNR>%s_", s:SID())
+delfunction s:SID
+
+nnoremap <SID>(v) v
+nnoremap <SID>(V) V
+nnoremap <SID>(CTRL-v) <C-v>
+
+let s:KEY_v = printf('%s(v)', s:SNR)
+let s:KEY_V = printf('%s(V)', s:SNR)
+let s:KEY_CTRL_v = printf('%s(CTRL-v)', s:SNR)
+
 " null valiables
 let s:null_coord = [0, 0]
 
@@ -268,9 +282,9 @@ function! s:textobj._get_region(sandwich, stimeoutlen) dict abort "{{{
     let v = self.visual.mode
   else
     let cmd = 'normal'
-    let v = self.visual.mode ==# 'v' ? "\<Plug>(sandwich-v)" :
-          \ self.visual.mode ==# 'V' ? "\<Plug>(sandwich-V)" :
-          \ "\<Plug>(sandwich-CTRL-v)"
+    let v = self.visual.mode ==# 'v' ? s:KEY_v :
+          \ self.visual.mode ==# 'V' ? s:KEY_V :
+          \ s:KEY_CTRL_v
   endif
 
   if self.mode ==# 'x'

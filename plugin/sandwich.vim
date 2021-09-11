@@ -1,5 +1,5 @@
 " The set of operator/textobj plugins to do well with 'sandwich' like structure
-" Last Change: 06-Nov-2016.
+" Last Change: 12-Sep-2021.
 " Maintainer : Masaaki Nakamura <mckn@outlook.jp>
 
 " License    : NYSL
@@ -12,12 +12,6 @@ endif
 let g:loaded_sandwich = 1
 
 " intrinsic keymappings
-nnoremap <Plug>(sandwich-i) i
-nnoremap <Plug>(sandwich-o) o
-nnoremap <Plug>(sandwich-O) O
-nnoremap <Plug>(sandwich-v) v
-nnoremap <Plug>(sandwich-V) V
-nnoremap <Plug>(sandwich-CTRL-v) <C-v>
 onoremap <silent> <Plug>(textobj-sandwich-function-ip) :<C-u>call sandwich#magicchar#f#ip()<CR>
 onoremap <silent> <Plug>(textobj-sandwich-function-i)  :<C-u>call sandwich#magicchar#f#i()<CR>
 xnoremap <silent> <Plug>(textobj-sandwich-function-ip) :<C-u>call sandwich#magicchar#f#ip()<CR>

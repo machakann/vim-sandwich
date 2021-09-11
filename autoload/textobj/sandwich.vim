@@ -17,7 +17,7 @@ function! textobj#sandwich#auto(mode, a_or_i, ...) abort  "{{{
           \ kind, a:a_or_i, a:mode, v:count1, recipes, opt)
     let cmd = ":\<C-u>call textobj#sandwich#select()\<CR>"
   else
-    let cmd = a:mode ==# 'o' ? "\<Esc>" : "\<Plug>(sandwich-nop)"
+    let cmd = a:mode ==# 'o' ? "\<Esc>" : "\<Ignore>"
   endif
   return cmd
 endfunction
@@ -40,7 +40,7 @@ function! textobj#sandwich#query(mode, a_or_i, ...) abort  "{{{
           \ kind, a:a_or_i, a:mode, v:count1, recipes, opt)
     let cmd = ":\<C-u>call textobj#sandwich#select()\<CR>"
   else
-    let cmd = a:mode ==# 'o' ? "\<Esc>" : "\<Plug>(sandwich-nop)"
+    let cmd = a:mode ==# 'o' ? "\<Esc>" : "\<Ignore>"
   endif
   return cmd
 endfunction
