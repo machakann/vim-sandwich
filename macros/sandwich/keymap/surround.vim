@@ -2,18 +2,18 @@ let g:sandwich_no_default_key_mappings = 1
 let g:operator_sandwich_no_default_key_mappings = 1
 let g:textobj_sandwich_no_default_key_mappings = 1
 
-nmap ys <Plug>(operator-sandwich-add)
+nmap ys <Plug>(sandwich-add)
 onoremap <SID>line :normal! ^vg_<CR>
-nmap <silent> yss <Plug>(operator-sandwich-add)<SID>line
+nmap <silent> yss <Plug>(sandwich-add)<SID>line
 onoremap <SID>gul g_
-nmap yS ys<SID>gul
+nmap <silent> yS <Plug>(sandwich-add)<SID>gul
 
-nmap ds <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-query-a)
-nmap dss <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-auto-a)
-nmap cs <Plug>(operator-sandwich-replace)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-query-a)
-nmap css <Plug>(operator-sandwich-replace)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-auto-a)
+nmap ds <Plug>(sandwich-delete)
+nmap dss <Plug>(sandwich-delete-auto)
+nmap cs <Plug>(sandwich-replace)
+nmap css <Plug>(sandwich-replace-auto)
 
-xmap S <Plug>(operator-sandwich-add)
+xmap S <Plug>(sandwich-add)
 
 runtime autoload/repeat.vim
 if hasmapto('<Plug>(RepeatDot)')

@@ -1,5 +1,5 @@
 " The set of operator/textobj plugins to do well with 'sandwich' like structure
-" Last Change: 12-Sep-2021.
+" Last Change: 23-Oct-2021.
 " Maintainer : Masaaki Nakamura <mckn@outlook.jp>
 
 " License    : NYSL
@@ -33,7 +33,15 @@ xnoremap <silent> <Plug>(textobj-sandwich-tag-a) :<C-u>call sandwich#magicchar#t
 " If g:sandwich_no_default_key_mappings has been defined, then quit immediately.
 if exists('g:sandwich_no_default_key_mappings') | finish | endif
 
-silent! nmap <unique><silent> sd <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-query-a)
-silent! nmap <unique><silent> sr <Plug>(operator-sandwich-replace)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-query-a)
-silent! nmap <unique><silent> sdb <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-auto-a)
-silent! nmap <unique><silent> srb <Plug>(operator-sandwich-replace)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-auto-a)
+map <silent> <Plug>(sandwich-add) <Plug>(operator-sandwich-add)
+nmap <silent> <Plug>(sandwich-delete) <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-query-a)
+xmap <silent> <Plug>(sandwich-delete) <Plug>(operator-sandwich-delete)
+nmap <silent> <Plug>(sandwich-replace) <Plug>(operator-sandwich-replace)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-query-a)
+xmap <silent> <Plug>(sandwich-replace) <Plug>(operator-sandwich-replace)
+nmap <silent> <Plug>(sandwich-delete-auto) <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-auto-a)
+nmap <silent> <Plug>(sandwich-replace-auto) <Plug>(operator-sandwich-replace)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-auto-a)
+
+silent! nmap <unique><silent> sd <Plug>(sandwich-delete)
+silent! nmap <unique><silent> sr <Plug>(sandwich-replace)
+silent! nmap <unique><silent> sdb <Plug>(sandwich-delete-auto)
+silent! nmap <unique><silent> srb <Plug>(sandwich-replace-auto)
