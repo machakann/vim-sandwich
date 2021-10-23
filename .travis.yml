@@ -14,4 +14,4 @@ before_script:
   - chmod +x ./test/dot-repeat/test_dot.sh
 
 script:
-  - ./vim-themis/bin/themis && ./test/dot-repeat/test_dot.sh
+  - ./vim-themis/bin/themis && ./vim-themis/bin/themis test/surround/test-surround.vim && ./test/dot-repeat/test_dot.sh
