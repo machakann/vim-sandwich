@@ -1,5 +1,5 @@
 " The set of operator/textobj plugins to do well with 'sandwich' like structure
-" Last Change: 23-Oct-2021.
+" Last Change: 31-Oct-2021.
 " Maintainer : Masaaki Nakamura <mckn@outlook.jp>
 
 " License    : NYSL
@@ -29,10 +29,6 @@ onoremap <silent> <Plug>(textobj-sandwich-tag-a) :<C-u>call sandwich#magicchar#t
 xnoremap <silent> <Plug>(textobj-sandwich-tag-i) :<C-u>call sandwich#magicchar#t#it()<CR>
 xnoremap <silent> <Plug>(textobj-sandwich-tag-a) :<C-u>call sandwich#magicchar#t#at()<CR>
 
-""" default keymappings
-" If g:sandwich_no_default_key_mappings has been defined, then quit immediately.
-if exists('g:sandwich_no_default_key_mappings') | finish | endif
-
 map <silent> <Plug>(sandwich-add) <Plug>(operator-sandwich-add)
 nmap <silent> <Plug>(sandwich-delete) <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-query-a)
 xmap <silent> <Plug>(sandwich-delete) <Plug>(operator-sandwich-delete)
@@ -41,7 +37,35 @@ xmap <silent> <Plug>(sandwich-replace) <Plug>(operator-sandwich-replace)
 nmap <silent> <Plug>(sandwich-delete-auto) <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-auto-a)
 nmap <silent> <Plug>(sandwich-replace-auto) <Plug>(operator-sandwich-replace)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-auto-a)
 
-silent! nmap <unique><silent> sd <Plug>(sandwich-delete)
-silent! nmap <unique><silent> sr <Plug>(sandwich-replace)
-silent! nmap <unique><silent> sdb <Plug>(sandwich-delete-auto)
-silent! nmap <unique><silent> srb <Plug>(sandwich-replace-auto)
+""" default keymappings
+" If g:sandwich_no_default_key_mappings has been defined, then quit immediately.
+if exists('g:sandwich_no_default_key_mappings') | finish | endif
+
+if !exists('g:operator_sandwich_no_default_key_mappings')
+  " add
+  silent! map <unique> sa <Plug>(sandwich-add)
+
+  " delete
+  silent! nmap <unique> sd <Plug>(sandwich-delete)
+  silent! xmap <unique> sd <Plug>(sandwich-delete)
+  silent! nmap <unique> sdb <Plug>(sandwich-delete-auto)
+
+  " replace
+  silent! nmap <unique> sr <Plug>(sandwich-replace)
+  silent! xmap <unique> sr <Plug>(sandwich-replace)
+  silent! nmap <unique> srb <Plug>(sandwich-replace-auto)
+endif
+
+if !exists('g:textobj_sandwich_no_default_key_mappings')
+  " auto
+  silent! omap <unique> ib <Plug>(textobj-sandwich-auto-i)
+  silent! xmap <unique> ib <Plug>(textobj-sandwich-auto-i)
+  silent! omap <unique> ab <Plug>(textobj-sandwich-auto-a)
+  silent! xmap <unique> ab <Plug>(textobj-sandwich-auto-a)
+
+  " query
+  silent! omap <unique> is <Plug>(textobj-sandwich-query-i)
+  silent! xmap <unique> is <Plug>(textobj-sandwich-query-i)
+  silent! omap <unique> as <Plug>(textobj-sandwich-query-a)
+  silent! xmap <unique> as <Plug>(textobj-sandwich-query-a)
+endif

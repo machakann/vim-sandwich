@@ -1,5 +1,5 @@
 " The vim operator plugin to do well with 'sandwich' like structure
-" Last Change: 09-Nov-2017.
+" Last Change: 30-Oct-2021.
 " Maintainer : Masaaki Nakamura <mckn@outlook.jp>
 
 " License    : NYSL
@@ -78,18 +78,3 @@ if !hasmapto('<Plug>(operator-sandwich-predot)') && !hasmapto('<Plug>(operator-s
     autocmd User DotCommandPre call operator#sandwich#predot()
   augroup END
 endif
-
-""" default keymappings
-" If g:operator_sandwich_no_default_key_mappings has been defined, then quit immediately.
-if exists('g:operator_sandwich_no_default_key_mappings') | finish | endif
-
-" add
-silent! nmap <unique> sa <Plug>(operator-sandwich-add)
-silent! xmap <unique> sa <Plug>(operator-sandwich-add)
-silent! omap <unique> sa <Plug>(operator-sandwich-g@)
-
-" delete
-silent! xmap <unique> sd <Plug>(operator-sandwich-delete)
-
-" replace
-silent! xmap <unique> sr <Plug>(operator-sandwich-replace)
