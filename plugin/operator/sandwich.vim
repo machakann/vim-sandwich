@@ -1,5 +1,5 @@
 " The vim operator plugin to do well with 'sandwich' like structure
-" Last Change: 30-Oct-2021.
+" Last Change: 31-Oct-2021.
 " Maintainer : Masaaki Nakamura <mckn@outlook.jp>
 
 " License    : NYSL
@@ -51,26 +51,6 @@ noremap  <Plug>(operator-sandwich-g@) g@
 inoremap <Plug>(operator-sandwich-g@) <C-o>g@
 nnoremap <Plug>(operator-sandwich-gv) gv
 inoremap <Plug>(operator-sandwich-gv) <C-o>gv
-
-" highlight group
-function! s:default_highlight() abort
-  highlight default link OperatorSandwichBuns   IncSearch
-  highlight default link OperatorSandwichAdd    DiffAdd
-  highlight default link OperatorSandwichDelete DiffDelete
-
-  if hlexists('OperatorSandwichStuff')
-    highlight default link OperatorSandwichChange OperatorSandwichStuff
-  else
-    " obsolete
-    highlight default link OperatorSandwichChange DiffChange
-  endif
-endfunction
-call s:default_highlight()
-
-augroup sandwich-event-ColorScheme
-  autocmd!
-  autocmd ColorScheme * call s:default_highlight()
-augroup END
 
 " use of vim-event-DotCommandPre
 if !hasmapto('<Plug>(operator-sandwich-predot)') && !hasmapto('<Plug>(operator-sandwich-dot)') && (hasmapto('<Plug>(event-DotCommandPre)') || hasmapto('<Plug>(event-DotCommandPre+Dot)'))
