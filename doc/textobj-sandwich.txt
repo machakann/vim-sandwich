@@ -1,5 +1,5 @@
 *textobj-sandwich.txt*	The textobject plugin to select sandwiched texts.
-						Last change:15-Dec-2020.
+						Last change:27-Nov-2021.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -41,6 +41,7 @@ CONFIGURATION			|textobj-sandwich-configuration|
     skip_breaking
     skip_expr
   GLOBAL OPTIONS
+    timeout			|g:textobj#sandwich#timeout|
     timeoutlen			|g:textobj#sandwich#timeoutlen|
     stimeoutlen			|g:textobj#sandwich#stimeoutlen|
     latest_jump			|g:textobj#sandwich#latest_jump|
@@ -1152,6 +1153,25 @@ Global option~
 
 There are several options to control fundamental behavior of the operators.
 
+g:textobj#sandwich#timeout		*g:textobj#sandwich#timeout*
+	If this option is a falsy value, the query-textobject will wait for
+	subsequent inputs until the complete key sequence has been received to
+	specify a recipe. For example, with the following recipes,
+>
+	let g:sandwich#recipes = [
+	  \   {'buns': ['for {', '}'],  'nesting': 1, 'input': ['bf']}
+	  \   {'buns': ['if {', '}'],   'nesting': 1, 'input': ['bi']}
+	  \   {'buns': ['else {', '}'], 'nesting': 1, 'input': ['be']}
+	  \ ]
+<
+	type `visb` and a while later the textobject eagerly select a text
+	wrapped in `b` if this option is true. The textobject wait next input
+	until a recipe is specified if this option is false. The default value
+	is determined by 'timeout' option.
+	See |g:textobj#sandwich#timeoutlen| also.
+
+
+
 g:textobj#sandwich#timeoutlen		*g:textobj#sandwich#timeoutlen*
 	The time in milli seconds that waits for a key code or mapped key
 	sequence to complete. If there are recipes overlapped, this option is
@@ -1166,6 +1186,9 @@ g:textobj#sandwich#timeoutlen		*g:textobj#sandwich#timeoutlen*
 	one more ( in the time, then a recipe for '((' and '))' is decided to
 	use. No keypress has come through the time a recipe for '(' and ')' is
 	settled. The default value is same as 'timeoutlen' vim option.
+
+	When 'timeout' is off or |g:textobj#sandwich#timeout| is false, this
+	option is ignored.
 
 
 

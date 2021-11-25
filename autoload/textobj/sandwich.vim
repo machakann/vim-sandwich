@@ -32,8 +32,9 @@ function! textobj#sandwich#query(mode, a_or_i, ...) abort  "{{{
   else
     let recipes = textobj#sandwich#recipes#new(kind, a:mode)
   endif
+  let timeout = s:get('timeout', &timeout)
   let timeoutlen = max([0, s:get('timeoutlen', &timeoutlen)])
-  call recipes.query(opt, timeoutlen)
+  call recipes.query(opt, timeout, timeoutlen)
 
   if recipes.integrated != []
     let g:textobj#sandwich#object = textobj#sandwich#textobj#new(
