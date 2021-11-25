@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:15-Dec-2020.
+						Last change:27-Nov-2021.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -45,6 +45,7 @@ CONFIGURATION			|operator-sandwich-configuration|
     regex
     skip_char
   GLOBAL OPTIONS
+    timeout			|g:operator#sandwich#timeout|
     timeoutlen			|g:operator#sandwich#timeoutlen|
     highlight_duration		|g:operator#sandwich#highlight_duration|
 HIGHLIGHT GROUP			|operator-sandwich-highlight-group|
@@ -1436,6 +1437,25 @@ Global option~
 
 There are several options to control fundamental behavior of the operators.
 
+g:operator#sandwich#timeout		*g:operator#sandwich#timeout*
+	If this option is a falsy value, the operators will wait for
+	subsequent inputs until the complete key sequence has been received to
+	specify a recipe. For example, with the following recipes,
+>
+	let g:sandwich#recipes = [
+	  \   {'buns': ['for {', '}'],  'nesting': 1, 'input': ['bf']}
+	  \   {'buns': ['if {', '}'],   'nesting': 1, 'input': ['bi']}
+	  \   {'buns': ['else {', '}'], 'nesting': 1, 'input': ['be']}
+	  \ ]
+<
+	type `saiwb` and a while later the operator eagerly wrap a word with
+	`b` if this option is true. The operators wait next input until a
+	recipe is specified if this option is false. The default value is
+	determined by 'timeout' option. See |g:operator#sandwich#timeoutlen|
+	also.
+
+
+
 g:operator#sandwich#timeoutlen		*g:operator#sandwich#timeoutlen*
 	The time in milli seconds that waits for a key code or mapped key
 	sequence to complete. If there are recipes overlapped, this option is
@@ -1450,6 +1470,9 @@ g:operator#sandwich#timeoutlen		*g:operator#sandwich#timeoutlen*
 	more ( in the time, then a recipe for '((' and '))' is decided to use.
 	No keypress has come through the time a recipe for '(' and ')' is
 	settled. The default value is same as 'timeoutlen' vim option.
+
+	When 'timeout' is off or |g:operator#sandwich#timeout| is false, this
+	option is ignored.
 
 
 

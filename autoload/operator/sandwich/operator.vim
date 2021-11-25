@@ -414,6 +414,7 @@ function! s:operator.query() dict abort  "{{{
   let recipes = filter(deepcopy(self.recipes.integrated), filter)
   let opt = self.opt
   let clock = sandwich#clock#new()
+  let timeout = s:get('timeout', &timeout)
   let timeoutlen = max([0, s:get('timeoutlen', &timeoutlen)])
 
   " query phase
@@ -422,7 +423,7 @@ function! s:operator.query() dict abort  "{{{
   while 1
     let c = getchar(0)
     if empty(c)
-      if clock.started && timeoutlen > 0 && clock.elapsed() > timeoutlen
+      if clock.started && timeout && timeoutlen > 0 && clock.elapsed() > timeoutlen
         let [input, recipes] = last_compl_match
         break
       else

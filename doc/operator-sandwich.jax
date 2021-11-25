@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:15-Dec-2020.
+						Last change:27-Nov-2021.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -45,6 +45,7 @@ CONFIGURATION			|operator-sandwich-configuration|
     regex
     skip_char
   GLOBAL OPTIONS
+    timeout			|g:operator#sandwich#timeout|
     timeoutlen			|g:operator#sandwich#timeoutlen|
     highlight_duration		|g:operator#sandwich#highlight_duration|
 HIGHLIGHT GROUP			|operator-sandwich-highlight-group|
@@ -1413,6 +1414,25 @@ Global option~
 
 いくつか基本的な動作を制御するためのオプションが存在します。
 
+g:operator#sandwich#timeout		*g:operator#sandwich#timeout*
+	このオプションに偽値が設定されている場合、オペレータは一つのレシピを指
+	定する完全な入力がなされるまで待ちます。例えば、下記のレシピを用意しま
+	す
+>
+	let g:sandwich#recipes = [
+	  \   {'buns': ['for {', '}'],  'nesting': 1, 'input': ['bf']}
+	  \   {'buns': ['if {', '}'],   'nesting': 1, 'input': ['bi']}
+	  \   {'buns': ['else {', '}'], 'nesting': 1, 'input': ['be']}
+	  \ ]
+<
+	このオプションが真の場合は `saiwb` とタイプして少し待つと、オペレータ
+	はタイムアウトのため単語を `b` で囲みます。しかし、偽の場合は一つのレ
+	シピを指定する入力が完成するまで待ちます。デフォルト値は 'timeout' オ
+	プションによって決まります。
+	関連：|g:operator#sandwich#timeoutlen|
+
+
+
 g:operator#sandwich#timeoutlen		*g:operator#sandwich#timeoutlen*
 	"input" に前方一致で重複するレシピが存在する場合に次のキーシーケンスを
 	待つ時間をミリ秒単位で指定します。
@@ -1427,6 +1447,9 @@ g:operator#sandwich#timeoutlen		*g:operator#sandwich#timeoutlen*
 	るでしょう。キーの押下なしでこの時間が過ぎると '(' と ')' のレシピが使
 	われるでしょう。デフォルトでは Vim のオプション 'timeoutlen' と同じ値
 	が使われます。
+
+	'timeout' オプションがオフか|g:operator#sandwich#timeout| が偽の時、
+	このオプションは無視されます。
 
 
 
