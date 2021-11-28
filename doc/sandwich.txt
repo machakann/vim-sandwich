@@ -244,8 +244,7 @@ Notes on default recipes~
 		foo -> 'foo'
 <
 	When deleting a pair of quotes, 'quoteescape' option is considered.
-	The pair of quotes are searched only in a same line. The target quotes
-	should have same syntax.
+	The pair of quotes are searched only in a same line.
 
 ------------------------------------------------------------------------------
 `<Space>`
