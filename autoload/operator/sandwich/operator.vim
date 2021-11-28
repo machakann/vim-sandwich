@@ -433,6 +433,13 @@ function! s:operator.query() dict abort  "{{{
     endif
 
     let c = type(c) == s:type_num ? nr2char(c) : c
+
+    " exit loop if <Esc> is pressed
+    if c is# "\<Esc>"
+      let input = "\<Esc>"
+      break
+    endif
+
     let input .= c
 
     " check forward match
