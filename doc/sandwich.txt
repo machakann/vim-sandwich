@@ -234,8 +234,7 @@ Notes on default recipes~
 >
 		foo -> (foo)
 <
-	`sd(` and `sd)` do the opposite, but it would be checked if their
-	syntax are matched.
+	`sd(` and `sd)` do the opposite.
 
 ------------------------------------------------------------------------------
 `'`
