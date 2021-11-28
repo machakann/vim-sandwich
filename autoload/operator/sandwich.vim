@@ -19,6 +19,26 @@ let s:is_in_cmdline_window = 0
 " Current set operator
 let s:operator = ''
 "}}}
+" highlight {{{
+function! s:default_highlight() abort
+  highlight! default link OperatorSandwichBuns   IncSearch
+  highlight! default link OperatorSandwichAdd    DiffAdd
+  highlight! default link OperatorSandwichDelete DiffDelete
+
+  if hlexists('OperatorSandwichStuff')
+    highlight! default link OperatorSandwichChange OperatorSandwichStuff
+  else
+    " obsolete
+    highlight! default link OperatorSandwichChange DiffChange
+  endif
+endfunction
+call s:default_highlight()
+
+augroup sandwich-event-ColorScheme
+  autocmd!
+  autocmd ColorScheme * call s:default_highlight()
+augroup END
+"}}}
 
 """ Public functions
 " Prerequisite
