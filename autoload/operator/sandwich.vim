@@ -495,14 +495,13 @@ lockvar! g:operator#sandwich#default_recipes
 "}}}
 
 " options "{{{
-let [s:get_operator_option] = operator#sandwich#lib#funcref(['get_operator_option'])
 function! s:default_options(kind, motionwise) abort "{{{
   return get(b:, 'operator_sandwich_options', g:operator#sandwich#options)[a:kind][a:motionwise]
 endfunction
 "}}}
 function! s:initialize_options(...) abort  "{{{
   let manner = a:0 ? a:1 : 'keep'
-  let g:operator#sandwich#options = s:get_operator_option('options', {})
+  let g:operator#sandwich#options = get(g:, 'operator#sandwich#options', {})
   for kind in ['add', 'delete', 'replace']
     if !has_key(g:operator#sandwich#options, kind)
       let g:operator#sandwich#options[kind] = {}
