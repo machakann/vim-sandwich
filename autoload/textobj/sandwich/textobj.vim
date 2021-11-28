@@ -19,7 +19,7 @@ let s:KEY_CTRL_v = printf('%s(CTRL-v)', s:SNR)
 let s:null_coord = [0, 0]
 
 " common functions
-let s:lib = textobj#sandwich#lib#get()
+let s:lib = textobj#sandwich#lib#import()
 "}}}
 
 function! textobj#sandwich#textobj#new(kind, a_or_i, mode, count, recipes, opt) abort  "{{{

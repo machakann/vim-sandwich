@@ -17,7 +17,7 @@ let s:type_list = type([])
 let s:type_fref = type(function('tr'))
 
 " common functions
-let s:lib = textobj#sandwich#lib#get()
+let s:lib = textobj#sandwich#lib#import()
 "}}}
 
 function! textobj#sandwich#sandwich#new(recipe, opt) abort  "{{{

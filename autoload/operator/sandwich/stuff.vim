@@ -1,5 +1,7 @@
 " stuff object - managing a line on buffer
 
+let s:lib = operator#sandwich#lib#import()
+
 " variables "{{{
 " null valiables
 let s:null_coord = [0, 0]
@@ -79,7 +81,7 @@ function! s:stuff.match(recipes, opt, ...) dict abort "{{{
   let edges = self.edges
   let edges_saved = deepcopy(edges)
   let match_edges = get(a:000, 0, 1)
-  if s:is_valid_2pos(edges) && s:is_ahead(edges.tail, edges.head)
+  if s:lib.is_valid_2pos(edges) && s:lib.is_ahead(edges.tail, edges.head)
     let edge_chars = ['', '']
     if self._match_recipes(a:recipes, a:opt) || (match_edges && self._match_edges(a:recipes, a:opt, edge_chars))
       " found!
@@ -88,7 +90,7 @@ function! s:stuff.match(recipes, opt, ...) dict abort "{{{
       let [head_c, tail_c] = edge_chars
       if head_c =~# '\s' || tail_c =~# '\s'
         call self.skip_space()
-        if s:is_ahead(edges.head, edges.tail)
+        if s:lib.is_ahead(edges.head, edges.tail)
           " invalid edges after skip spaces
           let self.active = 0
           return 0
@@ -114,7 +116,7 @@ function! s:stuff.match(recipes, opt, ...) dict abort "{{{
         let target_list += [s:search_edges(head, tail, patterns)]
       endif
     endfor
-    if filter(target_list, 's:is_valid_4pos(v:val)') != []
+    if filter(target_list, 's:lib.is_valid_4pos(v:val)') != []
       " found
       let self.target = s:shortest(target_list)
       return 1
@@ -144,7 +146,7 @@ function! s:stuff._match_recipes(recipes, opt, ...) dict abort "{{{
         let target = deepcopy(s:null_4pos)
       endif
 
-      if s:is_valid_4pos(target)
+      if s:lib.is_valid_4pos(target)
         let found = 1
         let self.target = target
         break
@@ -192,7 +194,7 @@ endfunction
 function! s:stuff.skip_space() dict abort  "{{{
   if self.active
     call s:skip_space(self.edges.head, self.edges.tail)
-    if s:is_ahead(self.edges.head, self.edges.tail)
+    if s:lib.is_ahead(self.edges.head, self.edges.tail)
       let self.active = 0
     endif
   endif
@@ -238,7 +240,7 @@ function! s:check_edges(head, tail, patterns) abort  "{{{
 
   if head1 == s:null_coord || tail1 == s:null_coord
         \ || head2 == s:null_coord || tail2 == s:null_coord
-        \ || s:is_equal_or_ahead(s:c2p(tail1), s:c2p(head2))
+        \ || s:lib.is_equal_or_ahead(s:lib.c2p(tail1), s:lib.c2p(head2))
     return s:null_4pos
   endif
 
@@ -246,7 +248,7 @@ function! s:check_edges(head, tail, patterns) abort  "{{{
         \   'head1': head1, 'tail1': tail1,
         \   'head2': head2, 'tail2': tail2,
         \ }
-  return map(target, 's:c2p(v:val)')
+  return map(target, 's:lib.c2p(v:val)')
 endfunction
 "}}}
 function! s:search_edges(head, tail, patterns) abort "{{{
@@ -259,18 +261,18 @@ function! s:search_edges(head, tail, patterns) abort "{{{
   let tail2 = s:searchpos_bce(a:tail, a:patterns[1], a:head[1])
 
   if head1 == s:null_coord || tail2 == s:null_coord
-        \ || s:is_equal_or_ahead(s:c2p(head1), s:c2p(tail2))
+        \ || s:lib.is_equal_or_ahead(s:lib.c2p(head1), s:lib.c2p(tail2))
     return s:null_4pos
   endif
 
   let head2 = searchpos(a:patterns[1], 'bc', head1[0])
-  call setpos('.', s:c2p(head1))
+  call setpos('.', s:lib.c2p(head1))
   let tail1 = searchpos(a:patterns[0], 'ce', head2[0])
 
   if tail1 == s:null_coord || head2 == s:null_coord
-        \ || s:is_ahead(s:c2p(head1), s:c2p(tail1))
-        \ || s:is_ahead(s:c2p(head2), s:c2p(tail2))
-        \ || s:is_equal_or_ahead(s:c2p(tail1), s:c2p(head2))
+        \ || s:lib.is_ahead(s:lib.c2p(head1), s:lib.c2p(tail1))
+        \ || s:lib.is_ahead(s:lib.c2p(head2), s:lib.c2p(tail2))
+        \ || s:lib.is_equal_or_ahead(s:lib.c2p(tail1), s:lib.c2p(head2))
     return s:null_4pos
   endif
 
@@ -278,22 +280,22 @@ function! s:search_edges(head, tail, patterns) abort "{{{
         \   'head1': head1, 'tail1': tail1,
         \   'head2': head2, 'tail2': tail2,
         \ }
-  return map(target, 's:c2p(v:val)')
+  return map(target, 's:lib.c2p(v:val)')
 endfunction
 "}}}
 function! s:check_textobj_diff(head, tail, candidate, opt_noremap) abort  "{{{
   let target = deepcopy(s:null_4pos)
   if has_key(a:candidate, 'excursus')
     let coord = a:candidate.excursus.coord
-    let target.head1 = s:c2p(coord.head)
-    let target.tail1 = s:get_left_pos(s:c2p(coord.inner_head))
-    let target.head2 = s:get_right_pos(s:c2p(coord.inner_tail))
-    let target.tail2 = s:c2p(coord.tail)
+    let target.head1 = s:lib.c2p(coord.head)
+    let target.tail1 = s:lib.get_left_pos(s:lib.c2p(coord.inner_head))
+    let target.head2 = s:lib.get_right_pos(s:lib.c2p(coord.inner_tail))
+    let target.tail2 = s:lib.c2p(coord.tail)
 
     if target.head1 == a:head && target.tail2 == a:tail
           \ && target.tail1 != s:null_pos && target.head2 != s:null_pos
-          \ && s:is_equal_or_ahead(target.tail1, target.head1)
-          \ && s:is_equal_or_ahead(target.tail2, target.head2)
+          \ && s:lib.is_equal_or_ahead(target.tail1, target.head1)
+          \ && s:lib.is_equal_or_ahead(target.tail2, target.head2)
       return target
     endif
   endif
@@ -340,9 +342,9 @@ function! s:check_textobj_diff(head, tail, candidate, opt_noremap) abort  "{{{
     " check validity
     if target.head1 == a:head && target.tail2 == a:tail
           \ && target.tail1 != s:null_pos && target.head2 != s:null_pos
-          \ && s:is_ahead(target.tail1, target.head1)
-          \ && s:is_ahead(target.tail2, target.head2)
-      let [target.tail1, target.head2] = s:get_wider_region(target.tail1, target.head2)
+          \ && s:lib.is_ahead(target.tail1, target.head1)
+          \ && s:lib.is_ahead(target.tail2, target.head2)
+      let [target.tail1, target.head2] = s:lib.get_wider_region(target.tail1, target.head2)
       let found = 1
       break
     endif
@@ -389,7 +391,7 @@ endfunction
 function! s:get_patterns(candidate, opt_regex) abort "{{{
   let patterns = deepcopy(a:candidate.buns)
   if !a:opt_regex
-    let patterns = map(patterns, 's:escape(v:val)')
+    let patterns = map(patterns, 's:lib.escape(v:val)')
   endif
 
   " substitute a break "\n" to a regular expression pattern '\n'
@@ -481,25 +483,23 @@ function! s:skip_space(head, tail) abort  "{{{
     " if the cursor is on a line breaking, it should not be skipped.
     let head = a:head
   else
-    let head = s:c2p(searchpos('\_S', 'c', a:tail[1]))
+    let head = s:lib.c2p(searchpos('\_S', 'c', a:tail[1]))
   endif
 
   call setpos('.', a:tail)
   if a:tail[2] == 1
     let tail = a:tail
   else
-    let tail = s:c2p(searchpos('\_S', 'bc', a:head[1]))
+    let tail = s:lib.c2p(searchpos('\_S', 'bc', a:head[1]))
   endif
 
-  if head != s:null_pos && tail != s:null_pos && s:is_equal_or_ahead(tail, head)
+  if head != s:null_pos && tail != s:null_pos && s:lib.is_equal_or_ahead(tail, head)
     let a:head[0:3] = head[0:3]
     let a:tail[0:3] = tail[0:3]
   endif
 endfunction
 "}}}
 
-let [s:get_wider_region, s:get_left_pos, s:get_right_pos, s:c2p, s:is_valid_2pos, s:is_valid_4pos, s:is_ahead, s:is_equal_or_ahead, s:escape]
-      \ = operator#sandwich#lib#funcref(['get_wider_region', 'get_left_pos', 'get_right_pos', 'c2p', 'is_valid_2pos', 'is_valid_4pos', 'is_ahead', 'is_equal_or_ahead', 'escape'])
 
 
 " vim:set foldmethod=marker:

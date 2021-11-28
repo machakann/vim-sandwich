@@ -1,5 +1,7 @@
 " act object - editing buffer
 
+let s:lib = operator#sandwich#lib#import()
+
 " variables "{{{
 let s:constants = function('sandwich#constants#get')
 let s:TRUE = 1
@@ -64,9 +66,9 @@ function! s:act.add_pair(buns, stuff, undojoin) dict abort "{{{
   let indent  = [0, 0]
   let is_linewise = [0, 0]
 
-  if s:is_valid_4pos(target) && s:is_equal_or_ahead(target.head2, target.head1)
+  if s:lib.is_valid_4pos(target) && s:lib.is_equal_or_ahead(target.head2, target.head1)
     if target.head2[2] != col([target.head2[1], '$'])
-      let target.head2[0:3] = s:get_right_pos(target.head2)
+      let target.head2[0:3] = s:lib.get_right_pos(target.head2)
     endif
 
     let indentopt = s:set_indent(opt)
@@ -96,14 +98,14 @@ function! s:act.add_pair(buns, stuff, undojoin) dict abort "{{{
     endif
 
     " update modmark
-    if modmark.head == s:null_pos || s:is_ahead(modmark.head, mod_head)
+    if modmark.head == s:null_pos || s:lib.is_ahead(modmark.head, mod_head)
       let modmark.head = mod_head
     endif
     if modmark.tail == s:null_pos
       let modmark.tail = mod_tail
     else
       call s:shift_for_add(modmark.tail, target, a:buns, indent, is_linewise)
-      if s:is_ahead(mod_tail, modmark.tail)
+      if s:lib.is_ahead(mod_tail, modmark.tail)
         let modmark.tail = mod_tail
       endif
     endif
@@ -115,7 +117,7 @@ function! s:act.add_pair(buns, stuff, undojoin) dict abort "{{{
 
     " update next target positions
     let edges.head = copy(head1)
-    let edges.tail = s:get_left_pos(tail2)
+    let edges.tail = s:lib.get_left_pos(tail2)
 
     let self.success = 1
   endif
@@ -128,7 +130,7 @@ function! s:act.delete_pair(stuff, modified) dict abort  "{{{
   let modmark = self.modmark
   let opt     = self.opt
 
-  if s:is_valid_4pos(target) && s:is_ahead(target.head2, target.tail1)
+  if s:lib.is_valid_4pos(target) && s:lib.is_ahead(target.head2, target.tail1)
     let reg = ['"', getreg('"'), getregtype('"')]
     let deletion = ['', '']
     let is_linewise = [0, 0]
@@ -151,7 +153,7 @@ function! s:act.delete_pair(stuff, modified) dict abort  "{{{
     let [mod_head, mod_tail] = s:execute_command(head, tail, opt.of('command'))
 
     " update modmark
-    if modmark.head == s:null_pos || s:is_ahead(modmark.head, mod_head)
+    if modmark.head == s:null_pos || s:lib.is_ahead(modmark.head, mod_head)
       let modmark.head = mod_head
     endif
     " NOTE: Probably, there is no possibility to delete breakings along multiple acts.
@@ -173,7 +175,7 @@ function! s:act.delete_pair(stuff, modified) dict abort  "{{{
 
     " update target positions
     let edges.head = copy(head)
-    let edges.tail = s:get_left_pos(tail)
+    let edges.tail = s:lib.get_left_pos(tail)
 
     let self.success = 1
   endif
@@ -186,10 +188,10 @@ function! s:act.replace_pair(buns, stuff, undojoin, modified) dict abort "{{{
   let modmark = self.modmark
   let opt     = self.opt
 
-  if s:is_valid_4pos(target) && s:is_ahead(target.head2, target.tail1)
+  if s:lib.is_valid_4pos(target) && s:lib.is_ahead(target.head2, target.tail1)
     set virtualedit=
-    let next_head = s:get_right_pos(target.tail1)
-    let next_tail = s:get_left_pos(target.head2)
+    let next_head = s:lib.get_right_pos(target.tail1)
+    let next_tail = s:lib.get_left_pos(target.head2)
     set virtualedit=onemore
 
     let reg = ['"', getreg('"'), getregtype('"')]
@@ -224,15 +226,15 @@ function! s:act.replace_pair(buns, stuff, undojoin, modified) dict abort "{{{
       call map(self.added, 's:shift_added("s:shift_for_replace", v:val, target, a:buns, deletion, indent, is_linewise)')
       call add(self.added, {
             \   'head1': head1,
-            \   'tail1': s:get_left_pos(tail1),
+            \   'tail1': s:lib.get_left_pos(tail1),
             \   'head2': head2,
-            \   'tail2': s:get_left_pos(tail2),
+            \   'tail2': s:lib.get_left_pos(tail2),
             \   'linewise': is_linewise
             \ })
     endif
 
     " update modmark
-    if modmark.head == s:null_pos || s:is_ahead(modmark.head, mod_head)
+    if modmark.head == s:null_pos || s:lib.is_ahead(modmark.head, mod_head)
       let modmark.head = copy(mod_head)
     endif
     if !a:modified
@@ -619,16 +621,16 @@ function! s:shift_for_delete(shifted_pos, target, deletion, is_linewise) abort  
 endfunction
 "}}}
 function! s:shift_for_replace(shifted_pos, target, addition, deletion, indent, is_linewise) abort "{{{
-  if s:is_in_between(a:shifted_pos, a:target.head1, a:target.tail1)
+  if s:lib.is_in_between(a:shifted_pos, a:target.head1, a:target.tail1)
     let startpos = copy(a:target.head1)
     let endpos   = copy(startpos)
     call s:push1(endpos, a:target, a:addition, a:indent, a:is_linewise)
-    let endpos = s:get_left_pos(endpos)
+    let endpos = s:lib.get_left_pos(endpos)
 
-    if s:is_equal_or_ahead(a:shifted_pos, endpos)
+    if s:lib.is_equal_or_ahead(a:shifted_pos, endpos)
       let a:shifted_pos[0:3] = endpos
     endif
-  elseif s:is_in_between(a:shifted_pos, a:target.head2, a:target.tail2)
+  elseif s:lib.is_in_between(a:shifted_pos, a:target.head2, a:target.tail2)
     let startpos = copy(a:target.head2)
     call s:pull1(startpos, a:target, a:deletion, a:is_linewise)
     call s:push1(startpos, a:target, a:addition, a:indent, a:is_linewise)
@@ -636,12 +638,12 @@ function! s:shift_for_replace(shifted_pos, target, addition, deletion, indent, i
     let target = copy(s:null_4pos)
     let target.head2 = copy(startpos)
     call s:push2(endpos, target, a:addition, a:indent, a:is_linewise)
-    let endpos = s:get_left_pos(endpos)
+    let endpos = s:lib.get_left_pos(endpos)
 
     call s:pull1(a:shifted_pos, a:target, a:deletion, a:is_linewise)
     call s:push1(a:shifted_pos, a:target, a:addition, a:indent, a:is_linewise)
 
-    if s:is_equal_or_ahead(a:shifted_pos, endpos)
+    if s:lib.is_equal_or_ahead(a:shifted_pos, endpos)
       let a:shifted_pos[0:3] = endpos
     endif
   else
@@ -682,7 +684,7 @@ function! s:push1(shifted_pos, target, addition, indent, is_linewise) abort  "{{
       let shift[1] += 1
     endif
 
-    if s:is_equal_or_ahead(a:shifted_pos, head) || (a:is_linewise[0] && a:shifted_pos[1] == head[1])
+    if s:lib.is_equal_or_ahead(a:shifted_pos, head) || (a:is_linewise[0] && a:shifted_pos[1] == head[1])
       call s:push(shift, a:shifted_pos, head, a:addition[0], a:indent[0], a:is_linewise[0])
     endif
     let a:shifted_pos[1:2] += shift[1:2]
@@ -700,7 +702,7 @@ function! s:push2(shifted_pos, target, addition, indent, is_linewise) abort  "{{
       let shift[1] += 1
     endif
 
-    if s:is_equal_or_ahead(a:shifted_pos, head)
+    if s:lib.is_equal_or_ahead(a:shifted_pos, head)
       call s:push(shift, a:shifted_pos, head, a:addition[1], a:indent[1], a:is_linewise[1])
     endif
     let a:shifted_pos[1:2] += shift[1:2]
@@ -737,8 +739,8 @@ function! s:pull1(shifted_pos, target, deletion, is_linewise) abort "{{{
       endif
     endif
     " column
-    if s:is_ahead(a:shifted_pos, head) && a:shifted_pos[1] <= tail[1]
-      if s:is_ahead(a:shifted_pos, tail)
+    if s:lib.is_ahead(a:shifted_pos, head) && a:shifted_pos[1] <= tail[1]
+      if s:lib.is_ahead(a:shifted_pos, tail)
         let shift[2] -= strlen(split(a:deletion[0], '\%(\n\|\r\|\r\n\)', 1)[-1])
         let shift[2] += head[1] != a:shifted_pos[1] ? head[2] - 1 : 0
       else
@@ -788,8 +790,8 @@ function! s:pull2(shifted_pos, target, deletion, is_linewise) abort "{{{
       endif
     endif
     " column
-    if s:is_equal_or_ahead(a:shifted_pos, head) && a:shifted_pos[1] <= tail[1]
-      if s:is_ahead(a:shifted_pos, tail)
+    if s:lib.is_equal_or_ahead(a:shifted_pos, head) && a:shifted_pos[1] <= tail[1]
+      if s:lib.is_ahead(a:shifted_pos, tail)
         let shift[2] -= strlen(split(a:deletion[1], '\%(\n\|\r\|\r\n\)', 1)[-1])
         let shift[2] += head[1] != a:shifted_pos[1] ? head[2] - 1 : 0
       else
@@ -822,14 +824,11 @@ function! s:added_tail(head, tail, linewise) abort  "{{{
   elseif a:linewise
     let tail = a:tail
   else
-    let tail = s:get_left_pos(a:tail)
+    let tail = s:lib.get_left_pos(a:tail)
   endif
   return tail
 endfunction
 "}}}
-
-let [s:get_left_pos, s:get_right_pos, s:is_valid_4pos, s:is_ahead, s:is_equal_or_ahead, s:is_in_between]
-      \ = operator#sandwich#lib#funcref(['get_left_pos', 'get_right_pos', 'is_valid_4pos', 'is_ahead', 'is_equal_or_ahead', 'is_in_between'])
 
 
 " vim:set foldmethod=marker:

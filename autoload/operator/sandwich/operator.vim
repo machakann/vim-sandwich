@@ -1,5 +1,7 @@
 " operator object - controlling a whole operation
 
+let s:lib = operator#sandwich#lib#import()
+
 " variables "{{{
 " null valiables
 let s:null_coord = [0, 0]
@@ -166,7 +168,7 @@ function! s:operator.split(region) dict abort  "{{{
         call s:set_displaycoord([lnum, col_head])
         let head = getpos('.')
         let tail = [0, lnum, col([lnum, '$']) - 1, 0]
-        if head[3] == 0 && s:is_equal_or_ahead(tail, head)
+        if head[3] == 0 && s:lib.is_equal_or_ahead(tail, head)
           let region_list += [{'head': head, 'tail': tail}]
         endif
       endfor
@@ -177,7 +179,7 @@ function! s:operator.split(region) dict abort  "{{{
         call s:set_displaycoord([lnum, col_tail])
         let tail = getpos('.')
         let endcol = col([lnum, '$'])
-        if head[2] != endcol && s:is_equal_or_ahead(tail, head)
+        if head[2] != endcol && s:lib.is_equal_or_ahead(tail, head)
           if tail[2] == endcol
             let tail[2] = endcol - 1
             let tail[3] = 0
@@ -263,7 +265,7 @@ function! s:operator.add_once(i, recipe) dict abort  "{{{
 
     if modified
       let self.cursor.head = copy(self.modmark.head)
-      let self.cursor.tail = s:get_left_pos(self.modmark.tail)
+      let self.cursor.tail = s:lib.get_left_pos(self.modmark.tail)
     endif
   endif
   return modified
@@ -306,7 +308,7 @@ function! s:operator.delete_once(i) dict abort "{{{
 
   if modified
     let self.cursor.head = copy(self.modmark.head)
-    let self.cursor.tail = s:get_left_pos(self.modmark.tail)
+    let self.cursor.tail = s:lib.get_left_pos(self.modmark.tail)
   endif
   return modified
 endfunction
@@ -375,7 +377,7 @@ function! s:operator.replace_once(i, recipe) dict abort  "{{{
 
   if modified
     let self.cursor.head = copy(self.modmark.head)
-    let self.cursor.tail = s:get_left_pos(self.modmark.tail)
+    let self.cursor.tail = s:lib.get_left_pos(self.modmark.tail)
   endif
   return modified
 endfunction
@@ -414,8 +416,9 @@ function! s:operator.query() dict abort  "{{{
   let recipes = filter(deepcopy(self.recipes.integrated), filter)
   let opt = self.opt
   let clock = sandwich#clock#new()
-  let timeout = s:get_sandwich_option('timeout', &timeout)
-  let timeoutlen = max([0, s:get_sandwich_option('timeoutlen', &timeoutlen)])
+  let timeout = s:lib.get_sandwich_option('timeout', &timeout)
+  let timeoutlen = s:lib.get_sandwich_option('timeoutlen', &timeoutlen)
+  let timeoutlen = max([0, timeoutlen])
 
   " query phase
   let input   = ''
@@ -592,7 +595,7 @@ function! s:operator.highlight_added(opt) dict abort  "{{{
   endif
 
   let hi_duration = a:opt.of('hi_duration', '')
-  let hi_method = s:get_operator_option('persistent_highlight', 'glow')
+  let hi_method = s:lib.get_operator_option('persistent_highlight', 'glow')
   if hi_method ==# 'glow' && s:has_timer
     call self.glow('added', 'OperatorSandwichAdd', hi_duration)
   else
@@ -613,7 +616,7 @@ function! s:operator.finalize() dict abort  "{{{
       " set modified marks
       let modmark = self.modmark
       if modmark.head != s:null_pos && modmark.tail != s:null_pos
-            \ && s:is_equal_or_ahead(modmark.tail, modmark.head)
+            \ && s:lib.is_equal_or_ahead(modmark.tail, modmark.head)
         call setpos("'[", modmark.head)
         call setpos("']", modmark.tail)
       endif
@@ -867,10 +870,10 @@ endfunction
 function! s:is_valid_region(kind, region, ...) abort "{{{
   " If the third argument is given and it is 'line', ignore the geometric
   " condition of head and tail.
-  return s:is_valid_2pos(a:region)
+  return s:lib.is_valid_2pos(a:region)
     \ && (
-    \       (a:kind ==# 'add' && s:is_equal_or_ahead(a:region.tail, a:region.head))
-    \    || ((a:kind ==# 'delete' || a:kind ==# 'replace') && s:is_ahead(a:region.tail, a:region.head))
+    \       (a:kind ==# 'add' && s:lib.is_equal_or_ahead(a:region.tail, a:region.head))
+    \    || ((a:kind ==# 'delete' || a:kind ==# 'replace') && s:lib.is_ahead(a:region.tail, a:region.head))
     \    || (a:0 > 0 && a:1 ==# 'line')
     \    )
 endfunction
@@ -1014,20 +1017,20 @@ endfunction
 function! s:get_default_cursor_pos(inner_head) abort  "{{{
   call setpos('.', a:inner_head)
   let default = searchpos('^\s*\zs\S', 'cn', a:inner_head[1])
-  return default == s:null_coord ? a:inner_head : s:c2p(default)
+  return default == s:null_coord ? a:inner_head : s:lib.c2p(default)
 endfunction
 "}}}
 function! s:get_headend_cursor_pos(head, inner_head) abort  "{{{
-  let headend = s:get_left_pos(a:inner_head)
-  if headend == s:null_pos || s:is_ahead(a:head, headend)
+  let headend = s:lib.get_left_pos(a:inner_head)
+  if headend == s:null_pos || s:lib.is_ahead(a:head, headend)
     let headend = copy(a:head)
   endif
   return headend
 endfunction
 "}}}
 function! s:get_tailstart_cursor_pos(tail, inner_tail) abort  "{{{
-  let tailstart = s:get_right_pos(a:inner_tail)
-  if tailstart == s:null_pos || s:is_ahead(tailstart, a:tail)
+  let tailstart = s:lib.get_right_pos(a:inner_tail)
+  if tailstart == s:null_pos || s:lib.is_ahead(tailstart, a:tail)
     let tailstart = copy(a:tail)
   endif
   return tailstart
@@ -1039,9 +1042,6 @@ function! s:reg_executing() abort "{{{
   endif
   return ''
 endfunction "}}}
-
-let [s:get_left_pos, s:get_right_pos, s:c2p, s:is_valid_2pos, s:is_ahead, s:is_equal_or_ahead, s:get_operator_option, s:get_sandwich_option]
-      \ = operator#sandwich#lib#funcref(['get_left_pos', 'get_right_pos', 'c2p', 'is_valid_2pos', 'is_ahead', 'is_equal_or_ahead', 'get_operator_option', 'get_sandwich_option'])
 
 
 " vim:set foldmethod=marker:
