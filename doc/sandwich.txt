@@ -1,4 +1,4 @@
-*sandwich.txt*				Last change:25-Jul-2020.
+*sandwich.txt*				Last change:28-Nov-2021.
 
 The set of operator and textobject plugins to edit sandwiched textobjects.
 
@@ -258,6 +258,55 @@ Notes on default recipes~
 `f`, `F`
 `i`, `I`
 	See |sandwich-magiccharacters|.
+
+
+
+------------------------------------------------------------------------------
+Global options~
+g:sandwich#timeout			*g:sandwich#timeout*
+	If this option is a falsy value, the operators and the
+	query-textobject will wait for subsequent inputs until the complete
+	key sequence has been received to specify a recipe. For example, with
+	the following recipes,
+>
+	let g:sandwich#recipes = [
+	  \   {'buns': ['for {', '}'],  'nesting': 1, 'input': ['bf']}
+	  \   {'buns': ['if {', '}'],   'nesting': 1, 'input': ['bi']}
+	  \   {'buns': ['else {', '}'], 'nesting': 1, 'input': ['be']}
+	  \ ]
+<
+	type `saiwb` and a while later the operator eagerly wrap a word with
+	`b` if this option is true. The operators wait next input until a
+	recipe is specified if this option is false. This option takes effect
+	both on the operators and the query-textobject.
+	|g:operator#sandwich#timeout| or |g:textobj#sandwich#timeout| takes
+	priority over this option if it exists. If this has not been defined,
+	'timeout' option is referred. See |g:sandwich#timeoutlen| also.
+
+
+
+g:sandwich#timeoutlen			*g:sandwich#timeoutlen*
+	The time in milli seconds that waits for a key code or mapped key
+	sequence to complete. If there are recipes overlapped, this option is
+	used. Assume that the following recipes are prepared:
+>
+	let g:sandwich#recipes = [
+	  \   {'buns': ['(', ')']}
+	  \   {'buns': ['((', '))']}
+	  \ ]
+<
+	after pressing saiw(, the operator waits in the time. If you press one
+	more ( in the time, then a recipe for '((' and '))' is decided to use.
+	No keypress has come through the time a recipe for '(' and ')' is
+	settled. This option takes effect both on the operators and the
+	query-textobject. |g:operator#sandwich#timeoutlen| or
+	|g:textobj#sandwich#timeoutlen| takes priority over this option if it
+	exists. If this variable has not been defined, 'timeoutlen' option is
+	referred.
+
+	When the timeout option (|g:operator#sandwich#timeout|,
+	|g:textobj#sandwich#timeout|, |g:sandwich#timeout|, 'timeout') is off,
+	this option is ignored.
 
 
 

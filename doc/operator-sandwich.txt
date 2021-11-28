@@ -1,5 +1,5 @@
 *operator-sandwich.txt*	The operator plugin to edit sandwiched textobjects.
-						Last change:27-Nov-2021.
+						Last change:28-Nov-2021.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -1450,9 +1450,10 @@ g:operator#sandwich#timeout		*g:operator#sandwich#timeout*
 <
 	type `saiwb` and a while later the operator eagerly wrap a word with
 	`b` if this option is true. The operators wait next input until a
-	recipe is specified if this option is false. The default value is
-	determined by 'timeout' option. See |g:operator#sandwich#timeoutlen|
-	also.
+	recipe is specified if this option is false. If this has not been
+	defined, |g:sandwich#timeout| is used instead. Unless there is any
+	particular reason, use |g:sandwich#timeout|.
+	See |g:operator#sandwich#timeoutlen| also.
 
 
 
@@ -1469,10 +1470,12 @@ g:operator#sandwich#timeoutlen		*g:operator#sandwich#timeoutlen*
 	after pressing saiw(, the operator waits in the time. If you press one
 	more ( in the time, then a recipe for '((' and '))' is decided to use.
 	No keypress has come through the time a recipe for '(' and ')' is
-	settled. The default value is same as 'timeoutlen' vim option.
+	settled. If this has not been defined, |g:sandwich#timeoutlen| is used
+	instead. Unless there is any particular reason, use
+	|g:sandwich#timeoutlen|.
 
-	When 'timeout' is off or |g:operator#sandwich#timeout| is false, this
-	option is ignored.
+	When the timeout option (|g:operator#sandwich#timeout|,
+	|g:sandwich#timeout|, 'timeout') is off, this option is ignored.
 
 
 

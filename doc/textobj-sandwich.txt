@@ -1,5 +1,5 @@
 *textobj-sandwich.txt*	The textobject plugin to select sandwiched texts.
-						Last change:27-Nov-2021.
+						Last change:28-Nov-2021.
 
 Author  : machakann <mckn{at}outlook.jp>
 License : NYSL license
@@ -1166,8 +1166,9 @@ g:textobj#sandwich#timeout		*g:textobj#sandwich#timeout*
 <
 	type `visb` and a while later the textobject eagerly select a text
 	wrapped in `b` if this option is true. The textobject wait next input
-	until a recipe is specified if this option is false. The default value
-	is determined by 'timeout' option.
+	until a recipe is specified if this option is false. If this has not
+	been defined, |g:sandwich#timeout| is used instead. Unless there is
+	any particular reason, use |g:sandwich#timeout|.
 	See |g:textobj#sandwich#timeoutlen| also.
 
 
@@ -1185,7 +1186,9 @@ g:textobj#sandwich#timeoutlen		*g:textobj#sandwich#timeoutlen*
 	after pressing vis(, the textobject waits in the time. If you press
 	one more ( in the time, then a recipe for '((' and '))' is decided to
 	use. No keypress has come through the time a recipe for '(' and ')' is
-	settled. The default value is same as 'timeoutlen' vim option.
+	settled. If this has not been defined, |g:sandwich#timeoutlen| is used
+	instead. Unless there is any particular reason, use
+	|g:sandwich#timeoutlen|.
 
 	When 'timeout' is off or |g:textobj#sandwich#timeout| is false, this
 	option is ignored.

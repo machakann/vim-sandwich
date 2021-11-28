@@ -32,8 +32,8 @@ function! textobj#sandwich#query(mode, a_or_i, ...) abort  "{{{
   else
     let recipes = textobj#sandwich#recipes#new(kind, a:mode)
   endif
-  let timeout = s:get_textobj_option('timeout', &timeout)
-  let timeoutlen = max([0, s:get_textobj_option('timeoutlen', &timeoutlen)])
+  let timeout = s:get_sandwich_option('timeout', &timeout)
+  let timeoutlen = max([0, s:get_sandwich_option('timeoutlen', &timeoutlen)])
   call recipes.query(opt, timeout, timeoutlen)
 
   if recipes.integrated != []
@@ -75,6 +75,16 @@ function! textobj#sandwich#select() abort  "{{{
 endfunction
 "}}}
 
+function! s:get_sandwich_option(name, default) abort "{{{
+  if exists('g:textobj#sandwich#' . a:name)
+    return eval('g:textobj#sandwich#' . a:name)
+  endif
+  if exists('g:sandwich#' . a:name)
+    return eval('g:sandwich#' . a:name)
+  endif
+  return a:default
+endfunction
+"}}}
 function! s:get_textobj_option(name, default) abort  "{{{
   return get(g:, 'textobj#sandwich#' . a:name, a:default)
 endfunction

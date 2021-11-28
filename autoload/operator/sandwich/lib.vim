@@ -59,6 +59,16 @@ function! s:is_in_between(pos, head, tail) abort  "{{{
     \  && ((a:pos[1] < a:tail[1]) || ((a:pos[1] == a:tail[1]) && (a:pos[2] <= a:tail[2])))
 endfunction
 "}}}
+function! s:get_sandwich_option(name, default) abort "{{{
+  if exists('g:operator#sandwich#' . a:name)
+    return eval('g:operator#sandwich#' . a:name)
+  endif
+  if exists('g:sandwich#' . a:name)
+    return eval('g:sandwich#' . a:name)
+  endif
+  return a:default
+endfunction
+"}}}
 function! s:get_operator_option(name, default) abort  "{{{
   return get(g:, 'operator#sandwich#' . a:name, a:default)
 endfunction

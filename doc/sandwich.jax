@@ -1,4 +1,4 @@
-*sandwich.jax*	日本語ヘルプ		Last change:25-Jul-2020.
+*sandwich.jax*	日本語ヘルプ		Last change:28-Nov-2021.
 
 “挟まれた”テキストを編集するためのオペレータとテキストオブジェクトの詰め合わせ
 です。
@@ -265,6 +265,54 @@ g:sandwich#default_recipes		*g:sandwich#default_recipes*
 `f`, `F`
 `i`, `I`
 	|sandwich-magiccharacters| をご覧ください。
+
+
+
+------------------------------------------------------------------------------
+Global options~
+g:sandwich#timeout			*g:sandwich#timeout*
+	この変数に偽値が設定されている場合は、オペレータやテキストオブジェクト
+	は一つのレシピを指定する完全な入力がなされるまで待ちます。例えば、下記
+	のレシピを用意します。
+>
+	let g:sandwich#recipes = [
+	  \   {'buns': ['for {', '}'],  'nesting': 1, 'input': ['bf']}
+	  \   {'buns': ['if {', '}'],   'nesting': 1, 'input': ['bi']}
+	  \   {'buns': ['else {', '}'], 'nesting': 1, 'input': ['be']}
+	  \ ]
+<
+	このオプションが真の場合は `saiwb` とタイプして少し待つと、オペレータ
+	はタイムアウトのため単語を `b` で囲みます。しかし、偽の場合は一つのレ
+	シピを指定する入力が完成するまで待ちます。この変数はオペレータとテキス
+	トオブジェクトの両方に効果を及ぼします。|g:operator#sandwich#timeout|
+	や |g:textobj#sandwich#timeout| が存在する場合はそれらが優先的に使われ
+	ます。この変数が定義されていなければ 'timeout' オプションが代わりに参
+	照されます。
+	関連：|g:sandwich#timeoutlen|
+
+
+
+g:sandwich#timeoutlen			*g:sandwich#timeoutlen*
+	入力に前方一致で重複するレシピが存在する場合に次のキーシーケンスを待つ
+	時間をミリ秒単位で指定します。
+>
+	let g:sandwich#recipes = [
+	  \   {'buns': ['(', ')']}
+	  \   {'buns': ['((', '))']}
+	  \ ]
+<
+	saiw( とキー入力するとオペレータは次に ( が入力されるかこの時間だけ待
+	ちます。この間にもう一度 ( を押下すると '((' と '))' のレシピが使われ
+	るでしょう。キーの押下なしでこの時間が過ぎると '(' と ')' のレシピが使
+	われるでしょう。この変数はオペレータとテキストオブジェクトの両方に効果
+	を及ぼします。|g:operator#sandwich#timeoutlen| や
+	|g:textobj#sandwich#timeout| が存在する場合はそれらが優先的に使われま
+	す。この変数が定義されていなければ 'timeoutlen' が代わりに参照されま
+	す。
+
+	タイムアウト機能(|g:operator#sandwich#timeout|,
+	|g:textobj#sandwich#timeout|, |g:sandwich#timeout|, 'timeout')がオフの
+	場合はこのオプションは無視されます。
 
 
 

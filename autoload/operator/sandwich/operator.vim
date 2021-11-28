@@ -414,8 +414,8 @@ function! s:operator.query() dict abort  "{{{
   let recipes = filter(deepcopy(self.recipes.integrated), filter)
   let opt = self.opt
   let clock = sandwich#clock#new()
-  let timeout = s:get_operator_option('timeout', &timeout)
-  let timeoutlen = max([0, s:get_operator_option('timeoutlen', &timeoutlen)])
+  let timeout = s:get_sandwich_option('timeout', &timeout)
+  let timeoutlen = max([0, s:get_sandwich_option('timeoutlen', &timeoutlen)])
 
   " query phase
   let input   = ''
@@ -1033,8 +1033,8 @@ function! s:reg_executing() abort "{{{
   return ''
 endfunction "}}}
 
-let [s:get_left_pos, s:get_right_pos, s:c2p, s:is_valid_2pos, s:is_ahead, s:is_equal_or_ahead, s:get_operator_option]
-      \ = operator#sandwich#lib#funcref(['get_left_pos', 'get_right_pos', 'c2p', 'is_valid_2pos', 'is_ahead', 'is_equal_or_ahead', 'get_operator_option'])
+let [s:get_left_pos, s:get_right_pos, s:c2p, s:is_valid_2pos, s:is_ahead, s:is_equal_or_ahead, s:get_operator_option, s:get_sandwich_option]
+      \ = operator#sandwich#lib#funcref(['get_left_pos', 'get_right_pos', 'c2p', 'is_valid_2pos', 'is_ahead', 'is_equal_or_ahead', 'get_operator_option', 'get_sandwich_option'])
 
 
 " vim:set foldmethod=marker:

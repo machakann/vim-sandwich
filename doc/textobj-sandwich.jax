@@ -1,5 +1,5 @@
 *textobj-sandwich.jax*	『挟まれた』テキストを選択する。
-						Last change:27-Nov-2021.
+						Last change:28-Nov-2021.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -1144,7 +1144,7 @@ Global option~
 g:textobj#sandwich#timeout		*g:textobj#sandwich#timeout*
 	このオプションに偽値が設定されている場合、テキストオブジェクトは一つの
 	レシピを指定する完全な入力がなされるまで待ちます。例えば、下記のレシピ
-	を用意します
+	を用意します。
 >
 	let g:sandwich#recipes = [
 	  \   {'buns': ['for {', '}'],  'nesting': 1, 'input': ['bf']}
@@ -1155,12 +1155,15 @@ g:textobj#sandwich#timeout		*g:textobj#sandwich#timeout*
 	このオプションが真の場合は `saiwb` とタイプして少し待つと、テキストオ
 	ブジェクトはタイムアウトのため `b` で囲まれたテキストを選択します。
 	しかし、偽の場合は一つのレシピを指定する入力が完成するまで待ちます。
-	デフォルト値は 'timeout' オプションによって決まります。
+	この変数が定義されていなければ |g:sandwich#timeout| が代わりに参照され
+	ます。特別な理由がなければ |g:sandwich#timeout| を使ってください。
 	関連：|g:textobj#sandwich#timeoutlen|
 
+
+
 g:textobj#sandwich#timeoutlen		*g:textobj#sandwich#timeoutlen*
-	"input" に前方一致で重複するレシピが存在する場合に次のキーシーケンスを
-	待つ時間をミリ秒単位で指定します。
+	入力に前方一致で重複するレシピが存在する場合に次のキーシーケンスを待つ
+	時間をミリ秒単位で指定します。
 >
 	let g:sandwich#recipes = [
 	  \   {'buns': ['(', ')']}
@@ -1170,11 +1173,12 @@ g:textobj#sandwich#timeoutlen		*g:textobj#sandwich#timeoutlen*
 	vis( とキー入力するとテキストオブジェクトは次に ( が入力されるかこの時
 	間だけ待ちます。この間にもう一度 ( を押下すると '((' と '))' のレシピ
 	が使われるでしょう。キーの押下なしでこの時間が過ぎると '(' と ')' のレ
-	シピが使われるでしょう。デフォルトでは Vim のオプション 'timeoutlen'
-	と同じ値が使われます。
+	シピが使われるでしょう。この変数が定義されていなければ
+	|g:sandwich#timeoutlen| が代わりに参照されます。特別な理由がなければ
+	|g:sandwich#timeoutlen| を使ってください。
 
-	'timeout' オプションがオフか|g:textobj#sandwich#timeout| が偽の時、
-	このオプションは無視されます。
+	タイムアウト機能(|g:textobj#sandwich#timeout|, |g:sandwich#timeout|,
+	'timeout')がオフの場合はこのオプションは無視されます。
 
 
 

@@ -1,5 +1,5 @@
 *operator-sandwich.jax*	『挟まれた』テキストを編集する。
-						Last change:27-Nov-2021.
+						Last change:28-Nov-2021.
 
 書いた人   : machakann <mckn{at}outlook.jp>
 ライセンス : NYSL license
@@ -1427,15 +1427,16 @@ g:operator#sandwich#timeout		*g:operator#sandwich#timeout*
 <
 	このオプションが真の場合は `saiwb` とタイプして少し待つと、オペレータ
 	はタイムアウトのため単語を `b` で囲みます。しかし、偽の場合は一つのレ
-	シピを指定する入力が完成するまで待ちます。デフォルト値は 'timeout' オ
-	プションによって決まります。
+	シピを指定する入力が完成するまで待ちます。この変数が定義されていなけれ
+	ば |g:sandwich#timeout| が代わりに参照されます。特別な理由がなければ
+	|g:sandwich#timeout| を使ってください。
 	関連：|g:operator#sandwich#timeoutlen|
 
 
 
 g:operator#sandwich#timeoutlen		*g:operator#sandwich#timeoutlen*
-	"input" に前方一致で重複するレシピが存在する場合に次のキーシーケンスを
-	待つ時間をミリ秒単位で指定します。
+	入力に前方一致で重複するレシピが存在する場合に次のキーシーケンスを待つ
+	時間をミリ秒単位で指定します。
 >
 	let g:sandwich#recipes = [
 	  \   {'buns': ['(', ')']}
@@ -1445,11 +1446,12 @@ g:operator#sandwich#timeoutlen		*g:operator#sandwich#timeoutlen*
 	saiw( とキー入力するとオペレータは次に ( が入力されるかこの時間だけ待
 	ちます。この間にもう一度 ( を押下すると '((' と '))' のレシピが使われ
 	るでしょう。キーの押下なしでこの時間が過ぎると '(' と ')' のレシピが使
-	われるでしょう。デフォルトでは Vim のオプション 'timeoutlen' と同じ値
-	が使われます。
+	われるでしょう。この変数が存在しなければ |g:sandwich#timeoutlen| が代
+	わりに参照されます。特別な理由がなければ |g:sandwich#timeoutlen| を
+	使ってください。
 
-	'timeout' オプションがオフか|g:operator#sandwich#timeout| が偽の時、
-	このオプションは無視されます。
+	タイムアウト機能(|g:operator#sandwich#timeout|, |g:sandwich#timeout|,
+	'timeout')がオフの場合はこのオプションは無視されます。
 
 
 
