@@ -29,10 +29,6 @@ onoremap <silent> <Plug>(textobj-sandwich-tag-a) :<C-u>call sandwich#magicchar#t
 xnoremap <silent> <Plug>(textobj-sandwich-tag-i) :<C-u>call sandwich#magicchar#t#it()<CR>
 xnoremap <silent> <Plug>(textobj-sandwich-tag-a) :<C-u>call sandwich#magicchar#t#at()<CR>
 
-""" default keymappings
-" If g:sandwich_no_default_key_mappings has been defined, then quit immediately.
-if exists('g:sandwich_no_default_key_mappings') | finish | endif
-
 map <silent> <Plug>(sandwich-add) <Plug>(operator-sandwich-add)
 nmap <silent> <Plug>(sandwich-delete) <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-query-a)
 xmap <silent> <Plug>(sandwich-delete) <Plug>(operator-sandwich-delete)
@@ -40,6 +36,10 @@ nmap <silent> <Plug>(sandwich-replace) <Plug>(operator-sandwich-replace)<Plug>(o
 xmap <silent> <Plug>(sandwich-replace) <Plug>(operator-sandwich-replace)
 nmap <silent> <Plug>(sandwich-delete-auto) <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-auto-a)
 nmap <silent> <Plug>(sandwich-replace-auto) <Plug>(operator-sandwich-replace)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-auto-a)
+
+""" default keymappings
+" If g:sandwich_no_default_key_mappings has been defined, then quit immediately.
+if exists('g:sandwich_no_default_key_mappings') | finish | endif
 
 silent! nmap <unique><silent> sd <Plug>(sandwich-delete)
 silent! nmap <unique><silent> sr <Plug>(sandwich-replace)
