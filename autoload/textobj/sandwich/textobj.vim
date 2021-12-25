@@ -386,9 +386,15 @@ function! s:textobj.elect(candidates) dict abort "{{{
   let elected = {}
   if len(a:candidates) >= self.count
     " election
-    let map_rule = 'extend(v:val, {"len": s:get_buf_length(v:val.coord.inner_head, v:val.coord.inner_tail)})'
+    if self.a_or_i is# 'a'
+      let map_rule = 'extend(v:val, {"len": s:get_buf_length(v:val.coord.inner_head, v:val.coord.inner_tail),
+                                   \ "is_inside": s:is_in_between(self.cursor, v:val.coord.head, v:val.coord.tail)})'
+    else
+      let map_rule = 'extend(v:val, {"len": s:get_buf_length(v:val.coord.inner_head, v:val.coord.inner_tail),
+                                   \ "is_inside": s:is_in_between(self.cursor, v:val.coord.inner_head, v:val.coord.inner_tail)})'
+    endif
     call map(a:candidates, map_rule)
-    call s:lib.sort(a:candidates, function('s:compare_buf_length'), self.count)
+    call s:lib.sort(a:candidates, function('s:compare_candidates'), self.count)
     let elected = a:candidates[self.count - 1]
   endif
   return elected
@@ -571,7 +577,12 @@ function! s:is_equal_or_ahead(coord1, coord2) abort  "{{{
   return a:coord1[0] > a:coord2[0] || (a:coord1[0] == a:coord2[0] && a:coord1[1] >= a:coord2[1])
 endfunction
 "}}}
-function! s:compare_buf_length(i1, i2) abort  "{{{
+function! s:compare_candidates(i1, i2) abort  "{{{
+  if a:i1.is_inside && !a:i2.is_inside
+    return -1
+  elseif !a:i1.is_inside && a:i2.is_inside
+    return 1
+  endif
   return a:i1.len - a:i2.len
 endfunction
 "}}}
