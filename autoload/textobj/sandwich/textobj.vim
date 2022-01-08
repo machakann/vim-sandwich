@@ -386,7 +386,7 @@ function! s:textobj.elect(candidates) dict abort "{{{
   let elected = {}
   if len(a:candidates) >= self.count
     " election
-    let map_rule = 'extend(v:val, {"len": s:get_buf_length(v:val.coord.inner_head, v:val.coord.inner_tail)})'
+    let map_rule = 'extend(v:val, {"len": s:get_buf_length(v:val.coord.head, v:val.coord.tail)})'
     call map(a:candidates, map_rule)
     call s:lib.sort(a:candidates, function('s:compare_buf_length'), self.count)
     let elected = a:candidates[self.count - 1]
