@@ -3,8 +3,8 @@ scriptencoding utf-8
 let s:suite = themis#suite('magicchar-f: ')
 
 function! s:suite.before() abort  "{{{
-  nmap sd <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-query-a)
-  xmap sd <Plug>(operator-sandwich-delete)
+  nmap sd <Plug>(sandwich-delete)
+  xmap sd <Plug>(sandwich-delete)
 endfunction
 "}}}
 function! s:suite.before_each() abort "{{{
@@ -19,6 +19,8 @@ endfunction
 "}}}
 function! s:suite.after() abort "{{{
   call s:suite.before_each()
+  nunmap sd
+  xunmap sd
 endfunction
 "}}}
 

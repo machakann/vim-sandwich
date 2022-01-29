@@ -2,6 +2,13 @@ scriptencoding utf-8
 
 let s:suite = themis#suite('textobj-sandwich: auto:')
 
+function! s:suite.before() abort  "{{{
+  omap ib <Plug>(textobj-sandwich-auto-i)
+  xmap ib <Plug>(textobj-sandwich-auto-i)
+  omap ab <Plug>(textobj-sandwich-auto-a)
+  xmap ab <Plug>(textobj-sandwich-auto-a)
+endfunction
+"}}}
 function! s:suite.before_each() abort "{{{
   %delete
   syntax off
@@ -23,6 +30,10 @@ endfunction
 "}}}
 function! s:suite.after() abort "{{{
   call s:suite.before_each()
+  ounmap ib
+  xunmap ib
+  ounmap ab
+  xunmap ab
 endfunction
 "}}}
 
