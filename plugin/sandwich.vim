@@ -1,5 +1,5 @@
 " The set of operator/textobj plugins to do well with 'sandwich' like structure
-" Last Change: 06-Nov-2021.
+" Last Change: 18-Jan-2022.
 " Maintainer : Masaaki Nakamura <mckn@outlook.jp>
 
 " License    : NYSL
@@ -29,7 +29,9 @@ onoremap <silent> <Plug>(textobj-sandwich-tag-a) :<C-u>call sandwich#magicchar#t
 xnoremap <silent> <Plug>(textobj-sandwich-tag-i) :<C-u>call sandwich#magicchar#t#it()<CR>
 xnoremap <silent> <Plug>(textobj-sandwich-tag-a) :<C-u>call sandwich#magicchar#t#at()<CR>
 
-map <silent> <Plug>(sandwich-add) <Plug>(operator-sandwich-add)
+nmap <silent> <Plug>(sandwich-add) <Plug>(operator-sandwich-add)
+xmap <silent> <Plug>(sandwich-add) <Plug>(operator-sandwich-add)
+omap <silent> <Plug>(sandwich-add) <Plug>(operator-sandwich-add)
 nmap <silent> <Plug>(sandwich-delete) <Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-query-a)
 xmap <silent> <Plug>(sandwich-delete) <Plug>(operator-sandwich-delete)
 nmap <silent> <Plug>(sandwich-replace) <Plug>(operator-sandwich-replace)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-query-a)
@@ -43,7 +45,9 @@ if exists('g:sandwich_no_default_key_mappings') | finish | endif
 
 if !exists('g:operator_sandwich_no_default_key_mappings')
   " add
-  silent! map <unique> sa <Plug>(sandwich-add)
+  silent! nmap <unique> sa <Plug>(sandwich-add)
+  silent! xmap <unique> sa <Plug>(sandwich-add)
+  silent! omap <unique> sa <Plug>(sandwich-add)
 
   " delete
   silent! nmap <unique> sd <Plug>(sandwich-delete)

@@ -6,6 +6,27 @@ let s:scope = themis#helper('scope')
 let s:t = s:scope.funcs('autoload/sandwich/magicchar/t.vim')
 
 
+function! s:suite.before() abort  "{{{
+  nmap sa <Plug>(sandwich-add)
+  xmap sa <Plug>(sandwich-add)
+  omap sa <Plug>(sandwich-add)
+  nmap sd <Plug>(sandwich-delete)
+  xmap sd <Plug>(sandwich-delete)
+  nmap sr <Plug>(sandwich-replace)
+  xmap sr <Plug>(sandwich-replace)
+endfunction
+"}}}
+function! s:suite.after() abort "{{{
+  nunmap sa
+  xunmap sa
+  ounmap sa
+  nunmap sd
+  xunmap sd
+  nunmap sr
+  xunmap sr
+endfunction
+"}}}
+
 function! s:suite.add() abort "{{{
   " #1
   call setline(1, 'foo')

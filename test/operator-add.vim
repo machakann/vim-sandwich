@@ -4,6 +4,12 @@ let s:suite = themis#suite('operator-sandwich: add:')
 let s:object = 'g:operator#sandwich#object'
 call themis#helper('command').with(s:)
 
+function! s:suite.before() abort "{{{
+  nmap sa <Plug>(sandwich-add)
+  xmap sa <Plug>(sandwich-add)
+  omap sa <Plug>(sandwich-add)
+endfunction
+"}}}
 function! s:suite.before_each() abort "{{{
   %delete
   set filetype=
@@ -30,6 +36,9 @@ endfunction
 "}}}
 function! s:suite.after() abort "{{{
   call s:suite.before_each()
+  nunmap sa
+  xunmap sa
+  ounmap sa
 endfunction
 "}}}
 
