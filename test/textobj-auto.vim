@@ -470,6 +470,15 @@ function! s:suite.i_o_nest() abort  "{{{
   let @@ = 'fail'
   normal 017lyib
   call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #36')
+
+  let g:sandwich#recipes = []
+  let g:textobj#sandwich#recipes = [{'buns': ['"', '"'], 'nesting': 0}, {'external': ['it', 'at'], 'input': ['t']}]
+
+  " #37
+  call setline('.', '<a href="http://www.url.com" target="_blank">Anchor Text</a>')
+  let @@ = 'fail'
+  normal 0fwyib
+  call g:assert.equals(@@, 'http://www.url.com', 'failed at #37')
 endfunction
 "}}}
 function! s:suite.i_o_no_nest() abort "{{{
@@ -1792,6 +1801,15 @@ function! s:suite.i_x_nest() abort  "{{{
   let @@ = 'fail'
   normal 017lviby
   call g:assert.equals(@@, 'aa(((bb)))aa', 'failed at #36')
+
+  let g:sandwich#recipes = []
+  let g:textobj#sandwich#recipes = [{'buns': ['"', '"'], 'nesting': 0}, {'external': ['it', 'at'], 'input': ['t']}]
+
+  " #37
+  call setline('.', '<a href="http://www.url.com" target="_blank">Anchor Text</a>')
+  let @@ = 'fail'
+  normal 0fwviby
+  call g:assert.equals(@@, 'http://www.url.com', 'failed at #37')
 endfunction
 "}}}
 function! s:suite.i_x_no_nest() abort "{{{
@@ -3201,6 +3219,15 @@ function! s:suite.a_o_nest() abort  "{{{
   let @@ = 'fail'
   normal 017lyab
   call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #36')
+
+  let g:sandwich#recipes = []
+  let g:textobj#sandwich#recipes = [{'buns': ['"', '"'], 'nesting': 0}, {'external': ['it', 'at'], 'input': ['t']}]
+
+  " #37
+  call setline('.', '<a href="http://www.url.com" target="_blank">Anchor Text</a>')
+  let @@ = 'fail'
+  normal 0fwyab
+  call g:assert.equals(@@, '"http://www.url.com"', 'failed at #37')
 endfunction
 "}}}
 function! s:suite.a_o_no_nest() abort "{{{
@@ -4563,6 +4590,15 @@ function! s:suite.a_x_nest() abort  "{{{
   let @@ = 'fail'
   normal 017lvaby
   call g:assert.equals(@@, '(((aa(((bb)))aa)))', 'failed at #36')
+
+  let g:sandwich#recipes = []
+  let g:textobj#sandwich#recipes = [{'buns': ['"', '"'], 'nesting': 0}, {'external': ['it', 'at'], 'input': ['t']}]
+
+  " #37
+  call setline('.', '<a href="http://www.url.com" target="_blank">Anchor Text</a>')
+  let @@ = 'fail'
+  normal 0fwvaby
+  call g:assert.equals(@@, '"http://www.url.com"', 'failed at #37')
 endfunction
 "}}}
 function! s:suite.a_x_no_nest() abort "{{{
