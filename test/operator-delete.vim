@@ -21,6 +21,7 @@ function! s:suite.before_each() abort "{{{
   silent! xunmap a{
   unlet! g:sandwich#recipes
   unlet! g:operator#sandwich#recipes
+  unlet! g:sandwich#input_fallback
   call operator#sandwich#set_default()
   call visualmode(1)
 endfunction

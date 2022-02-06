@@ -1,6 +1,9 @@
 " recipes object
 
 " variables "{{{
+let s:TRUE = 1
+let s:FALSE = 0
+
 " types
 let s:type_num = type(0)
 let s:type_str = type('')
@@ -101,7 +104,7 @@ function! s:recipes.query(opt, timeout, timeoutlen) dict abort "{{{
       let self.integrated = []
     endif
   else
-    if !(input ==# "\<Esc>" || input ==# "\<C-c>" || input ==# '')
+    if s:is_input_fallback(input)
       let c = split(input, '\zs')[0]
       let recipe = {'buns': [c, c], 'expr': 0, 'regex': 0}
       let self.integrated = [recipe]
@@ -259,6 +262,16 @@ function! s:is_input_matched(candidate, input, opt, flag) abort "{{{
   endif
 endfunction
 "}}}
+function! s:is_input_fallback(input) abort "{{{
+  if a:input ==# "\<Esc>" || a:input ==# "\<C-c>" || a:input ==# ''
+    return s:FALSE
+  endif
+  let input_fallback = get(g:, 'sandwich#input_fallback', s:TRUE)
+  if !input_fallback
+    return s:FALSE
+  endif
+  return s:TRUE
+endfunction "}}}
 
 " vim:set foldmethod=marker:
 " vim:set commentstring="%s:

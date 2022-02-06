@@ -5600,5 +5600,29 @@ function! s:suite.a_function_interface() abort  "{{{
 endfunction
 "}}}
 
+" input_fallback
+function! s:suite.input_fallback() abort "{{{
+  let g:sandwich#recipes = []
+  let g:textobj#sandwich#recipes = []
+
+  let g:sandwich#input_fallback = 1
+  call setline('.', 'afooa')
+  let @@ = 'fail'
+  normal 0yisa
+  call g:assert.equals(@@, 'foo', 'failed at #1')
+
+  let g:sandwich#input_fallback = 0
+  call setline('.', 'afooa')
+  let @@ = 'fail'
+  normal 0yisa
+  call g:assert.equals(@@, 'fail', 'failed at #2')
+
+  unlet! g:sandwich#input_fallback
+  call setline('.', 'afooa')
+  let @@ = 'fail'
+  normal 0yisa
+  call g:assert.equals(@@, 'foo', 'failed at #3')
+endfunction "}}}
+
 " vim:set foldmethod=marker:
 " vim:set commentstring="%s:

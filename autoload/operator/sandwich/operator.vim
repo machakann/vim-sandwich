@@ -4,6 +4,8 @@ let s:lib = operator#sandwich#lib#import()
 
 " variables "{{{
 " null valiables
+let s:TRUE = 1
+let s:FALSE = 0
 let s:null_coord = [0, 0]
 let s:null_pos   = [0, 0, 0, 0]
 let s:null_2pos  = {
@@ -473,11 +475,11 @@ function! s:operator.query() dict abort  "{{{
   if filter(recipes, 's:is_input_matched(v:val, input, opt, 1)') != []
     let recipe = recipes[0]
   else
-    if input ==# "\<Esc>" || input ==# '' || input =~# '^[\x80]'
-      let recipe = {}
-    else
+    if s:is_input_fallback(input)
       let c = split(input, '\zs')[0]
       let recipe = {'buns': [c, c], 'expr': 0}
+    else
+      let recipe = {}
     endif
   endif
   return extend(recipe, {'evaluated': 0})
@@ -1014,6 +1016,16 @@ function! s:check_buns(buns) abort  "{{{
   endif
 endfunction
 "}}}
+function! s:is_input_fallback(input) abort "{{{
+  if a:input ==# "\<Esc>" || a:input ==# '' || a:input =~# '^[\x80]'
+    return s:FALSE
+  endif
+  let input_fallback = get(g:, 'sandwich#input_fallback', s:TRUE)
+  if !input_fallback
+    return s:FALSE
+  endif
+  return s:TRUE
+endfunction "}}}
 function! s:get_default_cursor_pos(inner_head) abort  "{{{
   call setpos('.', a:inner_head)
   let default = searchpos('^\s*\zs\S', 'cn', a:inner_head[1])

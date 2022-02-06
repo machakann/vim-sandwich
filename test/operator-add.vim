@@ -32,6 +32,7 @@ function! s:suite.before_each() abort "{{{
   call operator#sandwich#set_default()
   unlet! g:sandwich#recipes
   unlet! g:operator#sandwich#recipes
+  unlet! g:sandwich#input_fallback
 endfunction
 "}}}
 function! s:suite.after() abort "{{{
@@ -11046,6 +11047,27 @@ function! s:suite.inappropriate_input() abort "{{{
   call cursor(1, 1)
   execute "normal saiw\<Left>l"
   call g:assert.equals(getline('.'), 'abc', 'failed at #1')
+endfunction "}}}
+
+" input_fallback
+function! s:suite.input_fallback() abort "{{{
+  let g:sandwich#recipes = []
+  let g:operator#sandwich#recipes = []
+
+  let g:sandwich#input_fallback = 1
+  call setline('.', 'foo')
+  normal 0saiwa
+  call g:assert.equals(getline('.'), 'afooa', 'failed at #1')
+
+  let g:sandwich#input_fallback = 0
+  call setline('.', 'foo')
+  normal 0saiwa
+  call g:assert.equals(getline('.'), 'foo', 'failed at #2')
+
+  unlet! g:sandwich#input_fallback
+  call setline('.', 'foo')
+  normal 0saiwa
+  call g:assert.equals(getline('.'), 'afooa', 'failed at #3')
 endfunction "}}}
 
 

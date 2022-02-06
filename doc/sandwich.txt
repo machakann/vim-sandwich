@@ -1,4 +1,4 @@
-*sandwich.txt*				Last change:28-Nov-2021.
+*sandwich.txt*				Last change:06-Feb-2022.
 
 The set of operator and textobject plugins to edit sandwiched textobjects.
 
@@ -305,6 +305,23 @@ g:sandwich#timeoutlen			*g:sandwich#timeoutlen*
 	When the timeout option (|g:operator#sandwich#timeout|,
 	|g:textobj#sandwich#timeout|, |g:sandwich#timeout|, 'timeout') is off,
 	this option is ignored.
+
+
+
+g:sandwich#input_fallback		*g:sandwich#input_fallback*
+	This bool option controls the behavior when no recipe matches with
+	user input to add/delete/replace surroundings. If this option is true
+	and no recipe matches with user input, the user input character itself
+	is used as the surroundings for add/delete/replace. For example, even
+	if there is no recipe associated with input `a` the key sequence
+	`saiwa` wraps a word with `a`.
+>
+	foo -> afooa
+<
+	Set falthy value to this option if this behavior is not desired.
+>
+	let g:sandwich#input_fallback = 0
+<
 
 
 

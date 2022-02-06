@@ -1,4 +1,4 @@
-*sandwich.jax*	日本語ヘルプ		Last change:28-Nov-2021.
+*sandwich.jax*	日本語ヘルプ		Last change:06-Feb-2022.
 
 “挟まれた”テキストを編集するためのオペレータとテキストオブジェクトの詰め合わせ
 です。
@@ -312,6 +312,21 @@ g:sandwich#timeoutlen			*g:sandwich#timeoutlen*
 	|g:textobj#sandwich#timeout|, |g:sandwich#timeout|, 'timeout')がオフの
 	場合はこのオプションは無視されます。
 
+
+
+g:sandwich#input_fallback		*g:sandwich#input_fallback*
+	このオプションは囲みを追加・削除・置換するためのユーザーの入力に合致す
+	るレシピが存在しない場合の挙動を制御します。このオプションが真のとき、
+	ユーザーの入力に合致するレシピがなければ、入力された文字自体を追加・削
+	除・置換の対象とします。例えば、a という入力に合致するレシピが存在しな
+	くても saiwa と入力すると単語を a で囲みます。
+>
+	foo -> afooa
+<
+	この動作が必要ない場合はこのオプションに偽値を設定します。
+>
+	let g:sandwich#input_fallback = 0
+<
 
 
 ==============================================================================

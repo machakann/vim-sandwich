@@ -28,6 +28,7 @@ function! s:suite.before_each() abort "{{{
   call operator#sandwich#set_default()
   unlet! g:sandwich#recipes
   unlet! g:operator#sandwich#recipes
+  unlet! g:sandwich#input_fallback
 endfunction
 "}}}
 function! s:suite.after() abort "{{{
@@ -14209,6 +14210,27 @@ function! s:suite.invalid_region() abort  "{{{
   nunmap sr'
 endfunction
 "}}}
+
+" input_fallback
+function! s:suite.input_fallback() abort "{{{
+  let g:sandwich#recipes = [{'buns': ['a', 'a']}]
+  let g:operator#sandwich#recipes = []
+
+  let g:sandwich#input_fallback = 1
+  call setline('.', 'afooa')
+  normal 0sriwb
+  call g:assert.equals(getline('.'), 'bfoob', 'failed at #1')
+
+  let g:sandwich#input_fallback = 0
+  call setline('.', 'afooa')
+  normal 0sriwb
+  call g:assert.equals(getline('.'), 'afooa', 'failed at #2')
+
+  unlet! g:sandwich#input_fallback
+  call setline('.', 'afooa')
+  normal 0sriwb
+  call g:assert.equals(getline('.'), 'bfoob', 'failed at #3')
+endfunction "}}}
 
 " vim:set foldmethod=marker:
 " vim:set commentstring="%s:
