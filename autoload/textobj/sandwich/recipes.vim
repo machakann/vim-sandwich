@@ -263,7 +263,7 @@ function! s:is_input_matched(candidate, input, opt, flag) abort "{{{
 endfunction
 "}}}
 function! s:is_input_fallback(input) abort "{{{
-  if a:input ==# "\<Esc>" || a:input ==# "\<C-c>" || a:input ==# ''
+  if a:input ==# "\<Esc>" || a:input ==# '' || a:input =~# '^[\x80]'
     return s:FALSE
   endif
   let input_fallback = get(g:, 'sandwich#input_fallback', s:TRUE)
