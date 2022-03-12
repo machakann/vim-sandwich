@@ -1,10 +1,14 @@
 " variables "{{{
+let s:FALSE = 0
+let s:TRUE = 1
 let s:null_coord = [0, 0]
 
 " types
 let s:type_num  = type(0)
 let s:type_str  = type('')
 let s:type_list = type([])
+
+let s:lib = operator#sandwich#lib#import()
 "}}}
 
 function! sandwich#magicchar#t#tag() abort "{{{
@@ -45,7 +49,19 @@ function! sandwich#magicchar#t#tagname() abort "{{{
   if tagname ==# ''
     throw 'OperatorSandwichCancel'
   endif
-  return s:expand(tagname)
+
+  " This is not quite good way. We need a new API for it.
+  let op = operator#sandwich#get_info()
+  let act = op.basket[0]
+  let head1 = act.target.head1
+  let head2 = act.target.head2
+  let tail1 = act.target.tail1
+  let tail2 = act.target.tail2
+
+  if s:is_tagname(head1, tail1, head2, tail2)
+    return s:expand(tagname)
+  endif
+  return [printf('<%s>', tagname), printf('</%s>', tagname)]
 endfunction
 "}}}
 function! s:tokenize(text) abort  "{{{
@@ -315,6 +331,44 @@ function! s:expand(text) abort  "{{{
   return [s:build(itemlist), element]
 endfunction
 "}}}
+
+function! s:is_tagname(head1, tail1, head2, tail2) abort "{{{
+  let view = winsaveview()
+
+  call setpos('.', a:head1)
+  if search('<\%#.', 'cn') == 0
+    call winrestview(view)
+    return s:FALSE
+  endif
+
+  call setpos('.', a:tail1)
+  let open_tag_end = searchpos('>', 'n')
+  if open_tag_end[0] == 0
+    call winrestview(view)
+    return s:FALSE
+  endif
+
+  call setpos('.', a:head2)
+  let close_tag_start = searchpos('</\%#.', 'cn')
+  if close_tag_start[0] == 0
+    call winrestview(view)
+    return s:FALSE
+  endif
+
+  if !s:lib.is_ahead(close_tag_start, open_tag_end)
+    call winrestview(view)
+    return s:FALSE
+  endif
+
+  call setpos('.', a:tail2)
+  if search('>', 'n') == 0
+    call winrestview(view)
+    return s:FALSE
+  endif
+
+  call winrestview(view)
+  return s:TRUE
+endfunction "}}}
 
 function! sandwich#magicchar#t#i() abort "{{{
   call s:prototype('i')
