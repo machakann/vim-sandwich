@@ -69,16 +69,6 @@ function! s:suite.replace() abort "{{{
   call setline(1, '<div title="foo">foo</div>')
   execute "normal 1GffsrTTp\<CR>"
   call g:assert.equals(getline(1), '<p>foo</p>', 'failed at #4')
-
-  " #5
-  call setline(1, '(foo)')
-  execute "normal 1Gsr(tp\<CR>"
-  call g:assert.equals(getline(1), '<p>foo</p>', 'failed at #5')
-
-  " #6
-  call setline(1, '(foo)')
-  execute "normal 1Gsr(Tp\<CR>"
-  call g:assert.equals(getline(1), '<p>foo</p>', 'failed at #6')
 endfunction "}}}
 function! s:suite.add_selection_exclusive() abort "{{{
   set selection=exclusive
