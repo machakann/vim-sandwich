@@ -1,4 +1,4 @@
-*sandwich.txt*				Last change:06-Feb-2022.
+*sandwich.txt*				Last change:14-May-2022.
 
 The set of operator and textobject plugins to edit sandwiched textobjects.
 
@@ -44,8 +44,8 @@ replace~
 Press srb{addition} or sr{deletion}{addition}.
 For example, srb" or sr(" makes (foo) to "foo".
 
-That's all. Now you already know enough about sandwich.vim. If you want more,
-read following descriptions and each help for operator/textobject,
+Now you already know enough about sandwich.vim. If you want more,
+read this help and each help documents of operator/textobject,
 |operator-sandwich| and |textobj-sandwich|.
 
 
@@ -56,19 +56,17 @@ INTRODUCTION				*sandwich-introduction*
 This plugin provides functions to add/delete/replace surroundings of
 sandwiched texts. These functions are implemented genuinely by utilizing
 operator/textobject framework. Their action can be repeated by |.| command
-without any dependency. It consists of two parts, |operator-sandwich| and
-|textobj-sandwich|. These two cooperate gracefully to realize the
-functionality. However, at the same time, each of them are independent, thus
-they could work with any other operators/textobjects.
+without any dependency.
 
-|operator-sandwich| gives three kinds of operators,
-|<Plug>(operator-sandwich-add)|, |<Plug>(operator-sandwich-delete)|,
-|<Plug>(operator-sandwich-replace)|. These operators edit sandwiched text.
+Refer to the |sandwich-keymappings| for the key mappings supplied by
+|sandwich.vim|. It also explains how to change key mappings for your
+preference.
 
-|textobj-sandwich| gives four kinds of textobjects,
-|<Plug>(textobj-sandwich-auto-i)|, |<Plug>(textobj-sandwich-auto-a)|,
-|<Plug>(textobj-sandwich-query-i)|, |<Plug>(textobj-sandwich-query-a)|.
-These textobjects search and select sandwiched text.
+Refer to the |operator-sandwich| for the details of the genuine operators.
+It also explains how to customize the functions to edit surroundings.
+
+Refer to the |textobj-sandwich| for the details of the genuine textobjects.
+It also explains how to customize the behavior of textobjects.
 
 
 
@@ -80,19 +78,35 @@ This plugin defines the following keymappings.
 function	default keymappings
 --------------------------------------------------------------------------
 add		sa{motion/textobject}{addition}	(normal and visual mode)
+			-> |<Plug>(sandwich-add)|
 
-delete		sd				(visual mode)
-		sdb				(normal mode)
+delete
 		sd{deletion}			(normal mode)
+		sd				(visual mode)
+			-> |<Plug>(sandwich-delete)|
 
-replace		sr{addition}			(visual mode)
-		srb{addition}			(normal mode)
+		sdb				(normal mode)
+			-> |<Plug>(sandwich-delete-auto)|
+
+replace
 		sr{deletion}{addition}		(normal mode)
+		sr{addition}			(visual mode)
+			-> |<Plug>(sandwich-replace)|
 
-textobjct	ib			(operator-pending and visual mode)
+		srb{addition}			(normal mode)
+			-> |<Plug>(sandwich-replace-auto)|
+
+textobjct
+		ib			(operator-pending and visual mode)
+			-> |<Plug>(textobj-sandwich-auto-i)|
 		ab			(operator-pending and visual mode)
+			-> |<Plug>(textobj-sandwich-auto-a)|
+
 		is			(operator-pending and visual mode)
+			-> |<Plug>(textobj-sandwich-query-i)|
 		as			(operator-pending and visual mode)
+			-> |<Plug>(textobj-sandwich-query-a)|
+
 --------------------------------------------------------------------------
 
 NOTE: To prevent unintended operation, the following setting is strongly
@@ -103,81 +117,156 @@ NOTE: To prevent unintended operation, the following setting is strongly
 <
       |s| could be easily replaced by |c|l| commands.
 
-
-
-The detailed breakdown is described below.
-
-  * |operator-sandwich|
-|<Plug>(operator-sandwich-add)| which is a operator to add surroundings is
-mapped to the key sequences sa. This is valid in both normal and visual modes.
-
-|<Plug>(operator-sandwich-delete)| which is a operator to delete surroundings
-is mapped to the key sequences sd in visual mode. If the both ends of the
-selected region are the same characters or the set of registered surroundings,
-then it deletes them.
-
-|<Plug>(operator-sandwich-replace)| which is a operator to replace
-surroundings is mapped to the key sequences sr in visual mode. If the both
-ends of the selected region are the same characters or the set of registered
-surroundings, then it replaces them.
-
-
-
-  * |textobj-sandwich|
-|<Plug>(textobj-sandwich-auto-i)| and |<Plug>(textobj-sandwich-auto-a)| which
-are the textobjects to search and select a sandwiched text automatically are
-mapped to the key sequences ib and ab. They are valid in both operator-pending
-mode and visual mode. ib selects the text inside the surroundings. ab selects
-the text including surroundings.
-
-|<Plug>(textobj-sandwich-query-i)| and |<Plug>(textobj-sandwich-query-a)|
-which are the textobjects to search and select a sandwiched text depending on
-user input are mapped to the key sequences is and as. They are valid in both
-operator-pending mode and visual mode. is selects the text inside the
-surroundings. as selects the text including surroundings.
-
-
-
-In addition to the above, the key sequences sd, sdb, sr and srb in normal mode
-is used by compound mappings of |operator-sandwich| and |textobj-sandwich|.
-Each of them are the short-hand mappings as following keysequences.
-
-  sd
->
-	<Plug>(operator-sandwich-delete)<Plug>(textobj-sandwich-query-a)
-<
-  sdb
->
-	<Plug>(operator-sandwich-delete)<Plug>(textobj-sandwich-auto-a)
-<
-  sr
->
-	<Plug>(operator-sandwich-replace)<Plug>(textobj-sandwich-query-a)
-<
-  srb
->
-	<Plug>(operator-sandwich-replace)<Plug>(textobj-sandwich-auto-a)
-<
-This is just for convenience, since these textobjects perfectly fills up the
-working condition of these operators. Users only have to assign surroundings
-as listed above. If you don't like the short-hands, define
-g:sandwich_no_default_key_mappings in your vimrc.
+If you don't need the default mappings, define
+*g:sandwich_no_default_key_mappings* in your vimrc.
 >
 	let g:sandwich_no_default_key_mappings = 1
 <
-NOTE: In fact, these compound keymappings have one more key sequence
-      |<Plug>(operator-sandwich-release-count)| in between the two key
-      sequences. It is a tiny trick for the [count] handling. For example the
-      key sequences 2sdb is identical to:
+The following code snippet shows how to change the trigger key from s to z.
 >
-	<Plug>(operator-sandwich-delete)2<Plug>(textobj-sandwich-auto-a)
+	let g:sandwich_no_default_key_mappings = 1
+
+	" add
+	nmap za <Plug>(sandwich-add)
+	xmap za <Plug>(sandwich-add)
+	omap za <Plug>(sandwich-add)
+
+	" delete
+	nmap zd <Plug>(sandwich-delete)
+	xmap zd <Plug>(sandwich-delete)
+	nmap zdb <Plug>(sandwich-delete-auto)
+
+	" replace
+	nmap zr <Plug>(sandwich-replace)
+	xmap zr <Plug>(sandwich-replace)
+	nmap zrb <Plug>(sandwich-replace-auto)
 <
-      It searches the second closest sandwiched text and deletes them.
+Additionally, map textobjects if you need.
 >
-	      #                            : cursor
-	[bar(foo)baz]   --->   bar(foo)baz
+	" text-objects (if you need)
+	omap ib <Plug>(textobj-sandwich-auto-i)
+	xmap ib <Plug>(textobj-sandwich-auto-i)
+	omap ab <Plug>(textobj-sandwich-auto-a)
+	xmap ab <Plug>(textobj-sandwich-auto-a)
+
+	omap is <Plug>(textobj-sandwich-query-i)
+	xmap is <Plug>(textobj-sandwich-query-i)
+	omap as <Plug>(textobj-sandwich-query-a)
+	xmap as <Plug>(textobj-sandwich-query-a)
 <
 
+
+					*<Plug>(sandwich-add)*
+ [count1] <Plug>(sandwich-add) [count2] {motion} {addition}
+	Wrap an assigned text on the buffer.
+	This key mapping handles [count] uniquely.
+	[count1] is given to |<Plug>(sandwich-add)| and thus surround the text
+	[count1] times. On the other hand, [count2] is passed to {motion} as
+	usually. Both of those [count]s are optional. The {addition} is the
+	key to specify the surroundings; for example, an input saiw( wraps a
+	word by parentheses().
+
+{Visual} [count] <Plug>(sandwich-add) {addition}
+	Wrap the visual-selected text [count] times.
+
+	<Plug>(sandwich-add) is available in normal, visual, and
+	operator-pending mode. It is mapped at sa in default.
+>
+	nmap sa <Plug>(sandwich-add)
+	xmap sa <Plug>(sandwich-add)
+	omap sa <Plug>(sandwich-add)
+<
+
+
+					*<Plug>(sandwich-delete)*
+[count] <Plug>(sandwich-delete) {deletion}
+	Delete a pair of surroundings nearest to the cursor specified by
+	{deletion}. For example, an input sd( deletes a pair of parentheses()
+	nearest to the cursor.
+>
+	(foo)    ->    foo
+<
+	Delete the [count]th closest surroundings if [count] is given.
+>
+	(foo(bar)baz)  cursor is on "bar"
+
+	--  sd( --> (foobarbaz)
+	-- 2sd( --> foo(bar)baz
+<
+
+{Visual} [count] <Plug>(sandwich-delete)
+	Delete the successive surroundings at the both ends of the visually
+	selected text. Delete [count] times if [count] is given.
+
+	<Plug>(sandwich-delete) is available in normal and visual mode. It is
+	mapped at sd in default.
+>
+	nmap sd <Plug>(sandwich-delete)
+	xmap sd <Plug>(sandwich-delete)
+<
+
+
+					*<Plug>(sandwich-delete-auto)*
+[count] <Plug>(sandwich-delete-auto)
+	Delete the [count]th closest surroundings from the cursor.
+>
+	[foo(bar)baz]  cursor is on "bar"
+
+	--  sdb --> [foobarbaz]
+	-- 2sdb --> foo(bar)baz
+<
+	<Plug>(sandwich-delete-auto) is available in normal mode. It is mapped
+	at sdb in default.
+>
+	nmap sdb <Plug>(sandwich-delete-auto)
+<
+
+
+					*<Plug>(sandwich-replace)*
+[count] <Plug>(sandwich-replace) {deletion} {addition}
+	Replace the closest surroundings from the cursor specified by
+	{deletion} to another surroundings specified by {addition}. For
+	example, an input sr([ replaces a pair of parentheses() to a pair of
+	square brackets[].
+>
+	(foo)    ->    [foo]
+<
+	Replace the [count]th closest surroundings if [count] is given.
+>
+	(foo(bar)baz)  cursor is on "bar"
+
+	--  sr([ --> (foo[bar]baz)
+	-- 2sr([ --> [foo(bar)baz]
+<
+
+{Visual} [count] <Plug>(sandwich-replace) {addition}
+	Replace the successive surroundings at the both ends of the visually
+	selected text to another surroundings specified by {addition}.
+	Replace [count] times if [count] is given.
+
+	<Plug>(sandwich-replace) is available in normal and visual mode. It is
+	mapped at sr in default.
+>
+	nmap sr <Plug>(sandwich-replace)
+	xmap sr <Plug>(sandwich-replace)
+<
+
+
+					*<Plug>(sandwich-replace-auto)*
+[count] <Plug>(sandwich-replace-auto) {addition}
+	Replace the [count]th closest surroundings from the cursor to another
+	surroundings specified by {addition}.
+>
+	[foo(bar)baz]  cursor is on "bar"
+
+	--  srb{ --> [foo{bar}baz]
+	-- 2srb{ --> {foo(bar)baz}
+<
+	<Plug>(sandwich-replace-auto) is available in normal mode. It is
+	mapped at sdb in default.
+>
+	nmap srb <Plug>(sandwich-replace-auto)
+<
 
 
 ==============================================================================
