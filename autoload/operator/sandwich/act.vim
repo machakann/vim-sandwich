@@ -387,7 +387,7 @@ endfunction
 function! s:restore_indent(indentopt) abort  "{{{
   " restore indentkeys first
   if a:indentopt.indentkeys.restore
-    execute printf('setlocal %s=%s', a:indentopt.indentkeys.name, a:indentopt.indentkeys.value)
+    execute printf('setlocal %s=%s', a:indentopt.indentkeys.name, escape(a:indentopt.indentkeys.value, ' \'))
   endif
 
   " restore autoindent options
