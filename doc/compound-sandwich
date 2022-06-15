@@ -1,0 +1,96 @@
+=============================================================================
+COMPOUND RECIPES			*sandwich-compound-recipes*		
+
+A compound recipe is one that contains multiple simple recipes.  A simple
+recipe could be a pair of parentheses `()` or braces `{}`, while a compound
+recipe could be made up of all types of brackets `(),[],{}`, or both types of
+quotes `'',""`.
+
+sandwich.vim allows for the creation of compound recipes.  This tutorial
+demonstrates the creation of two compound recipes, brackets and quotes. 
+Users can adapt the code provided to customize their own compound recipes.
+
+
+Compound text-objects~
+
+By default, sandwich.vim can automatically search for a set of surroundings.
+This functionality is provided by the `srb` and `sdb` |sandwich-keymappings|.
+Under the hood, these mappings call |textobj#sandwich#auto()|.
+
+This function |textobj#sandwich#auto()| also accepts an optional fourth
+argument. If a list of (simple) recipes is given to the fourth argument, this
+list is used instead.
+
+We create a list of recipes for the brackets >
+	let g:sandwich_brackets_recipes = [
+		\ {'buns': ['{', '}'], 'nesting': 1, 'skip_break': 1},
+		\ {'buns': ['[', ']'], 'nesting': 1},
+		\ {'buns': ['(', ')'], 'nesting': 1},
+	\ ]
+<
+and another for the quotes >
+	let g:sandwich_quotes_recipes = [
+		\ {'buns': ['"', '"'], 'quoteescape': 1, 'expand_range': 0, 'nesting': 0, 'linewise': 0},
+		\ {'buns': ["'", "'"], 'quoteescape': 1, 'expand_range': 0, 'nesting': 0, 'linewise': 0},
+	\ ]
+<
+
+Then, we pass these lists of (simple) recipes into |textobj#sandwich#auto| to
+create our text-objects.  It is also convenient to access these text-objects
+with key mappings.  In this tutorial, we assign the mappings `ij, aj` and 
+`io, ao` to the brackets and quotes text-objects respectively >
+
+	onoremap <silent><expr> ij textobj#sandwich#auto('x', 'i', {'synchro': 0}, g:sandwich_bracket_recipes)
+	onoremap <silent><expr> aj textobj#sandwich#auto('x', 'a', {'synchro': 0}, g:sandwich_bracket_recipes)
+	xnoremap <silent><expr> ij textobj#sandwich#auto('x', 'i', {'synchro': 0}, g:sandwich_bracket_recipes)
+	xnoremap <silent><expr> aj textobj#sandwich#auto('x', 'a', {'synchro': 0}, g:sandwich_bracket_recipes)
+
+	onoremap <silent><expr> io textobj#sandwich#auto('x', 'i', {'synchro': 0}, g:sandwich_quote_recipes)
+	onoremap <silent><expr> ao textobj#sandwich#auto('x', 'a', {'synchro': 0}, g:sandwich_quote_recipes)
+	xnoremap <silent><expr> io textobj#sandwich#auto('x', 'i', {'synchro': 0}, g:sandwich_quote_recipes)
+	xnoremap <silent><expr> ao textobj#sandwich#auto('x', 'a', {'synchro': 0}, g:sandwich_quote_recipes)
+<
+
+With these, one can visually select the nearest pair of brackets with `vaj`.
+In a similar manner, `dio` deletes the text between the two nearest quotes.
+
+Compound recipes~
+
+The next step is to add these text objects as compound recipes, and use them
+with sandwich operators such as |<Plug>(operator-sandwich-delete)| and
+|<Plug>(operator-sandwich-replace)| (default: `sd` and `sr`).
+
+We define these compound recipes using external requisites (see
+|textobj-sandwich-configuration| or |operator-sandwich-configuration|).  The
+text objects defined above and are passed into the `'external'` item, as seen
+below >
+
+	let g:sandwich_compound_recipes = [
+		\ {
+		\	'external': ['ij', 'aj'],
+		\	'kind'    : ['delete', 'replace', 'query'],
+		\	'noremap' : 0,
+		\	'input'   : ['j'],
+		\ },
+		\ {
+		\	'external': ['io', 'ao'],
+		\	'kind'    : ['delete', 'replace', 'query'],
+		\	'noremap' : 0,
+		\	'input'   : ['o'],
+		\ },
+	\ ]
+<
+These recipes require an `'input'`, which we specify to be `'j'` and `'o'` 
+for brackets and quotes respectively.
+
+Finally, we add these compound recipes to |g:sandwich#recipes|, 
+that is, the list of recipes used by vim.sandwich >
+
+	call extend(g:sandwich#recipes, g:sandwich_compound_recipes)
+<
+
+With these, one can delete the nearest pair of quotes simply with `sdo`. 
+Similarly, one can replace the nearest pair of brackets with `srj{char}`.
+
+==============================================================================
+vim:tw=78:ts=8:noet:ft=help:norl:
