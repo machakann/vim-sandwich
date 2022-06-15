@@ -22,20 +22,20 @@ argument. If a list of (simple) recipes is given to the fourth argument, this
 list is used instead.
 
 We create a list of recipes for the brackets >
-	let g:sandwich_brackets_recipes = [
+	let g:sandwich_bracket_recipes = [
 		\ {'buns': ['{', '}'], 'nesting': 1, 'skip_break': 1},
 		\ {'buns': ['[', ']'], 'nesting': 1},
 		\ {'buns': ['(', ')'], 'nesting': 1},
 	\ ]
 <
 and another for the quotes >
-	let g:sandwich_quotes_recipes = [
+	let g:sandwich_quote_recipes = [
 		\ {'buns': ['"', '"'], 'quoteescape': 1, 'expand_range': 0, 'nesting': 0, 'linewise': 0},
 		\ {'buns': ["'", "'"], 'quoteescape': 1, 'expand_range': 0, 'nesting': 0, 'linewise': 0},
 	\ ]
 <
 
-Then, we pass these lists of (simple) recipes into |textobj#sandwich#auto| to
+Then, we pass these lists of (simple) recipes into |textobj#sandwich#auto()| to
 create our text-objects.  It is also convenient to access these text-objects
 with key mappings.  In this tutorial, we assign the mappings `ij, aj` and 
 `io, ao` to the brackets and quotes text-objects respectively >
