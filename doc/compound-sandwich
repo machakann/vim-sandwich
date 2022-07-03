@@ -1,5 +1,5 @@
 =============================================================================
-COMPOUND RECIPES			*sandwich-compound-recipes*		
+COMPOUND RECIPES			*sandwich-compound-recipes*
 
 A compound recipe is one that contains multiple simple recipes.  A simple
 recipe could be a pair of parentheses `()` or braces `{}`, while a compound
@@ -35,10 +35,10 @@ and another for the quotes >
 	\ ]
 <
 
-Then, we pass these lists of (simple) recipes into |textobj#sandwich#auto()| to
-create our text-objects.  It is also convenient to access these text-objects
-with key mappings.  In this tutorial, we assign the mappings `ij, aj` and 
-`io, ao` to the brackets and quotes text-objects respectively >
+Then, we pass these lists of (simple) recipes into |textobj#sandwich#auto()|
+to create our text-objects.  It is also convenient to access these
+text-objects with key mappings.  In this tutorial, we assign the mappings `ij,
+aj` and `io, ao` to the brackets and quotes text-objects respectively >
 
 	onoremap <silent><expr> ij textobj#sandwich#auto('x', 'i', {'synchro': 0}, g:sandwich_bracket_recipes)
 	onoremap <silent><expr> aj textobj#sandwich#auto('x', 'a', {'synchro': 0}, g:sandwich_bracket_recipes)
@@ -80,16 +80,16 @@ below >
 		\ },
 	\ ]
 <
-These recipes require an `'input'`, which we specify to be `'j'` and `'o'` 
+These recipes require an `'input'`, which we specify to be `'j'` and `'o'`
 for brackets and quotes respectively.
 
 Finally, we add these compound recipes to |g:sandwich#recipes|, 
-that is, the list of recipes used by vim.sandwich >
+that is, the list of recipes used by sandwich.vim >
 
 	call extend(g:sandwich#recipes, g:sandwich_compound_recipes)
 <
 
-With these, one can delete the nearest pair of quotes simply with `sdo`. 
+With these, one can delete the nearest pair of quotes simply with `sdo`.
 Similarly, one can replace the nearest pair of brackets with `srj{char}`.
 
 ==============================================================================
