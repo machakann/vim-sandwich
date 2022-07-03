@@ -40,15 +40,15 @@ to create our text-objects.  It is also convenient to access these
 text-objects with key mappings.  In this tutorial, we assign the mappings `ij,
 aj` and `io, ao` to the brackets and quotes text-objects respectively >
 
-	onoremap <silent><expr> ij textobj#sandwich#auto('x', 'i', {'synchro': 0}, g:sandwich_bracket_recipes)
-	onoremap <silent><expr> aj textobj#sandwich#auto('x', 'a', {'synchro': 0}, g:sandwich_bracket_recipes)
-	xnoremap <silent><expr> ij textobj#sandwich#auto('x', 'i', {'synchro': 0}, g:sandwich_bracket_recipes)
-	xnoremap <silent><expr> aj textobj#sandwich#auto('x', 'a', {'synchro': 0}, g:sandwich_bracket_recipes)
+	onoremap <silent><expr> ij textobj#sandwich#auto('x', 'i', {}, g:sandwich_bracket_recipes)
+	onoremap <silent><expr> aj textobj#sandwich#auto('x', 'a', {}, g:sandwich_bracket_recipes)
+	xnoremap <silent><expr> ij textobj#sandwich#auto('x', 'i', {}, g:sandwich_bracket_recipes)
+	xnoremap <silent><expr> aj textobj#sandwich#auto('x', 'a', {}, g:sandwich_bracket_recipes)
 
-	onoremap <silent><expr> io textobj#sandwich#auto('x', 'i', {'synchro': 0}, g:sandwich_quote_recipes)
-	onoremap <silent><expr> ao textobj#sandwich#auto('x', 'a', {'synchro': 0}, g:sandwich_quote_recipes)
-	xnoremap <silent><expr> io textobj#sandwich#auto('x', 'i', {'synchro': 0}, g:sandwich_quote_recipes)
-	xnoremap <silent><expr> ao textobj#sandwich#auto('x', 'a', {'synchro': 0}, g:sandwich_quote_recipes)
+	onoremap <silent><expr> io textobj#sandwich#auto('x', 'i', {}, g:sandwich_quote_recipes)
+	onoremap <silent><expr> ao textobj#sandwich#auto('x', 'a', {}, g:sandwich_quote_recipes)
+	xnoremap <silent><expr> io textobj#sandwich#auto('x', 'i', {}, g:sandwich_quote_recipes)
+	xnoremap <silent><expr> ao textobj#sandwich#auto('x', 'a', {}, g:sandwich_quote_recipes)
 <
 
 With these, one can visually select the nearest pair of brackets with `vaj`.
