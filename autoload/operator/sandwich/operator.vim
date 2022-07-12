@@ -762,7 +762,7 @@ endfunction
 
 " visualrepeat.vim (vimscript #3848) support
 function! s:visualrepeat_set(kind, count) abort  "{{{
-  if !exists('g:operator_sandwich_no_visualrepeat')
+  if !exists('g:operator_sandwich_no_visualrepeat') && exists('visualrepeat#set')
     let key = printf("\<Plug>(operator-sandwich-%s-visualrepeat)", a:kind)
     silent! call visualrepeat#set(key, a:count)
   endif
