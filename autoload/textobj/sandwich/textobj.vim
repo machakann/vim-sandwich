@@ -127,6 +127,8 @@ function! s:textobj.search(sandwich, stimeoutlen) dict abort "{{{
   return candidates
 endfunction
 "}}}
+function! s:textobj.search_forward(sandwich, stimeoutlen) abort "{{{
+endfunction "}}}
 function! s:textobj._search_with_nest(sandwich, stimeoutlen) dict abort  "{{{
   let buns  = a:sandwich.bake_buns(self.state, self.clock)
   let range = a:sandwich.range
