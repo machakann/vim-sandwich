@@ -764,7 +764,10 @@ endfunction
 function! s:visualrepeat_set(kind, count) abort  "{{{
   if !exists('g:operator_sandwich_no_visualrepeat')
     let key = printf("\<Plug>(operator-sandwich-%s-visualrepeat)", a:kind)
-    silent! call visualrepeat#set(key, a:count)
+    try
+      call visualrepeat#set(key, a:count)
+    catch /^Vim\%((\a\+)\)\=:E117:/
+    endtry
   endif
 endfunction
 "}}}
