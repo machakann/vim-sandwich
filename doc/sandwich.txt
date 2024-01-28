@@ -264,7 +264,7 @@ Additionally, map textobjects if you need.
 	-- 2srb{ --> {foo(bar)baz}
 <
 	<Plug>(sandwich-replace-auto) is available in normal mode. It is
-	mapped at sdb in default.
+	mapped at srb in default.
 >
 	nmap srb <Plug>(sandwich-replace-auto)
 <
