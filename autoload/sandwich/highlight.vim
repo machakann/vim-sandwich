@@ -122,30 +122,27 @@ function! s:highlight.quench() dict abort "{{{
   let view = winsaveview()
   if self.highlighted_window()
     call s:matchdelete_all(self.id)
-    let succeeded = 1
-  else
-    if s:is_in_cmdline_window()
-      let s:paused += [self]
-      augroup sandwich-pause-quenching
-        autocmd!
-        autocmd CmdWinLeave * call s:got_out_of_cmdwindow()
-      augroup END
-      let succeeded = 0
-    else
-      if self.goto_highlighted_window()
-        call s:matchdelete_all(self.id)
-      else
-        call filter(self.id, 0)
-      endif
-      let succeeded = 1
-      call s:goto_window(winnr, tabnr, view)
-    endif
+    let self.status = 0
+    return 1
   endif
 
-  if succeeded
-    let self.status = 0
+  if s:is_in_cmdline_window() || s:is_in_popup_terminal_window()
+    let s:paused += [self]
+    augroup sandwich-pause-quenching
+      autocmd!
+      autocmd WinEnter * call s:got_out_of_cmdwindow()
+    augroup END
+    return 0
   endif
-  return succeeded
+
+  if self.goto_highlighted_window()
+    call s:matchdelete_all(self.id)
+  else
+    call filter(self.id, 0)
+  endif
+  let self.status = 0
+  call s:goto_window(winnr, tabnr, view)
+  return 1
 endfunction
 "}}}
 function! s:highlight.quench_timer(time) dict abort "{{{
@@ -230,7 +227,7 @@ function! sandwich#highlight#cancel(...) abort "{{{
 endfunction
 "}}}
 function! s:quench_paused(...) abort "{{{
-  if s:is_in_cmdline_window()
+  if s:is_in_cmdline_window() || s:is_in_popup_terminal_window()
     return
   endif
 
@@ -399,6 +396,17 @@ else
   endfunction
 endif
 "}}}
+" function! s:is_in_popup_terminal_window() abort  "{{{
+if exists('*popup_list')
+  function! s:is_in_popup_terminal_window() abort
+    return &buftype is# 'terminal' && count(popup_list(), win_getid())
+  endfunction
+else
+  function! s:is_in_popup_terminal_window() abort
+    return 0
+  endfunction
+endif
+" }}}
 function! s:shift_options() abort "{{{
   let options = {}
 
