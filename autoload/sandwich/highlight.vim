@@ -148,12 +148,8 @@ endfunction
 function! s:highlight.quench_timer(time) dict abort "{{{
   let id = timer_start(a:time, s:SID . 'quench')
   let s:quench_table[string(id)] = self
-
-  augroup sandwich-highlight
-    autocmd!
-    execute printf('autocmd TextChanged  <buffer> call s:set_autocmds(%s)', id)
-    execute printf('autocmd TextChangedI <buffer> call s:cancel_highlight(%s)', id)
-  augroup END
+  " this is called when user gets control again
+  call timer_start(1, {-> s:set_autocmds(id)})
   return id
 endfunction
 "}}}
