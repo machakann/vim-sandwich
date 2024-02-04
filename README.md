@@ -49,24 +49,6 @@ For a bigger change, like wrapping the whole line in a paragraph tag with a clas
 
 This tool is a game-changer for editing HTML and XML in Vim, which is an area that doesn't have a ton of great tools right now. With vim-sandwich, adding, changing, or removing tag pairs is super simple.
 
-# Quick start
-
-### Add
-Press `sa{motion/textobject}{addition}`.
-For example, a key sequence `saiw(` makes **foo** to **(foo)**.
-
-### Delete
-Press `sdb` or `sd{deletion}`.
-For example, key sequences `sdb` or `sd(` makes **(foo)** to **foo**.
-`sdb` searches a set of surrounding automatically.
-
-### Replace
-Press `srb{addition}` or `sr{deletion}{addition}`.
-For example, key sequences `srb"` or `sr("` makes **(foo)** to **"foo"**.
-
-That's all. Now you already know enough about `sandwich.vim`. If you are using [vim-surround](https://github.com/tpope/vim-surround), you can use a preset keymappings similar as it. See [here](https://github.com/machakann/vim-sandwich/wiki/Introduce-vim-surround-keymappings)
-
-`sandwich.vim` has some functional input for *{addition}*/*{deletion}*. Check [here](https://github.com/machakann/vim-sandwich/wiki/Magic-characters)!
 
 # Design
 
