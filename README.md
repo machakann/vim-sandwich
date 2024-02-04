@@ -3,8 +3,51 @@ vim-sandwich
 [![Build Status](https://travis-ci.org/machakann/vim-sandwich.svg)](https://travis-ci.org/machakann/vim-sandwich)
 [![Build status](https://ci.appveyor.com/api/projects/status/8hgvi5410lceq53x/branch/master?svg=true)](https://ci.appveyor.com/project/machakann/vim-sandwich/branch/master)
 
+`sandwich.vim` is a plugin that makes it super easy to work with stuff that comes in pairs, like brackets, quotes, and even HTML or XML tags. You can quickly get rid of them, swap them out, or slap new ones around your text.
 
-`sandwich.vim` is a set of operator and textobject plugins to add/delete/replace surroundings of a sandwiched textobject, like **(foo)**, **"bar"**.
+# Examples
+
+Let's dive into some quick examples. If you're inside a string with double quotes and you hit `sr"'`, you'll swap those double quotes for single quotes.
+
+    "Hello world!"  ->  'Hello world!'
+
+Want to turn that into an HTML tag? Easy, just type `sr'<q>` and watch it transform.
+
+    'Hello world!'  ->  <q>Hello world!</q>
+
+To switch it back to double quotes, you'd do `srt"`.
+
+    <q>Hello world!</q>  ->  "Hello world!"
+
+To strip away those quotes, just press `sd"`.
+
+    "Hello world!"  ->  Hello world!
+
+Say you want to bracket the word "Hello", move your cursor there and press `saiw]`.
+
+    Hello world!  ->  [Hello] world!
+
+Fancy braces with some breathing room? Type `sr]{`.
+
+    [Hello] world!  ->  { Hello } world!
+
+Wrap the whole line in parentheses with `sasb` or `sas)`.
+
+    { Hello } world!  ->  ({ Hello } world!)
+
+To get back to where you started, just do `sd{sd)`.
+
+    ({ Hello } world!)  ->  Hello world!
+
+Highlight "Hello" with an HTML emphasis tag by typing `saiw<em>`.
+
+    Hello world!  ->  <em>Hello</em> world!
+
+For a bigger change, like wrapping the whole line in a paragraph tag with a class, first select the line with `V` and then apply `S<p class="important">`.
+
+    <em>Hello</em> world!  ->  <p class="important"><em>Hello</em> world!</p>
+
+This tool is a game-changer for editing HTML and XML in Vim, which is an area that doesn't have a ton of great tools right now. With vim-sandwich, adding, changing, or removing tag pairs is super simple.
 
 # Quick start
 
