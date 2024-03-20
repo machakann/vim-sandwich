@@ -49,6 +49,7 @@ For a bigger change, like wrapping the whole line in a paragraph tag with a clas
 
 This tool is a game-changer for editing HTML and XML in Vim, which is an area that doesn't have a ton of great tools right now. With vim-sandwich, adding, changing, or removing tag pairs is super simple.
 
+If you are using [vim-surround](https://github.com/tpope/vim-surround), you can use a preset keymappings similar as it. See [here](https://github.com/machakann/vim-sandwich/wiki/Introduce-vim-surround-keymappings)
 
 # Design
 
